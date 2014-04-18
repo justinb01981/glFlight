@@ -1,0 +1,71 @@
+POST /che/che2002/_vti_bin/shtml.dll/file_upload_test_page.htm HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, */*
+Referer: http://www.coe.montana.edu/che/che2002/file_upload_test_page.htm
+Accept-Language: en-us
+Content-Type: multipart/form-data; boundary=---------------------------7d430f2422026e
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)
+Host: www.coe.montana.edu
+Content-Length: 1234
+Connection: Keep-Alive
+Cache-Control: no-cache
+
+-----------------------------7d430f2422026e
+Content-Disposition: form-data; name="VTI-GROUP"
+
+0
+-----------------------------7d430f2422026e
+Content-Disposition: form-data; name="_charset_"
+
+windows-1252
+-----------------------------7d430f2422026e
+Content-Disposition: form-data; name="F1"; filename="C:\Documents and Settings\Justin\Desktop\test.file"
+Content-Type: text/plain
+
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+
+-----------------------------7d430f2422026e
+Content-Disposition: form-data; name="B1"
+
+Submit
+-----------------------------7d430f2422026e--
