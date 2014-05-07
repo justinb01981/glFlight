@@ -33,6 +33,8 @@ SimpleSocket::SimpleSocket()
 
     listensock = remotesock = -1;
 
+    backlog = 1;
+
     isready = false;
 }
 

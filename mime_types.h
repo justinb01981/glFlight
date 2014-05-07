@@ -12,6 +12,7 @@ static char* mime_table[] = {
     "mpeg4", "video/mp4",
     "mp4", "video/mp4",
     "ogg", "video/ogg",
+    "mov", "video/quicktime",
     "png", "image/png",
     "", "application/octet-stream",
     " ", "application/octet-stream",
