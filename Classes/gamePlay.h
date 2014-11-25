@@ -1,0 +1,301 @@
+//
+//  gamePlay.h
+//  gl_flight
+//
+//  Created by Justin Brady on 5/14/13.
+//
+//
+
+#ifndef gl_flight_gamePlay_h
+#define gl_flight_gamePlay_h
+
+#include "gameTimeval.h"
+#include "world.h"
+#include "gameUtils.h"
+#include "gameGlobals.h"
+#include "gameAI.h"
+
+#define game_ammo_missles_max 4
+#define game_ammo_bullets_max 32
+#define GAME_POWERUP_DROP_TABLE_LEN 10
+
+enum
+{
+    STUFF_FLAGS_SHIP = 0x01,
+    STUFF_FLAGS_TURRET = 0x02,
+    STUFF_FLAGS_COLLECT = 0x04,
+};
+
+enum
+{
+    GAME_TYPE_DEATHMATCH = 0,
+    GAME_TYPE_COLLECT,
+    GAME_TYPE_SURVIVAL,
+    GAME_TYPE_DEFEND,
+    GAME_TYPE_RESERVED1,
+    GAME_TYPE_RESERVED2,
+    GAME_TYPE_RESERVED3,
+    GAME_TYPE_RESERVED4,
+    GAME_TYPE_RESERVED5,
+    GAME_TYPE_RESERVED6,
+    GAME_TYPE_RESERVED7,
+    GAME_TYPE_RESERVED8,
+    GAME_TYPE_LAST
+};
+
+enum
+{
+    AFFILIATION_NONE = 0,
+    AFFILIATION_POWERUP = 1001
+};
+
+enum
+{
+    GAME_SUBTYPE_NONE = 0,
+    GAME_SUBTYPE_MISSLE = 1,
+    GAME_SUBTYPE_POINTS1,
+    GAME_SUBTYPE_COLLECT,
+    GAME_SUBTYPE_ASTEROID,
+    GAME_SUBTYPE_LIFE,
+    GAME_SUBTYPE_SHIP,
+    GAME_SUBTYPE_TURRET,
+    GAME_SUBTYPE_ALLY,
+    GAME_SUBTYPE_LAST,
+    
+};
+
+typedef enum
+{
+    GAME_OBJECTIVE_TYPE_DESTROY,
+    GAME_OBJECTIVE_TYPE_CAPTURE,
+    GAME_OBJECTIVE_DEFEND,
+    GAME_OBJECTIVE_TYPE_SURVIVE_UNTIL
+} game_objective_type_t;
+
+typedef struct
+{
+    game_objective_type_t type;
+    float params[16];
+    char str[256];
+} game_objective_t;
+
+struct
+{
+    int started;
+    int delay_new_level;
+    
+    int n_caps;
+    float n_collect_points;
+    float max_enemies;
+    float max_enemies_spawned;
+    float n_turrets;
+    int n_asteroids;
+    int n_spawnpoints;
+    int difficulty;
+    float enemy_intelligence;
+    float ally_intelligence;
+    int defend_id;
+    
+    int setting_n_bots;
+    int setting_bot_intelligence;
+    
+    int ship_destruction_change_alliance;
+    //int ship_destruction_drop_powerup;
+    //int turret_destruction_drop_powerup;
+    int player_drops_powerup;
+    float powerup_drop_chance[GAME_POWERUP_DROP_TABLE_LEN];
+    int turret_destruction_change_alliance;
+    int one_collect_at_a_time;
+    
+    float rate_enemy_skill_increase;
+    float rate_point_increase;
+    float rate_enemy_count_increase;
+    float rate_enemy_p_increase;
+    float rate_collect_increase;
+    
+    float enemy_durability;
+    
+    int spawn_powerup_lifetime;
+    int spawn_powerup_m;
+    
+    int invuln_time_after_hit;
+    
+    float boost_charge;
+    
+    int powerup_lifetime_frames;
+    
+    int points;
+    struct
+    {
+        int enemies_killed;
+        int enemies_bh_killed;
+        int turrets_killed;
+        int score;
+        int score_last;
+        int level_last;
+        float data_collected;
+    } stats;
+    
+    float points_enemy_killed;
+    float points_turret_killed;
+    float points_enemy_bh_killed;
+    float points_data_grabbed;
+    float points_per_second_elapsed;
+    
+    game_timeval_t last_run;
+    game_timeval_t time_elapsed;
+    game_timeval_t end_time;
+    
+    int caps_owned;
+    int caps_found;
+    int collects_found;
+    int game_type;
+    int elem_id_spawnpoint;
+    int high_score[GAME_TYPE_LAST];
+    unsigned long lifetime_credits;
+    int high_score_session[GAME_TYPE_LAST];
+    
+    int game_action_spawnpoint_new_game;
+    
+    struct {
+        float vec[2][3];
+        float collect_vec_mag;
+        float collect_vec_delt;
+        float score;
+    } collect_data;
+    
+    char game_help_message[256];
+    
+    int object_types_towed[OBJ_LAST];
+    
+    struct {
+        int difficulty;
+        int score;
+    } last_game;
+    
+    int map_use_current;
+
+} gameStateSinglePlayer;
+
+extern float game_ammo_missles;
+extern float game_ammo_bullets;
+extern float game_ammo_missle_recharge;
+extern float game_ammo_bullets_recharge;
+const static float GAME_MISSLE_LIFETIME = (60*5);
+extern int model_my_ship;
+
+/*
+void game_add_cap();
+
+void game_add_enemy();
+
+void game_add_turret();
+ */
+
+void game_init();
+
+void game_start(float difficulty, int type);
+
+void game_run();
+
+void game_run_paused();
+
+void game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action);
+
+void game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB);
+
+void game_handle_destruction(WorldElem* elem);
+
+game_timeval_t game_time_remaining();
+
+int game_time_elapsed();
+
+int game_add_spawnpoint(float x, float y, float z, char* game_name);
+
+int game_add_powerup(float x, float y, float z, int type, int lifetime);
+
+void fireBullet(int bulletAction);
+
+int firePoopedCube(WorldElem *elem);
+
+inline static void
+game_elem_setup_ship(WorldElem* elem, int skill)
+{
+    if(skill > 5) skill = 5;
+    
+    elem->stuff.u.enemy.leaves_trail = 1;
+    elem->stuff.u.enemy.run_distance = rand_in_range(4, 14);
+    elem->stuff.u.enemy.fixed = 0;
+    elem->stuff.u.enemy.changes_target = 1;
+    elem->stuff.u.enemy.fires = 1;
+    elem->stuff.u.enemy.patrols_no_target = 1;
+    elem->stuff.u.enemy.max_speed = MIN(MAX_SPEED, MAX_SPEED * (0.5 + 0.1*skill));
+    elem->stuff.u.enemy.max_turn = /*0.5*/ 1.0 +  (0.2*skill);
+    elem->stuff.u.enemy.time_run_interval = MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
+    elem->stuff.u.enemy.forget_distance = 50 + (10 * skill);
+    elem->stuff.u.enemy.pursue_distance = 30 - (5 * skill);
+}
+
+inline static void
+game_elem_setup_turret(WorldElem* elem, int skill)
+{
+    if(skill > 5) skill = 5;
+    
+    elem->stuff.u.enemy.leaves_trail = 0;
+    elem->stuff.u.enemy.run_distance = 0;
+    elem->stuff.u.enemy.fixed = 1;
+    elem->stuff.u.enemy.changes_target = 1;
+    elem->stuff.u.enemy.fires = 1;
+    elem->stuff.u.enemy.fires_missles = 0;
+    elem->stuff.u.enemy.patrols_no_target = 0;
+    elem->stuff.u.enemy.max_speed = 0;
+    elem->stuff.u.enemy.max_turn = 0.8;
+    elem->stuff.u.enemy.time_run_interval = MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
+    elem->stuff.u.enemy.forget_distance = 70;
+    elem->stuff.u.enemy.pursue_distance = 70;
+}
+
+inline static void
+game_elem_setup_missle(WorldElem* x)
+{
+    x->stuff.intelligent = 1;
+    x->physics.ptr->friction = 1;
+    x->stuff.u.enemy.changes_target = 0;
+    x->stuff.u.enemy.patrols_no_target = 1;
+    x->stuff.u.enemy.leaves_trail = 0;
+    x->stuff.u.enemy.run_distance = 0;
+    x->stuff.u.enemy.fixed = 0;
+    x->stuff.u.enemy.changes_target = 0;
+    x->stuff.u.enemy.fires = 0;
+    x->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
+    x->stuff.u.enemy.time_last_run = time_ms;
+    x->durability = DURABILITY_MISSLE;
+    x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
+    x->stuff.u.enemy.max_turn = 2.0; // radians per second
+    x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
+    x->stuff.u.enemy.forget_distance = 50;
+    x->stuff.u.enemy.pursue_distance = 30;
+}
+
+inline static void
+game_elem_setup_powerup(WorldElem* elem)
+{
+    elem->renderInfo.priority = 1;
+}
+
+inline static void
+game_elem_setup_spawnpoint(WorldElem* elem)
+{
+    //elem->renderInfo.tex_adjust = 1;
+}
+
+void
+game_configure_missle(WorldElem *elem);
+
+int
+game_add_bullet(float pos[3], float euler[3], float vel, float leadV, int bulletAction, int missle_target, int affiliation);
+
+int
+game_ai_target_priority(WorldElem* pSearchElem, WorldElem* pTargetElem, float* dist_ignore);
+
+#endif

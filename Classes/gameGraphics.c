@@ -1,0 +1,1435 @@
+//
+//  gameGraphics.c
+//  gl_flight
+//
+//  Created by Justin Brady on 2/28/13.
+//
+//
+
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#include "gameIncludes.h"
+
+#include "gameGraphics.h"
+#include "gameCamera.h"
+#include "models.h"
+#include "gameInterface.h"
+#include "world.h"
+#include "gameGlobals.h"
+#include "gameUtils.h"
+#include "gameShip.h"
+#include "textures.h"
+#include "gameUtils.h"
+#include "gameNetwork.h"
+
+#define BACKGROUND_MODEL model_cube
+#define BACKGROUND_MODEL_TEXCOORDS model_cube_texcoords_alt
+#define BACKGROUND_MODEL_INDICES model_cube_indices
+
+extern int isLandscape;
+
+extern int game_target_missle_id;
+extern int game_target_objective_id;
+
+float viewWidth;
+float viewHeight;
+DrawBackgroundData* bgData = NULL;
+
+gameGraphics_drawState2d drawState_2d;
+
+int texture_id_playership;
+int texture_id_background = TEXTURE_ID_BACKGROUND;
+
+/*
+model_coord_t overlay_coords[12];
+model_texcoord_t overlay_texcoords[8];
+model_index_t overlay_indices[6];
+ */
+
+int radar_mode = 0;
+
+model_index_t* drawElemBatchedIndices = NULL;
+unsigned long drawElemBatchedIndicesLen = 0;
+int drawElemAnimationIdx = 0;
+model_coord_t tex_coord_adjust[128] =
+{
+    0.0, 0.01,
+    0.0, 0.01,
+    0.0, 0.01,
+    0.0, 0.01,
+    
+    0.0, 0.01,
+    0.0, 0.01,
+    0.0, 0.01,
+    0.0, 0.01,
+    
+    0.0, 0.01,
+    0.0, 0.01,
+    0.0, 0.01,
+    0.0, 0.01,
+    
+    0.0, 0.01,
+    0.0, 0.01,
+    0.0, 0.01,
+    0.0, 0.01
+};
+
+typedef struct
+{
+    float x, y;
+    float xw, yw;
+    int tex_id;
+} drawSubElement;
+
+void radarDrawTextDone()
+{
+    glMatrixMode(GL_TEXTURE); // hack
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+static inline void
+setupGLModelView(float scrWidth, float scrHeight)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    
+    float sw = scrWidth;
+    float sh = scrHeight;
+    /*
+     * 0,0 starts in center of view
+     * remember: matrix stack is applied in-reverse!
+     */
+    
+    glOrthof(-sw/2, sw/2,
+             -sh/2, sh/2,
+             1, -1);
+
+    glScalef((sw/sh), 1, 1);
+    glScalef((sw/sh), sh/sw, 1);
+    glRotatef(90, 0, 0, 1);
+    glTranslatef(-sw/2, -sh/2, 0);
+    
+    //glScalef(sw/sh, 1, 1);
+    //glTranslatef(sw, 0, 0);
+    //glRotatef(90, 0, 0, 1);
+}
+
+static void
+setupGLModelViewDone()
+{
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+}
+
+static inline void
+setupGLTextureView()
+{
+    glMatrixMode(GL_TEXTURE);
+    glPushMatrix();
+    glLoadIdentity();
+    glRotatef(180, 0, 1, 0);
+    glRotatef(90, 0, 0, 1);
+}
+
+void
+setupGLTextureViewDone()
+{
+    glMatrixMode(GL_TEXTURE);
+    glPopMatrix();
+}
+
+void
+bindTexture(unsigned int tex_id)
+{
+    static unsigned int drawn_texture_last;
+    
+    if(tex_id != drawn_texture_last)
+    {
+        glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
+        drawn_texture_last = tex_id;
+    }
+}
+
+static gameGraphics_drawState2d drawText_ds;
+
+void drawText(char *str, float x, float y)
+{
+    float screenWidth = viewWidth;
+    float screenHeight = viewHeight;
+    unsigned int len = strlen(str);
+    float fscreenwidth = /*8*/ gameInterfaceControls.textWidth;
+    float fscreenheight = /*12*/ gameInterfaceControls.textHeight;
+    float fmapwidth = 512; // width of the font bitmap
+    float fmapheight = 512; // height of the font bitmap
+    float rows = 6;
+    float cols = 10;
+    float z = -2;
+    int maxLines = 20;
+    gameGraphics_drawState2d *ds = &drawText_ds;
+    
+    controlRect r;
+    
+    setupGLModelView(screenWidth, screenHeight);
+    
+    float m = /*480 / gameInterfaceControls.interfaceWidth*/ 0.85;
+    fscreenwidth *= m;
+    fscreenheight *= m;
+    
+    glMatrixMode(GL_TEXTURE);
+    glPushMatrix();
+    glLoadIdentity();
+    glScalef(-(fmapwidth/cols) / fmapwidth, -(fmapheight/rows) / (fmapheight), 1);
+    glRotatef(90, 0, 0, 1);
+    
+    // enable alpha-blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    float line = 0;
+    
+    int j = 0;
+    for(int i = 0; i < len; i++)
+    {
+        if(str[i] == '\n')
+        {
+            line++;
+            if(line > maxLines) line = 0;
+            
+            j = 0;
+            if(i >= len) break;
+            else continue;
+        }
+        
+        if(str[i] == '\r')
+        {
+            j = 0;
+            if(i >= len) break;
+            else continue;
+        }
+        
+        ds->tex_id = TEXTURE_ID_FONTMAP;
+        
+        if(str[i] == '^' && i < len-1)
+        {
+            i++;
+            ds->tex_id = TEXTURE_ID_FONTMAP2;
+        }
+        
+        int c = toupper(str[i]);
+        //  above transforms cause this orientation:
+        //     x-->
+        //  3-------2
+        //  |       | y
+        //  |       | |
+        //  |       | \/
+        //  1-------0
+        int irow = (c-' ') / 10;
+        int icol = (c-' ') % 10;
+        float col = icol;
+        float row = irow;
+        
+        // 0
+        ds->texcoords[0] = row+1;
+        ds->texcoords[1] = col+1;
+        // 1
+        ds->texcoords[2] = row;
+        ds->texcoords[3] = col+1;
+        // 2
+        ds->texcoords[4] = row+1;
+        ds->texcoords[5] = col;
+        // 3
+        ds->texcoords[6] = row;
+        ds->texcoords[7] = col;
+        
+        r.x = x - (line*fscreenheight);
+        r.y = y + j*fscreenwidth;
+        r.xw = fscreenheight;
+        r.yw = fscreenwidth;
+        
+        // HACK: to flip instead of glRotatef
+        r.y = screenHeight - r.y-r.yw;
+        
+        ds->coords[0] = r.x;
+        ds->coords[1] = r.y;
+        ds->coords[2] = z;
+        
+        ds->coords[3] = r.x+r.xw;
+        ds->coords[4] = r.y;
+        ds->coords[5] = z;
+        
+        ds->coords[6] = r.x;
+        ds->coords[7] = r.y+r.yw;
+        ds->coords[8] = z;
+        
+        ds->coords[9] = r.x+r.xw;
+        ds->coords[10] = r.y+r.yw;
+        ds->coords[11] = z;
+
+        // {0,1,2, 1,3,2};
+        ds->indices[0] = 0; ds->indices[1] = 1; ds->indices[2] = 2;
+        ds->indices[3] = 1; ds->indices[4] = 3; ds->indices[5] = 2;
+        
+        drawState2dSet(ds);
+        drawState2dDraw();
+        
+        j++;
+    }
+    
+    glDisable(GL_BLEND);
+    
+    glPopMatrix();
+    
+    setupGLModelViewDone();
+}
+
+static gameGraphics_drawState2d drawRadar_ds;
+
+int drawRadar()
+{
+    float screenWidth = viewWidth;
+    float screenHeight = viewHeight;
+    float z = -2;
+    gameGraphics_drawState2d *ds = &drawRadar_ds;
+    int i;
+    
+    WorldElemListNode* cur = gWorld->elements_moving.next;
+    
+    // iterate over objects-moving list
+    while(cur)
+    {
+        int visible = 0;
+        float dist;
+        
+        if(cur->elem->stuff.radar_visible)
+        {
+            visible = 1;
+        }
+        
+        if(cur->elem->stuff.nametag) visible = 1;
+        if(cur->elem->elem_id == game_target_objective_id) visible = 1;
+        
+        dist = distance(cur->elem->physics.ptr->x,
+                        cur->elem->physics.ptr->y,
+                        cur->elem->physics.ptr->z,
+                        my_ship_x, my_ship_y, my_ship_z);
+        
+        if(dist <= 2) visible = 0;
+        
+        if(visible)
+        {
+            setupGLModelView(screenWidth, screenHeight);
+            
+            // rotate textures
+            glMatrixMode(GL_TEXTURE);
+            glPushMatrix();
+            glLoadIdentity();
+            glRotatef(180, 0, 1, 0);
+            glRotatef(90, 0, 0, 1);
+            
+            // enable alpha-blending
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            
+            float yawdot;
+            float pitchdot;
+            float xvec[3], yvec[3], zvec[3];
+            float ev[3];
+            float zdot;
+            controlRect er;
+            float x, y;
+            unsigned int tex_id = cur->elem->texture_id;
+            float scale = 1;
+            char *textLabel = NULL;
+            int camera_relative = 0;
+            
+            if(cur->elem->elem_id == game_target_missle_id) camera_relative = 1;
+            
+            if(camera_relative)
+            {
+                ev[0] = (cur->elem->physics.ptr->x - gameCamera_getX()) / dist;
+                ev[1] = (cur->elem->physics.ptr->y - gameCamera_getY()) / dist;
+                ev[2] = (cur->elem->physics.ptr->z - gameCamera_getZ()) / dist;
+                gameShip_getXVector(xvec);
+                gameShip_getYVector(yvec);
+                gameShip_getZVector(zvec);
+            }
+            else
+            {
+                ev[0] = (cur->elem->physics.ptr->x - my_ship_x) / dist;
+                ev[1] = (cur->elem->physics.ptr->y - my_ship_y) / dist;
+                ev[2] = (cur->elem->physics.ptr->z - my_ship_z) / dist;
+                gameShip_getXVector(xvec);
+                gameShip_getYVector(yvec);
+                gameShip_getZVector(zvec);
+            }
+            
+            zdot = -dot2(ev, zvec);
+            pitchdot = dot2(ev, yvec);
+            yawdot = dot2(ev, xvec);
+            
+            float vw = viewWidth;
+            float vh = viewHeight;
+            
+            if(!isLandscape)
+            {
+                vw = viewHeight;
+                vh = viewWidth;
+            }
+            
+            er = (controlRect) {0, 0, vw, vh};
+            
+            float ar = vw/vh;
+            float xs = /*(vw / 640) * (1/ar)*/ 1/ar;
+            float ys = /*vh / 480*/ 1;
+            
+            /* see our glFrustum */
+            float xfr = /*1 / (dist/50)*/ 1;
+            float yfr = /*0.75 / (dist/50)*/ 1;
+            x = 0.5 - ((yawdot/2) * xfr);
+            y = 0.5 + ((pitchdot/2) * yfr);
+            
+            /* JB: values after rotation into iOS orientation has happened */
+            er.y = x * vw;
+            er.x = y * vh;
+            
+            er.xw = 8 * xs;
+            er.yw = 8 * ys;
+            
+            // TODO: when aiming at target, display its name
+            if(/*cur->elem->object_type == OBJ_PLAYER*/ zdot >= 0)
+            {
+                // skip drawing when too close
+                if(dist <= 20 && zdot > 0.5 &&
+                   cur->elem->elem_id != game_target_missle_id &&
+                   cur->elem->elem_id != game_target_objective_id)
+                    goto radar_draw_end;
+                
+                if(cur->elem->stuff.nametag)
+                {
+                    textLabel = cur->elem->stuff.nametag;
+                }
+            }
+            else
+            {
+                tex_id = TEXTURE_ID_RADAR_BEHIND;
+            }
+            
+            if(cur->elem->elem_id == game_target_missle_id && zdot > 0)
+            {
+                // currently missle-targeted
+                tex_id = TEXTURE_ID_LOCKEDON;
+                scale = 4;
+            }
+            else if(cur->elem->elem_id == game_target_objective_id /* && zdot > 0*/)
+            {
+                tex_id = TEXTURE_ID_RADAR_OBJECTIVE;
+                scale = 4;
+            }
+            
+            er.x -= er.xw/2*scale;
+            er.y -= er.yw/2*scale;
+            er.xw *= scale;
+            er.yw *= scale;
+            
+            ds->coords[0] = er.x;
+            ds->coords[1] = er.y;
+            ds->coords[2] = z;
+            
+            ds->coords[3] = er.x+er.xw;
+            ds->coords[4] = er.y;
+            ds->coords[5] = z;
+            
+            ds->coords[6] = er.x;
+            ds->coords[7] = er.y+er.yw;
+            ds->coords[8] = z;
+            
+            ds->coords[9] = er.x+er.xw;
+            ds->coords[10] = er.y+er.yw;
+            ds->coords[11] = z;
+            
+            //model_texcoord_t overlay_texcoords_t[] = {0,1, 1,1, 0,0, 1,0};
+            i = 0;
+            ds->texcoords[i++] = 0; ds->texcoords[i++] = 1;
+            ds->texcoords[i++] = 1; ds->texcoords[i++] = 1;
+            ds->texcoords[i++] = 0; ds->texcoords[i++] = 0;
+            ds->texcoords[i++] = 1; ds->texcoords[i++] = 0;
+            
+            //model_index_t overlay_indices_t[] = {0,1,2, 1,3,2};
+            i = 0;
+            ds->indices[i++] = 0; ds->indices[i++] = 1; ds->indices[i++] = 2;
+            ds->indices[i++] = 1; ds->indices[i++] = 3; ds->indices[i++] = 2;
+            
+            ds->tex_id = tex_id;
+            
+            drawState2dSet(ds);
+            drawState2dDraw();
+            
+            radar_draw_end:
+            
+            glDisable(GL_BLEND);
+            glPopMatrix();
+            setupGLModelViewDone();
+            
+            if(textLabel && zdot > 0)
+            {
+                drawText(textLabel, er.x+20, viewHeight - er.y);
+            }
+        }
+
+        cur = cur->next;
+    }
+    
+    return 0;
+}
+
+int drawControlsRadar(drawSubElement subElemRadarList[], int max)
+{
+    WorldElemListNode* cur = gWorld->elements_moving.next;
+    int subElementsN = 0;
+    static drawSubElement fadeSubElements[10];
+    static int fadeSubElements_n = 0;
+    const int fadeSubElements_frames = 60;
+    
+    // iterate over objects-moving list
+    while(cur && subElementsN < max)
+    {
+        int visible = 0;
+        
+        if(cur->elem->object_type == OBJ_PLAYER)
+        {
+            if(cur->elem->physics.ptr->velocity >= RADAR_MIN_VELOCITY)
+                visible = 1;
+        }
+        else if(cur->elem->object_type == OBJ_SHIP ||
+                cur->elem->object_type == OBJ_CAPTURE ||
+                cur->elem->object_type == OBJ_POWERUP_GENERIC ||
+                cur->elem->object_type == OBJ_SPAWNPOINT)
+        {
+            visible = 1;
+        }
+        
+        if(radar_mode) // render on map x/z (top-down)
+        {
+            if(visible)
+            {
+                subElemRadarList[subElementsN].x = cur->elem->physics.ptr->x / gWorld->bound_x;
+                subElemRadarList[subElementsN].y = cur->elem->physics.ptr->z / gWorld->bound_z;
+                subElemRadarList[subElementsN].xw = 1.0/20;
+                subElemRadarList[subElementsN].yw = 1.0/20;
+                subElemRadarList[subElementsN].tex_id = cur->elem->texture_id;
+                
+                subElementsN++;
+            }
+        }
+        else // render on player x/y plane
+        {
+            int tex_id_infront = cur->elem->texture_id;
+            
+            if(visible)
+            {
+                float yawdot;
+                float pitchdot;
+                float xvec[3], yvec[3], zvec[3];
+                float elemVec[3];
+                float zdot;
+                
+                float dist = distance(cur->elem->physics.ptr->x,
+                                      cur->elem->physics.ptr->y,
+                                      cur->elem->physics.ptr->z,
+                                      my_ship_x, my_ship_y, my_ship_z);
+                elemVec[0] = (cur->elem->physics.ptr->x - my_ship_x) / dist;
+                elemVec[1] = (cur->elem->physics.ptr->y - my_ship_y) / dist;
+                elemVec[2] = (cur->elem->physics.ptr->z - my_ship_z) / dist;
+                gameShip_getXVector(xvec);
+                gameShip_getYVector(yvec);
+                gameShip_getZVector(zvec);
+                
+                conv_3d_to_2d(xvec, yvec, elemVec, &yawdot, &pitchdot);
+                
+                subElemRadarList[subElementsN].x = 0.5 + pitchdot/2; //1-fabs(pitchdot-0.5);
+                subElemRadarList[subElementsN].xw = 1.0/20.0;
+                subElemRadarList[subElementsN].y = 0.5 - yawdot/2; //fabs(yawdot-0.5);
+                subElemRadarList[subElementsN].yw = 1.0/20.0;
+                zdot = elemVec[0]*zvec[0]+elemVec[1]*zvec[1]+elemVec[2]*zvec[2];
+                subElemRadarList[subElementsN].tex_id = zdot <= 0? tex_id_infront: TEXTURE_ID_RADAR_BEHIND;
+                
+                subElementsN++;
+            }
+        }
+        cur = cur->next;
+    }
+    
+    if(radar_mode)
+    {
+        if(tex_pass % fadeSubElements_frames != 0)
+        {
+            for(int i = 0; i < fadeSubElements_n && subElementsN < max; i++)
+            {
+                subElemRadarList[subElementsN++] = fadeSubElements[i];
+            }
+        }
+        else
+        {
+            int i;
+            
+            for(i = 0; i < sizeof(fadeSubElements)/sizeof(drawSubElement) && i < subElementsN; i++)
+            {
+                fadeSubElements[i] = subElemRadarList[i];
+            }
+            
+            fadeSubElements_n = i;
+        }
+    }
+    
+    return subElementsN;
+}
+
+static gameGraphics_drawState2d drawControls_ds;
+
+void drawControls()
+{
+    float screenWidth = viewWidth;
+    float screenHeight = viewHeight;
+    int tex_id_controls = 1;
+    float z = -2;
+    static game_timeval_t blink_time_last = 0;
+    int ti;
+    drawSubElement subElements[64];
+    int subElementsN;
+    gameGraphics_drawState2d* ds = &drawControls_ds;
+    float yphase = 0;
+    
+    controlRect** controls = gameInterfaceGetControlArray();
+    
+    int i = 0;
+    while(controls[i])
+    {
+        controlRect r;
+        subElementsN = 0;
+        
+        setupGLModelView(screenWidth, screenHeight);
+        
+        // rotate textures
+        setupGLTextureView();
+        /*
+         glMatrixMode(GL_TEXTURE);
+         glPushMatrix();
+         glLoadIdentity();
+         glRotatef(180, 0, 1, 0);
+         glRotatef(90, 0, 0, 1);
+         */
+        
+        // enable alpha-blending
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        r = *controls[i];
+        tex_id_controls = controls[i]->tex_id;
+        
+        if(r.hide_frames > 0)
+        {
+            controls[i]->hide_frames--;
+        }
+        else if(r.visible)
+        {
+            if(controls[i] == &gameInterfaceControls.accelerator)
+            {
+                //yphase = speed / maxSpeed;
+                subElements[subElementsN].xw = 0.1;
+                subElements[subElementsN].x = (targetSpeed / maxSpeed) - subElements[subElementsN].xw/2;
+                subElements[subElementsN].y = 0;
+                subElements[subElementsN].yw = 1;
+                subElements[subElementsN].tex_id = 21;
+                subElementsN++;
+            }
+            else if(controls[i] == &gameInterfaceControls.radar)
+            {
+                subElementsN = drawControlsRadar(subElements, sizeof(subElements)/sizeof(drawSubElement));
+            }
+            else if(controls[i] == &gameInterfaceControls.fireRect2)
+            {
+                switch(fireAction)
+                {
+                    case ACTION_SHOOT_BLOCK:
+                    case ACTION_DROP_BLOCK:
+                    case ACTION_BLOCK_TEXTURE:
+                        tex_id_controls = texture_id_block;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            
+            game_timeval_t blink_d = time_ms - blink_time_last;
+            if(blink_d < 200 && controls[i]->blinking)
+            {
+                tex_id_controls = 0;
+            }
+            if(blink_d > 400) blink_time_last = time_ms;
+            
+            // HACK: to flip instead of glRotatef
+            r.y = screenHeight - r.y-r.yw;
+            
+            ti = 0;
+            ds->coords[ti++] = r.x;
+            ds->coords[ti++] = r.y;
+            ds->coords[ti++] = z;
+            
+            ds->coords[ti++] = r.x+r.xw;
+            ds->coords[ti++] = r.y;
+            ds->coords[ti++] = z;
+            
+            ds->coords[ti++] = r.x;
+            ds->coords[ti++] = r.y+r.yw;
+            ds->coords[ti++] = z;
+            
+            ds->coords[ti++] = r.x+r.xw;
+            ds->coords[ti++] = r.y+r.yw;
+            ds->coords[ti++] = z;
+            
+            //model_texcoord_t overlay_texcoords_t[] = {0,(1-yphase), 1,(1-yphase), 0,0-yphase, 1,0-yphase};
+            ti = 0;
+            ds->texcoords[ti++] = 0; ds->texcoords[ti++] = 1-yphase;
+            ds->texcoords[ti++] = 1; ds->texcoords[ti++] = 1-yphase;
+            ds->texcoords[ti++] = 0; ds->texcoords[ti++] = 0-yphase;
+            ds->texcoords[ti++] = 1; ds->texcoords[ti++] = 0-yphase;
+            
+            //model_index_t overlay_indices_t[] = {0,1,2, 1,3,2};
+            ti = 0;
+            ds->indices[ti++] = 0; ds->indices[ti++] = 1; ds->indices[ti++] = 2;
+            ds->indices[ti++] = 1; ds->indices[ti++] = 3; ds->indices[ti++] = 2;
+            
+            ds->tex_id = tex_id_controls;
+            
+            if(ds->tex_id >= 0)
+            {
+                drawState2dSet(ds);
+                drawState2dDraw();
+            }
+            
+            // draw sub-elements within this element
+            for(int j = 0; j < subElementsN; j++)
+            {
+                controlRect er = r;
+                
+                er.y += ((float) er.yw*subElements[j].y);
+                er.x += ((float) er.xw*subElements[j].x);
+                er.xw = (subElements[j].xw * (float) er.xw);
+                er.yw = (subElements[j].yw * (float) er.yw);
+                
+                ti = 0;
+                ds->coords[ti++] = er.x;
+                ds->coords[ti++] = er.y;
+                ds->coords[ti++] = z;
+                
+                ds->coords[ti++] = er.x+er.xw;
+                ds->coords[ti++] = er.y;
+                ds->coords[ti++] = z;
+                
+                ds->coords[ti++] = er.x;
+                ds->coords[ti++] = er.y+er.yw;
+                ds->coords[ti++] = z;
+                
+                ds->coords[ti++] = er.x+er.xw;
+                ds->coords[ti++] = er.y+er.yw;
+                ds->coords[ti++] = z;
+                
+                ds->tex_id = subElements[j].tex_id;
+                
+                drawState2dSet(ds);
+                drawState2dDraw();
+            }
+        }
+        
+        if(controls[i] == &gameInterfaceControls.textMenuControl &&
+           r.visible && r.hide_frames == 0)
+        {
+            char menuBuf[1024];
+            
+            console_display_menu(menuBuf);
+            
+            strcpy(controls[i]->text, menuBuf);
+        }
+        
+        glDisable(GL_BLEND);
+        setupGLTextureViewDone();
+        setupGLModelViewDone();
+        
+        if(controls[i]->visible &&
+           (controls[i]->text[0] || controls[i] == &gameInterfaceControls.textEditControl))
+        {
+            if(controls[i] == &gameInterfaceControls.textEditControl)
+            {
+                char tmp[256];
+                int td = 30;
+                
+                strcpy(tmp, controls[i]->text);
+                
+                if((tex_pass % td) < (td/2) && strlen(tmp) > 0) tmp[strlen(tmp)-1] = ' ';
+                
+                drawText("Enter new value:",
+                         controls[i]->x + controls[i]->xw*0.8,
+                         controls[i]->y + controls[i]->yw*0.15);
+                drawText(tmp,
+                         controls[i]->x + controls[i]->xw*0.8 - screenWidth * 0.05,
+                         controls[i]->y + controls[i]->yw*0.15);
+            }
+            else
+            {
+                drawText(controls[i]->text,
+                         controls[i]->x + controls[i]->xw*0.8,
+                         controls[i]->y + controls[i]->yw*0.15);
+            }
+            
+            if(controls[i]->textLeft[0])
+            {
+                drawText(controls[i]->textLeft,
+                         controls[i]->x + controls[i]->xw*0.15,
+                         controls[i]->y + controls[i]->yw*0.2);
+            }
+            
+            if(controls[i]->textRight[0])
+            {
+                 drawText(controls[i]->textRight,
+                          controls[i]->x + controls[i]->xw*0.15,
+                          controls[i]->y + controls[i]->yw/2 + controls[i]->yw*0.2);
+            }
+        }
+        
+        i++;
+    }
+}
+
+void* gl_vertex_ptr_last = 0;
+void* gl_texcoord_ptr_last = 0;
+
+void
+drawElem_newFrame()
+{
+    gl_vertex_ptr_last = gl_texcoord_ptr_last = NULL;
+    
+    drawElemAnimationIdx = floor((fmodf(time_ms, 1000) / 1000) * (float) TEXTURE_ANIMATION_LEN);
+}
+
+void
+drawState2dSet(gameGraphics_drawState2d* state)
+{
+    memcpy(drawState_2d.coords, state->coords, sizeof(drawState_2d.coords));
+    memcpy(drawState_2d.texcoords, state->texcoords, sizeof(drawState_2d.texcoords));
+    memcpy(drawState_2d.indices, state->indices, sizeof(drawState_2d.indices));
+    drawState_2d.tex_id = state->tex_id;
+    
+    bindTexture(drawState_2d.tex_id);
+    
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    glVertexPointer(3, GL_FLOAT, 0, drawState_2d.coords);
+    glTexCoordPointer(2, GL_FLOAT, 0, drawState_2d.texcoords);
+}
+
+void
+drawState2dDraw()
+{
+    glDrawElements(GL_TRIANGLES, sizeof(drawState_2d.indices)/sizeof(model_index_t),
+                   index_type_enum, drawState_2d.indices);
+}
+
+void
+drawElem(WorldElem* pElem)
+{
+    int batched = 0;
+
+    if(pElem->type == MODEL_SPRITE)
+    {
+        // draw billboards
+        drawBillboard(pElem);
+        
+        gl_vertex_ptr_last = NULL;
+        gl_texcoord_ptr_last = NULL;
+    }
+    else
+    if(pElem->uses_global_coords)
+    {
+        if(gl_vertex_ptr_last != gWorld->shared_coordinates)
+        {
+            gl_vertex_ptr_last = gWorld->shared_coordinates;
+            glVertexPointer(3, GL_FLOAT, 0, gWorld->shared_coordinates);
+        }
+        
+        if(gl_texcoord_ptr_last != gWorld->shared_texcoords)
+        {
+            gl_texcoord_ptr_last = gWorld->shared_texcoords;
+            glTexCoordPointer(2, GL_FLOAT, 0, gWorld->shared_texcoords);
+        }
+        
+        bindTexture(pElem->texture_id);
+        
+        if(batched)
+        {
+            // TODO: buffer up all indices and call glDrawElements ONCE for everything
+            memcpy(drawElemBatchedIndices+drawElemBatchedIndicesLen, pElem->global_coord_data.indices, pElem->n_indices);
+            drawElemBatchedIndicesLen += pElem->n_indices;
+        }
+        else
+        {
+            glDrawElements(GL_TRIANGLES, pElem->n_indices, index_type_enum, pElem->global_coord_data.indices);
+        }
+    }
+    else
+    {
+        gl_vertex_ptr_last = pElem->coords;
+        glVertexPointer(3, GL_FLOAT, 0, pElem->coords);
+        
+        gl_texcoord_ptr_last = pElem->texcoords;
+        glTexCoordPointer(2, GL_FLOAT, 0, pElem->texcoords);
+        
+        if(pElem->renderInfo.tex_adjust)
+        {
+            for(int x = 0; x < pElem->n_texcoords; x+=2)
+            {
+                pElem->texcoords[x] += tex_coord_adjust[x];
+            }
+        }
+        
+        if(pElem->renderInfo.tex_adjust)
+        {
+            for(int x = 1; x < pElem->n_texcoords; x+=2)
+            {
+                pElem->texcoords[x] += tex_coord_adjust[x];
+            }
+        }
+        
+        int texture_id = pElem->texture_id;
+        
+        int texture_id_animated = texture_animated(texture_id, drawElemAnimationIdx);
+        
+        bindTexture(texture_id_animated);
+        
+        if(batched)
+        {
+            memcpy(drawElemBatchedIndices+drawElemBatchedIndicesLen, pElem->indices, pElem->n_indices);
+            drawElemBatchedIndicesLen += pElem->n_indices;
+        }
+        else
+        {
+            glDrawElements(GL_TRIANGLES, pElem->n_indices, index_type_enum, pElem->indices);
+        }
+    }
+}
+
+void
+drawElemStart(WorldElemListNode* pVisibleList)
+{
+    /* setup that happens every frame */
+    
+    float camXVec[3], camYVec[3];
+    
+    gameCamera_getXVector(camXVec);
+    gameCamera_getYVector(camYVec);
+    
+    drawBillboardInit(camXVec, camYVec);
+    
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    drawElem_newFrame();
+    
+    /*
+    int n_vertices = 0;
+    while(pVisibleList)
+    {
+        n_vertices += pVisibleList->elem->n_indices;
+        pVisibleList = pVisibleList->next;
+    }
+    
+    size_t mem_size = n_vertices*sizeof(*drawElemBatchedIndices);
+    if(drawElemBatchedIndices && drawElemBatchedIndicesLen >= n_vertices)
+    {
+        // reuse buffer
+    }
+    else
+    {
+        free(drawElemBatchedIndices);
+        drawElemBatchedIndices = malloc(mem_size);
+    }
+    drawElemBatchedIndicesLen = 0;
+     */
+}
+
+void
+drawElemEnd()
+{
+    glDisable(GL_BLEND);
+    /*
+    glDrawElements(GL_TRIANGLES, drawElemBatchedIndicesLen, index_type_enum, drawElemBatchedIndices);
+     */
+}
+
+void
+visible_list_remove(WorldElem* elem, unsigned int* n_visible, WorldElemListNode** pVisCheckPtr)
+{
+    // visible-list may contain linked_elems so remove those (because clear-pending will)
+    WorldElem* pLinkedElem = elem;
+    while(pLinkedElem)
+    {
+        if(*pVisCheckPtr && pLinkedElem == (*pVisCheckPtr)->elem) *pVisCheckPtr = NULL;
+        
+        pLinkedElem->in_visible_list = 0;
+        // HACK: temporarily invisible to prevent adding back to list below
+        pLinkedElem->invisible = 1;
+        world_elem_list_remove(pLinkedElem, &gWorld->elements_visible);
+        world_vis_rgn_remove(pLinkedElem);
+        (*n_visible)--;
+        pLinkedElem = pLinkedElem->linked_elem;
+    }
+}
+
+static void
+drawBackgroundInit(int tex_id,
+                   float alpha, float beta, float gamma,
+                   float scale)
+{
+    int i;
+    
+    if(!bgData)
+    {
+        bgData = malloc(sizeof(*bgData));
+        
+        if(bgData)
+        {
+            memset(bgData, 0, sizeof(*bgData));
+            
+            bgData->tex_id = tex_id;
+            
+            bgData->coords = malloc(sizeof(BACKGROUND_MODEL));
+            bgData->texcoords = malloc(sizeof(BACKGROUND_MODEL_TEXCOORDS));
+            bgData->indices = malloc(sizeof(BACKGROUND_MODEL_INDICES));
+            
+            // swap triangle indices
+            for(i = 0; i < sizeof(BACKGROUND_MODEL_INDICES)/sizeof(model_index_t); i += 3)
+            {
+                bgData->indices[i] = BACKGROUND_MODEL_INDICES[i+2];
+                bgData->indices[i+1] = BACKGROUND_MODEL_INDICES[i+1];
+                bgData->indices[i+2] = BACKGROUND_MODEL_INDICES[i];
+                bgData->n_indices += 3;
+            }
+            
+            memcpy(bgData->texcoords, BACKGROUND_MODEL_TEXCOORDS, sizeof(BACKGROUND_MODEL_TEXCOORDS));
+            
+            float alpha = 0;
+            float beta = 0;
+            float gamma = 0;
+            
+            for(i = 0; i < sizeof(BACKGROUND_MODEL)/sizeof(model_coord_t); i += 3)
+            {
+                quaternion_t pt = {0, BACKGROUND_MODEL[i+0] * scale, BACKGROUND_MODEL[i+1] * scale, BACKGROUND_MODEL[i+2] * scale};
+                quaternion_t xq = {0, 1, 0, 0};
+                quaternion_t yq = {0, 0, 1, 0};
+                quaternion_t zq = {0, 0, 0, 1};
+                
+                // yaw
+                if(alpha != 0)
+                {
+                    quaternion_rotate_inplace(&pt, &zq, alpha);
+                    quaternion_rotate_inplace(&xq, &zq, alpha);
+                    quaternion_rotate_inplace(&yq, &zq, alpha);
+                }
+                
+                // pitch
+                if(beta != 0)
+                {
+                    quaternion_rotate_inplace(&pt, &xq, beta);
+                    quaternion_rotate_inplace(&yq, &xq, beta);
+                    quaternion_rotate_inplace(&zq, &xq, beta);
+                }
+                
+                // roll
+                if(gamma != 0)
+                {
+                    quaternion_rotate_inplace(&pt, &zq, gamma);
+                    quaternion_rotate_inplace(&xq, &zq, gamma);
+                    quaternion_rotate_inplace(&yq, &zq, gamma);
+                }
+                
+                bgData->coords[i+0] =  pt.x;
+                bgData->coords[i+1] =  pt.y;
+                bgData->coords[i+2] =  pt.z;
+            }
+        }
+    }
+}
+
+static void
+drawBackgroundUninit()
+{
+    if(bgData)
+    {
+        if(bgData->coords) free(bgData->coords);
+        if(bgData->indices) free(bgData->indices);
+        if(bgData->texcoords) free(bgData->texcoords);
+        free(bgData);
+        bgData = NULL;
+    }
+}
+
+void
+drawBackground()
+{
+    glMatrixMode(GL_TEXTURE);
+    glPushMatrix();
+    glLoadIdentity();
+    
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    
+    glOrthof(-1, 1,
+             -1, 1,
+             1, -1);
+    
+    if(isLandscape)
+    {
+        glRotatef(-90, 0, 0, 1);
+    }
+    
+    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerGamma()), 0, 0, 1);
+    // X'
+    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerBeta()), 1, 0, 0);
+    // Z
+    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerAlpha()), 0, 0, 1);
+    
+    glVertexPointer(3, GL_FLOAT, 0, bgData->coords);
+    glTexCoordPointer(2, GL_FLOAT, 0, bgData->texcoords);
+    bindTexture(bgData->tex_id);
+    glDrawElements(GL_TRIANGLES, bgData->n_indices,
+                   index_type_enum, bgData->indices);
+    
+    glPopMatrix();
+    
+    glMatrixMode(GL_TEXTURE);
+    glPopMatrix();
+}
+
+struct
+{
+    float coord_offsets[4][3];
+} drawBillboardData;
+
+void
+drawBillboardInit(float xVec[3], float yVec[3])
+{
+    float coords[4][3] =
+    {
+        {0, 0, 0},
+        {xVec[0], xVec[1], xVec[2]},
+        {yVec[0], yVec[1], yVec[2]},
+        {xVec[0]+yVec[0], xVec[1]+yVec[1], xVec[2]+yVec[2]}
+    };
+    
+    for(int i = 0; i < 4; i++)
+    {
+        for(int j = 0; j < 3; j++)
+        {
+            coords[i][j] -= xVec[j]/2;
+        }
+    }
+    
+    for(int i = 0; i < 4; i++)
+    {
+        for(int j = 0; j < 3; j++)
+        {
+            //coords[i][j] += yVec[j]/2;
+            coords[i][j] -= yVec[j]/2;
+        }
+    }
+    
+    for(int i = 0; i < 4; i++)
+        for(int j = 0; j < 3; j++) drawBillboardData.coord_offsets[i][j] = coords[i][j];
+}
+
+static gameGraphics_drawState2d drawBillboard_ds;
+
+void
+drawBillboard(WorldElem* pElem)
+{
+    float x = pElem->physics.ptr->x;
+    float y = pElem->physics.ptr->y;
+    float z = pElem->physics.ptr->z;
+    float s = pElem->scale;
+    gameGraphics_drawState2d *ds = &drawBillboard_ds;
+    int ti;
+    
+    // TODO: this is putting coordinates below and offset of physics position (instead of equal on all sides)
+    /*
+    model_coord_t coords[4][3] =
+    {
+        {x + s*drawBillboardData.coord_offsets[0][0], y + s*drawBillboardData.coord_offsets[0][1], z + s*drawBillboardData.coord_offsets[0][2]},
+        {x + s*drawBillboardData.coord_offsets[1][0], y + s*drawBillboardData.coord_offsets[1][1], z + s*drawBillboardData.coord_offsets[1][2]},
+        {x + s*drawBillboardData.coord_offsets[2][0], y + s*drawBillboardData.coord_offsets[2][1], z + s*drawBillboardData.coord_offsets[2][2]},
+        {x + s*drawBillboardData.coord_offsets[3][0], y + s*drawBillboardData.coord_offsets[3][1], z + s*drawBillboardData.coord_offsets[3][2]}
+    };
+     */
+
+    ti = 0;
+    ds->coords[ti++] = x + s*drawBillboardData.coord_offsets[0][0];
+    ds->coords[ti++] = y + s*drawBillboardData.coord_offsets[0][1];
+    ds->coords[ti++] = z + s*drawBillboardData.coord_offsets[0][2];
+    
+    ds->coords[ti++] = x + s*drawBillboardData.coord_offsets[1][0];
+    ds->coords[ti++] = y + s*drawBillboardData.coord_offsets[1][1];
+    ds->coords[ti++] = z + s*drawBillboardData.coord_offsets[1][2];
+    
+    ds->coords[ti++] = x + s*drawBillboardData.coord_offsets[2][0];
+    ds->coords[ti++] = y + s*drawBillboardData.coord_offsets[2][1];
+    ds->coords[ti++] = z + s*drawBillboardData.coord_offsets[2][2];
+    
+    ds->coords[ti++] = x + s*drawBillboardData.coord_offsets[3][0];
+    ds->coords[ti++] = y + s*drawBillboardData.coord_offsets[3][1];
+    ds->coords[ti++] = z + s*drawBillboardData.coord_offsets[3][2];
+    
+    /*
+    model_texcoord_t texcoords[4][2] =
+    {
+        {0, 0},
+        {1, 0},
+        {0, 1},
+        {1, 1}
+    };
+     */
+    ti = 0;
+    ds->texcoords[ti++] = 0; ds->texcoords[ti++] = 0;
+    ds->texcoords[ti++] = 1; ds->texcoords[ti++] = 0;
+    ds->texcoords[ti++] = 0; ds->texcoords[ti++] = 1;
+    ds->texcoords[ti++] = 1; ds->texcoords[ti++] = 1;
+    
+    /*
+    model_index_t indices[6] =
+    {
+        1,0,2,
+        1,2,3
+    };
+     */
+    ti = 0;
+    ds->indices[ti++] = 1; ds->indices[ti++] = 0; ds->indices[ti++] = 2;
+    ds->indices[ti++] = 1; ds->indices[ti++] = 2; ds->indices[ti++] = 3;
+    
+    ds->tex_id = pElem->texture_id;
+    
+    drawState2dSet(ds);
+    drawState2dDraw();
+}
+
+struct
+{
+    model_coord_t coords[6];
+    model_index_t indices[2];
+    float colorLast[3];
+    float widthLast;
+} drawLineData;
+
+void
+drawLineBegin()
+{
+    glDisable(GL_TEXTURE_2D);
+    glColor4f(0.0, 1.0, 0.0, 1.0);
+}
+
+void
+drawLineEnd()
+{
+    glEnable(GL_TEXTURE_2D);
+    glColor4f(1.0, 1.0, 1.0, 1.0);
+    
+    gl_vertex_ptr_last = NULL;
+    gl_texcoord_ptr_last = NULL;
+}
+
+void
+drawLineWithColorAndWidth(float a[3], float b[3], float color[3], float width)
+{
+    int i;
+    
+    for(i = 0; i < 3; i++) drawLineData.coords[i] = a[i];
+    for(i = 0; i < 3; i++) drawLineData.coords[i+3] = b[i];
+    
+    for(i = 0; i < 2; i++) drawLineData.indices[i] = i;
+    
+    if(drawLineData.widthLast != width)
+    {
+        glLineWidth(width);
+        drawLineData.widthLast = width;
+    }
+    
+    glColor4f(color[0], color[1], color[2], 1.0);
+    /*
+    if(drawLineData.colorLast[0] != color[0] ||
+       drawLineData.colorLast[1] != color[1] ||
+       drawLineData.colorLast[2] != color[2])
+    {
+        glColor4f(color[0], color[1], color[2], 1.0);
+        
+        for(int c = 0; c < 3; c++) drawLineData.colorLast[c] = color[c];
+    }
+     */
+
+    glVertexPointer(3, GL_FLOAT, 0, drawLineData.coords);
+    glDrawElements(GL_LINES, 2, index_type_enum, drawLineData.indices);
+}
+
+void
+drawLine(float a[3], float b[3])
+{
+    float color[] = {0, 1.0, 0};
+    
+    drawLineWithColorAndWidth(a, b, color, 1);
+}
+
+void
+drawLinesElemTriangles(WorldElem *pElem)
+{
+    int i;
+    for(i = 0; i*3 < pElem->n_indices; i++)
+    {
+        if(pElem->indices[i*3+2]*3+2 >= pElem->n_coords) break;
+        
+        {
+            float a[] =
+            {
+                pElem->coords[(pElem->indices[i*3]*3)],
+                pElem->coords[(pElem->indices[i*3]*3)+1],
+                pElem->coords[(pElem->indices[i*3]*3)+2]
+            };
+            
+            float b[] =
+            {
+                pElem->coords[(pElem->indices[i*3+1]*3)],
+                pElem->coords[(pElem->indices[i*3+1])*3+1],
+                pElem->coords[(pElem->indices[i*3+1])*3+2],
+            };
+            
+            glColor4f(1.0, 0.0, 0.0, 1.0);
+            drawLine(a, b);
+        }
+        
+        {
+            float a[] =
+            {
+                pElem->coords[(pElem->indices[i*3+1]*3)],
+                pElem->coords[(pElem->indices[i*3+1]*3)+1],
+                pElem->coords[(pElem->indices[i*3+1]*3)+2]
+            };
+            
+            float b[] =
+            {
+                pElem->coords[(pElem->indices[i*3+2]*3)],
+                pElem->coords[(pElem->indices[i*3+2]*3)+1],
+                pElem->coords[(pElem->indices[i*3+2]*3)+2],
+            };
+            
+            glColor4f(0.0, 1.0, 0.0, 1.0);
+            drawLine(a, b);
+        }
+        
+        {
+            float a[] =
+            {
+                pElem->coords[(pElem->indices[i*3+2]*3)],
+                pElem->coords[(pElem->indices[i*3+2]*3)+1],
+                pElem->coords[(pElem->indices[i*3+2]*3)+2]
+            };
+            
+            float b[] =
+            {
+                pElem->coords[(pElem->indices[i*3]*3)],
+                pElem->coords[(pElem->indices[i*3]*3)+1],
+                pElem->coords[(pElem->indices[i*3]*3)+2],
+            };
+            
+            glColor4f(0.0, 0.0, 1.0, 1.0);
+            drawLine(a, b);
+        }
+    }
+}
+
+void
+drawLineGrid(float start[3], float u[3], float v[3], float nu, float nv)
+{
+    float x;
+    for(x = 0; x <= nu; x++)
+    {
+        float k[3];
+        float j[3];
+        
+        for(int i = 0; i < 3; i++)
+        {
+            j[i] = start[i] + (u[i]*x);
+            k[i] = j[i] + (v[i]*nv);
+        }
+        
+        drawLine(j, k);
+    }
+    
+    for(x = 0; x <= nv; x++)
+    {
+        float k[3];
+        float j[3];
+        
+        for(int i = 0; i < 3; i++)
+        {
+            j[i] = start[i] + (v[i]*x);
+            k[i] = j[i] + (u[i]*nu);
+        }
+        
+        drawLine(j, k);
+    }
+}
+
+void
+drawBoundingLineGrid()
+{
+    int linter = 20;
+    float lstart[] = {0, 0, 0};
+    float u[] = {linter, 0, 0};
+    float v[] = {0, linter, 0};
+    
+    // grids along x, y
+    lstart[0] = 0; lstart[1] = 0; lstart[2] = 0;
+    u[0] = linter; u[1] = 0; u[2] = 0;
+    v[0] = 0; v[1] = linter; v[2] = 0;
+    drawLineGrid(lstart, u, v, gWorld->bound_x / linter, gWorld->bound_y / linter);
+    lstart[2] = gWorld->bound_z;
+    drawLineGrid(lstart, u, v, gWorld->bound_x / linter, gWorld->bound_y / linter);
+    
+    // grids along z, y
+    lstart[0] = 0; lstart[1] = 0; lstart[2] = 0;
+    u[0] = 0; u[1] = 0; u[2] = linter;
+    v[0] = 0; v[1] = linter; v[2] = 0;
+    drawLineGrid(lstart, u, v, gWorld->bound_z / linter, gWorld->bound_y / linter);
+    lstart[0] = gWorld->bound_x;
+    drawLineGrid(lstart, u, v, gWorld->bound_z / linter, gWorld->bound_y / linter);
+    
+    // grids along , y
+    lstart[0] = 0; lstart[1] = 0; lstart[2] = 0;
+    u[0] = linter; u[1] = 0; u[2] = 0;
+    v[0] = 0; v[1] = 0; v[2] = linter;
+    drawLineGrid(lstart, u, v, gWorld->bound_x / linter, gWorld->bound_z / linter);
+    lstart[1] = gWorld->bound_y;
+    drawLineGrid(lstart, u, v, gWorld->bound_z / linter, gWorld->bound_z / linter);
+}
+
+void
+gameGraphicsInit()
+{
+    drawBackgroundInit(texture_id_background, 0, 0, 0, 100);
+}
+
+void
+gameGraphicsUninit()
+{
+    drawBackgroundUninit();
+}

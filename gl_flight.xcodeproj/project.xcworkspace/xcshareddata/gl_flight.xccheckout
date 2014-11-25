@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>41E3A172-CBAA-4618-9D5D-8940EA9E0785</string>
+	<key>IDESourceControlProjectName</key>
+	<string>gl_flight</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>B2355197199298B1029E644E43E7A523855EF741</key>
+		<string>/Volumes/cabrillo/git/http_file_share/</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>glFlight/gl_flight.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>B2355197199298B1029E644E43E7A523855EF741</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>/Volumes/cabrillo/git/http_file_share/</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>B2355197199298B1029E644E43E7A523855EF741</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>B2355197199298B1029E644E43E7A523855EF741</string>
+			<key>IDESourceControlWCCName</key>
+			<string>git</string>
+		</dict>
+	</array>
+</dict>
+</plist>
