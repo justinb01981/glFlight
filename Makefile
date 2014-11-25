@@ -46,7 +46,7 @@ ios_workspace: base_ws
 	${CMD_COPY} *.plist ${BUILD_DIR_IOS}
 	${CMD_COPY} *.pch ${BUILD_DIR_IOS}
 	${CMD_COPY} *.bundle ${BUILD_DIR_IOS}
-	echo "iOS workspace:" ${BUILD_DIR_IOS}
+	echo "iOS (XCode) workspace created:" ${BUILD_DIR_IOS}
 	
 android_workspace: base_ws
 	PREV_DIR=${PWD}
@@ -63,5 +63,5 @@ android_workspace: base_ws
 	${CMD_COPY} *.jpg ${BUILD_DIR_ANDROID}/glFlight/res/raw/
 	${CMD_COPY} *.bmp ${BUILD_DIR_ANDROID}/glflight/res/raw/ 
 	${CMD_COPY} *.wav ${BUILD_DIR_ANDROID}/glFlight/res/raw/ 
-	echo "android workspace: " ${BUILD_DIR_ANDROID}
+	echo "android (eclipse) workspace created: " ${BUILD_DIR_ANDROID}
 
