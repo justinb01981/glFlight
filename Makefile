@@ -59,7 +59,6 @@ android_workspace: base_ws
 	${CMD_CHDIR} ${BUILD_DIR_ANDROID}; ${CMD_EXTRACT} ${ARCHIVE_FILE}
 	${CMD_COPY} android/ ${BUILD_DIR_ANDROID}/glFlight/
 	${CMD_COPY} Classes/* ${BUILD_DIR_ANDROID}/glFlight/jni/game/
-	${CMD_COPY} *.png ${BUILD_DIR_ANDROID}/glFlight/res/raw/
 	${CMD_COPY} *.jpg ${BUILD_DIR_ANDROID}/glFlight/res/raw/
 	${CMD_COPY} texture*.bmp ${BUILD_DIR_ANDROID}/glflight/res/raw/ 
 	${CMD_COPY} *.wav ${BUILD_DIR_ANDROID}/glFlight/res/raw/ 
