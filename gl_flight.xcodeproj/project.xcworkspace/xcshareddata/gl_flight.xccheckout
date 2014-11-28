@@ -10,22 +10,26 @@
 	<string>gl_flight</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
+		<key>8B4BD31F9478AA525506739440DE288EA2073101</key>
+		<string>https://github.com/justinb01981/glFlight.git</string>
 		<key>B2355197199298B1029E644E43E7A523855EF741</key>
 		<string>/Volumes/cabrillo/git/http_file_share/</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>glFlight/gl_flight.xcodeproj</string>
+	<string>gl_flight.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
+		<key>8B4BD31F9478AA525506739440DE288EA2073101</key>
+		<string>../..</string>
 		<key>B2355197199298B1029E644E43E7A523855EF741</key>
 		<string>../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>/Volumes/cabrillo/git/http_file_share/</string>
+	<string>https://github.com/justinb01981/glFlight.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>B2355197199298B1029E644E43E7A523855EF741</string>
+	<string>8B4BD31F9478AA525506739440DE288EA2073101</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
@@ -34,7 +38,15 @@
 			<key>IDESourceControlWCCIdentifierKey</key>
 			<string>B2355197199298B1029E644E43E7A523855EF741</string>
 			<key>IDESourceControlWCCName</key>
-			<string>git</string>
+			<string></string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>8B4BD31F9478AA525506739440DE288EA2073101</string>
+			<key>IDESourceControlWCCName</key>
+			<string>glFlight</string>
 		</dict>
 	</array>
 </dict>

@@ -2234,6 +2234,8 @@ firePoopedCube(WorldElem *elem)
 int
 game_ai_target_priority(WorldElem* pSearchElem, WorldElem* pTargetElem, float* dist_ignore)
 {
+    const static float velocity_pickup = 2.0;
+    
      if(pSearchElem->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID)
      {
          *dist_ignore = INT_MAX;
@@ -2252,7 +2254,7 @@ game_ai_target_priority(WorldElem* pSearchElem, WorldElem* pTargetElem, float* d
                  pTargetElem->physics.ptr->velocity < 1) return 1;
          else if(!pSearchElem->stuff.u.enemy.fixed && pTargetElem->object_type == OBJ_POWERUP_GENERIC &&
                  pSearchElem->stuff.subtype == GAME_SUBTYPE_COLLECT &&
-                 pTargetElem->physics.ptr->velocity < 1)
+                 pTargetElem->physics.ptr->velocity <= velocity_pickup)
          {
              return 1;
          }
