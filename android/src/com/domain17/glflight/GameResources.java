@@ -16,15 +16,13 @@ public class GameResources {
 	
 	// this needs to be bumped every time you add/modify a resource
 	// so that the java code unpacks resource so that JNI code can reach it
-	public static int version = 1;
+	public static int version = /* TODO: use android-version-string */ 10114;
 	
 	public static String resPrefix = /*"gameResources/"*/ "";
 	public static String resVersionFilename = "resVersion";
 	
 	public static Integer[] resObj = {
-		R.raw.testrsrc,
 		R.drawable.abc_ab_bottom_solid_light_holo,
-		R.raw.testimage,
 
 		R.raw.texture0,
         R.raw.texture1,
@@ -107,12 +105,12 @@ public class GameResources {
         R.raw.texture78,
         R.raw.texture79,
         R.raw.texture80,
+        R.raw.texture81,
+        R.raw.texture82,
 	};
 	
 	public static String[] resFilename = {
-		"testResource.txt",
 		"abc_ab_bottom_solid_light_holo.png",
-		"testImage.png",
 		
 		"texture0.bmp",
         "texture1.bmp",
@@ -195,6 +193,8 @@ public class GameResources {
         "texture78.bmp",
         "texture79.bmp",
         "texture80.bmp",
+        "texture81.bmp",
+        "texture82.bmp",
 	};
 	
 	public static String[] sndNameList = {
