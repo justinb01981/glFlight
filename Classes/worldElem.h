@@ -107,7 +107,6 @@ struct WorldElem {
     
     int in_visible_list:1;
     int visible_list_by_region_sorted:1;
-    int ignore_collisions:1;
     int collision_handle_remove:1;
     int remove_pending:1;
     int moving:1;

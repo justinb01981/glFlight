@@ -98,7 +98,7 @@ gameDialogWelcomeMultiJoinLAN()
 static void
 gameDialogWelcomeMultiInternet()
 {
-    gameInterfaceModalDialog("Find a game\nor Host:", "Find", "Host",
+    gameInterfaceModalDialog("Find a game\nor Host\n(see help)", "Find", "Host",
                              gameDialogWelcomeMultiDirectory, gameDialogWelcomeMultiHost);
 }
 
@@ -119,7 +119,7 @@ gameDialogWelcomeMulti()
 static void
 gameDialogWelcomeQuick()
 {
-    gameInterfaceModalDialog("Game Type:", "DataHack\n(single player)", "Browse\nMultiplayer",
+    gameInterfaceModalDialog("Game Type:", "DataHack\n(single)", "Multiplayer",
                              gameDialogWelcomeSingle, gameDialogWelcomeMulti);
 }
 
@@ -147,6 +147,11 @@ gameDialogWelcomeNoRating()
     gameDialogWelcome();
 }
 
+#define WELCOMESTR                                  \
+"^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D\n"    \
+"^DWelcome to d0gf1ght!^D\n"                        \
+"^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D\n"
+
 static void
 gameDialogWelcome()
 {
@@ -154,16 +159,29 @@ gameDialogWelcome()
     
     if(gameSettingsLaunchCount % 2 == 1 && !gameSettingsRatingGiven)
     {
-        gameInterfaceModalDialog("Welcome back!\nPlease rate d0gf1ght!",
+        gameInterfaceModalDialog(WELCOMESTR
+                                 "Please rate d0gf1ght!",
                                  "Sure", "No way",
                                  gameDialogWelcomeRating, gameDialogWelcomeNoRating);
     }
     else
     {
-        gameInterfaceModalDialog("Welcome to d0gf1ght!\n"
-                                 "^D^D^D  ^D^D^D", "Menu", "Begin\nGame",
-                                 gameDialogWelcomeMenu, gameDialogWelcomeQuick);
+        gameInterfaceModalDialog(WELCOMESTR, "Game", "Menu",
+                                 gameDialogWelcomeQuick, gameDialogWelcomeMenu);
     }
+}
+
+static void
+gameDialogCalibrate()
+{
+    gameInterfaceModalDialog(
+                             "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
+                             "^C Please calibrate controls:  ^C\n"
+                             "^C Hold device still           ^C\n"
+                             "^C hold flashing 'trim' button ^C\n"
+                             "^C for 3 sec                   ^C\n"
+                             "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
+                             "", "", gameDialogCancel, gameDialogCancel);
 }
 
 static void

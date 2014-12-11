@@ -811,6 +811,7 @@ gameNetwork_accept_map_download(gameNetworkAddress* src_addr)
     fd_set rd_set;
     int s = gameNetworkState.hostInfo.map_socket.s;
     
+    if(s < 0) return GAME_NETWORK_ERR_FAIL;
     
     memset(&block_time, 0, sizeof(block_time));
     
@@ -858,6 +859,7 @@ gameNetwork_accept_stream_connection(gameNetworkAddress* src_addr)
     int s = gameNetworkState.hostInfo.stream_socket.s;
     gameNetworkPlayerInfo* playerInfo;
     
+    if(s < 0) return GAME_NETWORK_ERR_FAIL;
     
     memset(&block_time, 0, sizeof(block_time));
     

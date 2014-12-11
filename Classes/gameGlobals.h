@@ -62,14 +62,14 @@ extern int save_map;
 #define GYRO_FEEDBACK_DEFAULT (0.01)
 #else
 #define GAME_PLATFORM_IS_LANDSCAPE 0
-#define GYRO_FEEDBACK_COEFF (0.01)
+#define GYRO_FEEDBACK_COEFF (0.002)
 #define GYRO_DC_DEFAULT /*0.004*/ (0.03)
 #define GYRO_FEEDBACK_DEFAULT (0.1)
 #endif
 
 #define MAX_SPEED (20)
 
-const static char* GAME_VERSION_STR = "0.9.11.3 core";
+const static char* GAME_VERSION_STR = "0.9.12.0 core";
 
 const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2.5);
 const static float SPEED_BOOST_FRAMES = 60 * 5;

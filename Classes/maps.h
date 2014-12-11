@@ -24,6 +24,25 @@
 "mesh_manip_pull rnd_40 rnd_40"" 0 rnd_50 0"" 0.90\n"            \
 "mesh_manip_complete 1 "#tex" 1 "#scale"\n"
 
+#define WORLD_SCALED_FRAME_MESH_PULL_RANDOM(height, range)       \
+"register_params rndx rndz 0 "#height" 0 0 0 0 0 0 0 0 0 0 0 0\n"       \
+"register_params_mul 0.2 0.2 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"      \
+"mesh_manip_pull r r r r 0"" "#range"\n"
+
+#define WORLD_SCALED_FRAME(x, tex, scale)                                \
+"register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
+"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
+"set_world_size r r r\n"                                                 \
+"mesh_manip_add wx0.1 " "wy0.1" " wz0.1" " 4 0 0" " 0 0 4" " wx0.2 wz0.2\n" \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.95) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.95) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.95) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.95) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.95) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.95) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.95) \
+"mesh_manip_complete 1 "#tex" 1 "#scale"\n"
+
 #define MESH_CUBES_2(tex, scale)                                    \
 "mesh_manip_add wx0.1 " "-4" " wz0.1" " 4 0 0" " 0 0 4" " 40 40\n"  \
 "mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"               \
@@ -404,11 +423,12 @@ RANDOM_FLOATING_BLOCKS_1
 
 const static char initial_map_collection[] = ""
 
-"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
+//"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
 
 BACKGROUND_TEX_RANDOM
 
-MESH_CUBES_2(28, 4)
+//MESH_CUBES_2(28, 4)
+WORLD_SCALED_FRAME(1, 28, 4)
 
 // else
 GREEN_TENDRILS_1

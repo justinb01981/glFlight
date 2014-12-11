@@ -266,7 +266,8 @@ gameInterfaceFindControl(float x, float y)
     // modal, this must be clicked
     if(gameInterfaceControls.dialogRect.visible)
     {
-        if(f != &gameInterfaceControls.dialogRect) return NULL;
+        if(f != &gameInterfaceControls.dialogRect &&
+           f != &gameInterfaceControls.trim) return NULL;
     }
     
     return f;
@@ -689,7 +690,7 @@ gameInterfaceHandleTouchBegin(float x, float y)
     
     gameInterfaceControls.touchCount++;
     
-    game_paused = 0;
+    if(touchedControl != &gameInterfaceControls.trim) game_paused = 0;
 }
 
 void

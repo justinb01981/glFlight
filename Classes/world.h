@@ -23,7 +23,19 @@
 // MUST DIVIDE bound_x, bound_y, bound_z evenly!
 #define WORLD_MAX_REGIONS /*50*/ 25
 #define WORLD_MAX_PLANES 16
-#define WORLD_VIS_REGIONS 4
+#define WORLD_VIS_REGIONS_X 4
+#define WORLD_VIS_REGIONS_Y 2
+#define WORLD_VIS_REGIONS_Z 4
+#define VIS_REGION_FOR_COORD(v, x, y, z)                  \
+    v[0] = x / (gWorld->bound_x / WORLD_VIS_REGIONS_X);   \
+    v[1] = y / (gWorld->bound_y / WORLD_VIS_REGIONS_Y);   \
+    v[2] = z / (gWorld->bound_z / WORLD_VIS_REGIONS_Z);
+#define VIS_COORD_VALID(x, y, z)                              \
+    (x >= 0 && x < gWorld->bound_x && \
+     y >= 0 && y < gWorld->bound_y && \
+     z >= 0 && z < gWorld->bound_z && \
+     gWorld->bound_x > 0 && gWorld->bound_y > 0 && gWorld->bound_z > 0)
+
 
 
 extern float visible_distance;
@@ -45,7 +57,7 @@ typedef struct
     
     WorldElemListNode elements_visible;
     
-    WorldElemListNode elements_visible_by_region[WORLD_VIS_REGIONS][WORLD_VIS_REGIONS][WORLD_VIS_REGIONS];
+    WorldElemListNode elements_visible_by_region[WORLD_VIS_REGIONS_X][WORLD_VIS_REGIONS_Y][WORLD_VIS_REGIONS_Z];
     
     //WorldElemListNode elements_by_type[MODEL_LAST];
     

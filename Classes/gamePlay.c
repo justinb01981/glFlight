@@ -607,6 +607,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.stats.score_last = 0;
         gameStateSinglePlayer.stats.score = 0;
         gameStateSinglePlayer.stats.level_last = 0;
+        texture_id_background = TEXTURE_ID_BACKGROUND;
     }
     else
     {
@@ -696,7 +697,7 @@ game_start(float difficulty, int type)
         game_reset();
         
         //gameStateSinglePlayer.n_caps = 2 + gameStateSinglePlayer.difficulty;
-        gameStateSinglePlayer.enemy_durability = 3;
+        gameStateSinglePlayer.enemy_durability = 1 + (gameStateSinglePlayer.difficulty/2);
         gameStateSinglePlayer.n_turrets = gameStateSinglePlayer.difficulty * 1;
         gameStateSinglePlayer.n_collect_points = 1 + 2*gameStateSinglePlayer.difficulty;
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
@@ -934,6 +935,7 @@ game_setup()
 void
 game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
 {
+    int do_data_grab_score_immediate = 1;
     WorldElemListNode* myShipListNode = world_elem_list_find(my_ship_id, &gWorld->elements_moving);
     if(!myShipListNode) return;
     
@@ -969,11 +971,35 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
         case GAME_SUBTYPE_COLLECT:
             if(elemA->object_type == OBJ_PLAYER || elemA->object_type == OBJ_SHIP)
             {
-                if(elemA->stuff.towed_elem_id == WORLD_ELEM_ID_INVALID)
+                if(!do_data_grab_score_immediate)
                 {
-                    elemA->stuff.towed_elem_id = elemB->elem_id;
+                    if(elemA->stuff.towed_elem_id == WORLD_ELEM_ID_INVALID)
+                    {
+                        elemA->stuff.towed_elem_id = elemB->elem_id;
+                        collect_sound = 1;
+                        camera_locked_frames = 0;
+                    }
+                }
+                else
+                {
+                    world_remove_object(elemB->elem_id);
+                    gameStateSinglePlayer.stats.data_collected++;
                     collect_sound = 1;
-                    camera_locked_frames = 0;
+                    //camera_locked_frames = 60;
+                    
+                    // points-indicator
+                    world_add_object(MODEL_CUBE2,
+                                     elemB->physics.ptr->x,
+                                     elemB->physics.ptr->y,
+                                     elemB->physics.ptr->z,
+                                     0, 0, 0, elemB->scale, TEXTURE_ID_DATA_GRABBED);
+                    world_get_last_object()->object_type = OBJ_WRECKAGE;
+                    world_object_set_lifetime(world_get_last_object()->elem_id, 60);
+                    update_object_velocity(world_get_last_object()->elem_id,
+                                           elemA->physics.ptr->vx * 1.5,
+                                           elemA->physics.ptr->vy * 1.5,
+                                           elemA->physics.ptr->vz * 1.5,
+                                           0);
                 }
             }
             break;
@@ -1023,7 +1049,7 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
             
             if(gameStateSinglePlayer.invuln_time_after_hit)
             {
-                myShipListNode->elem->ignore_collisions = 1;
+                collision_actions_set_player_invuln();
                 invuln_count = gameStateSinglePlayer.invuln_time_after_hit;
             }
         }
@@ -1110,8 +1136,6 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                     
                     world_get_last_object()->destructible = 0;
                     world_object_set_lifetime(obj_id, 60);
-                    
-                    camera_locked_frames = 120;
                     
                     console_write("File captured!\n");
                 }
@@ -1661,7 +1685,7 @@ game_run()
             }
             else
             {
-                pMyShipNode->elem->ignore_collisions = 0;
+                collision_actions_set_player_vuln();
             }
             
             if(gameStateSinglePlayer.boost_charge < 1.0)
@@ -2210,6 +2234,7 @@ firePoopedCube(WorldElem *elem)
     }
     else
     {
+        texture_id = TEXTURE_ID_POOPED_CUBE_ENEMY;
         if(elem->durability <= DURABILITY_LOW) texture_id = TEXTURE_ID_POOPED_CUBE_SHIELDLOW;
     }
     

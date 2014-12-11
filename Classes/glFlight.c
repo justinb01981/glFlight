@@ -419,20 +419,15 @@ glFlightFrameStage1()
         else if(pVisCheckPtrHead == &gWorld->elements_moving)
         {
             WorldElemListNode* pVisCheckWorldHead = &gWorld->elements_list;
-            int visibility_region_check = 0;
             
-            float visRgn[3] = {
-                gameCamera_getX() / (gWorld->bound_x / WORLD_VIS_REGIONS),
-                gameCamera_getY() / (gWorld->bound_y / WORLD_VIS_REGIONS),
-                gameCamera_getZ() / (gWorld->bound_z / WORLD_VIS_REGIONS)
-            };
+            float visRgn[3];
+            
+            VIS_REGION_FOR_COORD(visRgn, gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
             
             WorldElemListNode* pVisRegionHead =
                 &(gWorld->elements_visible_by_region[(int)visRgn[0]][(int)visRgn[1]][(int)visRgn[2]]);
             
-            for(int r = 0; r < 3; r++) if(visRgn[r] >= 0 && visRgn[r] < WORLD_VIS_REGIONS) visibility_region_check++;
-            
-            if(visibility_region_check == 3 && pVisRegionHead->next) {
+            if(VIS_COORD_VALID(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ()) && pVisRegionHead->next) {
                 pVisCheckWorldHead = pVisRegionHead;
             }
             

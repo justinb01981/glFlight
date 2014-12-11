@@ -215,7 +215,7 @@ gameInput()
         if(!needTrim && !needTrimLast)
         {
             console_clear();
-            console_write("Hold trim button\nto calibrate controls (flashing)\n"
+            console_write("Hold trim button\nto calibrate controls\n"
                           "---------------------------------------------------->\n");
             gameInterfaceSetInterfaceState(INTERFACE_STATE_TRIM_BLINKING);
             return;
@@ -364,9 +364,14 @@ gameInput()
     
     if(!needTrim)
     {
-        float fcr = GYRO_FEEDBACK_COEFF * (deviceRoll-deviceLast[0]) /*dz_roll*GYRO_FEEDBACK*/;
-        float fcp = GYRO_FEEDBACK_COEFF * (devicePitch-deviceLast[1]) /*dz_pitch*GYRO_FEEDBACK*/;
-        float fcy = GYRO_FEEDBACK_COEFF * (deviceYaw-deviceLast[2]) /*dz_yaw*GYRO_FEEDBACK*/;
+        float driftComp[3] = {
+            /*GYRO_FEEDBACK_COEFF*/(trim_dz[0]/(GAME_FRAME_RATE)) * 2.0,
+            /*GYRO_FEEDBACK_COEFF*/(trim_dz[1]/(GAME_FRAME_RATE)) * 2.0,
+            /*GYRO_FEEDBACK_COEFF*/(trim_dz[2]/(GAME_FRAME_RATE)) * 2.0
+        };
+        float fcr = driftComp[0] * (deviceRoll-deviceLast[0]) /*dz_roll*GYRO_FEEDBACK*/;
+        float fcp = driftComp[1] * (devicePitch-deviceLast[1]) /*dz_pitch*GYRO_FEEDBACK*/;
+        float fcy = driftComp[2] * (deviceYaw-deviceLast[2]) /*dz_yaw*GYRO_FEEDBACK*/;
         
         float dz_m[3] = {1.01, 1.01, 1.01}; // deadzone-multiplier
         

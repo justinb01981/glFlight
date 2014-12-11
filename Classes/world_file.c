@@ -183,6 +183,11 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
             map_cmd->type = MAP_REGISTER_UPDATE_PARAMS;
             n_params = WORLD_MAP_COMMAND_PARAMS_MAX;
         }
+        else if(strcmp(token, "register_params_mul") == 0)
+        {
+            map_cmd->type = MAP_REGISTER_UPDATE_MUL_PARAMS;
+            n_params = WORLD_MAP_COMMAND_PARAMS_MAX;
+        }
         else if(strcmp(token, "set_background_info") == 0)
         {
             map_cmd->type = MAP_SET_BG_INFO;
@@ -378,6 +383,13 @@ void map_render(char *map_buf)
                 {
                     for(int i = 0; i < sizeof(map_cmd.params)/sizeof(map_cmd.params[0]); i++)
                         register_params[i] += map_cmd.params[i];
+                    line_tok = strtok(NULL, line_token);
+                    continue;
+                }
+                else if(map_cmd.type == MAP_REGISTER_UPDATE_MUL_PARAMS)
+                {
+                    for(int i = 0; i < sizeof(map_cmd.params)/sizeof(map_cmd.params[0]); i++)
+                        register_params[i] *= map_cmd.params[i];
                     line_tok = strtok(NULL, line_token);
                     continue;
                 }

@@ -25,7 +25,9 @@ enum
     COLLISION_ACTION_SPAWNPOINT_TELEPORT = 4
 };
 
-const static int
+typedef unsigned int collision_action_t;
+
+const static collision_action_t
 collision_actions_default[OBJ_LAST][OBJ_LAST] =
 {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // unknown
@@ -70,6 +72,20 @@ collision_actions_set_grab_powerup()
 {
     collision_actions[OBJ_PLAYER][OBJ_POWERUP_GENERIC] = COLLISION_ACTION_DAMAGE;
     collision_actions[OBJ_POWERUP_GENERIC][OBJ_PLAYER] = COLLISION_ACTION_DAMAGE;
+}
+
+inline static void
+collision_actions_set_player_invuln()
+{
+    collision_actions[OBJ_PLAYER][OBJ_BULLET] = COLLISION_ACTION_NONE;
+    collision_actions[OBJ_BULLET][OBJ_PLAYER] = COLLISION_ACTION_NONE;
+}
+
+inline static void
+collision_actions_set_player_vuln()
+{
+    collision_actions[OBJ_PLAYER][OBJ_BULLET] = COLLISION_ACTION_DAMAGE;
+    collision_actions[OBJ_BULLET][OBJ_PLAYER] = COLLISION_ACTION_DAMAGE;
 }
 
 inline static void
@@ -301,12 +317,6 @@ do_world_collision_handling(float tc)
                     int object_damage = collision_action == COLLISION_ACTION_DAMAGE;
                     int durability_a = pCollisionA->elem->durability;
                     int durability_b = pCollisionB->elem->durability;
-                    
-                    if(pCollisionA->elem->ignore_collisions ||
-                       pCollisionB->elem->ignore_collisions)
-                    {
-                        break;
-                    }
                     
                     if(object_damage)
                     {

@@ -188,17 +188,18 @@ static void action_sub_prev()
     };
 }
 
-static void actions_menu_reset()
+static void actions_menu_set(int action)
 {
     fireAction = ACTION_FIRST;
     actions_sub_cur = 0;
-}
-
-static void actions_menu_set(int action)
-{
-    actions_menu_reset();
+    
     fireAction = action;
     while(!actions_enabled[action]) action_sub_next();
+}
+
+static void actions_menu_reset()
+{
+    actions_menu_set(ACTION_FIRST);
 }
 
 static void actions_display_menu(char *dest)

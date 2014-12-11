@@ -2078,9 +2078,9 @@ void
 world_vis_rgn_add(float vis_dist, WorldElem* elem)
 {
     float m[3] = {
-        gWorld->bound_x / WORLD_VIS_REGIONS,
-        gWorld->bound_y / WORLD_VIS_REGIONS,
-        gWorld->bound_z / WORLD_VIS_REGIONS
+        gWorld->bound_x / WORLD_VIS_REGIONS_X,
+        gWorld->bound_y / WORLD_VIS_REGIONS_Y,
+        gWorld->bound_z / WORLD_VIS_REGIONS_Z
     };
     
     if(elem->visible_list_by_region_sorted)
@@ -2088,16 +2088,16 @@ world_vis_rgn_add(float vis_dist, WorldElem* elem)
         return;
     }
     
-    for(int x = 0; x < WORLD_VIS_REGIONS; x++)
+    for(int x = 0; x < WORLD_VIS_REGIONS_X; x++)
     {
-        for(int y = 0; y < WORLD_VIS_REGIONS; y++)
+        for(int y = 0; y < WORLD_VIS_REGIONS_Y; y++)
         {
-            for(int z = 0; z < WORLD_VIS_REGIONS; z++)
+            for(int z = 0; z < WORLD_VIS_REGIONS_Z; z++)
             {
                 float p[3] = {
-                    m[0] * x,
-                    m[1] * y,
-                    m[2] * z
+                    m[0] * x + (m[0] / 2),
+                    m[1] * y + (m[1] / 2),
+                    m[2] * z + (m[2] / 2)
                 };
                 
                 float d = distance(elem->physics.ptr->x, elem->physics.ptr->y, elem->physics.ptr->z,

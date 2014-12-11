@@ -136,6 +136,10 @@
 		D0AF470C18DCAF7600081B81 /* texture61.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0AF470B18DCAF7600081B81 /* texture61.bmp */; };
 		D0AF470E18E2546000081B81 /* texture62.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0AF470D18E2546000081B81 /* texture62.bmp */; };
 		D0AF471018ECAE8200081B81 /* texture63.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0AF470F18ECAE8200081B81 /* texture63.bmp */; };
+		D0B4C4D01A325F1500F125D4 /* texture83.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CD1A325F1500F125D4 /* texture83.bmp */; };
+		D0B4C4D11A325F1500F125D4 /* texture84.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CE1A325F1500F125D4 /* texture84.bmp */; };
+		D0B4C4D21A325F1500F125D4 /* texture85.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CF1A325F1500F125D4 /* texture85.bmp */; };
+		D0B4C4D41A32616B00F125D4 /* texture86.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4D31A32616B00F125D4 /* texture86.bmp */; };
 		D0BCBFB1175FE67F00003168 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */; };
 		D0C133C319F448A1003A6949 /* greenhex.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0C133C219F448A1003A6949 /* greenhex.bmp */; };
 		D0C133C519F448BF003A6949 /* Default2.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C133C419F448BF003A6949 /* Default2.png */; };
@@ -340,6 +344,10 @@
 		D0AF470D18E2546000081B81 /* texture62.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture62.bmp; sourceTree = "<group>"; };
 		D0AF470F18ECAE8200081B81 /* texture63.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture63.bmp; sourceTree = "<group>"; };
 		D0AF471118ECB19700081B81 /* gameDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameDialogs.h; sourceTree = "<group>"; };
+		D0B4C4CD1A325F1500F125D4 /* texture83.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture83.bmp; sourceTree = "<group>"; };
+		D0B4C4CE1A325F1500F125D4 /* texture84.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture84.bmp; sourceTree = "<group>"; };
+		D0B4C4CF1A325F1500F125D4 /* texture85.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture85.bmp; sourceTree = "<group>"; };
+		D0B4C4D31A32616B00F125D4 /* texture86.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture86.bmp; sourceTree = "<group>"; };
 		D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		D0BCBFB3176136CF00003168 /* gameLock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameLock.h; sourceTree = "<group>"; };
 		D0C133C219F448A1003A6949 /* greenhex.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = greenhex.bmp; sourceTree = "<group>"; };
@@ -528,6 +536,10 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D0B4C4D31A32616B00F125D4 /* texture86.bmp */,
+				D0B4C4CD1A325F1500F125D4 /* texture83.bmp */,
+				D0B4C4CE1A325F1500F125D4 /* texture84.bmp */,
+				D0B4C4CF1A325F1500F125D4 /* texture85.bmp */,
 				D034416B1A1E7B9200C89475 /* texture82.bmp */,
 				D03441691A1E7B8A00C89475 /* texture81.bmp */,
 				D00D78D01A09525100E701B9 /* texture80.bmp */,
@@ -739,7 +751,9 @@
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
 				28EC4C5A11D54ECE0027AA9F /* gl_flightViewController.xib in Resources */,
 				D0FE6D0D1859C871007D67CF /* texture55.bmp in Resources */,
+				D0B4C4D01A325F1500F125D4 /* texture83.bmp in Resources */,
 				6D1073231585CAE0006B6499 /* texture0.bmp in Resources */,
+				D0B4C4D21A325F1500F125D4 /* texture85.bmp in Resources */,
 				D00D78D31A09525100E701B9 /* texture79.bmp in Resources */,
 				6DE4E2CC15926E7B00CE3C37 /* texture1.bmp in Resources */,
 				D02B8F0D195DF2CC00830369 /* texture30.bmp in Resources */,
@@ -814,6 +828,8 @@
 				D0309F261771A39E00100357 /* texture16.bmp in Resources */,
 				D0309F281771A3C900100357 /* texture23.bmp in Resources */,
 				D0309F2C1771A45E00100357 /* texture28.bmp in Resources */,
+				D0B4C4D11A325F1500F125D4 /* texture84.bmp in Resources */,
+				D0B4C4D41A32616B00F125D4 /* texture86.bmp in Resources */,
 				D0D7A5C7191AEFDF0083FDF8 /* texture65.bmp in Resources */,
 				D05A90B617A1CF8100F40807 /* texture40.bmp in Resources */,
 				D05A90B817A1E3F400F40807 /* engine.wav in Resources */,
