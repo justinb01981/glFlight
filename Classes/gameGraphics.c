@@ -345,6 +345,7 @@ int drawRadar()
             float scale = 1;
             char *textLabel = NULL;
             int camera_relative = 0;
+            int tex_icon = -1;
             
             if(cur->elem->elem_id == game_target_missle_id) camera_relative = 1;
             
@@ -427,6 +428,7 @@ int drawRadar()
             else if(cur->elem->elem_id == game_target_objective_id /* && zdot > 0*/)
             {
                 tex_id = TEXTURE_ID_RADAR_OBJECTIVE;
+                tex_icon = cur->elem->texture_id;
                 scale = 4;
             }
             
@@ -467,6 +469,20 @@ int drawRadar()
             
             drawState2dSet(ds);
             drawState2dDraw();
+            
+            if(tex_icon >= 0)
+            {
+                float w = er.yw;
+                ds->coords[1] += w;
+                ds->coords[4] += w;
+                ds->coords[7] += w;
+                ds->coords[10] += w;
+                ds->tex_id = tex_icon;
+                
+                drawState2dSetCoords(ds);
+                drawState2dDraw();
+                tex_icon = -1;
+            }
             
             radar_draw_end:
             
@@ -816,7 +832,7 @@ drawElem_newFrame()
 }
 
 void
-drawState2dSet(gameGraphics_drawState2d* state)
+drawState2dSetCoords(gameGraphics_drawState2d* state)
 {
     memcpy(drawState_2d.coords, state->coords, sizeof(drawState_2d.coords));
     memcpy(drawState_2d.texcoords, state->texcoords, sizeof(drawState_2d.texcoords));
@@ -824,6 +840,12 @@ drawState2dSet(gameGraphics_drawState2d* state)
     drawState_2d.tex_id = state->tex_id;
     
     bindTexture(drawState_2d.tex_id);
+}
+
+void
+drawState2dSet(gameGraphics_drawState2d* state)
+{
+    drawState2dSetCoords(state);
     
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

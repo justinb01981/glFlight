@@ -36,6 +36,9 @@ typedef struct
 } gameGraphics_drawState2d;
 
 void
+drawState2dSetCoords(gameGraphics_drawState2d* state);
+
+void
 drawState2dSet(gameGraphics_drawState2d* state);
 
 void
