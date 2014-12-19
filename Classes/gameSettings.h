@@ -31,7 +31,7 @@ typedef struct
 } glFlightPrefs;
 
 // TODO:bump this every time settings change
-const static int settings_version = 29;
+const static int settings_version = 30;
 
 // HACK: externs built in .m files
 extern double dz_roll, dz_pitch, dz_yaw;

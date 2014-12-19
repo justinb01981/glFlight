@@ -248,7 +248,7 @@ int
 gameNetwork_countPlayers();
 
 void
-gameNetwork_startGame();
+gameNetwork_startGame(unsigned int sec);
 
 gameNetworkError
 gameNetwork_send(gameNetworkMessage* msg);

@@ -107,6 +107,10 @@ public class GameResources {
         R.raw.texture80,
         R.raw.texture81,
         R.raw.texture82,
+        R.raw.texture83,
+        R.raw.texture84,
+        R.raw.texture85,
+        R.raw.texture86,
 	};
 	
 	public static String[] resFilename = {
@@ -195,6 +199,10 @@ public class GameResources {
         "texture80.bmp",
         "texture81.bmp",
         "texture82.bmp",
+        "texture83.bmp",
+        "texture84.bmp",
+        "texture85.bmp",
+        "texture86.bmp",
 	};
 	
 	public static String[] sndNameList = {
@@ -204,7 +212,8 @@ public class GameResources {
 		"dead",
 		"dropoff",
 		"engine",
-		"engine2",
+		"engineSlow",
+		"engineFast",
 		"flyby",
 		"highscore",
 		"lockedon",
@@ -224,7 +233,8 @@ public class GameResources {
 		R.raw.dead,
 		R.raw.dropoff,
 		R.raw.engine,
-		R.raw.engine2,
+		R.raw.engineSlow,
+		R.raw.engineFast,
 		R.raw.flyby,
 		R.raw.highscore,
 		R.raw.lockedon,

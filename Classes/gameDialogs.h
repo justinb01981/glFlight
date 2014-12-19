@@ -112,7 +112,7 @@ gameDialogWelcomeMultiLan()
 static void
 gameDialogWelcomeMulti()
 {
-    gameInterfaceModalDialog("LAN/Internet:", "LAN", "Internet",
+    gameInterfaceModalDialog("Local/Internet:", "Local\nWI-FI", "Internet",
                              gameDialogWelcomeMultiLan, gameDialogWelcomeMultiInternet);
 }
 

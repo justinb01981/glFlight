@@ -102,8 +102,6 @@
 		D0309F281771A3C900100357 /* texture23.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0309F271771A3C800100357 /* texture23.bmp */; };
 		D0309F2C1771A45E00100357 /* texture28.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0309F2B1771A45E00100357 /* texture28.bmp */; };
 		D033788714D9FEFD00FD8A74 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D033788614D9FEFD00FD8A74 /* CoreMotion.framework */; };
-		D03441661A1BB31F00C89475 /* engineSlow.wav in Resources */ = {isa = PBXBuildFile; fileRef = D03441651A1BB31F00C89475 /* engineSlow.wav */; };
-		D03441681A1BB49900C89475 /* engineFast.wav in Resources */ = {isa = PBXBuildFile; fileRef = D03441671A1BB49900C89475 /* engineFast.wav */; };
 		D034416A1A1E7B8A00C89475 /* texture81.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03441691A1E7B8A00C89475 /* texture81.bmp */; };
 		D034416C1A1E7B9200C89475 /* texture82.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D034416B1A1E7B9200C89475 /* texture82.bmp */; };
 		D03ADBA8178271E900D725F7 /* actions.c in Sources */ = {isa = PBXBuildFile; fileRef = D03ADBA7178271E800D725F7 /* actions.c */; };
@@ -121,6 +119,8 @@
 		D09893511937FD7D00298C8E /* texture67.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09893501937FD7D00298C8E /* texture67.bmp */; };
 		D09A4E321840196E004C73F2 /* Default-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = D09A4E311840196E004C73F2 /* Default-Landscape.png */; };
 		D09E7FC816EFBFC500343CE6 /* texture27.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09E7FC716EFBFC400343CE6 /* texture27.bmp */; };
+		D0A5039A1A43EF8C00C4BBD1 /* engineslow.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A503991A43EF8C00C4BBD1 /* engineslow.wav */; };
+		D0A5039C1A43EF9400C4BBD1 /* enginefast.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A5039B1A43EF9400C4BBD1 /* enginefast.wav */; };
 		D0A5535C189868B800F7E798 /* texture48.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A5535B189868B800F7E798 /* texture48.bmp */; };
 		D0A5535E18A6C79900F7E798 /* texture57.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A5535D18A6C79900F7E798 /* texture57.bmp */; };
 		D0A5536018B6DDD700F7E798 /* texture58.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A5535F18B6DDD700F7E798 /* texture58.bmp */; };
@@ -303,8 +303,6 @@
 		D0309F271771A3C800100357 /* texture23.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture23.bmp; sourceTree = "<group>"; };
 		D0309F2B1771A45E00100357 /* texture28.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture28.bmp; sourceTree = "<group>"; };
 		D033788614D9FEFD00FD8A74 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
-		D03441651A1BB31F00C89475 /* engineSlow.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engineSlow.wav; sourceTree = "<group>"; };
-		D03441671A1BB49900C89475 /* engineFast.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engineFast.wav; sourceTree = "<group>"; };
 		D03441691A1E7B8A00C89475 /* texture81.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture81.bmp; sourceTree = "<group>"; };
 		D034416B1A1E7B9200C89475 /* texture82.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture82.bmp; sourceTree = "<group>"; };
 		D03ABA6414ADACF000C44538 /* world.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = world.h; sourceTree = "<group>"; };
@@ -328,6 +326,8 @@
 		D09893501937FD7D00298C8E /* texture67.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture67.bmp; sourceTree = "<group>"; };
 		D09A4E311840196E004C73F2 /* Default-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape.png"; sourceTree = "<group>"; };
 		D09E7FC716EFBFC400343CE6 /* texture27.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture27.bmp; sourceTree = "<group>"; };
+		D0A503991A43EF8C00C4BBD1 /* engineslow.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engineslow.wav; sourceTree = "<group>"; };
+		D0A5039B1A43EF9400C4BBD1 /* enginefast.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = enginefast.wav; sourceTree = "<group>"; };
 		D0A5535B189868B800F7E798 /* texture48.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture48.bmp; sourceTree = "<group>"; };
 		D0A5535D18A6C79900F7E798 /* texture57.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture57.bmp; sourceTree = "<group>"; };
 		D0A5535F18B6DDD700F7E798 /* texture58.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture58.bmp; sourceTree = "<group>"; };
@@ -640,15 +640,15 @@
 				D02DAC1317D147E500035601 /* dropoff.wav */,
 				D02DAC1117D1478400035601 /* collect.wav */,
 				D02DAC0F17D145A000035601 /* bump.wav */,
-				D03441651A1BB31F00C89475 /* engineSlow.wav */,
 				D05A90B717A1E3F400F40807 /* engine.wav */,
+				D0A5039B1A43EF9400C4BBD1 /* enginefast.wav */,
+				D0A503991A43EF8C00C4BBD1 /* engineslow.wav */,
 				6D4F2F3F1618241A00286C16 /* boom.wav */,
 				6D4F2F3D1618241000286C16 /* shoot.wav */,
 				D0A5536818BC16C700F7E798 /* towing.wav */,
 				D098934C1937F44400298C8E /* speedboost.wav */,
 				6D53C4DA1696D30B009D6C3C /* dead.wav */,
 				D02DAC0D17C72E9700035601 /* engine2.wav */,
-				D03441671A1BB49900C89475 /* engineFast.wav */,
 				D00D78C919FB18EC00E701B9 /* flyby.wav */,
 				28EC4C5811D54ECE0027AA9F /* gl_flightViewController.xib */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
@@ -807,9 +807,9 @@
 				D02B8F1F1969E7B800830369 /* texture73.bmp in Resources */,
 				D02B8F031954A74400830369 /* texture69.bmp in Resources */,
 				D0FE6D0B1859C6C3007D67CF /* texture54.bmp in Resources */,
-				D03441681A1BB49900C89475 /* engineFast.wav in Resources */,
 				D0A5535E18A6C79900F7E798 /* texture57.bmp in Resources */,
 				6DDAAC7E16BEF3CB003D97DF /* texture26.bmp in Resources */,
+				D0A5039C1A43EF9400C4BBD1 /* enginefast.wav in Resources */,
 				D0AD4F6816D8466E00664895 /* texture24.bmp in Resources */,
 				D00D78D41A09525100E701B9 /* texture80.bmp in Resources */,
 				D09E7FC816EFBFC500343CE6 /* texture27.bmp in Resources */,
@@ -823,6 +823,7 @@
 				D0EECB321757D9B300B5B815 /* Default-568h@2x.png in Resources */,
 				D0C133C519F448BF003A6949 /* Default2.png in Resources */,
 				D0309F201770F3A600100357 /* texture37.bmp in Resources */,
+				D0A5039A1A43EF8C00C4BBD1 /* engineslow.wav in Resources */,
 				D0309F221770F41C00100357 /* texture38.bmp in Resources */,
 				D0309F241770F42A00100357 /* texture36.bmp in Resources */,
 				D0309F261771A39E00100357 /* texture16.bmp in Resources */,
@@ -861,7 +862,6 @@
 				D09893511937FD7D00298C8E /* texture67.bmp in Resources */,
 				D0AF470C18DCAF7600081B81 /* texture61.bmp in Resources */,
 				D0DA479E180B336600BD4DC2 /* texture47.bmp in Resources */,
-				D03441661A1BB31F00C89475 /* engineSlow.wav in Resources */,
 				D0A8D74819F9BFE6006FE907 /* lockedon.wav in Resources */,
 				D02B8F0F195DF2CC00830369 /* texture32.bmp in Resources */,
 				D02B8F071954D5F400830369 /* texture71.bmp in Resources */,

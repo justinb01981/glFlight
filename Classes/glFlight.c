@@ -163,11 +163,11 @@ glFlightFrameStage1()
             char* sndName = "engine2";
             if(speed/maxSpeed < 0.33)
             {
-                sndName = "engineSlow";
+                sndName = "engineslow";
             }
             else if(speed/ maxSpeed >= 0.66)
             {
-                sndName = "engineFast";
+                sndName = "enginefast";
             }
             gameAudioPlaySoundAtLocationWithRate(sndName, my_ship_x, my_ship_y, my_ship_z,
                                                  rate);
@@ -306,7 +306,7 @@ glFlightFrameStage1()
                                 my_ship_z,
                                 -ship_alpha, -ship_beta, -ship_gamma);
                 
-                gameCamera_yawRadians((viewRotationDegrees/180) * M_PI);
+                gameCamera_yawRadians((viewRotationDegrees/180.0) * M_PI);
                 gameCamera_MoveZ(-camera_z_trail);
                 gameCamera_MoveY(1);
             }

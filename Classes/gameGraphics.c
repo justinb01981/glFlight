@@ -428,7 +428,7 @@ int drawRadar()
             else if(cur->elem->elem_id == game_target_objective_id /* && zdot > 0*/)
             {
                 tex_id = TEXTURE_ID_RADAR_OBJECTIVE;
-                tex_icon = cur->elem->texture_id;
+                tex_icon = zdot >= 0? cur->elem->texture_id: TEXTURE_ID_RADAR_BEHIND;
                 scale = 4;
             }
             
@@ -472,11 +472,29 @@ int drawRadar()
             
             if(tex_icon >= 0)
             {
-                float w = er.yw;
-                ds->coords[1] += w;
-                ds->coords[4] += w;
-                ds->coords[7] += w;
-                ds->coords[10] += w;
+                float icon_wo = er.yw*0.25;
+                scale = 0.25;
+                
+                er.x -= er.xw/2*scale;
+                er.y -= (er.yw/2*scale)+icon_wo;
+                er.xw *= scale;
+                er.yw *= scale;
+                
+                ds->coords[0] = er.x;
+                ds->coords[1] = er.y;
+                ds->coords[2] = z;
+                
+                ds->coords[3] = er.x+er.xw;
+                ds->coords[4] = er.y;
+                ds->coords[5] = z;
+                
+                ds->coords[6] = er.x;
+                ds->coords[7] = er.y+er.yw;
+                ds->coords[8] = z;
+                
+                ds->coords[9] = er.x+er.xw;
+                ds->coords[10] = er.y+er.yw;
+                ds->coords[11] = z;
                 ds->tex_id = tex_icon;
                 
                 drawState2dSetCoords(ds);

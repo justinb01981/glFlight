@@ -35,8 +35,8 @@ static const char* gameSoundNames[] = {
     "speedboost",
     "lockedon",
     "flyby",
-    "engineSlow",
-    "engineFast",
+    "engineslow",
+    "enginefast",
     NULL
 };
 

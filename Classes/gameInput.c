@@ -178,10 +178,14 @@ gameInput()
     devicePitch = motionRoll;
     deviceYaw = -motionPitch;
     deviceRoll = -motionYaw;
+    
+    float dz_m[3] = {1.01, 1.01, 1.01}; // deadzone-multiplier
 #else
     devicePitch = -motionPitch;
     deviceYaw = motionYaw;
     deviceRoll = motionRoll;
+    
+    float dz_m[3] = {1.00, 1.00, 1.00}; // deadzone-multiplier
 #endif
     
     static double trimStart[3];
@@ -372,8 +376,6 @@ gameInput()
         float fcr = driftComp[0] * (deviceRoll-deviceLast[0]) /*dz_roll*GYRO_FEEDBACK*/;
         float fcp = driftComp[1] * (devicePitch-deviceLast[1]) /*dz_pitch*GYRO_FEEDBACK*/;
         float fcy = driftComp[2] * (deviceYaw-deviceLast[2]) /*dz_yaw*GYRO_FEEDBACK*/;
-        
-        float dz_m[3] = {1.01, 1.01, 1.01}; // deadzone-multiplier
         
         float cap = /*0.05*/ 0.1; // radians
         float sm[] = /*{0.6, 0.8, 0.8}*/ {0.7, 0.9, 0.6};

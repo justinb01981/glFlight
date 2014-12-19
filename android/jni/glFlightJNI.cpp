@@ -121,6 +121,9 @@ glFlightJNIInit()
 	gameMapSetMap(maps_list[0]);
 
 	gameInterfaceInit(viewWidth, viewHeight);
+    gameInterfaceControls.trim.blinking = 1;
+    
+    gameDialogCalibrate();    
 }
 
 static float xscale = 1;
