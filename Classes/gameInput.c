@@ -185,7 +185,7 @@ gameInput()
     deviceYaw = motionYaw;
     deviceRoll = motionRoll;
     
-    float dz_m[3] = {1.00, 1.00, 1.00}; // deadzone-multiplier
+    float dz_m[3] = {0.5, 0.5, 0.5}; // deadzone-multiplier
 #endif
     
     static double trimStart[3];
