@@ -108,6 +108,11 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
 "register_params_update rnd_"BACKGROUND_TEX_LEN" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n" \
 "set_background_info r\n"
 
+#define BACKGROUND_TEX_SPACE                                                      \
+"register_params "BACKGROUND_TEX_BEGIN" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"          \
+"register_params_update rnd_""1"" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n" \
+"set_background_info r\n"
+
 #define GREEN_TENDRILS_1                                                   \
 "register_params 2 rndx 20 rndy 0 0 0 10 0 0 0 0 0 0 0 0\n"                \
 "register_params_update 0 rnd_20 rnd_20 rnd_20 0 0 0 0 0 0 0 0 0 0 0 0\n"  \
@@ -419,6 +424,37 @@ RANDOM_FLOATING_BLOCKS_1
 "add_object 1 50 80 150 0 0 0 16 3\n"
 "add_object 1 50 90 150 0 0 0 16 3\n"
 */
+;
+
+const static char initial_map_asteroid1[] = ""
+BACKGROUND_TEX_SPACE
+
+WORLD_SCALED_FRAME(1, 80, 4)
+
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+
+"register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
 ;
 
 const static char initial_map_collection[] = ""
@@ -1198,6 +1234,7 @@ const static char* maps_list[] =
     map_400x100x400,
     map_portal_lobby,
     map_200x100x200_pits,
+    initial_map_asteroid1,
     NULL
 };
 
@@ -1209,6 +1246,7 @@ const static char* maps_list_names[] =
     "map bigcanvas",
     "lobby",
     "pit",
+    "asteroid",
     NULL
 };
 

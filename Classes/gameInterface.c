@@ -95,7 +95,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     
     gameInterfaceControls.radar = trimRect;
     gameInterfaceControls.radar.y -= (screenHeight*0.15);
-    gameInterfaceControls.radar.tex_id = 20;
+    gameInterfaceControls.radar.tex_id = TEXTURE_ID_CONTROLS_RADAR;
     gameInterfaceControls.radar.visible = 1;
     
     controlRect menuRect = {

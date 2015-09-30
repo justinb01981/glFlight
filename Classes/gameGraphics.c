@@ -295,6 +295,7 @@ int drawRadar()
     float z = -2;
     gameGraphics_drawState2d *ds = &drawRadar_ds;
     int i;
+    int minimal_overlay = 1;
     
     WorldElemListNode* cur = gWorld->elements_moving.next;
     
@@ -428,9 +429,16 @@ int drawRadar()
             else if(cur->elem->elem_id == game_target_objective_id /* && zdot > 0*/)
             {
                 tex_id = TEXTURE_ID_RADAR_OBJECTIVE;
-                tex_icon = zdot >= 0? cur->elem->texture_id: TEXTURE_ID_RADAR_BEHIND;
+                if(!minimal_overlay) tex_icon = zdot >= 0? cur->elem->texture_id: TEXTURE_ID_RADAR_BEHIND;
+                
                 scale = 4;
             }
+            else
+            {
+                // cleanup overlay: skip these
+                if(minimal_overlay) goto radar_draw_end;
+            }
+            
             
             er.x -= er.xw/2*scale;
             er.y -= er.yw/2*scale;
@@ -538,10 +546,7 @@ int drawControlsRadar(drawSubElement subElemRadarList[], int max)
             if(cur->elem->physics.ptr->velocity >= RADAR_MIN_VELOCITY)
                 visible = 1;
         }
-        else if(cur->elem->object_type == OBJ_SHIP ||
-                cur->elem->object_type == OBJ_CAPTURE ||
-                cur->elem->object_type == OBJ_POWERUP_GENERIC ||
-                cur->elem->object_type == OBJ_SPAWNPOINT)
+        else if(cur->elem->stuff.radar_visible)
         {
             visible = 1;
         }

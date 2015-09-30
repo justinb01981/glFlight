@@ -296,6 +296,7 @@ game_add_powerup(float x, float y, float z, int type, int lifetime)
     {
         case GAME_SUBTYPE_COLLECT:
             tex_id = TEXTURE_ID_DATA;
+            radar_visible = 1;
             break;
             
         case GAME_SUBTYPE_LIFE:
@@ -316,6 +317,7 @@ game_add_powerup(float x, float y, float z, int type, int lifetime)
             
         default:
             tex_id = TEXTURE_ID_CAPTUREPOINT;
+            radar_visible = 1;
             break;
     }
     
@@ -633,7 +635,7 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.spawn_powerup_lifetime = 0;
     gameStateSinglePlayer.spawn_powerup_m = 0;
     gameStateSinglePlayer.enemy_durability = DURABILITY_ENEMY_DEATHMATCH;
-    gameStateSinglePlayer.max_enemies = 1 + difficulty;
+    gameStateSinglePlayer.max_enemies = 3 + difficulty;
     gameStateSinglePlayer.max_enemies_spawned = 99999;
     gameStateSinglePlayer.n_turrets = 0;
     gameStateSinglePlayer.n_asteroids = 30;
