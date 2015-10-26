@@ -10,6 +10,7 @@
 #define __OBJECT_H__
 
 typedef enum {
+    // TODO: these enums are used in maps, so don't change their order/remove...
     OBJ_UNKNOWN = 0,
     OBJ_SHIP = 1,
     OBJ_PLAYER,

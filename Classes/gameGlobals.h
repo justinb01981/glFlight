@@ -17,6 +17,8 @@
 
 enum {
     DURABILITY_PLAYER = 10,
+    DURABILITY_BLOCK = 1,
+    DURABILITY_ASTEROID = 5,
     DURABILITY_LOW = 5,
     DURABILITY_ENEMY = 10,
     DURABILITY_ENEMY_DEATHMATCH = 10,
@@ -63,13 +65,16 @@ extern int save_map;
 #else
 #define GAME_PLATFORM_IS_LANDSCAPE 0
 #define GYRO_FEEDBACK_COEFF (0.002)
-#define GYRO_DC_DEFAULT /*0.004*/ (0.03)
+#define GYRO_DC_DEFAULT /*0.004*/ (0.05)
 #define GYRO_FEEDBACK_DEFAULT (0.1)
 #endif
 
-#define MAX_SPEED (20)
+#define GYRO_SAMPLE_RATE (30)
 
-const static char* GAME_VERSION_STR = "0.9.12.1 core";
+#define MAX_SPEED /*(15)*/ (10)
+#define MAX_SPEED_PLAYER_SCALE (2.0)
+
+const static char* GAME_VERSION_STR = "0.9.14.3 core";
 
 const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2.5);
 const static float SPEED_BOOST_FRAMES = 60 * 5;
@@ -77,6 +82,9 @@ extern float C_THRUST;
 extern float C_FRICTION;
 extern float GYRO_FEEDBACK;
 extern float GYRO_DC;
+
+const static int pooped_cube_interval_ms = 50;
+const static int pooped_cube_lifetime = 100;
 
 const static float collision_repulsion_coeff = 0.2;
 

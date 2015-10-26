@@ -26,7 +26,7 @@ const static int TRUE = 1;
 const static int FALSE = 0;
 
 int n_elements_compared = 0;
-volatile float time_ms = 0;
+volatile float time_ms = 1;
 
 float drawDistanceFar = 200;
 
@@ -240,10 +240,11 @@ element_dist_compare(WorldElem* pElemA, WorldElem* pElemB)
 game_timeval_t
 get_time_ms()
 {
+    /*
     struct timeval tv;
     static struct timeval tv_start = {0};
 
-    /* Warning: unsigned long cannot contain this value */
+    // Warning: unsigned long cannot contain this value
     gettimeofday(&tv, NULL);
     
     if(tv_start.tv_sec == 0)
@@ -255,8 +256,15 @@ get_time_ms()
     game_timeval_t tvus = tv.tv_usec / 1000;
 
     time_ms = tvs * 1000 + tvus;
+    */
     
     return time_ms;
+}
+
+void
+update_time_ms_frame_tick()
+{
+    time_ms += 1000 / GAME_FRAME_RATE;
 }
 
 unsigned long
@@ -298,11 +306,47 @@ char *consoleMessageLast = NULL;
 
 game_timeval_t console_write_time = 0;
 
+console_entry_t g_console_message_log_head = {NULL};
+int g_console_message_log_len = 0;
+
+void console_init()
+{
+    g_console_message_log_head.next = NULL;
+    g_console_message_log_len = 0;
+}
+
+void console_log_clear(int n, int clear_all)
+{
+    console_entry_t* pcur = &g_console_message_log_head;
+    while(pcur->next && (n > 0 || clear_all)) {
+        console_entry_t* pfree = pcur->next;
+        pcur->next = pcur->next->next;
+        free(pfree);
+        n--;
+        g_console_message_log_len--;
+    }
+}
 
 void
 console_clear()
 {
     consoleMessage[0] = '\0';
+}
+
+console_entry_t*
+console_log_search(char *key, unsigned idx)
+{
+    console_entry_t* cur = g_console_message_log_head.next;
+    while(cur)
+    {
+        if(strstr(cur->msg, key))
+        {
+            if(idx == 0) return cur;
+            idx--;
+        }
+        cur = cur->next;
+    }
+    return NULL;
 }
 
 void
@@ -337,9 +381,12 @@ console_write(char* fmt, ...)
 {
     int append = 0;
     char *msgPtr;
+    char consoleMessageHidden[2048];
   
     if(time_ms - console_write_time < 5000) append = 1;
     msgPtr = append? consoleMessageTemp: consoleMessage;
+    
+    if(strncmp(fmt, "HIDDEN:", 7) == 0) msgPtr = consoleMessageHidden;
     
     if(append) strcat(consoleMessage, "\n");
     
@@ -359,6 +406,22 @@ console_write(char* fmt, ...)
     va_end(list);
     
     if(append) console_append(consoleMessageTemp);
+    
+    /* append to global log */
+    if(g_console_message_log_len > 1024)
+    {
+        console_log_clear(1, 0);
+    }
+    console_entry_t* cur = &g_console_message_log_head;
+    while(cur->next) cur = cur->next;
+    console_entry_t* curnew = malloc(sizeof(console_entry_t));
+    if(curnew)
+    {
+        curnew->next = NULL;
+        strncpy(curnew->msg, msgPtr, sizeof(cur->next->msg)-1);
+        cur->next = curnew;
+        g_console_message_log_len++;
+    }
 }
 
 void

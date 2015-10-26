@@ -57,6 +57,8 @@ build_mesh(float x, float y, float z,
     }
     mesh->n_coordinates = n_coordinates;
     
+    mesh->round_inc_x = mesh->round_inc_y = mesh->round_inc_z = 0;
+    
     unsigned int triangle_n = 0;
     
     for(int row = 0; row <= mesh->dim_y-1; row++)
@@ -125,6 +127,42 @@ build_mesh(float x, float y, float z,
     }
     
     return mesh;
+}
+
+static float meshround(float v, float m)
+{
+    v = v / m;
+    float r = v - floor(v);
+    
+    if(fabs(r) >= 0.5) v += (v/fabs(v));
+    
+    return floor(v) * m;
+}
+
+void
+apply_mesh_rounding(struct mesh_t* mesh, float dx, float dy, float dz)
+{
+    mesh->round_inc_x = dx;
+    mesh->round_inc_y = dy;
+    mesh->round_inc_z = dz;
+    
+    int r;
+    for(r = 0; r < mesh->dim_y; r++)
+    {
+        int c;
+        for(c = 0; c < mesh->dim_x; c++)
+        {
+            if(mesh->round_inc_x)
+                mesh->coordinates[MESH_COORD_IDX(mesh, r, c)].x =
+                meshround(mesh->coordinates[MESH_COORD_IDX(mesh, r, c)].x, mesh->round_inc_x);
+            if(mesh->round_inc_y)
+                mesh->coordinates[MESH_COORD_IDX(mesh, r, c)].y =
+                meshround(mesh->coordinates[MESH_COORD_IDX(mesh, r, c)].y, mesh->round_inc_y);
+            if(mesh->round_inc_z)
+                mesh->coordinates[MESH_COORD_IDX(mesh, r, c)].z =
+                meshround(mesh->coordinates[MESH_COORD_IDX(mesh, r, c)].z, mesh->round_inc_z);
+        }
+    }
 }
 
 void

@@ -14,6 +14,7 @@
 #include "gameUtils.h"
 #include "gameGlobals.h"
 #include "gameAI.h"
+#include "assert.h"
 
 #define game_ammo_missles_max 4
 #define game_ammo_bullets_max 32
@@ -78,6 +79,76 @@ typedef struct
     float params[16];
     char str[256];
 } game_objective_t;
+
+#define GAME_VARIABLES_MAX 32
+#define GAME_VARIABLE(x) (game_variable_get(x))
+
+const static char *game_variables_name[] = {
+    "ENEMY_SPAWN_MAX_COUNT",
+    "ENEMY_SPAWN_MAX_ALIVE",
+    "PHYSICS_FRICTION_C",
+    
+    "ENEMY1_FORGET_DISTANCE",
+    "ENEMY1_PURSUE_DISTANCE",
+    "ENEMY1_SPEED_MAX",
+    "ENEMY1_TURN_MAX_RADIANS",
+    "ENEMY1_FIRES_MISSLES",
+    "ENEMY1_FIRES_LASERS",
+    "ENEMY1_CHANGES_TARGET",
+    "ENEMY1_PATROLS_NO_TARGET",
+    "ENEMY1_RUN_INTERVAL_MS",
+    "ENEMY1_LEAVES_TRAIL",
+    NULL
+};
+
+static char *game_log_messages[] = {
+    "file saved",
+    "detected: virus",
+    "detected: bounty hunter",
+    "file lost",
+    "detected: ally",
+    "warning: virus capturing file",
+    "killed: virus",
+    "killed: bounty-hunter",
+    "killed: turret",
+    NULL
+};
+
+enum {
+    GAME_LOG_FILESAVED,
+    GAME_LOG_NEWENEMY1,
+    GAME_LOG_NEWENEMY2,
+    GAME_LOG_FILELOST,
+    GAME_LOG_NEWALLY,
+    GAME_LOG_WARN_CAPTURE,
+    GAME_LOG_KILLED_ENEMY1,
+    GAME_LOG_KILLED_ENEMY2,
+    GAME_LOG_KILLED_TURRET,
+    GAME_LOG_LAST
+};
+
+
+extern float game_variables_val[GAME_VARIABLES_MAX];
+
+const static float game_variables_default[] = {
+    99999999,    // MAX_SPAWN_COUNT
+    10,          // MAX_ALIVE_COUNT
+    1,           // PHYSICS_FRICTION_C
+    
+    50,          // ENEMY1_FORGET_DISTANCE
+    30,          // ENEMY1_PURSUE_DISTANCE
+    MAX_SPEED,          // MAX_SPEED
+    1.2,         // MAX_RADIANS
+    0,           // FIRES MISSLES
+    1,           // FIRES LASERS
+    1,           // CHANGES_TARGET
+    1,           // PATROLS
+    50,          // RUN_INTERVAL_MS
+    1,           // LEAVES TRAIL
+    0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0            // END
+};
 
 struct
 {
@@ -181,7 +252,7 @@ extern float game_ammo_missles;
 extern float game_ammo_bullets;
 extern float game_ammo_missle_recharge;
 extern float game_ammo_bullets_recharge;
-const static float GAME_MISSLE_LIFETIME = (60*5);
+const static float GAME_MISSLE_LIFETIME = (60*6);
 extern int model_my_ship;
 
 /*
@@ -218,22 +289,54 @@ void fireBullet(int bulletAction);
 
 int firePoopedCube(WorldElem *elem);
 
+static float
+game_variable_get(const char* name)
+{
+    int i = 0;
+    while(game_variables_name[i] != NULL && strcmp(game_variables_name[i], name) != 0)
+    {
+        i++;
+    }
+    assert(game_variables_name[i] != NULL);
+    return game_variables_val[i];
+}
+
+static float
+game_variable_set(const char* name, float val)
+{
+    int i = 0;
+    while(game_variables_name[i] != NULL && strcmp(game_variables_name[i], name) != 0)
+    {
+        i++;
+    }
+    if(i < sizeof(game_variables_val)/sizeof(float)) game_variables_val[i] = val;
+    return val;
+}
+
 inline static void
 game_elem_setup_ship(WorldElem* elem, int skill)
 {
     if(skill > 5) skill = 5;
     
-    elem->stuff.u.enemy.leaves_trail = 1;
+    elem->stuff.u.enemy.leaves_trail = GAME_VARIABLE("ENEMY1_LEAVES_TRAIL");
     elem->stuff.u.enemy.run_distance = rand_in_range(4, 14);
     elem->stuff.u.enemy.fixed = 0;
-    elem->stuff.u.enemy.changes_target = 1;
-    elem->stuff.u.enemy.fires = 1;
-    elem->stuff.u.enemy.patrols_no_target = 1;
-    elem->stuff.u.enemy.max_speed = MIN(MAX_SPEED, MAX_SPEED * (0.5 + 0.1*skill));
-    elem->stuff.u.enemy.max_turn = /*0.5*/ 1.0 +  (0.2*skill);
-    elem->stuff.u.enemy.time_run_interval = MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
-    elem->stuff.u.enemy.forget_distance = 50 + (10 * skill);
-    elem->stuff.u.enemy.pursue_distance = 30 - (5 * skill);
+    elem->stuff.u.enemy.changes_target = GAME_VARIABLE("ENEMY1_CHANGES_TARGET");
+    elem->stuff.u.enemy.fires = GAME_VARIABLE("ENEMY1_FIRES_LASERS");
+    elem->stuff.u.enemy.patrols_no_target = GAME_VARIABLE("ENEMY1_PATROLS_NO_TARGET");
+    elem->stuff.u.enemy.max_speed = MIN(GAME_VARIABLE("ENEMY1_SPEED_MAX"), GAME_VARIABLE("ENEMY1_SPEED_MAX") * (0.5 + 0.1*skill));
+    elem->stuff.u.enemy.max_turn = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS")
+    //1.0 +  (0.2*skill);
+    ;
+    elem->stuff.u.enemy.time_run_interval = GAME_VARIABLE("ENEMY1_RUN_INTERVAL_MS")
+    //MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
+    ;
+    elem->stuff.u.enemy.scan_distance = GAME_VARIABLE("ENEMY1_FORGET_DISTANCE")
+    //50 + (10 * skill);
+    ;
+    elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE")
+    //30 - (5 * skill);
+    ;
 }
 
 inline static void
@@ -251,7 +354,7 @@ game_elem_setup_turret(WorldElem* elem, int skill)
     elem->stuff.u.enemy.max_speed = 0;
     elem->stuff.u.enemy.max_turn = 0.8;
     elem->stuff.u.enemy.time_run_interval = MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
-    elem->stuff.u.enemy.forget_distance = 70;
+    elem->stuff.u.enemy.scan_distance = 70;
     elem->stuff.u.enemy.pursue_distance = 70;
 }
 
@@ -273,7 +376,7 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
     x->stuff.u.enemy.max_turn = 2.0; // radians per second
     x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
-    x->stuff.u.enemy.forget_distance = 50;
+    x->stuff.u.enemy.scan_distance = 50;
     x->stuff.u.enemy.pursue_distance = 30;
 }
 

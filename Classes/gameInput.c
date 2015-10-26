@@ -83,6 +83,9 @@ double roll_m, pitch_m, yaw_m;
 int trimCount = 0;
 int trimCountLast = 0;
 unsigned int gyroInputCount = 0;
+int gyroStableCount = 0;
+float gyroInputDeltaLast[3] = {0, 0, 0};
+float fcr = 0.0, fcp = 0.0, fcy = 0.0;
 
 void
 gameInputInit()
@@ -97,8 +100,8 @@ gameInputInit()
     // movement speed
     speed = minSpeed;
     targetSpeed = speed;
-    maxSpeed = MAX_SPEED;
-    maxAccelDecel = /*5*/ 20; // change per second
+    maxSpeed = MAX_SPEED * MAX_SPEED_PLAYER_SCALE;
+    maxAccelDecel = /*5*/ MAX_SPEED/2; // change per second
     minSpeed = 0;
     bulletVel = 40;
     
@@ -109,6 +112,7 @@ void
 gameInputTrimBegin()
 {
     needTrim = 1;
+    needTrimLast = 0;
     trimCount++;
 }
 
@@ -150,25 +154,27 @@ gameInputGyro2(float roll, float pitch, float yaw, float c)
 }
 
 void
+gyro_calibrate_log(float pct)
+{
+    console_clear();
+    console_write("calibrating: ");
+    int s = 0;
+    float width = (24.0 * pct) / 100;
+    for(s = 0; s < width && s <= 24; s++)
+    {
+        console_append("=");
+    }
+    while(s < 24) { console_append("."); s++; }
+    console_append("]");
+}
+
+void
 gameInput()
 {
 	double pi = M_PI;
     float tex_pass_initial_sample = 30;
     static float deviceLast[3];
     static unsigned long gyroInputCountLast = 0;
-    
-    /* wait for sensor to calibrate */
-    if(gameInputTrimPending()) return;
-    
-    if(gyroInputCount == gyroInputCountLast) return;
-    gyroInputCountLast = gyroInputCount;
-	
-	if(!initialized)
-	{
-        euler_to_quaternion(pi, 0.1, 0.1, &b.w, &b.x, &b.y, &b.z);
-		
-		initialized = 1;
-	}
     
     double devicePitch;
     double deviceYaw;
@@ -187,6 +193,68 @@ gameInput()
     
     float dz_m[3] = {0.5, 0.5, 0.5}; // deadzone-multiplier
 #endif
+    
+    float gyroInputStableThresh = 0.01;
+    if(fabs(devicePitch-gyroInputDeltaLast[0]) >= gyroInputStableThresh ||
+       fabs(deviceYaw-gyroInputDeltaLast[1]) >= gyroInputStableThresh ||
+        fabs(deviceRoll-gyroInputDeltaLast[2]) >= gyroInputStableThresh)
+    {
+        gyroStableCount = 0;
+    }
+    else
+    {
+        gyroStableCount ++;
+    }
+    
+    gyroInputDeltaLast[0] = devicePitch;
+    gyroInputDeltaLast[1] = deviceYaw;
+    gyroInputDeltaLast[2] = deviceRoll;
+    
+    if(!controlsCalibrated)
+    {
+        if(!needTrim && trimCountLast == trimCount)
+        {
+            if(gyroStableCount >= (GYRO_SAMPLE_RATE*2))
+            {
+                console_clear();
+                console_write("calibrating...");
+                gameInterfaceSetInterfaceState(INTERFACE_STATE_TRIM_BLINKING);
+                gameInputTrimBegin();
+                gyroStableCount = 1;
+            }
+        }
+        else
+        {
+            if(gyroStableCount == 0)
+            {
+                /* restart learning */
+                gameInputTrimBegin();
+            }
+            
+            gyro_calibrate_log((float) gyroStableCount / (float) (GYRO_SAMPLE_RATE*4) * 100);
+            
+            if(gyroStableCount >= (GYRO_SAMPLE_RATE*4))
+            {
+                console_append("\ndone\n");
+                needTrim = 0;
+                trimCountLast = 1;
+                gameInterfaceControls.trim.blinking = 0;
+            }
+        }
+    }
+    
+    /* wait for sensor to calibrate */
+    if(gameInputTrimPending()) return;
+    
+    if(gyroInputCount == gyroInputCountLast) return;
+    gyroInputCountLast = gyroInputCount;
+	
+	if(!initialized)
+	{
+        euler_to_quaternion(pi, 0.1, 0.1, &b.w, &b.x, &b.y, &b.z);
+		
+		initialized = 1;
+	}
     
     static double trimStart[3];
     static double trim_dz[3];
@@ -214,6 +282,7 @@ gameInput()
         trimStartTime = tex_pass - 1;
     }
     
+    /*
     if(!controlsCalibrated)
     {
         if(!needTrim && !needTrimLast)
@@ -225,6 +294,7 @@ gameInput()
             return;
         }
     }
+     */
     
     // indicate to user when sampling
     if(needTrimLast)
@@ -260,9 +330,14 @@ gameInput()
             
             if(!controlsCalibrated)
             {
-                console_clear();
-                console_write("Welcome to d0gf1ght %s\n    tap to re_center\n", GAME_VERSION_STR);
-                gameDialogWelcome();
+                //console_clear();
+                //console_write("Welcome to d0gf1ght %s\n    tap to re_center\n", GAME_VERSION_STR);
+                static int firstCalibrate = 1;
+                if(firstCalibrate)
+                {
+                    firstCalibrate = 0;
+                    gameDialogWelcome();
+                }
             }
             else
             {
@@ -340,26 +415,33 @@ gameInput()
     devicePitch -= pitch_m;
     deviceYaw -= yaw_m;
     
+    /*
+    float inputScale = 2.0;
+    deviceRoll = deviceRoll * fabs(deviceRoll) * inputScale;
+    devicePitch = devicePitch * fabs(devicePitch) * inputScale;
+    deviceYaw = deviceYaw * fabs(deviceYaw) * inputScale;
+     */
+    
     inputAvg_i++;
     if(inputAvg_i >= AVG_INPUTS_LENGTH) inputAvg_i = 0;
         
-        // read device orientation/inputs
-        //double input_roll = deviceRoll - roll_m;
-        //double input_pitch = devicePitch - pitch_m; // pitch is inverted
-        //double input_yaw = deviceYaw - yaw_m;
-        double input_roll = deviceRoll;
-        double input_pitch = devicePitch;
-        double input_yaw = deviceYaw;
+    // read device orientation/inputs
+    //double input_roll = deviceRoll - roll_m;
+    //double input_pitch = devicePitch - pitch_m; // pitch is inverted
+    //double input_yaw = deviceYaw - yaw_m;
+    double input_roll = deviceRoll;
+    double input_pitch = devicePitch;
+    double input_yaw = deviceYaw;
+    
+    // periodically do some stuff
+    if(rm_count <= 0)
+    {
+        rm_count = 60;
         
-        // periodically do some stuff
-        if(rm_count <= 0)
-        {
-            rm_count = 60;
-            
-            // renormalize body vectors every so often
-            gameCamera_normalize();
-            gameShip_normalize();
-        }
+        // renormalize body vectors every so often
+        gameCamera_normalize();
+        gameShip_normalize();
+    }
 	rm_count--;
     
     static float time_input_last = 0;
@@ -369,22 +451,28 @@ gameInput()
     if(!needTrim)
     {
         float driftComp[3] = {
-            /*GYRO_FEEDBACK_COEFF*/(trim_dz[0]/(GAME_FRAME_RATE)) * 2.0,
-            /*GYRO_FEEDBACK_COEFF*/(trim_dz[1]/(GAME_FRAME_RATE)) * 2.0,
-            /*GYRO_FEEDBACK_COEFF*/(trim_dz[2]/(GAME_FRAME_RATE)) * 2.0
+            /*GYRO_FEEDBACK_COEFF*/(trim_dz[0]) * 4.0,
+            /*GYRO_FEEDBACK_COEFF*/(trim_dz[1]) * 4.0,
+            /*GYRO_FEEDBACK_COEFF*/(trim_dz[2]) * 4.0
         };
-        float fcr = driftComp[0] * (deviceRoll-deviceLast[0]) /*dz_roll*GYRO_FEEDBACK*/;
-        float fcp = driftComp[1] * (devicePitch-deviceLast[1]) /*dz_pitch*GYRO_FEEDBACK*/;
-        float fcy = driftComp[2] * (deviceYaw-deviceLast[2]) /*dz_yaw*GYRO_FEEDBACK*/;
+      
+        // disabling this for now
+        float fcamp = 0.000001;
+        fcr = deviceRoll/fabs(deviceRoll) > 0? -fcamp: fcamp;
+        fcp = devicePitch/fabs(devicePitch) > 0? -fcamp: fcamp;
+        fcy = deviceYaw/fabs(deviceYaw) > 0? -fcamp: fcamp;
         
         float cap = /*0.05*/ 0.1; // radians
         float sm[] = /*{0.6, 0.8, 0.8}*/ {0.7, 0.9, 0.6};
+        
+        float cs = (speed - minSpeed) / (maxSpeed*2);
+        float speedC = 1.0 - (cs*cs*0.9);
         
         if(fabs(input_roll) > dz_roll*dz_m[0] /*&& touchThrottle*/)
         {
             //printf("-----------ROLLING-----------\n");
             
-            double s = input_roll * fabs(input_roll*sm[0]) * GYRO_DC * tc;
+            double s = input_roll * fabs(input_roll*sm[0]) * GYRO_DC * tc * speedC;
             
             if(fabs(s) > cap) s = cap * (s/fabs(s));
             
@@ -395,14 +483,14 @@ gameInput()
         //else
         {
             // feedback to avoid drift
-            roll_m += /*input_roll*/ deviceRoll * fcr;
+            roll_m += /*input_roll*/ fcr;
         }
         
         if(fabs(input_pitch) > dz_pitch*dz_m[1])
         {
             //printf("-----------PITCHING-----------\n");
             
-            double s = input_pitch * fabs(input_pitch*sm[1]) * GYRO_DC * tc;
+            double s = input_pitch * fabs(input_pitch*sm[1]) * GYRO_DC * tc * speedC;
             
             if(fabs(s) > cap) s = cap * (s/fabs(s));
             
@@ -413,14 +501,14 @@ gameInput()
         //else
         {
             // feedback to avoid drift
-            pitch_m += /*input_pitch*/ devicePitch * fcp;
+            pitch_m += /*input_pitch*/ fcp;
         }
         
         if(fabs(input_yaw) > dz_yaw*dz_m[2])
         {
             //printf("-----------YAWING-----------\n");
             
-            double s = input_yaw * fabs(input_yaw*sm[2]) * GYRO_DC * tc;
+            double s = input_yaw * fabs(input_yaw*sm[2]) * GYRO_DC * tc * speedC;
             
             if(fabs(s) > cap) s = cap * (s/fabs(s));
             
@@ -431,7 +519,7 @@ gameInput()
         //else
         {
             // feedback to avoid drift
-            yaw_m += /*input_yaw*/ deviceYaw * fcy;
+            yaw_m += /*input_yaw*/ fcy;
         }
     }
     

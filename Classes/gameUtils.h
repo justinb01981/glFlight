@@ -22,6 +22,15 @@ extern int do_visibility_test;
 extern int nearest_first;
 extern game_timeval_t console_write_time;
 
+struct console_entry
+{
+    struct console_entry* next;
+    char msg[256];
+};
+typedef struct console_entry console_entry_t;
+
+extern console_entry_t g_console_message_log_head;
+
 float
 distance(float x1, float y1, float z1, float x2, float y2, float z2);
 
@@ -72,6 +81,15 @@ console_pop();
 
 void
 console_push();
+
+void
+console_init();
+
+void
+console_log_clear(int n, int all);
+
+console_entry_t*
+console_log_search(char *key, unsigned idx);
 
 void
 console_append(char* fmt, ...);

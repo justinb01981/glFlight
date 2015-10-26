@@ -102,6 +102,10 @@ struct WorldElem {
 
     int invisible:1;
     
+    int is_line:1;
+    
+    int elem_id_line_next;
+    
     int bounding_wrap:1;
     int bounding_remain:1;
     
@@ -156,7 +160,7 @@ struct WorldElem {
                 float tgt_x, tgt_y, tgt_z;
                 float max_speed;
                 float max_turn;
-                float run_distance, pursue_distance, forget_distance;
+                float run_distance, pursue_distance, scan_distance;
                 float intelligence;
                 float pitch_last, yaw_last;
                 int appearance;
@@ -177,6 +181,8 @@ struct WorldElem {
         } flags;
         
         int towed_elem_id;
+        
+        int line_id_last;
         
     } stuff;
     
@@ -223,7 +229,7 @@ inline static void
 world_elem_init(WorldElem* pElem, int elem_id)
 {
     pElem->elem_id = elem_id;
-    pElem->stuff.towed_elem_id = -1;
+    pElem->stuff.towed_elem_id = WORLD_ELEM_ID_INVALID;
 }
 
 void

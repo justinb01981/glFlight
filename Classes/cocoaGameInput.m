@@ -100,7 +100,7 @@ int resumeCountDown = 0;
     
     self.showsDeviceMovementDisplay = YES;
     
-	[self setDeviceMotionUpdateInterval:1/30];
+	[self setDeviceMotionUpdateInterval:1/GYRO_SAMPLE_RATE];
     
 	return self;
 }

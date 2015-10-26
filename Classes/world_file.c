@@ -158,6 +158,11 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
             map_cmd->type = MAP_MANIP_MESH_PULL;
             n_params = 6;
         }
+        else if(strcmp(token, "mesh_manip_round") == 0)
+        {
+            map_cmd->type = MAP_MANIP_MESH_SET_ROUND;
+            n_params = 3;
+        }
         else if(strcmp(token, "mesh_manip_complete") == 0)
         {
             map_cmd->type = MAP_MANIP_MESH_COMPLETE;
@@ -536,6 +541,10 @@ void map_render(char *map_buf)
                         d_xyz[1] = map_cmd.params[3];
                         d_xyz[2] = map_cmd.params[4];
                         world_manip_mesh(rc, d_xyz, map_cmd.params[5]);
+                        break;
+                        
+                    case MAP_MANIP_MESH_SET_ROUND:
+                        world_manip_mesh_round(map_cmd.params[0], map_cmd.params[1], map_cmd.params[2]);
                         break;
                         
                     case MAP_MANIP_MESH_COMPLETE:

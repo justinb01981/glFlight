@@ -40,6 +40,9 @@ struct mesh_t {
     unsigned int n_row_coords;
     unsigned int n_triangles;
     unsigned int n_coordinates;
+    float round_inc_x;
+    float round_inc_y;
+    float round_inc_z;
 };
 
 struct mesh_opengl_t
@@ -56,6 +59,9 @@ build_mesh(float x, float y, float z,
            float dx_r, float dy_r, float dz_r,
            float dx_c, float dy_c, float dz_c,
            unsigned int mesh_r, unsigned int mesh_c);
+
+void
+apply_mesh_rounding(struct mesh_t* mesh, float dx, float dy, float dz);
 
 void
 pull_mesh(struct mesh_t* mesh,

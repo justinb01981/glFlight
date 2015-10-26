@@ -149,6 +149,9 @@ world_complete_mesh(int type, int tex_id, float tiling_m, float scale);
 void
 world_manip_mesh(float xy_coord[2], float d_xyz[3], float m_c);
 
+void
+world_manip_mesh_round(float x, float y, float z);
+
 float
 world_mesh_pending_x();
 

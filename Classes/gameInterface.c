@@ -141,12 +141,13 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     
     float dialogWidth = 0.48;
     float dialogHeight = 0.512;
-    gameInterfaceControls.dialogRect.x = gameInterfaceControls.interfaceWidth/2 - (dialogWidth*gameInterfaceControls.interfaceWidth)/2;
-    gameInterfaceControls.dialogRect.y = gameInterfaceControls.interfaceHeight/2 - (dialogHeight*gameInterfaceControls.interfaceHeight)/2;
-    gameInterfaceControls.dialogRect.xw = (dialogWidth*gameInterfaceControls.interfaceWidth);
-    gameInterfaceControls.dialogRect.yw = (dialogHeight*gameInterfaceControls.interfaceHeight);
-    gameInterfaceControls.dialogRect.tex_id = TEXTURE_ID_CONTROLS_DIALOG_BOX;
-    gameInterfaceControls.dialogRect.visible = 0;
+    gameInterfaceControls.dialogRectDefault.x = gameInterfaceControls.interfaceWidth/2 - (dialogWidth*gameInterfaceControls.interfaceWidth)/2;
+    gameInterfaceControls.dialogRectDefault.y = gameInterfaceControls.interfaceHeight/2 - (dialogHeight*gameInterfaceControls.interfaceHeight)/2;
+    gameInterfaceControls.dialogRectDefault.xw = (dialogWidth*gameInterfaceControls.interfaceWidth);
+    gameInterfaceControls.dialogRectDefault.yw = (dialogHeight*gameInterfaceControls.interfaceHeight);
+    gameInterfaceControls.dialogRectDefault.tex_id = TEXTURE_ID_CONTROLS_DIALOG_BOX;
+    gameInterfaceControls.dialogRectDefault.visible = 0;
+    gameInterfaceControls.dialogRect = gameInterfaceControls.dialogRectDefault;
     
     float reticlem = 0.2;
     gameInterfaceControls.reticleRect.x = ((screenWidth)/2 - (reticlem*screenWidth)/2) - screenWidth*0.025;
@@ -299,7 +300,7 @@ gameInterfaceHandleTouchMove(float x, float y)
     else if(touchedControl == &gameInterfaceControls.trim)
     {
         gameInputTrimBegin();
-        //console_write("calibrating (hold still)...\n");
+        gyro_calibrate_log(100);
         gameInterfaceControls.trim.blinking = 0;
     }
     else if(touchedControl == &gameInterfaceControls.look)
@@ -725,8 +726,13 @@ gameInterfaceHandleAllTouchEnd()
 }
 
 void
-gameInterfaceModalDialog(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void))
+gameInterfaceModalDialogWithRect(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void),
+                         controlRect* overrideRect, unsigned long life_frames)
 {
+    gameInterfaceControls.dialogLifeFrames = life_frames;
+    
+    gameInterfaceControls.dialogRect = *overrideRect;
+    
     sprintf(gameInterfaceControls.dialogRect.text,
             "%s",
             msg? msg: "");
@@ -739,7 +745,12 @@ gameInterfaceModalDialog(char* msg, char *buttonLeft, char *buttonRight, void (*
     gameInterfaceControls.dialogRectActionLeft = cbLeft;
     gameInterfaceControls.dialogRectActionRight = cbRight;
     gameInterfaceControls.dialogRect.visible = 1;
-    gameInterfaceControls.consoleHidden = 1;
+}
+
+void
+gameInterfaceModalDialog(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void))
+{
+    gameInterfaceModalDialogWithRect(msg, buttonLeft, buttonRight, cbLeft, cbRight, &gameInterfaceControls.dialogRectDefault, 999999);
 }
 
 void

@@ -147,7 +147,7 @@ bindTexture(unsigned int tex_id)
 {
     static unsigned int drawn_texture_last;
     
-    if(tex_id != drawn_texture_last)
+    if(tex_id != drawn_texture_last && tex_id < n_textures)
     {
         glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
         drawn_texture_last = tex_id;
@@ -345,25 +345,36 @@ int drawRadar()
             unsigned int tex_id = cur->elem->texture_id;
             float scale = 1;
             char *textLabel = NULL;
-            int camera_relative = 0;
+            int camera_relative = 1;
             int tex_icon = -1;
+            float leadv = dist / bulletVel;
             
             if(cur->elem->elem_id == game_target_missle_id) camera_relative = 1;
             
+            float elemPos[3] = {cur->elem->physics.ptr->x, cur->elem->physics.ptr->y, cur->elem->physics.ptr->z};
+            
+            // calculate lead
+            if(cur->elem->physics.ptr->velocity > 0)
+            {
+                elemPos[0] += cur->elem->physics.ptr->vx*leadv;
+                elemPos[1] += cur->elem->physics.ptr->vy*leadv;
+                elemPos[2] += cur->elem->physics.ptr->vz*leadv;
+            }
+            
             if(camera_relative)
             {
-                ev[0] = (cur->elem->physics.ptr->x - gameCamera_getX()) / dist;
-                ev[1] = (cur->elem->physics.ptr->y - gameCamera_getY()) / dist;
-                ev[2] = (cur->elem->physics.ptr->z - gameCamera_getZ()) / dist;
+                ev[0] = (elemPos[0] - gameCamera_getX()) / dist;
+                ev[1] = (elemPos[1] - gameCamera_getY()) / dist;
+                ev[2] = (elemPos[2] - gameCamera_getZ()) / dist;
                 gameShip_getXVector(xvec);
                 gameShip_getYVector(yvec);
                 gameShip_getZVector(zvec);
             }
             else
             {
-                ev[0] = (cur->elem->physics.ptr->x - my_ship_x) / dist;
-                ev[1] = (cur->elem->physics.ptr->y - my_ship_y) / dist;
-                ev[2] = (cur->elem->physics.ptr->z - my_ship_z) / dist;
+                ev[0] = (elemPos[0] - my_ship_x) / dist;
+                ev[1] = (elemPos[1] - my_ship_y) / dist;
+                ev[2] = (elemPos[2] - my_ship_z) / dist;
                 gameShip_getXVector(xvec);
                 gameShip_getYVector(yvec);
                 gameShip_getZVector(zvec);
@@ -424,7 +435,8 @@ int drawRadar()
             {
                 // currently missle-targeted
                 tex_id = TEXTURE_ID_LOCKEDON;
-                scale = 4;
+                scale = (4.0*50) / dist;
+                if(scale > 6) scale = 6;
             }
             else if(cur->elem->elem_id == game_target_objective_id /* && zdot > 0*/)
             {
@@ -702,6 +714,21 @@ void drawControls()
                         break;
                 }
             }
+            else if(controls[i] == &gameInterfaceControls.dialogRect)
+            {
+                if(gameInterfaceControls.dialogLifeFrames > 0)
+                {
+                    gameInterfaceControls.dialogLifeFrames--;
+                    if(gameInterfaceControls.dialogLifeFrames <= GAME_FRAME_RATE)
+                    {
+                        gameInterfaceControls.dialogRect.x += gameInterfaceControls.interfaceWidth / GAME_FRAME_RATE;
+                    }
+                }
+                else
+                {
+                    gameInterfaceControls.dialogRect.visible = 0;
+                }
+            }
             
             game_timeval_t blink_d = time_ms - blink_time_last;
             if(blink_d < 200 && controls[i]->blinking)
@@ -819,9 +846,19 @@ void drawControls()
             }
             else
             {
-                drawText(controls[i]->text,
-                         controls[i]->x + controls[i]->xw*0.8,
-                         controls[i]->y + controls[i]->yw*0.15);
+                if(strchr(controls[i]->text, '\n') == NULL)
+                {
+                    // one line
+                    drawText(controls[i]->text,
+                             controls[i]->x + controls[i]->xw*0.5,
+                             controls[i]->y + controls[i]->yw*0.2);
+                }
+                else
+                {
+                    drawText(controls[i]->text,
+                             controls[i]->x + controls[i]->xw*0.8,
+                             controls[i]->y + controls[i]->yw*0.15);
+                }
             }
             
             if(controls[i]->textLeft[0])

@@ -34,14 +34,15 @@
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
 "set_world_size r r r\n"                                                 \
 "mesh_manip_add wx0.1 " "wy0.1" " wz0.1" " 4 0 0" " 0 0 4" " wx0.2 wz0.2\n" \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
-"mesh_manip_complete 1 "#tex" 1 "#scale"\n"
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
+"mesh_manip_round 0 4 0\n" \
+"mesh_manip_complete 2 "#tex" 1 "#scale"\n"
 
 #define MESH_CUBES_2(tex, scale)                                    \
 "mesh_manip_add wx0.1 " "-4" " wz0.1" " 4 0 0" " 0 0 4" " 40 40\n"  \
@@ -101,7 +102,7 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
 "add_object 1 rndx rndy rndz rndr rndr rndr 2 18\n"
 
 #define BACKGROUND_TEX_BEGIN "77"
-#define BACKGROUND_TEX_LEN "3"
+#define BACKGROUND_TEX_LEN /*"3"*/ "1"
 
 #define BACKGROUND_TEX_RANDOM                                                     \
 "register_params "BACKGROUND_TEX_BEGIN" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"          \
@@ -464,7 +465,7 @@ const static char initial_map_collection[] = ""
 BACKGROUND_TEX_RANDOM
 
 //MESH_CUBES_2(28, 4)
-WORLD_SCALED_FRAME(1, 28, 4)
+WORLD_SCALED_FRAME(1, 57, 4)
 
 // else
 GREEN_TENDRILS_1

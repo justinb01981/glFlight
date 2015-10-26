@@ -38,4 +38,7 @@ gameInput();
 int
 gameInputTrimPending();
 
+void
+gyro_calibrate_log(float pct);
+
 #endif

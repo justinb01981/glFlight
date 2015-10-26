@@ -56,6 +56,8 @@ int new_level = 0;
 int game_delay_frames = 0;
 int invuln_count = 0;
 
+float game_variables_val[GAME_VARIABLES_MAX];
+
 int
 game_add_ally(float x, float y, float z);
 
@@ -120,12 +122,16 @@ score_display()
     
     score_update();
     
+    int capture_log_count = 0;
+    while(console_log_search(game_log_messages[GAME_LOG_FILESAVED], capture_log_count) != NULL) capture_log_count++;
+    
     char scoreStr[255];
     sprintf(scoreStr, "Score:** %d **\n"
-            "^D Stolen:%.0f/%.0f (%.0fpct)\n"
+            "^D:%.0f/%.0f (%.0fpct)\n"
             "bot kills:%d\n"
             "bounty-hunter kills:%d\n"
             "Turret kills:%d\n"
+            "captured:%d\n"
             "Time:%02dsec\n"
             "High score:%d\n"
             /* "Session High score:%d\n" */
@@ -137,6 +143,7 @@ score_display()
             gameStateSinglePlayer.stats.enemies_killed,
             gameStateSinglePlayer.stats.enemies_bh_killed,
             gameStateSinglePlayer.stats.turrets_killed,
+            capture_log_count,
             game_time_elapsed(),
             *high_score
             /* ,*high_score_session */
@@ -151,22 +158,33 @@ score_display()
 }
 
 static void
+score_pop()
+{
+    char str[255];
+    sprintf(str, "Score: %d", gameStateSinglePlayer.stats.score);
+    gameDialogScorePopup(str);
+}
+
+static void
 score_kill(WorldElem* pElem)
 {
     switch(pElem->object_type)
     {
         case OBJ_TURRET:
             gameStateSinglePlayer.stats.turrets_killed++;
+            console_write(game_log_messages[GAME_LOG_KILLED_TURRET]);
             break;
             
         case OBJ_SHIP:
             if(pElem->stuff.u.enemy.fires_missles)
             {
                 gameStateSinglePlayer.stats.enemies_bh_killed++;
+                console_write(game_log_messages[GAME_LOG_KILLED_ENEMY2]);
             }
             else
             {
                 gameStateSinglePlayer.stats.enemies_killed++;
+                console_write(game_log_messages[GAME_LOG_KILLED_ENEMY1]);
             }
             break;
             
@@ -254,29 +272,6 @@ game_findMissleTarget(float p[3], float u[3], int *obj_types, float infoOut[3], 
     }
     
     return id;
-}
-
-void
-game_add_cap(float x, float y, float z)
-{
-    float spawn[6];
-    
-    spawn[0] = x;
-    spawn[1] = y;
-    spawn[2] = z;
-    
-    spawn[3] = spawn[4] = spawn[5] = 0;
-    
-    int obj_id =
-    world_add_object(MODEL_CUBE2,
-                     spawn[0], spawn[1], spawn[2],
-                     spawn[3], spawn[4], spawn[5],
-                     7, TEXTURE_ID_CAPTUREPOINT);
-    
-    update_object_velocity(obj_id, 0, 0, 0, 0);
-    world_get_last_object()->durability = 0;
-    world_get_last_object()->destructible = 1;
-    world_get_last_object()->object_type = OBJ_CAPTURE;
 }
 
 int
@@ -434,6 +429,8 @@ game_add_enemy_core(float x, float y, float z, int model)
     game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
     update_object_velocity(obj_id, 1, 1, 1, 0);
     
+    console_write(game_log_messages[GAME_LOG_NEWENEMY1]);
+    
     return obj_id;
 }
 
@@ -450,7 +447,7 @@ game_add_enemy_ace(float x, float y, float z)
     game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence + 2);
     world_get_last_object()->texture_id = TEXTURE_ID_ENEMYSHIP_ACE;
     world_get_last_object()->stuff.u.enemy.fires_missles = 1;
-    console_write("Warning: bounty hunter!");
+    console_write(game_log_messages[GAME_LOG_NEWENEMY2]);
     return obj_id;
 }
 
@@ -462,7 +459,7 @@ game_add_ally(float x, float y, float z)
     world_get_last_object()->texture_id = TEXTURE_ID_ALLYSHIP;
     world_get_last_object()->stuff.affiliation = gameNetworkState.my_player_id;
     
-    console_write("Ally comes to your aid!");
+    console_write(game_log_messages[GAME_LOG_NEWALLY]);
     return obj_id;
 }
 
@@ -594,8 +591,12 @@ game_init_objects()
 void
 game_init()
 {
+    int i;
+    
     memset(&gameStateSinglePlayer.high_score_session, 0, sizeof(gameStateSinglePlayer.high_score_session));
     gameStateSinglePlayer.map_use_current = 0;
+    
+    for(i = 0; i < GAME_VARIABLES_MAX; i++) game_variables_val[i] = game_variables_default[i];
 }
 
 void
@@ -690,9 +691,16 @@ game_start(float difficulty, int type)
     else if(gameStateSinglePlayer.game_type == GAME_TYPE_COLLECT)
     {
         //strcpy(gameStateSinglePlayer.game_help_message, "Collect data and return to node");
+        /*
         sprintf(dialogStr, "^D^D^DTELEPORT SUCCESSFUL^D^D^D\n"
                 "SYSTEM DEFENSES ONLINE!!!\nCollect ^D at node ^H\n"
                 "**** High Score: %d ****",
+                gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
+         */
+        sprintf(dialogStr, "^D^D^DWARNING: SYSTEM_COMPROMISED^D^D^D\n"
+                           "^D^D^D    ACTIVATE_DEFENSES      ^D^D^D\n"
+                           "^D^D^D    (Protect ^D)           ^D^D^D\n"
+                            "**** High Score: %d ****",
                 gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
         gameDialogDisplayString(dialogStr);
         
@@ -706,10 +714,14 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
         gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
-        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_ALLY;
+        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_LIFE;
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.turret_destruction_change_alliance = 0;
-        gameStateSinglePlayer.max_enemies_spawned = 3 + difficulty * 2;
+        gameStateSinglePlayer.max_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
+        
+        gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/10;
+        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/10;
+        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/10;
         
         // different map for "collection" game type
         gameMapSetMap(initial_map_collection);
@@ -937,7 +949,7 @@ game_setup()
 void
 game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
 {
-    int do_data_grab_score_immediate = 1;
+    int do_data_grab_score_immediate = 0;
     WorldElemListNode* myShipListNode = world_elem_list_find(my_ship_id, &gWorld->elements_moving);
     if(!myShipListNode) return;
     
@@ -956,9 +968,12 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
             {
                 int models_list[] = {MODEL_SHIP1, MODEL_SHIP2, MODEL_SHIP3};
                 int mi = rand_in_range(0, 2);
-                model_my_ship = models_list[mi];
-                world_remove_object(elemB->elem_id);
-                my_ship_changed = 1;
+                if(elemB == myShipListNode->elem)
+                {
+                    model_my_ship = models_list[mi];
+                    world_remove_object(elemB->elem_id);
+                    my_ship_changed = 1;
+                }
             }
             break;
             
@@ -977,6 +992,8 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
                 {
                     if(elemA->stuff.towed_elem_id == WORLD_ELEM_ID_INVALID)
                     {
+                        if(elemA->elem_id != my_ship_id) console_write(game_log_messages[GAME_LOG_WARN_CAPTURE]);
+                        
                         elemA->stuff.towed_elem_id = elemB->elem_id;
                         collect_sound = 1;
                         camera_locked_frames = 0;
@@ -1074,23 +1091,6 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     
     switch(elemB->object_type)
     {
-        case OBJ_CAPTURE:
-            if(gameNetworkState.hostInfo.hosting || !gameNetworkState.connected)
-            {
-                if(elemA->object_type == OBJ_BULLET)
-                {
-                    // neutralize point
-                    elemB->texture_id = TEXTURE_ID_CAPTUREPOINT;
-                    elemB->stuff.affiliation = 0;
-                }
-                else
-                {
-                    elemB->texture_id = elemA->texture_id;
-                    elemB->stuff.affiliation = elemA->stuff.affiliation;
-                }
-            }
-            break;
-            
         case OBJ_POWERUP_GENERIC:
             {
                 game_handle_collision_powerup(elemA, elemB);
@@ -1139,7 +1139,15 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                     world_get_last_object()->destructible = 0;
                     world_object_set_lifetime(obj_id, 60);
                     
-                    console_write("File captured!\n");
+                    console_write(game_log_messages[GAME_LOG_FILESAVED]);
+                    
+                    {
+                        // replace
+                        game_add_powerup(rand_in_range(1, gWorld->bound_x),
+                                         rand_in_range(1, gWorld->bound_y),
+                                         rand_in_range(1, gWorld->bound_z),
+                                         GAME_SUBTYPE_COLLECT, 0);
+                    }
                 }
             }
             break;
@@ -1147,7 +1155,7 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
         case OBJ_SPAWNPOINT_ENEMY:
             if(elemA->object_type == OBJ_POWERUP_GENERIC)
             {
-                console_write("File lost!");
+                console_write(game_log_messages[GAME_LOG_FILELOST]);
                 world_remove_object(elemA->elem_id);
             }
             break;
@@ -1221,13 +1229,6 @@ game_handle_destruction(WorldElem* elem)
 
                 score_kill(elem);
             }
-            break;
-            
-        case OBJ_CAPTURE:
-            // restore cap
-            game_add_cap(elem->physics.ptr->x, elem->physics.ptr->y, elem->physics.ptr->z);
-            world_get_last_object()->stuff.affiliation = elem->stuff.affiliation;
-            world_get_last_object()->texture_id = elem->texture_id;
             break;
             
         case OBJ_POWERUP_GENERIC:
@@ -1353,6 +1354,7 @@ game_run()
     float v[3], r[3];
     int target_types[] = {OBJ_SHIP, OBJ_PLAYER, OBJ_TURRET, OBJ_UNKNOWN};
     static int game_map_custom_loaded = 0;
+    static int game_ends_collects_lost = 1;
     
     if(game_delay_frames > 0)
     {
@@ -1397,10 +1399,6 @@ game_run()
             {                    
                 case OBJ_SHIP:
                     enemies_found++;
-                    break;
-                    
-                case OBJ_CAPTURE:
-                    caps_found++;
                     break;
                     
                 case OBJ_MISSLE:
@@ -1460,7 +1458,7 @@ game_run()
                         pCur->elem->physics.ptr->z + (bz.z*1.0 - by.z*1) - listNodeTowed->elem->physics.ptr->z
                     };
                     float tow_d = sqrt(tow_v[0]*tow_v[0] + tow_v[1]*tow_v[1] + tow_v[2]*tow_v[2]);
-                    float tow_m = tow_d * 3.0;
+                    float tow_m = tow_d * 4.5;
                     
                     tow_v[0] = (tow_v[0]/tow_d);
                     tow_v[1] = (tow_v[1]/tow_d);
@@ -1496,6 +1494,8 @@ game_run()
             gameStateSinglePlayer.last_run = time_ms;
             
             game_target_objective_id = gameStateSinglePlayer.elem_id_spawnpoint;
+            
+            if(strncmp(gameNetworkState.hostInfo.name, "god", 3) == 0) pMyShipNode->elem->durability = 9999;
          
             if(gameStateSinglePlayer.started)
             {
@@ -1579,15 +1579,6 @@ game_run()
                             }
                             break;
                             
-                        case OBJ_CAPTURE:
-                            // heal if posessing points
-                            if(pCur->elem->stuff.affiliation == pMyShipNode->elem->stuff.affiliation)
-                            {
-                                caps_owned++;
-                                if(pMyShipNode->elem->durability < DURABILITY_PLAYER) pMyShipNode->elem->durability += 0.1;
-                            }
-                            break;
-                            
                         default:
                             break;
                     }
@@ -1641,6 +1632,12 @@ game_run()
                 {
                     if(collects_found <= 0 && gameStateSinglePlayer.rate_collect_increase == 0)
                     {
+                        if(game_ends_collects_lost)
+                        {
+                            console_write("SYSTEM_COMPROMISED (HACKERS_WIN)");
+                            game_over();
+                        }
+                        
                         if(gameStateSinglePlayer.game_action_spawnpoint_new_game &&
                            !new_level)
                         {
@@ -1726,6 +1723,13 @@ game_run()
             if(game_ammo_missles < game_ammo_missles_max) game_ammo_missles += game_ammo_missle_recharge;
             
             score_update();
+        }
+        
+        static unsigned int score_last_checked = 0;
+        if(gameStateSinglePlayer.stats.score != score_last_checked)
+        {
+            score_last_checked = gameStateSinglePlayer.stats.score;
+            score_pop();
         }
     }
     
@@ -1889,6 +1893,10 @@ game_run()
                     }
                     break;
                     
+                case ACTION_DISPLAY_SCORES:
+                    gameDialogScores();
+                    break;
+                    
                 case ACTION_HELP:
                     gameInterfaceControls.help.visible = !gameInterfaceControls.help.visible;
                     break;
@@ -2029,7 +2037,7 @@ game_run()
     
     // poop cubes
     static game_timeval_t time_cube_poop_last = 0;
-    if(time_ms - time_cube_poop_last > 150)
+    if(time_ms - time_cube_poop_last > pooped_cube_interval_ms)
     {
         time_cube_poop_last = time_ms;
         firePoopedCube(pMyShipNode->elem);
@@ -2251,7 +2259,10 @@ firePoopedCube(WorldElem *elem)
     world_get_last_object()->object_type = OBJ_POOPEDCUBE;
     world_get_last_object()->destructible = 0;
     world_get_last_object()->physics.ptr->friction = 1;
-    world_object_set_lifetime(obj, 200);
+    world_get_last_object()->is_line = 1;
+    world_get_last_object()->elem_id_line_next = elem->stuff.line_id_last;
+    elem->stuff.line_id_last = obj;
+    world_object_set_lifetime(obj, pooped_cube_lifetime);
     
     update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);
     
@@ -2263,28 +2274,28 @@ game_ai_target_priority(WorldElem* pSearchElem, WorldElem* pTargetElem, float* d
 {
     const static float velocity_pickup = 2.0;
     
-     if(pSearchElem->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID)
-     {
-         *dist_ignore = INT_MAX;
+    if(pSearchElem == pTargetElem) return 0;
+    
+    if(pSearchElem->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID)
+    {
+        *dist_ignore = INT_MAX;
      
-         if((pTargetElem->object_type == OBJ_SPAWNPOINT_ENEMY || pTargetElem->object_type == OBJ_SPAWNPOINT) &&
-            pTargetElem->stuff.affiliation == pSearchElem->stuff.affiliation) return 1;
-     }
-     else
-     {
-         *dist_ignore = pSearchElem->stuff.u.enemy.forget_distance;
+        if((pTargetElem->object_type == OBJ_SPAWNPOINT_ENEMY || pTargetElem->object_type == OBJ_SPAWNPOINT) &&
+           pTargetElem->stuff.affiliation == pSearchElem->stuff.affiliation) return 1;
+    }
+    else
+    {
+        *dist_ignore = pSearchElem->stuff.u.enemy.scan_distance;
      
-         if(pTargetElem->object_type == OBJ_PLAYER) return 2;
-         else if(pTargetElem->object_type == OBJ_SHIP) return 2;
-         else if(pTargetElem->object_type == OBJ_TURRET) return 1;
-         else if(!pSearchElem->stuff.u.enemy.fixed && pTargetElem->object_type == OBJ_CAPTURE &&
-                 pTargetElem->physics.ptr->velocity < 1) return 1;
-         else if(!pSearchElem->stuff.u.enemy.fixed && pTargetElem->object_type == OBJ_POWERUP_GENERIC &&
-                 pSearchElem->stuff.subtype == GAME_SUBTYPE_COLLECT &&
-                 pTargetElem->physics.ptr->velocity <= velocity_pickup)
-         {
-             return 1;
-         }
-     }
-     return 0;
+        if(pTargetElem->object_type == OBJ_PLAYER) return 2;
+        else if(pTargetElem->object_type == OBJ_SHIP) return 2;
+        else if(pTargetElem->object_type == OBJ_TURRET) return 1;
+        else if(!pSearchElem->stuff.u.enemy.fixed && pTargetElem->object_type == OBJ_POWERUP_GENERIC &&
+                pTargetElem->stuff.subtype == GAME_SUBTYPE_COLLECT &&
+                pTargetElem->physics.ptr->velocity <= velocity_pickup)
+        {
+            return 3;
+        }
+    }
+    return 0;
 }

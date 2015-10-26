@@ -124,6 +124,8 @@ void glFlightInit(gl_flightViewController* viewController)
     
     gameInputInit();
     
+    console_init();
+    
     gameMapFilePrefix((char*) [docsPrefix UTF8String]);
     gameMapFileName("temp");
     
@@ -219,6 +221,8 @@ void glFlightResume(time_t time_last_suspend)
     
     game_terminated_gracefully = 1;
     appWriteSettings();
+    
+    console_log_clear(0, 1);
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application

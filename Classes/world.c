@@ -309,13 +309,13 @@ world_add_object_core(Model type,
     if(replace_id < 0)
     switch(type)
     {
-        case MODEL_CUBE:
         case MODEL_ICOSAHEDRON:
-            new_durability = 5;
+            new_durability = DURABILITY_ASTEROID;
             break;
-            
+          
+        case MODEL_CUBE:
     	case MODEL_CUBE2:
-            new_durability = 5;
+            new_durability = DURABILITY_BLOCK;
             break;
             
         case MODEL_SHIP1:
@@ -1252,6 +1252,7 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc)
 {
     float mv[3];
     float s = collision_repulsion_coeff;
+    float repulse_min = 0.001;
 
     float v = sqrt((pCollisionA->physics.ptr->vx*pCollisionA->physics.ptr->vx) +
                    (pCollisionA->physics.ptr->vy*pCollisionA->physics.ptr->vy) +
@@ -1266,7 +1267,7 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc)
     mv[1] = (pCollisionA->physics.ptr->y - pCollisionB->physics.ptr->y) * v * tc * s;
     mv[2] = (pCollisionA->physics.ptr->z - pCollisionB->physics.ptr->z) * v * tc * s;
 
-    for(int i = 0; i < 3; i++) if(fabs(mv[i]) < 0.001) mv[i] = 0.001;
+    for(int i = 0; i < 3; i++) if(fabs(mv[i]) < repulse_min) mv[i] = 0.1;
 
     world_move_elem(pCollisionA, mv[0], mv[1], mv[2], 1);
 }
@@ -1651,6 +1652,7 @@ world_update(float tc)
                     {
                         int sound_played = 0;
                         int repulsed;
+                        int repulse_retry = 100;
                         do
                         {
                             repulsed = 0;
@@ -1734,7 +1736,8 @@ world_update(float tc)
                                     pRegionElemsCur = pRegionElemsCur->next;
                                 }
                             }
-                        } while(repulsed);
+                            repulse_retry--;
+                        } while(repulsed && repulse_retry > 0);
                     }
                     
                     if(do_sound_checks)
@@ -1775,7 +1778,7 @@ world_update(float tc)
     pCur = gWorld->elements_expiring.next;
     while(pCur)
     {
-        int retry = 0;
+        WorldElemListNode* pNext = pCur->next;
         
         pCur->elem->lifetime--;
         if(pCur->elem->lifetime <= 0)
@@ -1789,11 +1792,9 @@ world_update(float tc)
             
             world_elem_list_add(pCurRemoveElem, &gWorld->elements_to_be_freed);
             
-            retry = 1;
         }
         
-        if(retry) pCur = gWorld->elements_expiring.next;
-        else pCur = pCur->next;
+        pCur = pNext;
     }
 }
 
@@ -2025,6 +2026,15 @@ world_manip_mesh(float xy_coord[2], float d_xyz[3], float m_c)
     if(world_pending_mesh)
     {
         pull_mesh(world_pending_mesh, xy_coord[0], xy_coord[1], d_xyz[0], d_xyz[1], d_xyz[2], m_c);
+    }
+}
+
+void
+world_manip_mesh_round(float x, float y, float z)
+{
+    if(world_pending_mesh)
+    {
+        apply_mesh_rounding(world_pending_mesh, x, y, z);
     }
 }
 

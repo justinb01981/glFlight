@@ -51,6 +51,10 @@ typedef struct {
     controlRect statsTextRect;
     controlRect textEditControl;
     
+    controlRect dialogRectDefault;
+    
+    unsigned long dialogLifeFrames;
+    
     int menuAction;
     
     float textWidth;
@@ -98,6 +102,12 @@ gameInterfaceHandleAllTouchEnd();
 
 void
 gameInterfaceModalDialog(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void));
+
+void
+gameInterfaceModalDialogWithRect(char* msg, char *buttonLeft, char *buttonRight,
+                                 void (*cbLeft)(void), void (*cbRight)(void),
+                                 controlRect* overrideRect,
+                                 unsigned long life_frames);
 
 static controlRect**
 gameInterfaceGetControlArray()

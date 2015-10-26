@@ -104,7 +104,7 @@ glFlightFrameStage1()
     world_lock();
     
     if(!world_inited && world_data)
-    { 
+    {
         gameGraphicsUninit();
         gameMapReRender();
         gameNetwork_worldInit();
@@ -120,6 +120,8 @@ glFlightFrameStage1()
         goto draw_bail;
     }
     
+    extern void update_time_ms_frame_tick();
+    update_time_ms_frame_tick();
     get_time_ms();
     
     if(game_paused)
@@ -137,9 +139,15 @@ glFlightFrameStage1()
         goto draw_bail;
     }
     
+    // round
+    static float TCROUNDM = (GAME_FRAME_RATE/2) / 1000.0;
+    float tcr = 0;
+    while(tcr <= tc) tcr += TCROUNDM;
+    tc = tcr;
+    
     // TODO: can save many cycles by updating objects in motion with less frequency
     // than every frame
-    if(tc >= 0.015)
+    if(tc >= /*0.015*/ TCROUNDM)
     {
         world_update(tc);
         world_update_time_last = time_ms;
@@ -263,9 +271,10 @@ glFlightFrameStage1()
         world_get_last_object()->bounding_remain = 1;
         world_get_last_object()->durability = ship_durability;
         
-        gameCamera_init(spawn[0], spawn[1], spawn[2], spawn[3], spawn[4], spawn[5]);
+        gameCamera_init(my_ship_x, my_ship_y, my_ship_z,
+                        spawn[3], spawn[4], spawn[5]);
         gameCamera_MoveY(5);
-        gameCamera_pitchRadians(M_PI/2);
+        gameCamera_pitchRadians(-M_PI/2);
         camera_locked_frames = 120;
         
         /* TODO: figure out why a crash in visible-checks if this isn't here */

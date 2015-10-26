@@ -23,6 +23,7 @@ float skill_m = 0.1; // 10% per skill-level
 float boundary_avoid_distance = 10;
 float fire_dist = 70;
 float diff_m = 0.1;
+float forget_thresh_increase = 0.5;
 
 gameAIState_t gameAIState;
 
@@ -56,14 +57,14 @@ game_ai_find_target(WorldElem *pElem)
     float minDist = INT_MAX;
     int minId = WORLD_ELEM_ID_INVALID;
     float wMin = 0;
-    float dist_ignore = pElem->stuff.u.enemy.forget_distance;
+    float dist_thresh = pElem->stuff.u.enemy.scan_distance;
     
     if(pElem->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID) return WORLD_ELEM_ID_INVALID;
     
     WorldElemListNode* pTarget = gWorld->elements_moving.next;
     while(pTarget)
     {
-        int priority = target_priority(pElem, pTarget->elem, &dist_ignore);
+        int priority = target_priority(pElem, pTarget->elem, &dist_thresh);
         
         if(priority > 0)
         {
@@ -92,7 +93,7 @@ game_ai_find_target(WorldElem *pElem)
         pTarget = pTarget->next;
     }
     
-    if(minDist <= dist_ignore)
+    if(minDist <= dist_thresh)
     {
         /*
         if(minId == my_ship_id)
@@ -105,6 +106,8 @@ game_ai_find_target(WorldElem *pElem)
         
         return minId;
     }
+    
+    if(pElem->stuff.u.enemy.scan_distance > 0) pElem->stuff.u.enemy.scan_distance += forget_thresh_increase;
     
     return WORLD_ELEM_ID_INVALID;
 }
@@ -151,7 +154,7 @@ game_ai_run()
                                      pCurElem->physics.ptr->y,
                                      pCurElem->physics.ptr->z);
                         
-                        if(dist_to_target < 2.0)
+                        if(dist_to_target < 4.0)
                         {
                             // drop tow
                             pCurElem->stuff.towed_elem_id = WORLD_ELEM_ID_INVALID;
@@ -254,6 +257,9 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     WorldElemListNode* pTargetNode = world_elem_list_find(elem->stuff.u.enemy.target_id, &gWorld->elements_list);
     if(pTargetNode) pTargetElem = pTargetNode->elem;
     
+    // AI speed
+    float vcur = world_elem_get_velocity(elem);
+    
     // test if nearing world boundary and avoid it (head to dead-middle of world
     // until sufficiently distant)
     if(!elem->stuff.u.enemy.fixed &&
@@ -302,19 +308,30 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     {
         // adjust target vector to intercept (with some fudge-factor)
         float fm = (1.0 + (1.0 / (float) rand_in_range(1, 100)));
-        float leadv = (dist / bulletVel) * fm;
+        float leadVel = bulletVel;
+        
+        // if not firing, intercept course
+        if(!elem->stuff.u.enemy.fires)
+        {
+            leadVel = vcur;
+            fm = 1.0;
+        }
+        
+        float leadv = (dist / leadVel) * fm;
         
         ax -= vx*leadv;
         ay -= vy*leadv;
         az -= vz*leadv;
         
-        if(dist > elem->stuff.u.enemy.forget_distance && elem->stuff.u.enemy.changes_target) // if distance is too great, forget target
+        // if distance is too great, forget target
+        if(dist > elem->stuff.u.enemy.scan_distance && elem->stuff.u.enemy.changes_target)
         {
             elem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
             
             elem->stuff.u.enemy.tgt_x = elem->stuff.u.enemy.tgt_y = elem->stuff.u.enemy.tgt_z = 0;
             
             elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
+            elem->stuff.u.enemy.scan_distance = 1;
         }
         
         if(elem->stuff.u.enemy.run_distance > 0 &&
@@ -418,9 +435,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     // rate at which enemy rotates
     float r = elem->stuff.u.enemy.max_turn * tc;
     
-    // AI speed
-    float vcur = world_elem_get_velocity(elem);
-    
     // HACK
     float vdesired = pursuit_speed_for_object(elem);
     
@@ -489,7 +503,10 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     if(elem->stuff.u.enemy.collided)
     {
         elem->stuff.u.enemy.collided = 0;
+        // force firing a bullet
         fireBullet = 1;
+        zdot = zdot_ikillyou;
+        dist = 0;
     }
     
     // fire a bullet
@@ -541,9 +558,8 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     }
     
     // leave trail
-    float pm = 2;
     if(elem->stuff.u.enemy.leaves_trail &&
-       time_ms - elem->stuff.u.enemy.time_last_trail > 250/pm)
+       time_ms - elem->stuff.u.enemy.time_last_trail >= pooped_cube_interval_ms)
     {
         firePoopedCube(elem);
         elem->stuff.u.enemy.time_last_trail = time_ms;

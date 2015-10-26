@@ -41,6 +41,9 @@ extern "C" {
 #include "gameIncludes.h"
 #include "gameLock.h"
 #include "collision.h"
+    
+//#define GAMENET_TRACE() {console_append("%s:%d",__func__,__LINE__);}
+#define GAMENET_TRACE()
 
 gameNetworkState_t gameNetworkState;
 game_lock_t networkLock;
@@ -107,16 +110,17 @@ prepare_listen_socket(int stream, unsigned int port)
     int sock;
     struct sockaddr_in addr;
     
-    sock = socket(AF_INET, stream? SOCK_STREAM: SOCK_DGRAM, 0);
+    sock = socket(AF_INET, (stream? SOCK_STREAM: SOCK_DGRAM), 0);
     if(sock < 0)
     {
+        console_append("%s:%d %s\n", __func__, __LINE__, "socket failure");
         return -1;
     }
     
     memset(&addr, 0, sizeof(addr));
     
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	addr.sin_port = htons(port);
     
 	int bcast_enabled = 1;
@@ -141,6 +145,7 @@ prepare_listen_socket(int stream, unsigned int port)
     /* bind */
     if(bind(sock, (struct sockaddr*) &addr, sizeof(addr)) < 0)
     {
+        console_append("%s:%d %s\n", __func__, __LINE__, "socket failure (bind)");
         close(sock);
         return -1;
     }
@@ -149,6 +154,7 @@ prepare_listen_socket(int stream, unsigned int port)
     {
         if(listen(sock, backlog))
         {
+            console_append("%s:%d %s\n", __func__, __LINE__, "socket failure (listen)");
             // listen failed
             close(sock);
             return -1;
@@ -379,12 +385,15 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
             
             if(gameNetwork_receive(&msgBeacon, &gameAddress, 1000) == GAME_NETWORK_ERR_NONE)
             {
+                GAMENET_TRACE();
+                
                 if(msgBeacon.cmd == GAME_NETWORK_MSG_BEACON_RESP)
                 {
                     struct sockaddr_in* beaconSockaddr = (struct sockaddr_in*) &gameAddress;
                     
                     strcpy(server_ip_resolved, inet_ntoa(beaconSockaddr->sin_addr));
                     server_port_resolved = GAME_NETWORK_ADDRESS_PORT(&gameAddress);
+                    GAMENET_TRACE();
                     break;
                 }
                 else continue;
@@ -394,6 +403,7 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
     
         if(search_retries == 0) // failed
         {
+            GAMENET_TRACE();
             // attempt to find via directory
             search_retries = directory_search_retries;
             while(search_retries > 0 && server_ip_resolved[0] == '\0')
@@ -408,12 +418,15 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
                 msgSearch.cmd = GAME_NETWORK_MSG_DIRECTORY_QUERY;
                 strcpy(msgSearch.params.c, gameNetworkState.hostInfo.name);
                 
+                GAMENET_TRACE();
+                
                 send_to_address_udp(&msgSearch, &gameNetworkState.gameDirectory.directory_address);
                 
                 int recv_retries = 100;
                 while(recv_retries > 0 &&
                       gameNetwork_receive(&msgSearchResponse, &responseAddr, 2000) == GAME_NETWORK_ERR_NONE)
                 {
+                    GAMENET_TRACE();
                     if(msgSearchResponse.cmd == GAME_NETWORK_MSG_DIRECTORY_RESPONSE)
                     {
                         console_append("\n...game found in directory\n");
@@ -431,6 +444,8 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
         }
         
         if(search_retries == 0) strcpy(server_ip_resolved, gameNetworkState.hostInfo.name);
+        
+        GAMENET_TRACE();
 
         memset(&addr, 0, sizeof(addr));
         addr.sin_addr.s_addr = inet_addr(server_ip_resolved);
@@ -620,7 +635,7 @@ gameNetwork_send_player(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerIn
     
     msg->needs_stream = 0;
     
-    msg->timestamp = time_ms;
+    msg->timestamp = get_time_ms();
     
     gameNetworkPlayerInfo* playerInfo = gameNetworkState.player_list_head.next;
     while(playerInfo)
@@ -914,7 +929,7 @@ gameNetwork_addPlayerInfo(int player_id)
     if(!pInfo->next) return GAME_NETWORK_ERR_FAIL;
     
     memset(pInfo->next, 0, sizeof(*pInfo->next));
-    pInfo->next->time_last_update = time_ms;
+    pInfo->next->time_last_update = get_time_ms();
     pInfo->next->elem_id = WORLD_ELEM_ID_INVALID;
     
     pInfo->next->player_id = player_id;
@@ -1056,6 +1071,7 @@ game_network_periodic_check()
 {
     const game_timeval_t time_out_ms = 1000*30;
     gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
+    game_timeval_t network_time_ms = get_time_ms();
     
     gameNetwork_initsockets();
     
@@ -1063,10 +1079,10 @@ game_network_periodic_check()
     {
         if(pInfo->player_id != gameNetworkState.my_player_id)
         {
-            if(time_ms - pInfo->time_last_update > time_out_ms)
+            if(network_time_ms - pInfo->time_last_update > time_out_ms)
             {
                 console_write("Player %s disconnected (%lu)", pInfo->name,
-                              time_ms - pInfo->time_last_update);
+                              network_time_ms - pInfo->time_last_update);
                 
                 if(pInfo->player_id == GAME_NETWORK_PLAYER_ID_HOST)
                 {
@@ -1083,12 +1099,12 @@ game_network_periodic_check()
         
         if(gameNetworkState.hostInfo.hosting)
         {
-            if(time_ms - pInfo->time_status_last > 1000)
+            if(network_time_ms - pInfo->time_status_last > 1000)
             {
                 gameNetworkMessage statusMsg;
                 
                 /* TODO: finish */
-                pInfo->time_status_last = time_ms;
+                pInfo->time_status_last = network_time_ms;
                 
                 statusMsg.cmd = GAME_NETWORK_MSG_PLAYER_STATUS;
                 statusMsg.params.playerStatus.is_towing = 0;
@@ -1104,7 +1120,7 @@ game_network_periodic_check()
         gameNetworkObjectInfo* pObjectInfo = &gameNetworkState.game_object_list_head;
         while(pObjectInfo->next)
         {
-            if(time_ms - pObjectInfo->next->update_time > 1000)
+            if(network_time_ms - pObjectInfo->next->update_time > 1000)
             {
                 world_remove_object(pObjectInfo->next->elem_id_local);
                 
@@ -1119,23 +1135,23 @@ game_network_periodic_check()
     }
     
     static game_timeval_t time_last_stats_alert = 0;
-    if(gameNetworkState.hostInfo.hosting && time_ms - time_last_stats_alert > 10000)
+    if(gameNetworkState.hostInfo.hosting && network_time_ms - time_last_stats_alert > 10000)
     {
         if(gameNetwork_getPlayerInfo(GAME_NETWORK_PLAYER_ID_HOST, &pInfo, 0) == GAME_NETWORK_ERR_NONE)
         {
             pInfo->elem_id = my_ship_id;
         }
         
-        time_last_stats_alert = time_ms;
+        time_last_stats_alert = network_time_ms;
         gameNetwork_sendStatsAlert();
         
         gameNetwork_sendPing();
     }
     
     static game_timeval_t time_last_name_send = 0;
-    if(time_ms - time_last_name_send > 5000)
+    if(network_time_ms - time_last_name_send > 5000)
     {
-        time_last_name_send = time_ms;
+        time_last_name_send = network_time_ms;
         
         gameNetworkMessage nameMsg;
         
@@ -1145,11 +1161,11 @@ game_network_periodic_check()
     }
     
     static game_timeval_t time_last_unacked_send = 0;
-    if(time_ms - time_last_unacked_send > 200 &&
+    if(network_time_ms - time_last_unacked_send > 200 &&
        gameNetworkState.msgUnacked.cmd != GAME_NETWORK_MSG_NONE &&
        gameNetworkState.msgUnackedRetransmitCount < 10)
     {
-        time_last_unacked_send = time_ms;
+        time_last_unacked_send = network_time_ms;
         gameNetwork_send(&gameNetworkState.msgUnacked);
         gameNetworkState.msgUnackedRetransmitCount++;
     }
@@ -1181,6 +1197,8 @@ do_game_network_write()
         beacon_time_last = time_ms;
         gameNetworkMessage directoryRegisterMsg;
         
+        GAMENET_TRACE();
+        
         memset(&directoryRegisterMsg, 0, sizeof(directoryRegisterMsg));
         directoryRegisterMsg.cmd = GAME_NETWORK_MSG_DIRECTORY_ADD;
         // TODO: mention player-counts / game information
@@ -1196,15 +1214,15 @@ do_game_network_write()
         send_to_address_udp(&directoryRegisterMsg, &gameNetworkState.gameDirectory.directory_address);
     }
     
-    if(time_ms - update_time_last > update_frequency_ms)
+    if(time_ms - update_time_last >= update_frequency_ms)
     {
-        update_time_last = time_ms;
+        update_time_last = get_time_ms();
 
         memset(&netMsg, 0, sizeof(netMsg));
         netMsg.cmd = GAME_NETWORK_MSG_PLAYER_INFO;
         if(get_world_elem_info(my_ship_id, &netMsg) == GAME_NETWORK_ERR_NONE)
         {
-            netMsg.params.f[16] = time_ms;
+            netMsg.params.f[16] = update_time_last;
         
             gameNetwork_send(&netMsg);
         }
@@ -1222,7 +1240,6 @@ do_game_network_write()
         while(pNode)
         {
             if(pNode->elem->stuff.intelligent ||
-               pNode->elem->object_type == OBJ_CAPTURE ||
                pNode->elem->object_type == OBJ_POWERUP_GENERIC ||
                pNode->elem->object_type == OBJ_SPAWNPOINT ||
                pNode->elem->object_type == OBJ_SPAWNPOINT_ENEMY)
@@ -1589,8 +1606,9 @@ do_game_network_handle_directory_msg(gameNetworkMessage *msg, gameNetworkAddress
                         struct sockaddr_in* sin_ptr = (struct sockaddr_in*) pInfo->address.storage;
                         if(inet_ntoa(sin_ptr->sin_addr))
                         {
-                            console_write("QUERY: found game %s at\n%s\noffset:%d",
-                                          pInfo->name, inet_ntoa(sin_ptr->sin_addr), offset_o);
+                            console_write("QUERY: found game %s at\n%s\noffset:%d(srcAddr=%s)",
+                                          pInfo->name, inet_ntoa(sin_ptr->sin_addr), offset_o,
+                                          inet_ntoa(GAME_NETWORK_ADDRESS_INADDR(srcAddr)));
                             /*
                             strcpy(queryResponseMsg.params.c, inet_ntoa(sin_ptr->sin_addr));
                              */
@@ -1655,8 +1673,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
     game_timeval_t t;
     int net_obj_id;
     int interp_velo = 1;
-    
-    get_time_ms();
+    game_timeval_t network_time_ms = get_time_ms();
     
     if(msg->is_ack && msg->msg_seq == gameNetworkState.msgUnacked.msg_seq)
     {
@@ -1750,7 +1767,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                 break;
                 
             case GAME_NETWORK_MSG_PONG:
-                playerInfo->network_latency = time_ms - playerInfo->time_ping;
+                playerInfo->network_latency = network_time_ms - playerInfo->time_ping;
                 break;
                 
             case GAME_NETWORK_MSG_PLAYER_INFO:
@@ -1802,7 +1819,10 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                     // log location
                     for(int i = 2; i > 0; i--)
                     {
-                        for(int d = 0; d < 3; d++) playerInfo->loc_last[d][i] = playerInfo->loc_last[d][i-1];
+                        for(int d = 0; d < 3; d++)
+                        {
+                            playerInfo->loc_last[d][i] = playerInfo->loc_last[d][i-1];
+                        }
                         playerInfo->timestamp_last[i] = playerInfo->timestamp_last[i-1];
                     }
                     playerInfo->loc_last[0][0] = pPlayerElem->physics.ptr->x;
@@ -1856,13 +1876,16 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                     }
                     playerInfo->shot_fired = 0;
                     
-                    if(time_ms - playerInfo->time_cube_pooped_last >= 150)
+                    if(network_time_ms - playerInfo->time_cube_pooped_last >= pooped_cube_interval_ms)
                     {
-                        playerInfo->time_cube_pooped_last = time_ms;
+                        playerInfo->time_cube_pooped_last = network_time_ms;
                         firePoopedCube(pPlayerElem);
+                        
+                        WorldElem *pCube = world_get_last_object();
+                        pCube->physics.ptr->vx = pCube->physics.ptr->vy = pCube->physics.ptr->vz = 0;
                     }
                     
-                    playerInfo->time_last_update = time_ms;
+                    playerInfo->time_last_update = network_time_ms;
                 }
                 break;
                 
@@ -2091,7 +2114,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                         }
                     }
                     
-                    objectInfo->update_time = time_ms;
+                    objectInfo->update_time = network_time_ms;
                 }
                 break;
                 
@@ -2189,7 +2212,7 @@ do_game_network_read()
     
     if(!in_render_thread)
     {
-        receive_block_ms = 25;
+        receive_block_ms = 5;
     }
     
     while(retries > 0)

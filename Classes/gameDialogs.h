@@ -119,7 +119,7 @@ gameDialogWelcomeMulti()
 static void
 gameDialogWelcomeQuick()
 {
-    gameInterfaceModalDialog("Game Type:", "DataHack\n(single)", "Multiplayer",
+    gameInterfaceModalDialog("Game type:", "Hacker\nDefender", "Multiplayer",
                              gameDialogWelcomeSingle, gameDialogWelcomeMulti);
 }
 
@@ -166,8 +166,8 @@ gameDialogWelcome()
     }
     else
     {
-        gameInterfaceModalDialog(WELCOMESTR, "Game", "Menu",
-                                 gameDialogWelcomeQuick, gameDialogWelcomeMenu);
+        gameInterfaceModalDialog(WELCOMESTR, "New Game", "Menu",
+                                 /*gameDialogWelcomeQuick*/ gameDialogWelcomeSingle, gameDialogWelcomeMenu);
     }
 }
 
@@ -176,10 +176,10 @@ gameDialogCalibrate()
 {
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
-                             "^C Please calibrate controls:  ^C\n"
-                             "^C Hold device still           ^C\n"
-                             "^C hold flashing 'trim' button ^C\n"
-                             "^C for 3 sec                   ^C\n"
+                             "^C Calibrating controls:       ^C\n"
+                             "^C Hold device still...        ^C\n"
+                             "^C (to re-calibrate later use  ^C\n"
+                             "^C  flashing TRIM button)      ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
                              "", "", gameDialogCancel, gameDialogCancel);
 }
@@ -255,7 +255,7 @@ static void
 gameDialogStartNetworkGame()
 {
     gameStateSinglePlayer.map_use_current = 1;
-    gameInterfaceModalDialog("Start network game\n(on this map)?", "OK", "Change\nmap", gameDialogStartNetworkGame2, gameDialogStartNetworkGameNewMap);
+    gameInterfaceModalDialog("Gathering players...\nWait...\nStart when ready\n", "Start", "Change\nmap", gameDialogStartNetworkGame2, gameDialogStartNetworkGameNewMap);
 }
 
 static char gameDialogDisplayStringStr[16][1024];
@@ -288,6 +288,38 @@ gameDialogCancelString()
                                  "OK", "OK",
                                  gameDialogCancelString, gameDialogCancelString);
     }
+}
+
+static char gameDialogScoresString[1024];
+
+static void
+gameDialogScores()
+{
+    sprintf(gameDialogScoresString, "Datagrab:%d\nSurvival:%d\nDefend:%d\nDeathmatch:%d\n",
+            gameStateSinglePlayer.high_score[GAME_TYPE_COLLECT],
+            gameStateSinglePlayer.high_score[GAME_TYPE_SURVIVAL],
+            gameStateSinglePlayer.high_score[GAME_TYPE_DEFEND],
+            gameStateSinglePlayer.high_score[GAME_TYPE_DEATHMATCH]);
+    
+    gameInterfaceModalDialog(gameDialogScoresString,
+                             "OK", "OK",
+                             gameDialogCancelString, gameDialogCancelString);
+}
+
+static void
+gameDialogScorePopup(char *scoreStr)
+{
+    controlRect r;
+    r = gameInterfaceControls.dialogRectDefault;
+    
+    float scale = 3;
+    r.x += r.xw/scale;
+    r.y += r.yw/scale;
+    r.xw /= scale;
+    r.yw /= scale;
+    r.tex_id = 4;
+    
+    gameInterfaceModalDialogWithRect(scoreStr, "", "", gameDialogCancelString, gameDialogCancelString, &r, GAME_FRAME_RATE * 1.2);
 }
 
 #endif
