@@ -17,9 +17,12 @@
 			<key>CFBundleIconFiles</key>
 			<array>
 				<string>shipicon.png</string>
-				<string>app_icon_57x57.png</string>
+				<string>app_icon57x57.png</string>
 				<string>app_icon114x114.png</string>
+				<string>app_icon120x120.png</string>
+				<string>app_icon152x152.png</string>
 				<string>app_icon72x72.png</string>
+				<string>app_icon76x76.png</string>
 			</array>
 		</dict>
 	</dict>
@@ -32,11 +35,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.9.12</string>
+	<string>0.9.14</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>0.9.12.1</string>
+	<string>0.9.14.4</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.simulation-games</string>
 	<key>LSRequiresIPhoneOS</key>
