@@ -10,7 +10,7 @@
 
 #include "collision.h"
 
-int
+collision_action_t
 collision_actions[OBJ_LAST][OBJ_LAST] =
 {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // unknown
@@ -34,6 +34,8 @@ collision_actions[OBJ_LAST][OBJ_LAST] =
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // reserved
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // reserved
 };
+
+collision_action_t collision_actions_stage1[OBJ_LAST][OBJ_LAST];
 
 
 char collidedPortalNametagLast[256] = {0};

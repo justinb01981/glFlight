@@ -162,9 +162,9 @@ gyro_calibrate_log(float pct)
     float width = (24.0 * pct) / 100;
     for(s = 0; s < width && s <= 24; s++)
     {
-        console_append("=");
+        console_append("^I");
     }
-    while(s < 24) { console_append("."); s++; }
+    while(s < 24) { console_append("^J"); s++; }
     console_append("]");
 }
 

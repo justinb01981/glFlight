@@ -89,7 +89,7 @@ extern int actions_sub_cur;
 
 static const char* action_strings[] =
 {
-    "game: datahack",
+    "game: hackattack",
     "game: resume",
     "game: survival",
     "game: defend",

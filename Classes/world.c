@@ -125,6 +125,17 @@ world_add_object_core(Model type,
 	
 	switch (type)
 	{
+    case MODEL_CUBE_INVERTED:
+            model_coords = model_cube;
+            model_sizeof = sizeof(model_cube);
+            model_indices = model_cube_indices_inverted;
+            model_indices_sizeof = sizeof(model_cube_indices);
+            model_texcoords = model_cube_texcoords_alt /*model_cube_texcoords*/;
+            model_texcoords_sizeof = sizeof(model_cube_texcoords);
+            model_primitives_sizeof = sizeof(model_cube_primitives);
+            model_primitives = model_cube_primitives;
+            break;
+            
 	case MODEL_CUBE:
             model_coords = model_cube;
             model_sizeof = sizeof(model_cube);
@@ -1514,6 +1525,7 @@ world_update(float tc)
     int do_oob_gravity_sound = 1;
     int do_sound_checks = 1;
     
+    
     WorldElemListNode* pRegionElemsHead;
     WorldElemListNode* pCur = gWorld->elements_moving.next;
     
@@ -1648,96 +1660,118 @@ world_update(float tc)
                 }
                 else // added to region successfully
                 {
-                    if(do_check_collisions)
-                    {
-                        int sound_played = 0;
-                        int repulsed;
-                        int repulse_retry = 100;
-                        do
+                    collision_action_table_t* collision_actions_table_list[] =
                         {
-                            repulsed = 0;
-                            
-                            // check collisions
-                            WorldElemListNode* pRegionElemsHead =
-                                get_region_list_head(pCur->elem->physics.ptr->x,
-                                                     pCur->elem->physics.ptr->y,
-                                                     pCur->elem->physics.ptr->z);
-                            
-                            if(pRegionElemsHead)
+                            &collision_actions_stage1,
+                            &collision_actions,
+                            NULL
+                        };
+                    int cl = 0;
+                    
+                    while(collision_actions_table_list[cl])
+                    {
+                        collision_action_table_t *collision_actions_cur = collision_actions_table_list[cl];
+                        
+                        if(do_check_collisions)
+                        {
+                            int sound_played = 0;
+                            int repulsed;
+                            int repulse_retry = 100;
+                            do
                             {
-                                WorldElemListNode* pRegionElemsCur = pRegionElemsHead->next;
+                                repulsed = 0;
                                 
-                                while(pRegionElemsCur)
+                                // check collisions
+                                WorldElemListNode* pRegionElemsHead =
+                                    get_region_list_head(pCur->elem->physics.ptr->x,
+                                                         pCur->elem->physics.ptr->y,
+                                                         pCur->elem->physics.ptr->z);
+                                
+                                if(pRegionElemsHead)
                                 {
-                                    if(pRegionElemsCur->elem != pCur->elem)
+                                    WorldElemListNode* pRegionElemsCur = pRegionElemsHead->next;
+                                    
+                                    while(pRegionElemsCur)
                                     {
-                                        if(pRegionElemsCur->elem->type == MODEL_TELEPORTER &&
-                                           check_collision(pRegionElemsCur->elem, pCur->elem))
+                                        if(pRegionElemsCur->elem != pCur->elem)
                                         {
-                                            remove_element_from_region(pCur->elem);
-                                            
-                                            float dx = pCur->elem->physics.ptr->x - pRegionElemsCur->elem->stuff.u.teleporter.x;
-                                            float dy = pCur->elem->physics.ptr->y - pRegionElemsCur->elem->stuff.u.teleporter.y;
-                                            float dz = pCur->elem->physics.ptr->z - pRegionElemsCur->elem->stuff.u.teleporter.z;
-                                            
-                                            move_elem_relative(pCur->elem, -dx, -dy, -dz);
-                                            add_element_to_region(pCur->elem);
-                                        }
-                                        else if(pRegionElemsCur->elem->destructible &&
-                                                pCur->elem->destructible &&
-                                                check_collision(pRegionElemsCur->elem, pCur->elem))
-                                        {
-                                            WorldElem *elemA = pRegionElemsCur->elem;
-                                            WorldElem *elemB = pCur->elem;
-                                            
-                                            // elemA = slower
-                                            // elemB = faster
-                                            if(elemA->physics.ptr->velocity > elemB->physics.ptr->velocity)
+                                            if(pRegionElemsCur->elem->type == MODEL_TELEPORTER &&
+                                               check_collision(pRegionElemsCur->elem, pCur->elem))
                                             {
-                                                WorldElem* elemTmp = elemB;
-                                                elemB = elemA;
-                                                elemA = elemTmp;
+                                                remove_element_from_region(pCur->elem);
+                                                
+                                                float dx = pCur->elem->physics.ptr->x - pRegionElemsCur->elem->stuff.u.teleporter.x;
+                                                float dy = pCur->elem->physics.ptr->y - pRegionElemsCur->elem->stuff.u.teleporter.y;
+                                                float dz = pCur->elem->physics.ptr->z - pRegionElemsCur->elem->stuff.u.teleporter.z;
+                                                
+                                                move_elem_relative(pCur->elem, -dx, -dy, -dz);
+                                                add_element_to_region(pCur->elem);
                                             }
-                                            
-                                            if(collision_actions[elemB->object_type][elemA->object_type] == COLLISION_ACTION_REPULSE)
+                                            else if(pRegionElemsCur->elem->destructible &&
+                                                    pCur->elem->destructible &&
+                                                    check_collision(pRegionElemsCur->elem, pCur->elem))
                                             {
-                                                repulsed = 1;
+                                                WorldElem *elemA = pRegionElemsCur->elem;
+                                                WorldElem *elemB = pCur->elem;
                                                 
-                                                // repulse
-                                                world_repulse_elem(elemB, elemA, tc);
-                                                
-                                                if(elemB->elem_id == my_ship_id && !sound_played)
+                                                // elemA = slower
+                                                // elemB = faster
+                                                if(elemA->physics.ptr->velocity > elemB->physics.ptr->velocity)
                                                 {
-                                                    sound_played = 1;
-                                                    gameAudioPlaySoundAtLocation("bump",
-                                                                                 elemA->physics.ptr->x,
-                                                                                 elemA->physics.ptr->y,
-                                                                                 elemA->physics.ptr->z);
+                                                    WorldElem* elemTmp = elemB;
+                                                    elemB = elemA;
+                                                    elemA = elemTmp;
+                                                }
+                                                
+                                                collision_action_t colact = (*collision_actions_cur)[elemB->object_type][elemA->object_type];
+                                                
+                                                if(colact == COLLISION_ACTION_REPULSE)
+                                                {
+                                                    repulsed = 1;
+                                                    
+                                                    // repulse
+                                                    world_repulse_elem(elemB, elemA, tc);
+                                                    
+                                                    if(elemB->elem_id == my_ship_id && !sound_played)
+                                                    {
+                                                        sound_played = 1;
+                                                        gameAudioPlaySoundAtLocation("bump",
+                                                                                     elemA->physics.ptr->x,
+                                                                                     elemA->physics.ptr->y,
+                                                                                     elemA->physics.ptr->z);
+                                                    }
+                                                }
+                                                else if(colact == COLLISION_ACTION_NONE)
+                                                {
+                                                    // ignored
+                                                }
+                                                else
+                                                {
+                                                    if(!world_elem_list_find_elem(elemA, &gWorld->elements_collided) &&
+                                                       !world_elem_list_find_elem(elemB, &gWorld->elements_collided))
+                                                    {
+                                                        WorldElemListNode* pNodeA =
+                                                            world_elem_list_add(elemA, &gWorld->elements_collided);
+                                                        
+                                                        WorldElemListNode* pNodeB =
+                                                            world_elem_list_add(elemB, &gWorld->elements_collided);
+                                                        
+                                                        pNodeA->userarg = colact;
+                                                        pNodeB->userarg = colact;
+                                                    }
                                                 }
                                             }
-                                            else if(collision_actions[elemB->object_type][elemA->object_type] == COLLISION_ACTION_NONE)
-                                            {
-                                                // ignored
-                                            }
-                                            else
-                                            {
-                                                if(!world_elem_list_find_elem(elemA, &gWorld->elements_collided) &&
-                                                   !world_elem_list_find_elem(elemB, &gWorld->elements_collided))
-                                                {
-                                                    world_elem_list_add(elemA, &gWorld->elements_collided);
-                                                    world_elem_list_add(elemB, &gWorld->elements_collided);
-                                                }
-                                            }
                                         }
+                                        
+                                        if(repulsed) break;
+                                        
+                                        pRegionElemsCur = pRegionElemsCur->next;
                                     }
-                                    
-                                    if(repulsed) break;
-                                    
-                                    pRegionElemsCur = pRegionElemsCur->next;
                                 }
-                            }
-                            repulse_retry--;
-                        } while(repulsed && repulse_retry > 0);
+                                repulse_retry--;
+                            } while(repulsed && repulse_retry > 0);
+                        }
+                        cl++;
                     }
                     
                     if(do_sound_checks)

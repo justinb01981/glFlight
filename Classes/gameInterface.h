@@ -16,6 +16,7 @@ typedef struct
 {
     double x, y;
     double xw, yw;
+    double xm, ym;
     int tex_id;
     int touched;
     int visible;

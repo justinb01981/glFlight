@@ -205,7 +205,7 @@ typedef enum
 struct WorldElemListNode {
     WorldElem* elem;
     struct WorldElemListNode* next;
-    ListType type;
+    unsigned int type:8, userarg:8;
     simple_hash_table_t* hash_ptr;
 };
 

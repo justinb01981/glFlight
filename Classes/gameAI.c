@@ -24,6 +24,7 @@ float boundary_avoid_distance = 10;
 float fire_dist = 70;
 float diff_m = 0.1;
 float forget_thresh_increase = 0.5;
+float tow_turn_scale = 2.0;
 
 gameAIState_t gameAIState;
 
@@ -434,6 +435,8 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     // rate at which enemy rotates
     float r = elem->stuff.u.enemy.max_turn * tc;
+    
+    if(elem->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID) r *= tow_turn_scale;
     
     // HACK
     float vdesired = pursuit_speed_for_object(elem);

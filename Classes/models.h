@@ -42,6 +42,7 @@ typedef enum {
     MODEL_MISSLE,
     MODEL_SHIP3,
     MODEL_ICOSAHEDRON,
+    MODEL_CUBE_INVERTED,
     MODEL_LAST
 } Model;
 
@@ -429,6 +430,22 @@ static model_index_t model_cube_indices[] =
 	1,0,4, 4,5,1,
 
     11,8,9, 10,11,9, // bottom
+};
+
+static model_index_t model_cube_indices_inverted[] =
+{
+    // ordering: counter-clockwise for each face (2 triangles) looking inwards to cube
+    15,12,13, 15,13,14, // top
+    
+    7,3,0, 0,4,7,
+    
+    6,2,3, 3,7,6,
+    
+    5,1,2, 2,6,5,
+    
+    4,0,1, 1,5,3,
+    
+    9,8,11, 9,11,10, // bottom
 };
 
 static int model_cube_primitives[] = 

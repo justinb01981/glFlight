@@ -55,6 +55,7 @@ int model_my_ship = MODEL_SHIP1;
 int new_level = 0;
 int game_delay_frames = 0;
 int invuln_count = 0;
+unsigned int score_last_checked = 0;
 
 float game_variables_val[GAME_VARIABLES_MAX];
 
@@ -161,7 +162,7 @@ static void
 score_pop()
 {
     char str[255];
-    sprintf(str, "Score: %d", gameStateSinglePlayer.stats.score);
+    sprintf(str, "+ %d", gameStateSinglePlayer.stats.score - score_last_checked);
     gameDialogScorePopup(str);
 }
 
@@ -576,8 +577,8 @@ game_init_objects()
         switch(pCur->elem->object_type)
         {
             case OBJ_SPAWNPOINT_ENEMY:
-                pCur->elem->stuff.u.spawnpoint.time_spawn_interval = (1000 * 10) / gameStateSinglePlayer.difficulty;
-                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000 * 20;
+                pCur->elem->stuff.u.spawnpoint.time_spawn_interval = (1000 * 1) / gameStateSinglePlayer.difficulty;
+                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000 * 30;
                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence = 3 + gameStateSinglePlayer.difficulty;
                 break;
                 
@@ -648,7 +649,7 @@ game_start(float difficulty, int type)
     
     gameStateSinglePlayer.points_data_grabbed = 10;
     gameStateSinglePlayer.points_enemy_killed = 3;
-    gameStateSinglePlayer.points_enemy_bh_killed = 5;
+    gameStateSinglePlayer.points_enemy_bh_killed = gameStateSinglePlayer.points_enemy_killed*2;
     gameStateSinglePlayer.points_turret_killed = 2;
     gameStateSinglePlayer.points_per_second_elapsed = 0;
     gameStateSinglePlayer.invuln_time_after_hit = 0;
@@ -699,7 +700,7 @@ game_start(float difficulty, int type)
          */
         sprintf(dialogStr, "^D^D^DWARNING: SYSTEM_COMPROMISED^D^D^D\n"
                            "^D^D^D    ACTIVATE_DEFENSES      ^D^D^D\n"
-                           "^D^D^D    (Protect ^D)           ^D^D^D\n"
+                           "^D^D^D    (Protect ^D)            ^D^D^D\n"
                             "**** High Score: %d ****",
                 gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
         gameDialogDisplayString(dialogStr);
@@ -992,7 +993,10 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
                 {
                     if(elemA->stuff.towed_elem_id == WORLD_ELEM_ID_INVALID)
                     {
-                        if(elemA->elem_id != my_ship_id) console_write(game_log_messages[GAME_LOG_WARN_CAPTURE]);
+                        if(elemA->elem_id != my_ship_id)
+                        {
+                            console_write(game_log_messages[GAME_LOG_WARN_CAPTURE]);
+                        }
                         
                         elemA->stuff.towed_elem_id = elemB->elem_id;
                         collect_sound = 1;
@@ -1226,8 +1230,6 @@ game_handle_destruction(WorldElem* elem)
                         world_get_last_object()->texture_id = elemPlayer->texture_id; // TODO: bug
                     }
                 }
-
-                score_kill(elem);
             }
             break;
             
@@ -1355,6 +1357,7 @@ game_run()
     int target_types[] = {OBJ_SHIP, OBJ_PLAYER, OBJ_TURRET, OBJ_UNKNOWN};
     static int game_map_custom_loaded = 0;
     static int game_ends_collects_lost = 1;
+    static game_timeval_t logSoundTimeLast = 0;
     
     if(game_delay_frames > 0)
     {
@@ -1725,11 +1728,24 @@ game_run()
             score_update();
         }
         
-        static unsigned int score_last_checked = 0;
         if(gameStateSinglePlayer.stats.score != score_last_checked)
         {
-            score_last_checked = gameStateSinglePlayer.stats.score;
             score_pop();
+            score_last_checked = gameStateSinglePlayer.stats.score;
+        }
+        
+        // play sounds based on log events
+        char* soundName = NULL;
+        if(strstr(consoleMessage, game_log_messages[GAME_LOG_FILESAVED])) soundName = "victory";
+        else if(strstr(consoleMessage, game_log_messages[GAME_LOG_FILELOST])) soundName = "dropoff";
+        else if(strstr(consoleMessage, game_log_messages[GAME_LOG_WARN_CAPTURE])) soundName = "warning";
+        else if(strstr(consoleMessage, game_log_messages[GAME_LOG_KILLED_ENEMY1])) soundName = "none";
+        else if(strstr(consoleMessage, game_log_messages[GAME_LOG_KILLED_ENEMY2])) soundName = "none";
+        else if(strstr(consoleMessage, game_log_messages[GAME_LOG_KILLED_TURRET])) soundName = "none";
+        if(soundName && logSoundTimeLast != console_write_time)
+        {
+            gameAudioPlaySoundAtLocation(soundName, my_ship_x, my_ship_y, my_ship_z);
+            logSoundTimeLast = console_write_time;
         }
     }
     

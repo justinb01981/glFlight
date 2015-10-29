@@ -27,7 +27,9 @@
 #define WORLD_SCALED_FRAME_MESH_PULL_RANDOM(height, range)       \
 "register_params rndx rndz 0 "#height" 0 0 0 0 0 0 0 0 0 0 0 0\n"       \
 "register_params_mul 0.2 0.2 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"      \
-"mesh_manip_pull r r r r 0"" "#range"\n"
+"mesh_manip_pull r r r r 0"" "#range"\n" \
+"register_params_update 0 0 8 0 0 0 0 0 0 0 0 0 0 0 0 0\n"  \
+"add_object 1 r r r 0 0 0 4 16\n"
 
 #define WORLD_SCALED_FRAME(x, tex, scale)                                \
 "register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
@@ -165,8 +167,27 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
 "add_object r r r r 0 0 0 r r\n"
 
 #define BASE_FRIENDLY_1                        \
-"add_object 2 rndx 50 rndz 0 0 0 8 " "42" "\n" \
-"object_set_info 8\n"
+"register_params 2 rndx 50 rndz 0 0 0 8 42 0 0 0 0 0 0 0\n"                 \
+"add_object r r r r r r r r " "r" "\n" \
+"object_set_info 8\n" \
+\
+"register_params_update 0 0 -8 0 0 0 0 -4 44 0 0 0 0 0 0 0\n"   \
+"add_object r r r r 0 0 0 r r\n"                                           \
+"register_params_update 0 0 16 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
+"add_object r r r r 0 0 0 r r\n" \
+"register_params_update 0 0 -8 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
+\
+"register_params_update 0 -8 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
+"add_object r r r r 0 0 0 r r\n"                                           \
+"register_params_update 0 16 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
+"add_object r r r r 0 0 0 r r\n"                                           \
+"register_params_update 0 -8 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
+\
+"register_params_update 0 0 0 -8 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
+"add_object r r r r 0 0 0 r r\n"                                           \
+"register_params_update 0 0 0 16 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
+"add_object r r r r 0 0 0 r r\n"                                           \
+"register_params_update 0 0 0 -8 0 0 0 0 0 0 0 0 0 0 0 0\n"
 
 #define BASE_ENEMY_1                           \
 "add_object 2 rndx 50 rndz 0 0 0 8 58\n"       \
@@ -1241,7 +1262,7 @@ const static char* maps_list[] =
 
 const static char* maps_list_names[] =
 {
-    "map datahack-grid",
+    "map hack-grid",
     "map asteroidfield",
     "map canvas",
     "map bigcanvas",

@@ -27,6 +27,8 @@ enum
 
 typedef unsigned int collision_action_t;
 
+typedef collision_action_t collision_action_table_t[OBJ_LAST][OBJ_LAST];
+
 const static collision_action_t
 collision_actions_default[OBJ_LAST][OBJ_LAST] =
 {
@@ -52,10 +54,22 @@ collision_actions_default[OBJ_LAST][OBJ_LAST] =
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // reserved
 };
 
+extern collision_action_t collision_actions[OBJ_LAST][OBJ_LAST];
+extern collision_action_t collision_actions_stage1[OBJ_LAST][OBJ_LAST];
+
 // TODO: make this an array of callback-lists
-extern int collision_actions[OBJ_LAST][OBJ_LAST];
+extern collision_action_t collision_actions[OBJ_LAST][OBJ_LAST];
 
 extern char collidedPortalNametagLast[256];
+
+inline static void
+collision_actions_set_stage1()
+{
+    collision_actions_stage1[OBJ_SPAWNPOINT][OBJ_POWERUP_GENERIC] = COLLISION_ACTION_DAMAGE;
+    collision_actions_stage1[OBJ_POWERUP_GENERIC][OBJ_SPAWNPOINT] = COLLISION_ACTION_DAMAGE;
+    collision_actions_stage1[OBJ_SPAWNPOINT_ENEMY][OBJ_POWERUP_GENERIC] = COLLISION_ACTION_DAMAGE;
+    collision_actions_stage1[OBJ_POWERUP_GENERIC][OBJ_SPAWNPOINT_ENEMY] = COLLISION_ACTION_DAMAGE;
+}
 
 inline static void
 collision_actions_set_default()
@@ -64,7 +78,10 @@ collision_actions_set_default()
         for(int c = 0; c < OBJ_LAST; c++)
         {
             collision_actions[r][c] = collision_actions_default[r][c];
+            collision_actions_stage1[r][c] = COLLISION_ACTION_NONE;
         }
+    
+    collision_actions_set_stage1();
 }
 
 inline static void
@@ -111,24 +128,25 @@ do_world_collision_handling(float tc)
         
         if(pCollisionB)
         {
-            int collision_action = collision_actions[pCollisionA->elem->object_type][pCollisionB->elem->object_type];
+            // action recorded by world-boundary-checks
+            collision_action_t world_coll_act = pCollisionA->userarg;
             
             // always trigger collision logic in certain cases (map building)
             if(pCollisionA->elem->object_type == OBJ_BULLET)
             {
                 if(pCollisionA->elem->stuff.bullet.action == ACTION_REPLACE_OBJECT)
                 {
-                    collision_action = COLLISION_ACTION_DAMAGE;
+                    world_coll_act = COLLISION_ACTION_DAMAGE;
                 }
             }
             
-            switch(collision_action)
+            switch(world_coll_act)
             {
             // JB: this should now be handled in world_update()
             case COLLISION_ACTION_REPULSE:
-                game_handle_collision(pCollisionA->elem, pCollisionB->elem, collision_action);
-                gameNetwork_handle_collision(pCollisionA->elem, pCollisionB->elem, collision_action);
-                game_ai_collision(pCollisionA->elem, pCollisionB->elem, collision_action);
+                game_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
+                gameNetwork_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
+                game_ai_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
                 break;
     
             case COLLISION_ACTION_NONE:
@@ -321,7 +339,7 @@ do_world_collision_handling(float tc)
                 else
                 {
                     int object_destroyed = 0;
-                    int object_damage = collision_action == COLLISION_ACTION_DAMAGE;
+                    int object_damage = world_coll_act == COLLISION_ACTION_DAMAGE;
                     int durability_a = pCollisionA->elem->durability;
                     int durability_b = pCollisionB->elem->durability;
                     
@@ -341,9 +359,9 @@ do_world_collision_handling(float tc)
                         }
                     }
                     
-                    game_handle_collision(pCollisionA->elem, pCollisionB->elem, collision_action);
-                    gameNetwork_handle_collision(pCollisionA->elem, pCollisionB->elem, collision_action);
-                    game_ai_collision(pCollisionA->elem, pCollisionB->elem, collision_action);
+                    game_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
+                    gameNetwork_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
+                    game_ai_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
                     
                     if(object_damage)
                     {
@@ -416,22 +434,22 @@ do_world_collision_handling(float tc)
                             // handle spawned-objects (bullets)
                             if(pCollisionB->elem->type == MODEL_SHIP1)
                             {
-                                /*
                                 gameAudioPlaySoundAtLocation("dead",
                                                              pCollisionB->elem->physics.ptr->x,
                                                              pCollisionB->elem->physics.ptr->y,
                                                              pCollisionB->elem->physics.ptr->z);
-                                 */
                                 
                                 if(pCollisionB->elem->elem_id == my_ship_id)
                                 {
                                     extern int camera_locked_frames;
                                     camera_locked_frames = 240;
                                     
+                                    /*
                                     gameAudioPlaySoundAtLocation("dead",
                                                                  my_ship_x,
                                                                  my_ship_y,
                                                                  my_ship_z);
+                                    */
                                     
                                     // add wreckage
                                     world_add_object(MODEL_SPRITE, my_ship_x, my_ship_y, my_ship_z,

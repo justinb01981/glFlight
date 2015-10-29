@@ -400,8 +400,8 @@ int drawRadar()
             float ys = /*vh / 480*/ 1;
             
             /* see our glFrustum */
-            float xfr = /*1 / (dist/50)*/ 1;
-            float yfr = /*0.75 / (dist/50)*/ 1;
+            float xfr = 1;
+            float yfr = xfr * (viewWidth/viewHeight);
             x = 0.5 - ((yawdot/2) * xfr);
             y = 0.5 + ((pitchdot/2) * yfr);
             
@@ -450,7 +450,6 @@ int drawRadar()
                 // cleanup overlay: skip these
                 if(minimal_overlay) goto radar_draw_end;
             }
-            
             
             er.x -= er.xw/2*scale;
             er.y -= er.yw/2*scale;
@@ -721,7 +720,8 @@ void drawControls()
                     gameInterfaceControls.dialogLifeFrames--;
                     if(gameInterfaceControls.dialogLifeFrames <= GAME_FRAME_RATE)
                     {
-                        gameInterfaceControls.dialogRect.x += gameInterfaceControls.interfaceWidth / GAME_FRAME_RATE;
+                        gameInterfaceControls.dialogRect.x += (gameInterfaceControls.interfaceWidth / GAME_FRAME_RATE) * gameInterfaceControls.dialogRect.xm;
+                        gameInterfaceControls.dialogRect.y += (gameInterfaceControls.interfaceHeight / GAME_FRAME_RATE) * gameInterfaceControls.dialogRect.ym;
                     }
                 }
                 else

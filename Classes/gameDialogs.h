@@ -312,14 +312,18 @@ gameDialogScorePopup(char *scoreStr)
     controlRect r;
     r = gameInterfaceControls.dialogRectDefault;
     
+    r.x -= gameInterfaceControls.interfaceWidth / 3;
+    
     float scale = 3;
     r.x += r.xw/scale;
     r.y += r.yw/scale;
     r.xw /= scale;
     r.yw /= scale;
+    r.xm = -1;
+    r.ym = 0;
     r.tex_id = 4;
     
-    gameInterfaceModalDialogWithRect(scoreStr, "", "", gameDialogCancelString, gameDialogCancelString, &r, GAME_FRAME_RATE * 1.2);
+    gameInterfaceModalDialogWithRect(scoreStr, "", "", gameDialogCancelString, gameDialogCancelString, &r, GAME_FRAME_RATE * 2.0);
 }
 
 #endif
