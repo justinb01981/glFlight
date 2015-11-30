@@ -34,10 +34,13 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 	Context appCtx;
 	int accuracyLast = SensorManager.SENSOR_STATUS_UNRELIABLE;
 
+	double viewWidthScaled;
+	double viewHeightScaled;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         appCtx = this.getApplicationContext();
       
         running = true;
@@ -57,18 +60,29 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         //this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        
+
         GLSurfaceView glView = new GLSurfaceView(this);
+
+		SurfaceHolder h = glView.getHolder();
+
+		double sh = 600;
+		double sw = sh * 1.5;
+
+		viewWidthScaled = sw;
+		viewHeightScaled = sh;
+
+		h.setFixedSize((int) sw, (int) sh);
         
         glView.setRenderer(gameRenderer);
         
         setContentView(glView);
         
         contentView = glView;
-        
+
         contentView.setOnTouchListener(mOnTouchListener);
        
         mBGThread.start();
+		mBGThreadTimer.start();
         
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
@@ -135,53 +149,52 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 	float touchFudge = 5;
     
     public boolean onTouchEvent(MotionEvent motionEvent) {
-    	System.out.println("touched at [" + motionEvent.getRawX() + "," + motionEvent.getRawY() +
-    			"] action:" + motionEvent.getActionMasked() + "\n");
-    	
     	float action = 0;
     	float x = 0;
     	float y = 0;
-    	
+
+		InputDevice dev = motionEvent.getDevice();
+
 		for(int i = 0; i < motionEvent.getPointerCount(); i++)
 		{
 			int index = i;
-			
+
+			double tX = motionEvent.getX(i) ;
+			double tY = motionEvent.getY(i);
+
+			// scale
+			tX /= (dev.getMotionRange(InputDevice.MOTION_RANGE_X).getMax() / viewWidthScaled);
+			tY /= (dev.getMotionRange(InputDevice.MOTION_RANGE_Y).getMax() /  viewHeightScaled);
+
+			System.out.println("touched at [" + tX + "," + tY +
+					"] action:" + motionEvent.getActionMasked() + "\n");
+
+			x = (int) tX;
+			y = (int) tY;
+
 	    	if(motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN)
 	    	{
-	    		x = motionEvent.getX();
-	    		y = motionEvent.getY();
 	    		action = 0;
 	    	}
 	    	else if(motionEvent.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN)
 	    	{
-	    		
-	    		x = motionEvent.getX(index);
-	    		y = motionEvent.getY(index);
 	    		action = 0;
 	    	}
 	    	else if(motionEvent.getActionMasked() == MotionEvent.ACTION_UP)
 	    	{
 	    		action = 1;
-	    		x = motionEvent.getX();
-	    		y = motionEvent.getY();
 	    	}
 	    	else if(motionEvent.getActionMasked() == MotionEvent.ACTION_POINTER_UP)
 	    	{
 	    		action = 1;
-	    		x = motionEvent.getX(i);
-	    		y = motionEvent.getY(i);
 	    	}
 	    	else if(motionEvent.getActionMasked() == MotionEvent.ACTION_MOVE)
 	    	{
 	    		action = 2;
-	    		x = motionEvent.getX(i);
-	    		y = motionEvent.getY(i);
 	    	}
 	    	else if(motionEvent.getActionMasked() == MotionEvent.ACTION_CANCEL)
 	    	{
 	    		action = 3;
-	    		x = motionEvent.getX(i);
-	    		y = motionEvent.getY(i);
 	    	}
 	    	
 	    	if(action == 2 && Math.abs(x - touchLastX) < touchFudge && Math.abs(y - touchLastY) < touchFudge)
@@ -212,9 +225,23 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         }
     };
 
+	Thread mBGThreadTimer = new Thread(new Runnable() {
+		public void run() {
+			while (running) {
+				long sleep_ms = 1000 / GameRenderer.fps;
+				GameRunnable.runTimerThread();
+
+				try {
+					java.lang.Thread.sleep(sleep_ms);
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+	});
+
     Thread mBGThread = new Thread(new Runnable() {
     		public void run() {
-    			long sleep_ms = 1000/30;
+    			long sleep_ms = 1000/GameRenderer.fps/2;
 
     			while(running)
     			{

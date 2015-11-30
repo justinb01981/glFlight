@@ -200,6 +200,7 @@ gameInput()
         fabs(deviceRoll-gyroInputDeltaLast[2]) >= gyroInputStableThresh)
     {
         gyroStableCount = 0;
+        gyroInputStableThresh *= 2.0;
     }
     else
     {

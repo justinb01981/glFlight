@@ -140,7 +140,7 @@ glFlightFrameStage1()
     }
     
     // round
-    static float TCROUNDM = (GAME_FRAME_RATE/2) / 1000.0;
+    static float TCROUNDM = (GAME_FRAME_RATE) / 1000.0;
     float tcr = 0;
     while(tcr <= tc) tcr += TCROUNDM;
     tc = tcr;
@@ -151,6 +151,10 @@ glFlightFrameStage1()
     {
         world_update(tc);
         world_update_time_last = time_ms;
+    }
+    else
+    {
+        return;
     }
     
     // physical collisions between world objects

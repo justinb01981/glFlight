@@ -21,6 +21,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIEnv *e, jobject o);
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JNIEnv *e, jobject o);
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightRunBGThread(JNIEnv *e, jobject o);
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightRunTimerThread(JNIEnv *e, jobject o);
 
 JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAudioEvent(JNIEnv *e, jobject o, jfloatArray arr);
 

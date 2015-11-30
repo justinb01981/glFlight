@@ -303,6 +303,7 @@ gameInterfaceHandleTouchMove(float x, float y)
         gameInputTrimBegin();
         gyro_calibrate_log(100);
         gameInterfaceControls.trim.blinking = 0;
+        controlsCalibrated = 1;
     }
     else if(touchedControl == &gameInterfaceControls.look)
     {

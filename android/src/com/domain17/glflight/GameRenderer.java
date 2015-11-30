@@ -19,6 +19,9 @@ public class GameRenderer implements Renderer {
 	
 	public static int clientVersion = 1;
 
+	public static long lastDrawTime = 0;
+	public static long fps = 60;
+
 	@Override
 	public void onDrawFrame(GL10 arg0) {
 		onDrawFrame();

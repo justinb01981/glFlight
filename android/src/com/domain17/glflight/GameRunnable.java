@@ -13,6 +13,7 @@ public class GameRunnable  {
 	static native void glFlightInit(GameRenderer r);
 	static native void glFlightUninit();
 	static native void glFlightRunBGThread();
+	static native void glFlightRunTimerThread();
 	static native void glFlightTouchInput(float f[]);
 	static native String glFlightNextAudioEvent(String s);
 	static native Integer glFlightSensorNeedsCalibrate();
@@ -21,6 +22,10 @@ public class GameRunnable  {
 	
 	public static void runBGThread() {
 		glFlightRunBGThread();
+	}
+
+	public static void runTimerThread() {
+		glFlightRunTimerThread();
 	}
 	
 	public static void sensorInput(float f[]) {

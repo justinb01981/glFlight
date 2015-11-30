@@ -32,6 +32,8 @@ extern "C" {
 void dbtrace(const char* x, int y) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d\n", x, y); }
 void dbtracelog(const char* x, int y, const char* s) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d %s\n", x, y, s); }
 
+extern void update_time_ms_frame_tick();
+
 #include "game/glFlight.h"
 
 static int
@@ -45,7 +47,6 @@ env_float_copy(JNIEnv* e, jfloatArray arr, float dest[])
 	for(i = 0; i < len; i++) dest[i] = jf[i];
 
 	e->ReleaseFloatArrayElements(arr, jf, false);
-    e->DeleteLocalRef(arr);
 
 	return len;
 }
@@ -111,6 +112,8 @@ glFlightJNIInit()
 
 	gameInputInit();
 
+	console_init();
+
 	initTextures(glFlightGameResourceInfo.pathPrefix);
 
 	gameNetwork_init(0, gameSettingsGameName, gameSettingsPlayerName,
@@ -160,17 +163,26 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 			viewHeight));
 }
 
+static game_timeval_t gameInputTimeLast = 0;
+
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jobject o)
 {
 	if(!glFlightInited)
 	{
+		DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
+
 		glFlightJNIInit();
 
 		glFlightInited = true;
 		return;
 	}
 
-	gameInput();
+    if(time_ms - gameInputTimeLast >= (1000/60))
+	{
+		gameInput();
+
+		gameInputTimeLast = time_ms;
+	}
 
 	glFlightFrameStage1();
 	glFlightFrameStage2();
@@ -184,6 +196,11 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIE
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JNIEnv *e, jobject o)
 {
 	gameSettingsWrite(glFlightSettingsPath());
+}
+
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightRunTimerThread(JNIEnv *e, jobject o)
+{
+	update_time_ms_frame_tick();
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightRunBGThread(JNIEnv *e, jobject o)
@@ -211,6 +228,7 @@ JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAu
 		{
 			strcpy(audioStr, cocoaMessageAudioList.next->str);
 			cocoaMessageListPop(&cocoaMessageAudioList);
+			dbtrace((char*)"sound\n",0);
 		}
 		gameAudioUnlock();
 	}
@@ -241,7 +259,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 		gameInputGyro(roll, pitch, yaw);
 	}
 
-	if(get_time_ms() - sensorInputLast > 1000/60)
+	if(/*get_time_ms() - sensorInputLast > 1000/GAME_FRAME_RATE*/1)
 	{
 		gameInputGyro2(roll, pitch, yaw, 0.03);
 		sensorInputLast = get_time_ms();
