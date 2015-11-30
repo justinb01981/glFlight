@@ -4,12 +4,15 @@ CMD_MKDIR=mkdir
 CMD_CHDIR=cd
 CMD_EXTRACT=unzip
 CMD_RMDIR=rm -rf
+CMD_RM=rm -f
 else
 CMD_COPY=cp -r
 CMD_MKDIR=mkdir
 CMD_CHDIR=cd
 CMD_EXTRACT=unzip
 CMD_RMDIR=rm -rf
+CMD_RM=rm -f
+CMD_LIST=ls -l
 endif
 ARCHIVE_PATH=android
 ARCHIVE_FILE=glFlightAndroidBase.zip
@@ -17,6 +20,7 @@ FILES_RAW_TEXTURES=texture*.bmp
 FILES_RAW_SOUNDS=*.wav
 BUILD_DIR_IOS=build/ios
 BUILD_DIR_ANDROID=build/android
+CMD_NDK_BUILD=ndk-build
 
 all: android_workspace ios_workspace
 	echo "done"
@@ -47,13 +51,17 @@ ios_workspace: base_ws
 	${CMD_COPY} *.pch ${BUILD_DIR_IOS}
 	${CMD_COPY} *.bundle ${BUILD_DIR_IOS}
 	echo "iOS (XCode) workspace created:" ${BUILD_DIR_IOS}
-	
+
+PREV_DIR=${PWD}
+PROJ_DIR=${BUILD_DIR_ANDROID}/glFlight
+PROJ_DIR_RES=${BUILD_DIR_ANDROID}/glFlight/res
+PROJ_DIR_RESRAW=${BUILD_DIR_ANDROID}/glFlight/res/raw/
+PROJ_DIR_JNI=${BUILD_DIR_ANDROID}/glFlight/jni
+PROJ_DIR_GAME=${BUILD_DIR_ANDROID}/glFlight/jni/game/
+PROJ_DIR_LIBS=${BUILD_DIR_ANDROID}/glFlight/libs
+GRADLE_DIR=${PROJ_DIR}/gradle-build/glFlightImport/app/src/main
+
 android_workspace: base_ws
-	PREV_DIR=${PWD}
-	PROJ_DIR=${BUILD_DIR_ANDROID}/glFlight/
-	PROJ_DIR_RES=${BUILD_DIR_ANDROID}/glFlight/res/raw/
-	PROJ_DIR_JNI=${BUILD_DIR_ANDROID}/glFlight/jni/
-	PROJ_DIR_GAME=${BUILD_DIR_ANDROID}/glFlight/jni/game/
 	${CMD_MKDIR} ${BUILD_DIR_ANDROID}
 	${CMD_COPY} ${ARCHIVE_PATH}/${ARCHIVE_FILE} ${BUILD_DIR_ANDROID}
 	${CMD_CHDIR} ${BUILD_DIR_ANDROID}; ${CMD_EXTRACT} ${ARCHIVE_FILE}
@@ -65,3 +73,18 @@ android_workspace: base_ws
 	${CMD_COPY} *.wav ${BUILD_DIR_ANDROID}/glFlight/res/raw/ 
 	echo "android (eclipse) workspace created: " ${BUILD_DIR_ANDROID}
 
+gradle_workspace: android_workspace
+	echo "setting up gradle-build dir: " ${GRADLE_DIR}
+	${CMD_COPY} ${PROJ_DIR_RES} ${GRADLE_DIR}
+	${CMD_COPY} ${PROJ_DIR_JNI} ${GRADLE_DIR}
+	${CMD_COPY} ${PROJ_DIR}/src/* ${GRADLE_DIR}/java/
+	${CMD_COPY} ${PROJ_DIR_LIBS} ${GRADLE_DIR}
+	${CMD_COPY} ${PROJ_DIR}/AndroidManifest.xml ${GRADLE_DIR}
+	${CMD_RM} ${GRADLE_DIR}/res/raw/Default*
+	${CMD_RM} ${GRADLE_DIR}/res/raw/app_icon*
+	${CMD_LIST} ${GRADLE_DIR}
+
+android_ndk_libs:
+	echo "TODO: call ndk-build and copy .so files to " ${GRADLE_DIR}/libs
+	${CMD_CHDIR} ${GRADLE_DIR}/jni
+	${CMD_NDK_BUILD} 
