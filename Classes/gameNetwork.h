@@ -106,6 +106,14 @@ typedef struct
     } params;
 } gameNetworkMessage;
 
+struct gameNetworkMessageQueued {
+    struct gameNetworkMessageQueued* next;
+    gameNetworkMessage msg;
+    gameNetworkAddress srcAddr;
+    int processed;
+};
+typedef struct gameNetworkMessageQueued gameNetworkMessageQueued;
+
 typedef struct
 {
     int s;
@@ -206,6 +214,11 @@ typedef struct
         int affiliation_hit_last;
         int obj_type_hit_last;
     } collision;
+
+    struct
+    {
+        gameNetworkMessageQueued head;
+    } msgQueue;
     
     game_timeval_t time_last_periodic_check;
     
@@ -304,5 +317,8 @@ gameNetwork_lock();
 
 void
 gameNetwork_unlock();
+
+void
+do_game_network_handle_msg(gameNetworkMessage *msg, gameNetworkAddress *srcAddr);
 
 #endif

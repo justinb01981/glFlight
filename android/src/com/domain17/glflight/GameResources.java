@@ -22,7 +22,7 @@ public class GameResources {
 	public static String resVersionFilename = "resVersion";
 	
 	public static Integer[] resObj = {
-		R.drawable.abc_ab_bottom_solid_light_holo,
+		//R.drawable.abc_ab_bottom_solid_light_holo,
 
 		R.raw.texture0,
         R.raw.texture1,
@@ -111,10 +111,16 @@ public class GameResources {
         R.raw.texture84,
         R.raw.texture85,
         R.raw.texture86,
+        R.raw.texture87,
+        R.raw.texture88,
+        R.raw.texture89,
+        R.raw.texture90,
+        R.raw.texture91,
+        R.raw.texture92,
 	};
 	
 	public static String[] resFilename = {
-		"abc_ab_bottom_solid_light_holo.png",
+		//"abc_ab_bottom_solid_light_holo.png",
 		
 		"texture0.bmp",
         "texture1.bmp",
@@ -203,6 +209,12 @@ public class GameResources {
         "texture84.bmp",
         "texture85.bmp",
         "texture86.bmp",
+        "texture87.bmp",
+        "texture88.bmp",
+        "texture89.bmp",
+        "texture90.bmp",
+        "texture91.bmp",
+        "texture92.bmp",
 	};
 	
 	public static String[] sndNameList = {
@@ -212,8 +224,8 @@ public class GameResources {
 		"dead",
 		"dropoff",
 		"engine",
-		"engineSlow",
-		"engineFast",
+		"engineslow",
+		"enginefast",
 		"flyby",
 		"highscore",
 		"lockedon",
@@ -263,6 +275,7 @@ public class GameResources {
 		
 		if(resObj.length != resFilename.length)
 		{
+            System.out.println("resObj/resFilename out-of-sync");
 			return 0;
 		}
 		

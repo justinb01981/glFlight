@@ -87,6 +87,11 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
             map_cmd->type = MAP_SET_BLOCK_SCALE;
             n_params = 1;
         }
+        else if(strcmp(token, "object_set_sub_info") == 0)
+        {
+            map_cmd->type = MAP_SET_OBJECT_SUB_INFO;
+            n_params = 1;
+        }
         else if(strcmp(token, "object_set_info") == 0)
         {
             map_cmd->type = MAP_SET_OBJECT_INFO;
@@ -438,6 +443,10 @@ void map_render(char *map_buf)
                                          map_cmd.params[6], map_cmd.params[7], map_cmd.params[8]);
                         break;
                         
+                    case MAP_SET_OBJECT_SUB_INFO:
+                        world_get_last_object()->stuff.subtype = map_cmd.params[0];
+                        break;
+                        
                     case MAP_SET_OBJECT_INFO:
                         world_get_last_object()->object_type = map_cmd.params[0];
                         if(!object_is_static(world_get_last_object()->object_type))
@@ -446,26 +455,30 @@ void map_render(char *map_buf)
                         }
                         
                         switch(world_get_last_object()->object_type)
-                    {
-                        case OBJ_TURRET:
-                            game_elem_setup_turret(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
-                            break;
-                            
-                        case OBJ_SHIP:
-                            game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
-                            break;
-                            
-                        case OBJ_POWERUP_GENERIC:
-                            game_elem_setup_powerup(world_get_last_object());
-                            break;
-                            
-                        case OBJ_SPAWNPOINT:
-                            game_elem_setup_spawnpoint(world_get_last_object());
-                            break;
-                            
-                        default:
-                            break;
-                    }
+                        {
+                            case OBJ_TURRET:
+                                game_elem_setup_turret(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
+                                break;
+                                
+                            case OBJ_SHIP:
+                                game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
+                                break;
+                                
+                            case OBJ_POWERUP_GENERIC:
+                                game_elem_setup_powerup(world_get_last_object());
+                                break;
+                                
+                            case OBJ_SPAWNPOINT:
+                                game_elem_setup_spawnpoint(world_get_last_object());
+                                break;
+                                
+                            case OBJ_SPAWNPOINT_ENEMY:
+                                game_elem_setup_spawnpoint_enemy(world_get_last_object());
+                                break;
+                                
+                            default:
+                                break;
+                        }
                         break;
                         
                     case MAP_SET_OBJECT_VELOCITY:

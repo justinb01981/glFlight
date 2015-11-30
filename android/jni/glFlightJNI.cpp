@@ -27,6 +27,7 @@ extern "C" {
 #include "game/gameNetwork.h"
 #include "game/maps.h"
 #include "game/gameDebug.h"
+#include "game/gameDialogs.h"
 
 void dbtrace(const char* x, int y) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d\n", x, y); }
 void dbtracelog(const char* x, int y, const char* s) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d %s\n", x, y, s); }
@@ -43,8 +44,8 @@ env_float_copy(JNIEnv* e, jfloatArray arr, float dest[])
 	int i;
 	for(i = 0; i < len; i++) dest[i] = jf[i];
 
-	float f;
-	e->ReleaseFloatArrayElements(arr, &f, false);
+	e->ReleaseFloatArrayElements(arr, jf, false);
+    e->DeleteLocalRef(arr);
 
 	return len;
 }

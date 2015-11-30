@@ -164,7 +164,7 @@ struct WorldElem {
                 float intelligence;
                 float pitch_last, yaw_last;
                 int appearance;
-                int fixed:1, changes_target:1, fires:1, fires_missles:1, leaves_trail:1, patrols_no_target:1, deploys_collect:1;
+                int fixed:1, changes_target:1, fires:1, fires_missles:1, leaves_trail:1, patrols_no_target:1, deploys_collect:1, ignore_player:1;
                 int collided:1;
             } enemy;
         } u;

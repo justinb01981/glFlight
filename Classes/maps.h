@@ -116,6 +116,25 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
 "register_params_update rnd_""1"" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n" \
 "set_background_info r\n"
 
+#define COIN_LINE_1_4X                                                     \
+"register_params 10 rndx rndz rndy 0 0 0 2 0 0 0 0 0 0 0 0\n"                \
+"register_params_update 0 rnd_2 rnd_2 rnd_2 0 0 0 0 0 0 0 0 0 0 0 0\n"     \
+"add_object r r r r 0 0 0 r 91\n"                                          \
+"object_set_info 11\n" \
+"object_set_sub_info 9\n" \
+"register_params_update 0 rnd_2 rnd_2 rnd_2 0 0 0 0 0 0 0 0 0 0 0 0\n"     \
+"add_object r r r r 0 0 0 r 91\n"                                          \
+"object_set_info 11\n" \
+"object_set_sub_info 9\n" \
+"register_params_update 0 rnd_2 rnd_2 rnd_2 0 0 0 0 0 0 0 0 0 0 0 0\n"     \
+"add_object r r r r 0 0 0 r 91\n"                                          \
+"object_set_info 11\n" \
+"object_set_sub_info 9\n" \
+"register_params_update 0 rnd_2 rnd_2 rnd_2 0 0 0 0 0 0 0 0 0 0 0 0\n"     \
+"add_object r r r r 0 0 0 r 91\n" \
+"object_set_info 11\n" \
+"object_set_sub_info 9\n"
+
 #define GREEN_TENDRILS_1                                                   \
 "register_params 2 rndx 20 rndy 0 0 0 10 0 0 0 0 0 0 0 0\n"                \
 "register_params_update 0 rnd_20 rnd_20 rnd_20 0 0 0 0 0 0 0 0 0 0 0 0\n"  \
@@ -167,30 +186,12 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
 "add_object r r r r 0 0 0 r r\n"
 
 #define BASE_FRIENDLY_1                        \
-"register_params 2 rndx 50 rndz 0 0 0 8 42 0 0 0 0 0 0 0\n"                 \
+"register_params 10 rndx 50 rndz 0 0 0 8 "/*"42"*/"92"" 0 0 0 0 0 0 0\n"                 \
 "add_object r r r r r r r r " "r" "\n" \
-"object_set_info 8\n" \
-\
-"register_params_update 0 0 -8 0 0 0 0 -4 44 0 0 0 0 0 0 0\n"   \
-"add_object r r r r 0 0 0 r r\n"                                           \
-"register_params_update 0 0 16 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
-"add_object r r r r 0 0 0 r r\n" \
-"register_params_update 0 0 -8 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
-\
-"register_params_update 0 -8 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
-"add_object r r r r 0 0 0 r r\n"                                           \
-"register_params_update 0 16 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
-"add_object r r r r 0 0 0 r r\n"                                           \
-"register_params_update 0 -8 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
-\
-"register_params_update 0 0 0 -8 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
-"add_object r r r r 0 0 0 r r\n"                                           \
-"register_params_update 0 0 0 16 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
-"add_object r r r r 0 0 0 r r\n"                                           \
-"register_params_update 0 0 0 -8 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"object_set_info 8\n" 
 
 #define BASE_ENEMY_1                           \
-"add_object 2 rndx 50 rndz 0 0 0 8 58\n"       \
+"add_object 10 rndx 50 rndz 0 0 0 8 "/*"58"*/"89""\n"       \
 "object_set_info 15\n"
 
 #define ASTEROID_FIELD_BEGIN_1(x, y, z)                      \
@@ -490,6 +491,15 @@ WORLD_SCALED_FRAME(1, 57, 4)
 
 // else
 GREEN_TENDRILS_1
+
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
 
 /////////////
 

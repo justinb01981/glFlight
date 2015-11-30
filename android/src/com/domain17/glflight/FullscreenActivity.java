@@ -120,7 +120,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     	*/
     	if(e.sensor == mSensorGyro)
     	{	    	
-	    	if(accuracyLast == SensorManager.SENSOR_STATUS_ACCURACY_HIGH) GameRunnable.glFlightSensorInput(e.values);
+	    	/*if(accuracyLast == SensorManager.SENSOR_STATUS_ACCURACY_HIGH)*/
+                GameRunnable.glFlightSensorInput(e.values);
     	}
     }
     

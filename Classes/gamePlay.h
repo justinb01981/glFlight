@@ -61,6 +61,7 @@ enum
     GAME_SUBTYPE_SHIP,
     GAME_SUBTYPE_TURRET,
     GAME_SUBTYPE_ALLY,
+    GAME_SUBTYPE_POINTS,
     GAME_SUBTYPE_LAST,
     
 };
@@ -102,15 +103,19 @@ const static char *game_variables_name[] = {
 };
 
 static char *game_log_messages[] = {
-    "file saved",
+    "^D: firewalled :-)",
     "detected: virus",
     "detected: bounty hunter",
-    "file lost",
-    "detected: ally",
-    "warning: virus capturing file",
+    "^D: deleted :-(",
+    "detected: ally AI",
+    "warning: virus capturing ^D",
     "killed: virus",
     "killed: bounty-hunter",
     "killed: turret",
+    "HIDDEN: shot-fired",
+    "****NEW HIGH SCORE!****",
+    "^K^K^KSYSTEM_COMPROMISED (GAME_OVER)^K^K^K\n",
+    "HIDDEN: points collected",
     NULL
 };
 
@@ -124,6 +129,10 @@ enum {
     GAME_LOG_KILLED_ENEMY1,
     GAME_LOG_KILLED_ENEMY2,
     GAME_LOG_KILLED_TURRET,
+    GAME_LOG_SHOTFIRED,
+    GAME_LOG_HIGHSCORE,
+    GAME_LOG_GAMEOVER,
+    GAME_LOG_POWERUP_POINTS,
     GAME_LOG_LAST
 };
 
@@ -195,6 +204,8 @@ struct
     
     int powerup_lifetime_frames;
     
+    int enemy1_ignore_player;
+    
     int points;
     struct
     {
@@ -227,6 +238,8 @@ struct
     int high_score_session[GAME_TYPE_LAST];
     
     int game_action_spawnpoint_new_game;
+    
+    int score_pop_threshold;
     
     struct {
         float vec[2][3];
@@ -344,6 +357,7 @@ game_elem_setup_turret(WorldElem* elem, int skill)
 {
     if(skill > 5) skill = 5;
     
+    elem->stuff.intelligent = 1;
     elem->stuff.u.enemy.leaves_trail = 0;
     elem->stuff.u.enemy.run_distance = 0;
     elem->stuff.u.enemy.fixed = 1;
@@ -353,7 +367,7 @@ game_elem_setup_turret(WorldElem* elem, int skill)
     elem->stuff.u.enemy.patrols_no_target = 0;
     elem->stuff.u.enemy.max_speed = 0;
     elem->stuff.u.enemy.max_turn = 0.8;
-    elem->stuff.u.enemy.time_run_interval = MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
+    elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     elem->stuff.u.enemy.scan_distance = 70;
     elem->stuff.u.enemy.pursue_distance = 70;
 }
@@ -387,9 +401,17 @@ game_elem_setup_powerup(WorldElem* elem)
 }
 
 inline static void
+game_elem_setup_spawnpoint_enemy(WorldElem* elem)
+{
+    //elem->renderInfo.tex_adjust = 1;
+    elem->renderInfo.priority = 1;
+}
+
+inline static void
 game_elem_setup_spawnpoint(WorldElem* elem)
 {
     //elem->renderInfo.tex_adjust = 1;
+    elem->renderInfo.priority = 1;
 }
 
 void

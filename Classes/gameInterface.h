@@ -27,6 +27,7 @@ typedef struct
     char text[512], textLeft[64], textRight[64];
     char *textDest;
     int *textDestInt;
+    int modal:1;
 } controlRect;
 
 typedef struct {
@@ -72,6 +73,8 @@ typedef struct {
 
     float interfaceWidth;
     float interfaceHeight;
+    
+    float touchUnmappedX, touchUnmappedY;
 
 } controls;
 

@@ -297,22 +297,22 @@ gameInput()
      */
     
     // indicate to user when sampling
-    if(needTrimLast)
+    if(needTrimLast && controlsCalibrated)
     {
         int samp_min = 10;
         
         if(tex_pass - trimStartTime == samp_min)
         {
-            console_append("\ncalibrating:");
+            gyro_calibrate_log(0);
         }
         else if(tex_pass - trimStartTime < tex_pass_initial_sample &&
                 tex_pass - trimStartTime > samp_min)
         {
-            console_append(".");
+            gyro_calibrate_log((100 / tex_pass_initial_sample) * (tex_pass - trimStartTime));
         }
         else if(tex_pass - trimStartTime == tex_pass_initial_sample)
         {
-            console_append(" done");
+            gyro_calibrate_log(100);
         }
     }
     

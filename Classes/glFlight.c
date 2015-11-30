@@ -120,8 +120,8 @@ glFlightFrameStage1()
         goto draw_bail;
     }
     
-    extern void update_time_ms_frame_tick();
-    update_time_ms_frame_tick();
+    //extern void update_time_ms_frame_tick();
+    //update_time_ms_frame_tick(); // relocated to bg-worker
     get_time_ms();
     
     if(game_paused)
@@ -190,12 +190,25 @@ glFlightFrameStage1()
     
     if(!gameNetworkState.connected || gameNetworkState.hostInfo.hosting) game_ai_run();
     
+    // JB: moved to background thread
+    //do_game_network_read();
+    
     // TODO: this is being called at most once every 1/60th of a second (16ms)
     do_game_network_world_update();
     
+    gameNetworkMessageQueued* pNetworkMsg = gameNetworkState.msgQueue.head.next;
+    while(pNetworkMsg)
+    {
+        gameNetworkMessageQueued* pNetworkMsgNext = pNetworkMsg->next;
+        if(!pNetworkMsg->processed)
+        {
+            do_game_network_handle_msg(&pNetworkMsg->msg, &pNetworkMsg->srcAddr);
+        }
+        pNetworkMsg->processed = 1;
+        pNetworkMsg = pNetworkMsgNext;
+    }
+    
     do_game_network_write();
-    // JB: moved to background thread
-    //do_game_network_read();
     
     paused_bail:
     
@@ -247,6 +260,8 @@ glFlightFrameStage1()
     {
         respawned = 1;
         
+        game_ammo_missles = game_ammo_missles_max;
+        
         if(update_ship_stats)
         {
         }
@@ -266,16 +281,19 @@ glFlightFrameStage1()
                              my_ship_alpha, my_ship_beta, my_ship_gamma,
                              1, texture_id_playership);
         world_get_last_object()->object_type = OBJ_PLAYER;
-        targetSpeed = speed = minSpeed;
+        targetSpeed = minSpeed;
+        speed = 3;
         update_object_velocity(my_ship_id, ship_z_vec[0]*speed, ship_z_vec[1]*speed, ship_z_vec[2]*speed, 0);
         world_get_last_object()->bounding_remain = 1;
         world_get_last_object()->durability = ship_durability;
         
         gameCamera_init(my_ship_x, my_ship_y, my_ship_z,
-                        spawn[3], spawn[4], spawn[5]);
-        gameCamera_MoveY(5);
-        gameCamera_pitchRadians(-M_PI/2);
-        camera_locked_frames = 120;
+                        -spawn[3], -spawn[4], -spawn[5]);
+        gameCamera_yawRadians((viewRotationDegrees/180.0) * M_PI);
+        //gameCamera_MoveY(5);
+        gameCamera_MoveZ(-camera_z_trail);
+        //gameCamera_pitchRadians(-M_PI/2);
+        //camera_locked_frames = 120;
         
         /* TODO: figure out why a crash in visible-checks if this isn't here */
         // bail this draw

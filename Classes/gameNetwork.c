@@ -51,14 +51,13 @@ game_lock_t networkLock;
 static unsigned long update_frequency_ms = 20;
 static unsigned long update_time_last = 0;
 static int gameNetwork_inited = 0;
+static int read_in_render_thread = 0;
 
 static char *gameKillVerbs[] = {"slaughtered", "evicerated", "de-rezzed", "shot-down", "ended", "terminated"};
 
 static int
 gameNetwork_directoryListOffset(int offset);
 
-void
-do_game_network_handle_msg(gameNetworkMessage *msg, gameNetworkAddress *srcAddr);
 
 ////////////////////////////////
 
@@ -818,7 +817,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
 }
 
 gameNetworkError
-gameNetwork_accept_map_download(gameNetworkAddress* src_addr)
+gameNetwork_accept_map_download(gameNetworkAddress* src_addr, char* (*mapRenderCallback)())
 {
     struct sockaddr from_addr;
     socklen_t from_addr_len;
@@ -842,7 +841,7 @@ gameNetwork_accept_map_download(gameNetworkAddress* src_addr)
             
             int a = accept(s, &from_addr, &from_addr_len);
             
-            char *map_data = gameMapReadRendered();
+            char *map_data = mapRenderCallback();
             
             if(a > 0 && map_data)
             {
@@ -1810,6 +1809,13 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                     
                     pPlayerElem = pNode->elem;
                     
+                    float velDetected[3] =
+                    {
+                        (msg->params.f[1] - pPlayerElem->physics.ptr->x) * (1000.0 / (t - playerInfo->timestamp_last[0])),
+                        (msg->params.f[2] - pPlayerElem->physics.ptr->y) * (1000.0 / (t - playerInfo->timestamp_last[0])),
+                        (msg->params.f[3] - pPlayerElem->physics.ptr->z) * (1000.0 / (t - playerInfo->timestamp_last[0]))
+                    };
+                    
                     world_replace_object(pPlayerElem->elem_id, pPlayerElem->type,
                                          msg->params.f[1], msg->params.f[2], msg->params.f[3],
                                          msg->params.f[4], msg->params.f[5], msg->params.f[6],
@@ -1876,13 +1882,16 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                     }
                     playerInfo->shot_fired = 0;
                     
+                    
                     if(network_time_ms - playerInfo->time_cube_pooped_last >= pooped_cube_interval_ms)
                     {
                         playerInfo->time_cube_pooped_last = network_time_ms;
-                        firePoopedCube(pPlayerElem);
                         
-                        WorldElem *pCube = world_get_last_object();
-                        pCube->physics.ptr->vx = pCube->physics.ptr->vy = pCube->physics.ptr->vz = 0;
+                        if(firePoopedCube(pPlayerElem) != WORLD_ELEM_ID_INVALID)
+                        {
+                            WorldElem *pCube = world_get_last_object();
+                            pCube->physics.ptr->vx = pCube->physics.ptr->vy = pCube->physics.ptr->vz = 0;
+                        }
                     }
                     
                     playerInfo->time_last_update = network_time_ms;
@@ -2195,6 +2204,26 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
         break;
     }
 }
+    
+static char*
+do_game_map_render()
+{
+    if(!read_in_render_thread)
+    {
+        game_lock_lock(&networkLock);
+        world_lock();
+    }
+    
+    char* map = gameMapReadRendered();
+    
+    if(!read_in_render_thread)
+    {
+        world_unlock();
+        game_lock_unlock(&networkLock);
+    }
+    
+    return map;
+}
 
 void
 do_game_network_read()
@@ -2203,16 +2232,16 @@ do_game_network_read()
     gameNetworkAddress srcAddr;
     int receive_block_ms = 1;
     int retries = 100;
-    int in_render_thread = 0;
     
     if(!gameNetworkState.connected || !world_inited)
     {
         return;
     }
     
-    if(!in_render_thread)
+    if(!read_in_render_thread)
     {
         receive_block_ms = 5;
+        retries = 10;
     }
     
     while(retries > 0)
@@ -2221,22 +2250,9 @@ do_game_network_read()
         {
             if(gameNetworkState.hostInfo.hosting)
             {
-                if(!in_render_thread)
-                {
-                    game_lock_lock(&networkLock);
-                    world_lock();
-                }
-                
-                gameNetwork_accept_map_download(&srcAddr);
+                gameNetwork_accept_map_download(&srcAddr, do_game_map_render);
                 
                 gameNetwork_accept_stream_connection(&srcAddr);
-                
-                if(!in_render_thread)
-                {
-                    world_unlock();
-                    game_lock_unlock(&networkLock);
-                }
-                
             }
             
             break;
@@ -2256,7 +2272,7 @@ do_game_network_read()
         }
         else if(msg.cmd >= GAME_NETWORK_MSG_DIRECTORY_ADD && msg.cmd <= GAME_NETWORK_MSG_DIRECTORY_RESPONSE)
         {
-            if(!in_render_thread)
+            if(!read_in_render_thread)
             {
                 game_lock_lock(&networkLock);
                 world_lock();
@@ -2264,7 +2280,7 @@ do_game_network_read()
             
             do_game_network_handle_directory_msg(&msg, &srcAddr);
             
-            if(!in_render_thread)
+            if(!read_in_render_thread)
             {
                 world_unlock();
                 game_lock_unlock(&networkLock);
@@ -2274,18 +2290,29 @@ do_game_network_read()
             continue;
         }
         
-        if(!in_render_thread)
+        // clean up processed messages
+        gameNetworkMessageQueued* pMsgCur = &gameNetworkState.msgQueue.head;
+        while(pMsgCur->next && pMsgCur->next->processed)
         {
-            game_lock_lock(&networkLock);
-            world_lock();
+            gameNetworkMessageQueued* pMsgFree = pMsgCur->next;
+            pMsgCur->next = pMsgCur->next->next;
+            free(pMsgFree);
         }
         
-        do_game_network_handle_msg(&msg, &srcAddr);
-        
-        if(!in_render_thread)
+        // add to queue
+        gameNetworkMessageQueued* pMsg =
+            (gameNetworkMessageQueued*) malloc(sizeof(gameNetworkMessageQueued));
+        if(pMsg)
         {
-            world_unlock();
-            game_lock_unlock(&networkLock);
+            pMsg->next = NULL;
+            pMsg->msg = msg;
+            pMsg->srcAddr = srcAddr;
+            pMsg->processed = 0;
+            
+            gameNetworkMessageQueued* pTail = &gameNetworkState.msgQueue.head;
+            while(pTail->next) pTail = pTail->next;
+            pTail->next = pMsg;
+            
         }
         
         retries--;

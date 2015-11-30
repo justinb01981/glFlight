@@ -17,6 +17,7 @@
 #include "gameUtils.h"
 #include "textures.h"
 #include "gamePlay.h"
+#include "collision.h"
 
 float skill_m = 0.1; // 10% per skill-level
 
@@ -24,7 +25,6 @@ float boundary_avoid_distance = 10;
 float fire_dist = 70;
 float diff_m = 0.1;
 float forget_thresh_increase = 0.5;
-float tow_turn_scale = 2.0;
 
 gameAIState_t gameAIState;
 
@@ -50,6 +50,15 @@ target_avoid_collision(int object_type)
 {
     if(object_type == OBJ_PLAYER || object_type == OBJ_SHIP) return 1;
     return 0;
+}
+
+void
+game_ai_juke(WorldElem* pElem)
+{
+    pElem->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
+    pElem->stuff.u.enemy.tgt_x = rand_in_range(0, gWorld->bound_x);
+    pElem->stuff.u.enemy.tgt_y = rand_in_range(0, gWorld->bound_y);
+    pElem->stuff.u.enemy.tgt_z = rand_in_range(0, gWorld->bound_z);
 }
 
 int
@@ -146,20 +155,6 @@ game_ai_run()
                         pCurElem->stuff.u.enemy.tgt_z = pBaseElem->physics.ptr->z;
                         pCurElem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
                         pCurElem->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
-                        
-                        float dist_to_target =
-                            distance(pCurElem->stuff.u.enemy.tgt_x,
-                                     pCurElem->stuff.u.enemy.tgt_y,
-                                     pCurElem->stuff.u.enemy.tgt_z,
-                                     pCurElem->physics.ptr->x,
-                                     pCurElem->physics.ptr->y,
-                                     pCurElem->physics.ptr->z);
-                        
-                        if(dist_to_target < 4.0)
-                        {
-                            // drop tow
-                            pCurElem->stuff.towed_elem_id = WORLD_ELEM_ID_INVALID;
-                        }
                     }
                 }
             }
@@ -216,7 +211,7 @@ game_ai_run()
                             else if(distance(pCurElem->physics.ptr->x, pCurElem->physics.ptr->y,
                                              pCurElem->physics.ptr->z,
                                              pCurElem->stuff.u.enemy.tgt_x, pCurElem->stuff.u.enemy.tgt_y,
-                                             pCurElem->stuff.u.enemy.tgt_z) <= 1)
+                                             pCurElem->stuff.u.enemy.tgt_z) <= 1.0)
                             {
                                 pCurElem->stuff.u.enemy.tgt_x = 0;
                                 pCurElem->stuff.u.enemy.tgt_y = 0;
@@ -249,6 +244,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     quaternion_t xq, yq, zq;
     float tc;
     WorldElem* pTargetElem = NULL;
+    Object targetElemType = OBJ_UNKNOWN;
     
     if(time_ms - elem->stuff.u.enemy.time_last_run < elem->stuff.u.enemy.time_run_interval) return;
     tc = time_ms - elem->stuff.u.enemy.time_last_run;
@@ -256,7 +252,11 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     elem->stuff.u.enemy.time_last_run = time_ms;
     
     WorldElemListNode* pTargetNode = world_elem_list_find(elem->stuff.u.enemy.target_id, &gWorld->elements_list);
-    if(pTargetNode) pTargetElem = pTargetNode->elem;
+    if(pTargetNode)
+    {
+        pTargetElem = pTargetNode->elem;
+        targetElemType = pTargetElem->object_type;
+    }
     
     // AI speed
     float vcur = world_elem_get_velocity(elem);
@@ -325,6 +325,8 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         az -= vz*leadv;
         
         // if distance is too great, forget target
+        // TODO: why qualify with fixed?
+        if(!elem->stuff.u.enemy.fixed)
         if(dist > elem->stuff.u.enemy.scan_distance && elem->stuff.u.enemy.changes_target)
         {
             elem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
@@ -353,10 +355,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
                 elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
                 elem->stuff.u.enemy.time_next_decision = 3000;
                 
-                elem->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
-                elem->stuff.u.enemy.tgt_x = rand() % (int) gWorld->bound_x;
-                elem->stuff.u.enemy.tgt_y = rand() % (int) gWorld->bound_y;
-                elem->stuff.u.enemy.tgt_z = rand() % (int) gWorld->bound_z;
+                game_ai_juke(elem);
             }
         }
     }
@@ -373,17 +372,15 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         ax = -ax; ay = -ay; az = -az;
         
         // add unpredictable behavior by heading off on a tangent periodically for a short period
-        if(time_ms >= elem->stuff.u.enemy.time_next_decision && zdot < zdot_juke &&
+        if(time_ms >= elem->stuff.u.enemy.time_next_decision &&
+           /* zdot < zdot_juke && */
            elem->stuff.u.enemy.enemy_state != ENEMY_STATE_JUKE)
         {
-            if (rand() % 4 == 0)
+            if (rand_in_range(0, 3) == 0)
             {
                 elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
                 
-                elem->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
-                elem->stuff.u.enemy.tgt_x = rand() % (int) gWorld->bound_x;
-                elem->stuff.u.enemy.tgt_y = rand() % (int) gWorld->bound_y;
-                elem->stuff.u.enemy.tgt_z = rand() % (int) gWorld->bound_z;
+                game_ai_juke(elem);
             }
         }
         
@@ -424,22 +421,15 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     if(elem->stuff.u.enemy.enemy_state != prev_state && time_ms > elem->stuff.u.enemy.time_next_decision)
     {
         elem->stuff.u.enemy.time_next_decision = time_ms + 1000;
-        
-        /*
-        printf("AI %d now in state %d (target=%d) (%s)\n",
-               elem->elem_id, elem->stuff.u.enemy.enemy_state,
-               elem->stuff.u.enemy.target_id,
-               elem->stuff.u.enemy.target_id == my_ship_id? "you": "?");
-         */
     }
     
     // rate at which enemy rotates
-    float r = elem->stuff.u.enemy.max_turn * tc;
+    float tow_turn_v_scale = elem->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID? 1.0: 1.0;
     
-    if(elem->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID) r *= tow_turn_scale;
+    float r = elem->stuff.u.enemy.max_turn * tc * tow_turn_v_scale;
     
     // HACK
-    float vdesired = pursuit_speed_for_object(elem);
+    float vdesired = pursuit_speed_for_object(elem) * tow_turn_v_scale;
     
     float v = vcur > vdesired? 0.1: 2;
     
@@ -498,7 +488,12 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         //update_object_velocity(elem->elem_id, 0, 0, 0, 0);
     }
     
-    if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PURSUE)
+    if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PURSUE &&
+       elem->stuff.u.enemy.fires &&
+       (collision_actions[OBJ_BULLET][targetElemType] == COLLISION_ACTION_DAMAGE ||
+        collision_actions[OBJ_MISSLE][targetElemType] == COLLISION_ACTION_DAMAGE) &&
+       zdot >= zdot_ikillyou &&
+       dist < fire_dist)
     {
         fireBullet = 1;
     }
@@ -513,38 +508,35 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     }
     
     // fire a bullet
-    if(fireBullet && elem->stuff.u.enemy.fires)
+    if(fireBullet &&
+       time_ms - elem->stuff.u.enemy.time_last_bullet > (1000.0-(1000.0*(diff_m/skill))))
     {
         elem->stuff.u.enemy.collided = 0;
         
-        if(zdot >= zdot_ikillyou && dist < fire_dist &&
-           time_ms - elem->stuff.u.enemy.time_last_bullet > (1000.0-(1000.0*(diff_m/skill))))
+        elem->stuff.u.enemy.time_last_bullet = time_ms;
+        
+        float bv = 2 * elem->scale;
+        float bulletPos[3] = {
+            elem->physics.ptr->x + -zq.x*bv,
+            elem->physics.ptr->y + -zq.y*bv,
+            elem->physics.ptr->z + -zq.z*bv
+        };
+        float bulletEuler[3] = {
+            elem->physics.ptr->alpha,
+            elem->physics.ptr->beta,
+            elem->physics.ptr->gamma,
+        };
+        
+        if(elem->stuff.u.enemy.fires_missles)
         {
-            elem->stuff.u.enemy.time_last_bullet = time_ms;
+            elem->stuff.u.enemy.time_last_bullet += 3000; // fire missles less frequently
             
-            float bv = elem->scale + (elem->physics.ptr->velocity/5);
-            float bulletPos[3] = {
-                elem->physics.ptr->x + -zq.x*bv,
-                elem->physics.ptr->y + -zq.y*bv,
-                elem->physics.ptr->z + -zq.z*bv
-            };
-            float bulletEuler[3] = {
-                elem->physics.ptr->alpha,
-                elem->physics.ptr->beta,
-                elem->physics.ptr->gamma,
-            };
+            game_add_bullet(bulletPos, bulletEuler, bulletVel, bv, 0, elem->stuff.u.enemy.target_id, elem->stuff.affiliation);
             
-            if(elem->stuff.u.enemy.fires_missles)
-            {
-                elem->stuff.u.enemy.time_last_bullet += 3000; // fire missles less frequently
-                
-                game_add_bullet(bulletPos, bulletEuler, bulletVel, bv, 0, elem->stuff.u.enemy.target_id, elem->stuff.affiliation);
-                
-            }
-            else
-            {
-                game_add_bullet(bulletPos, bulletEuler, bulletVel, bv, 0, -1, elem->stuff.affiliation);
-            }
+        }
+        else
+        {
+            game_add_bullet(bulletPos, bulletEuler, bulletVel, bv, 0, -1, elem->stuff.affiliation);
         }
     }
     
@@ -590,13 +582,16 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     if(!elemAI || !elemC) return;
     
     elemAI->stuff.u.enemy.collided = 1;
+    
+    elemAI->stuff.u.enemy.time_last_trail = time_ms + pooped_cube_interval_ms;
+    
     elemAI->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
     
     if(elemAI && elemC->physics.ptr->velocity == 0)
     {
         // head away from collision
         if(elemAI->stuff.u.enemy.enemy_state != ENEMY_STATE_JUKE)
-        {            
+        {
             elemAI->stuff.u.enemy.last_state = elemAI->stuff.u.enemy.enemy_state;
             
             float cPos[3] = {elemC->physics.ptr->x, elemC->physics.ptr->y, elemC->physics.ptr->z};

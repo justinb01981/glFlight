@@ -185,6 +185,8 @@ void glFlightResume(time_t time_last_suspend)
 
     [NSThread detachNewThreadSelector:@selector(applicationBackgroundWorker) toTarget:self withObject:NULL];
     
+    [NSThread detachNewThreadSelector:@selector(applicationBackgroundWorkerTimer) toTarget:self withObject:NULL];
+    
     time_last_suspend = 0;
     
     gameSettingsLaunchCount++;
@@ -271,6 +273,17 @@ void glFlightResume(time_t time_last_suspend)
         
         // throttle this thread in select(), not here
         do_game_network_read();
+    }
+}
+
+- (void) applicationBackgroundWorkerTimer
+{
+    while(1)
+    {
+        extern void update_time_ms_frame_tick();
+        update_time_ms_frame_tick();
+        
+        usleep((1000/GAME_FRAME_RATE)*1000);
     }
 }
 

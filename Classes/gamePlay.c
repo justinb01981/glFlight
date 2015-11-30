@@ -69,7 +69,7 @@ game_add_ally(float x, float y, float z);
 //          points modifier = 0.5 * level
 //
 static void
-score_update()
+score_total()
 {
     int *high_score;
     int *high_score_session;
@@ -87,20 +87,28 @@ score_update()
     fscore += gameStateSinglePlayer.stats.turrets_killed * gameStateSinglePlayer.points_turret_killed;
     fscore += gameStateSinglePlayer.points_per_second_elapsed * game_time_elapsed();
     
+    float point_bonus_collected = 0;
+    while(console_log_search(game_log_messages[GAME_LOG_POWERUP_POINTS], point_bonus_collected) != NULL) point_bonus_collected++;
+    
+    fscore += point_bonus_collected * 10;
+    
     gameStateSinglePlayer.stats.score = gameStateSinglePlayer.stats.score_last + (fscore * m);
     
     if(gameStateSinglePlayer.stats.score > *high_score)
     {
         *high_score = gameStateSinglePlayer.stats.score;
-        console_write("****NEW HIGH SCORE!****");
-        gameAudioPlaySoundAtLocation("highscore.wav", my_ship_x, my_ship_y, my_ship_z);
+        if(console_log_search(game_log_messages[GAME_LOG_HIGHSCORE], 0) == NULL)
+        {
+            console_write(game_log_messages[GAME_LOG_HIGHSCORE]);
+            gameAudioPlaySoundAtLocation("highscore.wav", my_ship_x, my_ship_y, my_ship_z);
+        }
     }
 }
 
 static void
 score_newlevel()
 {
-    score_update();
+    score_total();
     
     gameStateSinglePlayer.stats.level_last = gameStateSinglePlayer.difficulty;
     
@@ -121,30 +129,47 @@ score_display()
     high_score = &(gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
     high_score_session = &(gameStateSinglePlayer.high_score_session[gameStateSinglePlayer.game_type]);
     
-    score_update();
+    score_total();
     
-    int capture_log_count = 0;
+    float capture_log_count = 0;
     while(console_log_search(game_log_messages[GAME_LOG_FILESAVED], capture_log_count) != NULL) capture_log_count++;
+    
+    float lost_log_count = 0;
+    while(console_log_search(game_log_messages[GAME_LOG_FILELOST], lost_log_count) != NULL) lost_log_count++;
+    
+    float shots_fired = 0;
+    while(console_log_search(game_log_messages[GAME_LOG_SHOTFIRED], shots_fired) != NULL) shots_fired++;
+    
+    float enemies_killed1 = 0;
+    while(console_log_search(game_log_messages[GAME_LOG_KILLED_ENEMY1], enemies_killed1) != NULL) enemies_killed1++;
+    
+    float enemies_killed2 = 0;
+    while(console_log_search(game_log_messages[GAME_LOG_KILLED_ENEMY2], enemies_killed2) != NULL) enemies_killed2++;
+    
+    float point_bonus_collected = 0;
+    while(console_log_search(game_log_messages[GAME_LOG_POWERUP_POINTS], point_bonus_collected) != NULL) point_bonus_collected++;
+    
+    float enemies_killed = enemies_killed1 + enemies_killed2;
     
     char scoreStr[255];
     sprintf(scoreStr, "Score:** %d **\n"
-            "^D:%.0f/%.0f (%.0fpct)\n"
+            "^D saved/lost: %.0f/%.0f (%.0fpct)\n"
             "bot kills:%d\n"
             "bounty-hunter kills:%d\n"
             "Turret kills:%d\n"
-            "captured:%d\n"
+            "Accuracy:%f\n"
             "Time:%02dsec\n"
             "High score:%d\n"
             /* "Session High score:%d\n" */
             "",
             gameStateSinglePlayer.stats.score,
-            gameStateSinglePlayer.stats.data_collected,
-            gameStateSinglePlayer.n_collect_points,
-            (gameStateSinglePlayer.stats.data_collected / gameStateSinglePlayer.n_collect_points) * 100.0,
+            capture_log_count,
+            lost_log_count,
+            (capture_log_count / (capture_log_count+lost_log_count)) * 100.0,
             gameStateSinglePlayer.stats.enemies_killed,
             gameStateSinglePlayer.stats.enemies_bh_killed,
             gameStateSinglePlayer.stats.turrets_killed,
-            capture_log_count,
+            shots_fired / enemies_killed,
             game_time_elapsed(),
             *high_score
             /* ,*high_score_session */
@@ -438,7 +463,9 @@ game_add_enemy_core(float x, float y, float z, int model)
 int
 game_add_enemy(float x, float y, float z)
 {
-    return game_add_enemy_core(x, y, z, MODEL_SHIP2);
+    int obj_id = game_add_enemy_core(x, y, z, MODEL_SHIP2);
+    world_get_last_object()->stuff.u.enemy.ignore_player = gameStateSinglePlayer.enemy1_ignore_player;
+    return obj_id;
 }
 
 int
@@ -448,6 +475,7 @@ game_add_enemy_ace(float x, float y, float z)
     game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence + 2);
     world_get_last_object()->texture_id = TEXTURE_ID_ENEMYSHIP_ACE;
     world_get_last_object()->stuff.u.enemy.fires_missles = 1;
+    world_get_last_object()->durability *= 4;
     console_write(game_log_messages[GAME_LOG_NEWENEMY2]);
     return obj_id;
 }
@@ -534,6 +562,25 @@ game_add_spawnpoint(float x, float y, float z, char* game_name)
     return obj_id;
 }
 
+static float relocate_s(float k)
+{
+    return k/fabs(k);
+}
+
+void
+game_relocate_elem(WorldElem* pElem)
+{
+    float vmove = 10;
+    pElem->bounding_remain = 1;
+    
+    /* TODO: NOT WORKING */
+    update_object_velocity(pElem->elem_id,
+                           rand_in_range(1, relocate_s(gWorld->bound_x/2.0 - pElem->physics.ptr->x) * vmove),
+                           rand_in_range(1, relocate_s(gWorld->bound_y/2.0 - pElem->physics.ptr->y) * vmove),
+                           rand_in_range(1, relocate_s(gWorld->bound_z/2.0 - pElem->physics.ptr->z) * vmove),
+                           0);
+}
+
 void
 game_move_spawnpoint(WorldElem* pElem)
 {
@@ -547,6 +594,9 @@ game_move_spawnpoint(WorldElem* pElem)
                         rand_in_range(1, gWorld->bound_x),
                         rand_in_range(1, gWorld->bound_y),
                         rand_in_range(1, gWorld->bound_z), 0);
+        /*
+        game_relocate_elem(pElem);
+         */
     }
 }
 
@@ -578,7 +628,7 @@ game_init_objects()
         {
             case OBJ_SPAWNPOINT_ENEMY:
                 pCur->elem->stuff.u.spawnpoint.time_spawn_interval = (1000 * 1) / gameStateSinglePlayer.difficulty;
-                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000 * 30;
+                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000 * 10;
                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence = 3 + gameStateSinglePlayer.difficulty;
                 break;
                 
@@ -604,6 +654,8 @@ void
 game_start(float difficulty, int type)
 {
     char dialogStr[255];
+    
+    console_log_clear(0, 1);
     
     if(difficulty <= 1)
     {
@@ -647,14 +699,16 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.collect_data.collect_vec_delt = 5;
     gameStateSinglePlayer.collect_data.collect_vec_mag = 20;
     
-    gameStateSinglePlayer.points_data_grabbed = 10;
-    gameStateSinglePlayer.points_enemy_killed = 3;
+    gameStateSinglePlayer.points_data_grabbed = 200;
+    gameStateSinglePlayer.points_enemy_killed = 50;
     gameStateSinglePlayer.points_enemy_bh_killed = gameStateSinglePlayer.points_enemy_killed*2;
-    gameStateSinglePlayer.points_turret_killed = 2;
+    gameStateSinglePlayer.points_turret_killed = 25;
     gameStateSinglePlayer.points_per_second_elapsed = 0;
     gameStateSinglePlayer.invuln_time_after_hit = 0;
     gameStateSinglePlayer.powerup_lifetime_frames = GAME_FRAME_RATE * 10;
     gameStateSinglePlayer.player_drops_powerup = 0;
+    gameStateSinglePlayer.enemy1_ignore_player = 0;
+    gameStateSinglePlayer.score_pop_threshold = 10;
     
     collision_actions_set_default();
     
@@ -698,10 +752,10 @@ game_start(float difficulty, int type)
                 "**** High Score: %d ****",
                 gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
          */
-        sprintf(dialogStr, "^D^D^DWARNING: SYSTEM_COMPROMISED^D^D^D\n"
-                           "^D^D^D    ACTIVATE_DEFENSES      ^D^D^D\n"
-                           "^D^D^D    (Protect ^D)            ^D^D^D\n"
-                            "**** High Score: %d ****",
+        sprintf(dialogStr, "^D^D^DWARNING: INTRUDER_ALERT^D^D^D\n"
+                           "^D^D^D   ACTIVATE_FIREWALL   ^D^D^D\n"
+                           "^D^D^D (COPY ^D TO FIREWALL) ^D^D^D\n"
+                           "****   High Score: %d  ****",
                 gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
         gameDialogDisplayString(dialogStr);
         
@@ -715,7 +769,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
         gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
-        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_LIFE;
+        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_POINTS;
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.turret_destruction_change_alliance = 0;
         gameStateSinglePlayer.max_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
@@ -724,10 +778,12 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.rate_enemy_count_increase = 1.0/10;
         gameStateSinglePlayer.rate_enemy_count_increase = 1.0/10;
         
+        gameStateSinglePlayer.enemy1_ignore_player = 0;
+        
         // different map for "collection" game type
         gameMapSetMap(initial_map_collection);
         
-        gameStateSinglePlayer.game_action_spawnpoint_new_game = 1;
+        gameStateSinglePlayer.game_action_spawnpoint_new_game = 0;
         
         gameStateSinglePlayer.invuln_time_after_hit = 2;
         
@@ -1025,6 +1081,12 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
                                            0);
                 }
             }
+            break;
+            
+        case GAME_SUBTYPE_POINTS:
+            world_remove_object(elemB->elem_id);
+            console_write(game_log_messages[GAME_LOG_POWERUP_POINTS]);
+            collect_sound = 1;
             break;
             
         default:
@@ -1325,7 +1387,7 @@ game_handle_destruction(WorldElem* elem)
         if(add_score)
         {
             char scorebuf[255];
-            score_update();
+            score_total();
             sprintf(scorebuf, "%d", gameStateSinglePlayer.stats.score - score_snap);
             world_object_set_nametag(wreck_id, scorebuf);
         }
@@ -1356,7 +1418,6 @@ game_run()
     float v[3], r[3];
     int target_types[] = {OBJ_SHIP, OBJ_PLAYER, OBJ_TURRET, OBJ_UNKNOWN};
     static int game_map_custom_loaded = 0;
-    static int game_ends_collects_lost = 1;
     static game_timeval_t logSoundTimeLast = 0;
     
     if(game_delay_frames > 0)
@@ -1461,7 +1522,7 @@ game_run()
                         pCur->elem->physics.ptr->z + (bz.z*1.0 - by.z*1) - listNodeTowed->elem->physics.ptr->z
                     };
                     float tow_d = sqrt(tow_v[0]*tow_v[0] + tow_v[1]*tow_v[1] + tow_v[2]*tow_v[2]);
-                    float tow_m = tow_d * 4.5;
+                    float tow_m = tow_d * /*4.5*/ 1.0;
                     
                     tow_v[0] = (tow_v[0]/tow_d);
                     tow_v[1] = (tow_v[1]/tow_d);
@@ -1517,7 +1578,7 @@ game_run()
                     {
                         case OBJ_SPAWNPOINT:
                             pCur->elem->stuff.affiliation = gameNetworkState.my_player_id;
-                            world_object_set_nametag(pCur->elem->elem_id, "Node");
+                            world_object_set_nametag(pCur->elem->elem_id, "Firewall");
                             
                             gameStateSinglePlayer.elem_id_spawnpoint = pCur->elem->elem_id;
                             
@@ -1635,9 +1696,9 @@ game_run()
                 {
                     if(collects_found <= 0 && gameStateSinglePlayer.rate_collect_increase == 0)
                     {
-                        if(game_ends_collects_lost)
+                        if(console_log_search(game_log_messages[GAME_LOG_GAMEOVER], 0) == NULL)
                         {
-                            console_write("SYSTEM_COMPROMISED (HACKERS_WIN)");
+                            console_write(game_log_messages[GAME_LOG_GAMEOVER]);
                             game_over();
                         }
                         
@@ -1725,12 +1786,12 @@ game_run()
             if(game_ammo_bullets < game_ammo_bullets_max) game_ammo_bullets += game_ammo_bullets_recharge;
             if(game_ammo_missles < game_ammo_missles_max) game_ammo_missles += game_ammo_missle_recharge;
             
-            score_update();
+            score_total();
         }
         
-        if(gameStateSinglePlayer.stats.score != score_last_checked)
+        if(gameStateSinglePlayer.stats.score - score_last_checked > gameStateSinglePlayer.score_pop_threshold)
         {
-            score_pop();
+            if(gameStateSinglePlayer.stats.score > score_last_checked) score_pop();
             score_last_checked = gameStateSinglePlayer.stats.score;
         }
         
@@ -1754,6 +1815,8 @@ game_run()
     {
         firedLast = time_ms;
         fireBullet(ACTION_FIRE_BULLET);
+        
+        console_write(game_log_messages[GAME_LOG_SHOTFIRED]);
     }
     
     if(gameInterfaceControls.fireRectMissle.touched && time_ms - firedLast > 200)
@@ -2288,7 +2351,7 @@ firePoopedCube(WorldElem *elem)
 int
 game_ai_target_priority(WorldElem* pSearchElem, WorldElem* pTargetElem, float* dist_ignore)
 {
-    const static float velocity_pickup = 2.0;
+    const static float velocity_pickup = 3.0;
     
     if(pSearchElem == pTargetElem) return 0;
     
@@ -2303,7 +2366,7 @@ game_ai_target_priority(WorldElem* pSearchElem, WorldElem* pTargetElem, float* d
     {
         *dist_ignore = pSearchElem->stuff.u.enemy.scan_distance;
      
-        if(pTargetElem->object_type == OBJ_PLAYER) return 2;
+        if(pTargetElem->object_type == OBJ_PLAYER && !pSearchElem->stuff.u.enemy.ignore_player) return 2;
         else if(pTargetElem->object_type == OBJ_SHIP) return 2;
         else if(pTargetElem->object_type == OBJ_TURRET) return 1;
         else if(!pSearchElem->stuff.u.enemy.fixed && pTargetElem->object_type == OBJ_POWERUP_GENERIC &&

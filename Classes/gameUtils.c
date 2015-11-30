@@ -353,6 +353,16 @@ void
 console_append(char* fmt, ...)
 {
     int i = strlen(consoleMessage);
+    int newlines = 0;
+    int newlinesMax = 5;
+    
+    i = 0;
+    while(consoleMessage[i])
+    {
+        if(consoleMessage[i] == '\n') newlines++;
+        i++;
+    }
+    if(newlines > newlinesMax) i = 0;
     
     //if(i > 0) consoleMessage[i++] = '\n';
     consoleMessage[i] = '\0';
@@ -383,14 +393,19 @@ console_write(char* fmt, ...)
     char *msgPtr;
     char consoleMessageHidden[2048];
   
-    if(time_ms - console_write_time < 5000) append = 1;
-    msgPtr = append? consoleMessageTemp: consoleMessage;
-    
-    if(strncmp(fmt, "HIDDEN:", 7) == 0) msgPtr = consoleMessageHidden;
-    
-    if(append) strcat(consoleMessage, "\n");
-    
-    console_write_time = time_ms;
+    if(strncmp(fmt, "HIDDEN:", 7) == 0)
+    {
+        msgPtr = consoleMessageHidden;
+    }
+    else
+    {
+        if(time_ms - console_write_time < 5000) append = 1;
+        msgPtr = append? consoleMessageTemp: consoleMessage;
+        
+        if(append) strcat(consoleMessage, "\n");
+        
+        console_write_time = time_ms;
+    }
     
     va_list list;
      
@@ -452,13 +467,14 @@ float
 rand_in_range(float b, float e)
 {
     float range = fabs(e-b);
+    float s = (e - b) / range;
     if(range == 0) return b;
     
     float m = RAND_MAX / range;
     float k = rand() / m;
     float r = roundf(fmod(k, range));
     
-    return b + r;
+    return b + (r*s);
 }
 
 void

@@ -1677,6 +1677,7 @@ world_update(float tc)
                             int sound_played = 0;
                             int repulsed;
                             int repulse_retry = 100;
+                            
                             do
                             {
                                 repulsed = 0;

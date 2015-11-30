@@ -265,7 +265,8 @@ gameInterfaceFindControl(float x, float y)
     }
     
     // modal, this must be clicked
-    if(gameInterfaceControls.dialogRect.visible)
+    if(gameInterfaceControls.dialogRect.visible &&
+       gameInterfaceControls.dialogRect.modal)
     {
         if(f != &gameInterfaceControls.dialogRect &&
            f != &gameInterfaceControls.trim) return NULL;
@@ -334,6 +335,11 @@ gameInterfaceHandleTouchMove(float x, float y)
     }
     else if(touchedControl == &gameInterfaceControls.fireRectMisc)
     {
+    }
+    else
+    {
+        gameInterfaceControls.touchUnmappedX = x;
+        gameInterfaceControls.touchUnmappedY = y;
     }
 }
 
@@ -745,6 +751,7 @@ gameInterfaceModalDialogWithRect(char* msg, char *buttonLeft, char *buttonRight,
     gameInterfaceControls.dialogRectActionLeft = cbLeft;
     gameInterfaceControls.dialogRectActionRight = cbRight;
     gameInterfaceControls.dialogRect.visible = 1;
+    gameInterfaceControls.dialogRect.modal = 1;
 }
 
 void

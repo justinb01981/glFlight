@@ -112,14 +112,17 @@ gameDialogWelcomeMultiLan()
 static void
 gameDialogWelcomeMulti()
 {
+    /*
     gameInterfaceModalDialog("Local/Internet:", "Local\nWI-FI", "Internet",
                              gameDialogWelcomeMultiLan, gameDialogWelcomeMultiInternet);
+     */
+    gameDialogWelcomeMultiLan();
 }
 
 static void
 gameDialogWelcomeQuick()
 {
-    gameInterfaceModalDialog("Game type:", "Hacker\nDefender", "Multiplayer",
+    gameInterfaceModalDialog("Game type:", "Firewall", "Multiplayer",
                              gameDialogWelcomeSingle, gameDialogWelcomeMulti);
 }
 
@@ -295,7 +298,7 @@ static char gameDialogScoresString[1024];
 static void
 gameDialogScores()
 {
-    sprintf(gameDialogScoresString, "Datagrab:%d\nSurvival:%d\nDefend:%d\nDeathmatch:%d\n",
+    sprintf(gameDialogScoresString, "firewall:%d\nSurvival:%d\nDefend:%d\nDeathmatch:%d\n",
             gameStateSinglePlayer.high_score[GAME_TYPE_COLLECT],
             gameStateSinglePlayer.high_score[GAME_TYPE_SURVIVAL],
             gameStateSinglePlayer.high_score[GAME_TYPE_DEFEND],
@@ -324,6 +327,7 @@ gameDialogScorePopup(char *scoreStr)
     r.tex_id = 4;
     
     gameInterfaceModalDialogWithRect(scoreStr, "", "", gameDialogCancelString, gameDialogCancelString, &r, GAME_FRAME_RATE * 2.0);
+    gameInterfaceControls.dialogRect.modal = 0;
 }
 
 #endif
