@@ -264,7 +264,7 @@ get_time_ms()
 void
 update_time_ms_frame_tick()
 {
-    time_ms += 1000 / GAME_FRAME_RATE;
+    time_ms += 1000 / GAME_TICK_RATE;
 }
 
 unsigned long

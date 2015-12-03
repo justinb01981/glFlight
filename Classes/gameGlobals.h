@@ -95,7 +95,8 @@ const static float TOW_DISTANCE_MAX = 20;
 const static float GAME_AI_UPDATE_INTERVAL_MS = 50;
 
 #define GAME_FRAME_RATE 60
+#define GAME_TICK_RATE 60
 
-extern int controlsCalibrated;;
+extern int controlsCalibrated;
 
 #endif

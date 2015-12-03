@@ -82,7 +82,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         contentView.setOnTouchListener(mOnTouchListener);
        
         mBGThread.start();
-		mBGThreadTimer.start();
+		mTimerThread.start();
         
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
@@ -133,8 +133,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     	}
     	*/
     	if(e.sensor == mSensorGyro)
-    	{	    	
-	    	/*if(accuracyLast == SensorManager.SENSOR_STATUS_ACCURACY_HIGH)*/
+    	{
+			if(accuracyLast >= SensorManager.SENSOR_STATUS_ACCURACY_LOW)
                 GameRunnable.glFlightSensorInput(e.values);
     	}
     }
@@ -225,19 +225,22 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         }
     };
 
-	Thread mBGThreadTimer = new Thread(new Runnable() {
-		public void run() {
-			while (running) {
-				long sleep_ms = 1000 / GameRenderer.fps;
-				GameRunnable.runTimerThread();
-
-				try {
-					java.lang.Thread.sleep(sleep_ms);
-				} catch (InterruptedException e) {
-				}
-			}
+	class GameTimer extends TimerTask {
+		Timer t;
+		public GameTimer() {
+			t = new Timer();
+			t.scheduleAtFixedRate(this, 0, 1000 / GameRenderer.fps);
 		}
-	});
+
+		public void run() {
+			GameRunnable.runTimerThread();
+		}
+
+		public void start() {
+		}
+	}
+
+	GameTimer mTimerThread = new GameTimer();
 
     Thread mBGThread = new Thread(new Runnable() {
     		public void run() {

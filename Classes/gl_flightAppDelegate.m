@@ -280,10 +280,11 @@ void glFlightResume(time_t time_last_suspend)
 {
     while(1)
     {
-        extern void update_time_ms_frame_tick();
-        update_time_ms_frame_tick();
+        /* keeping this in glFlight-main render loop for now on iOS */
+        //extern void update_time_ms_frame_tick();
+        //update_time_ms_frame_tick();
         
-        usleep((1000/GAME_FRAME_RATE)*1000);
+        usleep((1000/GAME_TICK_RATE)*1000);
     }
 }
 

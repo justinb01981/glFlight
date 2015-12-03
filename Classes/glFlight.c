@@ -120,8 +120,8 @@ glFlightFrameStage1()
         goto draw_bail;
     }
     
-    //extern void update_time_ms_frame_tick();
-    //update_time_ms_frame_tick(); // relocated to bg-worker
+    extern void update_time_ms_frame_tick();
+    update_time_ms_frame_tick(); // relocated to bg-worker
     get_time_ms();
     
     if(game_paused)
@@ -138,24 +138,9 @@ glFlightFrameStage1()
         world_update_time_last = time_ms;
         goto draw_bail;
     }
-    
-    // round
-    static float TCROUNDM = (GAME_FRAME_RATE) / 1000.0;
-    float tcr = 0;
-    while(tcr <= tc) tcr += TCROUNDM;
-    tc = tcr;
-    
-    // TODO: can save many cycles by updating objects in motion with less frequency
-    // than every frame
-    if(tc >= /*0.015*/ TCROUNDM)
-    {
-        world_update(tc);
-        world_update_time_last = time_ms;
-    }
-    else
-    {
-        return;
-    }
+
+    world_update(tc);
+    world_update_time_last = time_ms;
     
     // physical collisions between world objects
     do_world_collision_handling(tc);
