@@ -136,6 +136,16 @@ gameDialogWelcomeMenu()
 static void gameDialogWelcome();
 
 static void
+gameDialogRating()
+{
+    gameDialogState.ratingDesired = 1;
+    gameSettingsRatingGiven = 1;
+    gameInterfaceModalDialog("Launching ratings app...",
+                             "Done", "OK",
+                             gameDialogCancel, gameDialogCancel);
+}
+
+static void
 gameDialogWelcomeRating()
 {
     gameDialogState.ratingDesired = 1;
@@ -163,7 +173,8 @@ gameDialogWelcome()
     if(gameSettingsLaunchCount % 2 == 1 && !gameSettingsRatingGiven)
     {
         gameInterfaceModalDialog(WELCOMESTR
-                                 "Please rate d0gf1ght!",
+                                 "Please rate d0gf1ght!\n(and unlock new ships!)\n"
+                                 "It only takes a second!\n",
                                  "Sure", "No way",
                                  gameDialogWelcomeRating, gameDialogWelcomeNoRating);
     }
@@ -184,7 +195,7 @@ gameDialogCalibrate()
                              "^C (to re-calibrate later use  ^C\n"
                              "^C  flashing TRIM button)      ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
-                             "", "", gameDialogCancel, gameDialogCancel);
+                             "", "cancel", gameDialogCancel, gameDialogCancel);
 }
 
 static void

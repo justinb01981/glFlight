@@ -172,6 +172,7 @@
 		D0EECB2E1757CFFE00B5B815 /* texture33.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2D1757CFFD00B5B815 /* texture33.bmp */; };
 		D0EECB301757D69300B5B815 /* texture35.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2F1757D69200B5B815 /* texture35.bmp */; };
 		D0EECB321757D9B300B5B815 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB311757D9B200B5B815 /* Default-568h@2x.png */; };
+		D0EFCAA91C3A4E3700731FAF /* texture93.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EFCAA81C3A4E3700731FAF /* texture93.bmp */; };
 		D0F33ADE1BBF453C00215953 /* texture87.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F33ADD1BBF453C00215953 /* texture87.bmp */; };
 		D0F3BE2417DFEDE100E9C49E /* texture42.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F3BE2317DFEDE100E9C49E /* texture42.bmp */; };
 		D0F3BE2617E3C72400E9C49E /* texture43.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F3BE2517E3C72300E9C49E /* texture43.bmp */; };
@@ -395,6 +396,7 @@
 		D0EECB2F1757D69200B5B815 /* texture35.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture35.bmp; sourceTree = "<group>"; };
 		D0EECB311757D9B200B5B815 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		D0EF8AFD170CCF0C00BDD4B7 /* collision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision.h; sourceTree = "<group>"; };
+		D0EFCAA81C3A4E3700731FAF /* texture93.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture93.bmp; sourceTree = "<group>"; };
 		D0F33ADD1BBF453C00215953 /* texture87.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture87.bmp; sourceTree = "<group>"; };
 		D0F3BE2317DFEDE100E9C49E /* texture42.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture42.bmp; sourceTree = "<group>"; };
 		D0F3BE2517E3C72300E9C49E /* texture43.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture43.bmp; sourceTree = "<group>"; };
@@ -556,6 +558,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D0EFCAA81C3A4E3700731FAF /* texture93.bmp */,
 				D0CB80E61BFF9A5C00E52F43 /* texture92.bmp */,
 				D0CB80E41BFD9F0100E52F43 /* texture91.bmp */,
 				D0CB80E21BFB9F5500E52F43 /* texture90.bmp */,
@@ -786,6 +789,7 @@
 				6D1073231585CAE0006B6499 /* texture0.bmp in Resources */,
 				D0CB80E71BFF9A5C00E52F43 /* texture92.bmp in Resources */,
 				D0B4C4D21A325F1500F125D4 /* texture85.bmp in Resources */,
+				D0EFCAA91C3A4E3700731FAF /* texture93.bmp in Resources */,
 				D00D78D31A09525100E701B9 /* texture79.bmp in Resources */,
 				6DE4E2CC15926E7B00CE3C37 /* texture1.bmp in Resources */,
 				D02B8F0D195DF2CC00830369 /* texture30.bmp in Resources */,

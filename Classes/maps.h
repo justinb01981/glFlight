@@ -35,7 +35,7 @@
 "register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
 "set_world_size r r r\n"                                                 \
-"mesh_manip_add wx0.1 " "wy0.1" " wz0.1" " 4 0 0" " 0 0 4" " wx0.2 wz0.2\n" \
+"mesh_manip_add wx0.2 " "wy0.2" " wz0.1" " 4 0 0" " 0 0 4" " wx0.2 wz0.2\n" \
 WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
 WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
 WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
@@ -186,7 +186,7 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
 "add_object r r r r 0 0 0 r r\n"
 
 #define BASE_FRIENDLY_1                        \
-"register_params 10 rndx 50 rndz 0 0 0 8 "/*"42"*/"92"" 0 0 0 0 0 0 0\n"                 \
+"register_params 10 "/*"rndx"*/"wx0.5"" 50 "/*"rndz"*/"wz0.5"" 0 0 0 8 "/*"42"*/"92"" 0 0 0 0 0 0 0\n"                 \
 "add_object r r r r r r r r " "r" "\n" \
 "object_set_info 8\n" 
 
@@ -619,7 +619,7 @@ RANDOM_DECORATION_1
 
 const static char initial_map_deathmatch[] = ""
 
-"set_world_size 100 100 100\n" // all must be divisible by MAX_WORLD_REGIONS
+"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
 //"set_background_info 27\n"
 "set_background_info ""27""\n"
 

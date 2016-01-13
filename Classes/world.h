@@ -21,11 +21,12 @@
 
 
 // MUST DIVIDE bound_x, bound_y, bound_z evenly!
-#define WORLD_MAX_REGIONS /*50*/ 25
+//#define WORLD_MAX_REGIONS /*50*/ 25
 #define WORLD_MAX_PLANES 16
-#define WORLD_VIS_REGIONS_X 4
-#define WORLD_VIS_REGIONS_Y 2
-#define WORLD_VIS_REGIONS_Z 4
+#define WORLD_MAX_ARROWS 16
+//#define WORLD_VIS_REGIONS_X ((int) gWorld->bound_x / gWorld->vis_region_m)
+//#define WORLD_VIS_REGIONS_Y ((int) gWorld->bound_y / gWorld->vis_region_m)
+//#define WORLD_VIS_REGIONS_Z ((int) gWorld->bound_z / gWorld->vis_region_m)
 #define VIS_REGION_FOR_COORD(v, x, y, z)                  \
     v[0] = x / (gWorld->bound_x / WORLD_VIS_REGIONS_X);   \
     v[1] = y / (gWorld->bound_y / WORLD_VIS_REGIONS_Y);   \
@@ -37,14 +38,13 @@
      gWorld->bound_x > 0 && gWorld->bound_y > 0 && gWorld->bound_z > 0)
 
 
-
 extern float visible_distance;
 
 typedef struct
 {
     WorldElemListNode elements_list; // master list of all elements in existence
     
-    WorldElemListNode elements_by_region[WORLD_MAX_REGIONS][WORLD_MAX_REGIONS][WORLD_MAX_REGIONS];
+    //WorldElemListNode elements_by_region[WORLD_MAX_REGIONS][WORLD_MAX_REGIONS][WORLD_MAX_REGIONS];
     
     WorldElemListNode elements_moving;
     
@@ -57,7 +57,8 @@ typedef struct
     
     WorldElemListNode elements_visible;
     
-    WorldElemListNode elements_visible_by_region[WORLD_VIS_REGIONS_X][WORLD_VIS_REGIONS_Y][WORLD_VIS_REGIONS_Z];
+    //WorldElemListNode elements_visible_by_region[WORLD_VIS_REGIONS_X][WORLD_VIS_REGIONS_Y][WORLD_VIS_REGIONS_Z];
+    WorldElemListNode *elements_by_region_vis;
     
     //WorldElemListNode elements_by_type[MODEL_LAST];
     
@@ -70,7 +71,8 @@ typedef struct
 	
 	float bound_x, bound_y, bound_z;
     
-    float region_size_x, region_size_y, region_size_z;
+    //float region_size_x, region_size_y, region_size_z;
+    float regions_x, regions_y, regions_z;
     
     boundingRegion* boundingRegion;
     
@@ -82,6 +84,13 @@ typedef struct
         float v1[3], v2[3];
     } world_planes[WORLD_MAX_PLANES];
     
+    struct
+    {
+        float x, y, z;
+        
+    } world_arrows[WORLD_MAX_ARROWS];
+    int num_world_arrows;
+    
     float vec_gravity[3];
     
     float vec[6];
@@ -89,10 +98,22 @@ typedef struct
     int ignore_add:1;
     int ignore_remove:1;
     int visible_list_change:1;
+    
+    float vis_regions_x, vis_regions_y, vis_regions_z;
+    
+    WorldElemListNode *elements_by_region;
 	
 } world_t;
 
 extern world_t *gWorld;
+
+void region_for_coord(float x, float y, float z, int rgn[3]);
+
+WorldElemListNode*
+world_region_head(float x, float y, float z);
+
+WorldElemListNode*
+world_vis_region_head(float x, float y, float z);
 
 void world_init(float size_x, float size_y, float size_z);
 
@@ -160,6 +181,11 @@ world_mesh_pending_y();
 
 void
 world_set_plane(int idx, float ox, float oy, float oz, float x1, float y1, float z1, float x2, float y2, float z2);
+
+void
+world_add_arrow(float x, float y, float z);
+void
+world_clear_arrows();
 
 void
 world_random_spawn_location(float loc[6], int affiliation);

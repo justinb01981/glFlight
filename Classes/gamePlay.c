@@ -100,7 +100,7 @@ score_total()
         if(console_log_search(game_log_messages[GAME_LOG_HIGHSCORE], 0) == NULL)
         {
             console_write(game_log_messages[GAME_LOG_HIGHSCORE]);
-            gameAudioPlaySoundAtLocation("highscore.wav", my_ship_x, my_ship_y, my_ship_z);
+            gameAudioPlaySoundAtLocation("highscore", my_ship_x, my_ship_y, my_ship_z);
         }
     }
 }
@@ -177,7 +177,7 @@ score_display()
     
     gameDialogDisplayString(scoreStr);
     
-    gameAudioPlaySoundAtLocation("victory.wav", my_ship_x, my_ship_y, my_ship_z);
+    gameAudioPlaySoundAtLocation("victory", my_ship_x, my_ship_y, my_ship_z);
     
     console_append("game paused.. tap to resume");
     game_paused = 1;
@@ -464,7 +464,7 @@ int
 game_add_enemy(float x, float y, float z)
 {
     int obj_id = game_add_enemy_core(x, y, z, MODEL_SHIP2);
-    world_get_last_object()->stuff.u.enemy.ignore_player = gameStateSinglePlayer.enemy1_ignore_player;
+    world_get_last_object()->stuff.u.enemy.ignore_player = (rand_in_range(1, 100) <= gameStateSinglePlayer.enemy1_ignore_player_pct);
     return obj_id;
 }
 
@@ -562,25 +562,6 @@ game_add_spawnpoint(float x, float y, float z, char* game_name)
     return obj_id;
 }
 
-static float relocate_s(float k)
-{
-    return k/fabs(k);
-}
-
-void
-game_relocate_elem(WorldElem* pElem)
-{
-    float vmove = 10;
-    pElem->bounding_remain = 1;
-    
-    /* TODO: NOT WORKING */
-    update_object_velocity(pElem->elem_id,
-                           rand_in_range(1, relocate_s(gWorld->bound_x/2.0 - pElem->physics.ptr->x) * vmove),
-                           rand_in_range(1, relocate_s(gWorld->bound_y/2.0 - pElem->physics.ptr->y) * vmove),
-                           rand_in_range(1, relocate_s(gWorld->bound_z/2.0 - pElem->physics.ptr->z) * vmove),
-                           0);
-}
-
 void
 game_move_spawnpoint(WorldElem* pElem)
 {
@@ -590,13 +571,21 @@ game_move_spawnpoint(WorldElem* pElem)
     {
         pElem->stuff.u.spawnpoint.time_last_move = time_ms;
         
-        world_move_elem(pElem,
-                        rand_in_range(1, gWorld->bound_x),
-                        rand_in_range(1, gWorld->bound_y),
-                        rand_in_range(1, gWorld->bound_z), 0);
-        /*
-        game_relocate_elem(pElem);
-         */
+        float v[] = {
+            pElem->physics.ptr->x+rand_in_range(-2, 2),
+            pElem->physics.ptr->y+rand_in_range(-2, 2),
+            pElem->physics.ptr->z+rand_in_range(-2, 2)
+        };
+        
+        if(v[0] < gWorld->bound_x &&
+           v[1] > 1 && v[1] < gWorld->bound_y &&
+           v[2] > 1 && v[2] < gWorld->bound_z)
+        {
+            world_move_elem(pElem, v[0], v[1], v[2], 0);
+            /*
+            game_relocate_elem(pElem);
+             */
+        }
     }
 }
 
@@ -628,7 +617,7 @@ game_init_objects()
         {
             case OBJ_SPAWNPOINT_ENEMY:
                 pCur->elem->stuff.u.spawnpoint.time_spawn_interval = (1000 * 1) / gameStateSinglePlayer.difficulty;
-                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000 * 10;
+                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000 * 2;
                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence = 3 + gameStateSinglePlayer.difficulty;
                 break;
                 
@@ -707,7 +696,7 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.invuln_time_after_hit = 0;
     gameStateSinglePlayer.powerup_lifetime_frames = GAME_FRAME_RATE * 10;
     gameStateSinglePlayer.player_drops_powerup = 0;
-    gameStateSinglePlayer.enemy1_ignore_player = 0;
+    gameStateSinglePlayer.enemy1_ignore_player_pct = 0;
     gameStateSinglePlayer.score_pop_threshold = 10;
     
     collision_actions_set_default();
@@ -774,11 +763,10 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.turret_destruction_change_alliance = 0;
         gameStateSinglePlayer.max_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
         
-        gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/10;
-        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/10;
-        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/10;
+        gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/5;
+        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/5;
         
-        gameStateSinglePlayer.enemy1_ignore_player = 0;
+        gameStateSinglePlayer.enemy1_ignore_player_pct = 50;
         
         // different map for "collection" game type
         gameMapSetMap(initial_map_collection);
@@ -1751,17 +1739,20 @@ game_run()
                 collision_actions_set_player_vuln();
             }
             
-            if(gameStateSinglePlayer.boost_charge < 1.0)
-            {
-                if(!gameInterfaceControls.fireRectBoost.visible)
+            if(!gameSettingsSimpleControls)
+            {                
+                if(gameStateSinglePlayer.boost_charge < 1.0)
                 {
-                    gameStateSinglePlayer.boost_charge += game_boost_recharge_rate;
+                    if(!gameInterfaceControls.fireRectBoost.visible)
+                    {
+                        gameStateSinglePlayer.boost_charge += game_boost_recharge_rate;
+                    }
                 }
-            }
-            else
-            {
-                gameStateSinglePlayer.boost_charge = 0;
-                gameInterfaceSetInterfaceState(INTERFACE_STATE_BOOST_AVAIL);
+                else
+                {
+                    gameStateSinglePlayer.boost_charge = 0;
+                    gameInterfaceSetInterfaceState(INTERFACE_STATE_BOOST_AVAIL);
+                }
             }
             
             if(gameStateSinglePlayer.rate_collect_increase > 0)

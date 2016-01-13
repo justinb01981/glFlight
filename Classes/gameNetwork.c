@@ -52,6 +52,8 @@ static unsigned long update_frequency_ms = 20;
 static unsigned long update_time_last = 0;
 static int gameNetwork_inited = 0;
 static int read_in_render_thread = 0;
+const static float euler_interp_range_max = (M_PI/8);
+const static float velo_interp_update_mult = 8;
 
 static char *gameKillVerbs[] = {"slaughtered", "evicerated", "de-rezzed", "shot-down", "ended", "terminated"};
 
@@ -1004,6 +1006,34 @@ gameNetwork_removePlayer(int player_id)
     return GAME_NETWORK_ERR_NONE;
 }
 
+gameNetworkError
+gameNetwork_updatePlayerObject(gameNetworkPlayerInfo* playerInfo,
+                               float x, float y, float z,
+                               float alpha, float beta, float gamma,
+                               float velx, float vely, float velz)
+{
+    WorldElemListNode* pElemNode = world_elem_list_find(playerInfo->elem_id, &gWorld->elements_list);
+    
+    WorldElem* pElem = NULL;
+    if(pElemNode) pElem = pElemNode->elem;
+    
+    if(pElem)
+    {
+        int obj_id =
+        world_replace_object(pElem->elem_id, pElem->type,
+                             x, y, z,
+                             alpha, beta, gamma,
+                             pElem->scale, pElem->texture_id);
+        
+        pElem->object_type = OBJ_PLAYER;
+        
+        update_object_velocity(pElem->elem_id, velx, vely, velz, 0);
+        
+        return GAME_NETWORK_ERR_NONE;
+    }
+    return GAME_NETWORK_ERR_FAIL;
+}
+
 static int
 get_world_elem_info(int elem_id, gameNetworkMessage* msg)
 {
@@ -1463,6 +1493,50 @@ do_game_network_world_update()
         }
         pNode = pNode->next;
     }
+    
+    // interpolate euler-velocity
+    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
+    while(pInfo)
+    {
+        if(pInfo->player_id == my_ship_id)
+        {
+        }
+        else
+        {
+            float euler[3];
+            int i;
+            for(i = 0; i < 3; i++)
+            {
+                euler[i] = ((pInfo->euler_last[i][0] - pInfo->euler_last[i][1]) /
+                            (pInfo->timestamp_last[0] - pInfo->timestamp_last[1])) *
+                    (time_ms - pInfo->euler_last_interp);
+            }
+            
+            WorldElemListNode* pElemNode = world_elem_list_find(pInfo->elem_id, &gWorld->elements_moving);
+            
+            WorldElem* pElem = NULL;
+            if(pElemNode) pElem = pElemNode->elem;
+            
+            if(pElem)
+            {
+                if(fabs(euler[0]) < euler_interp_range_max &&
+                   fabs(euler[1]) < euler_interp_range_max &&
+                   fabs(euler[2]) < euler_interp_range_max)
+                {
+                    gameNetwork_updatePlayerObject(pInfo,
+                                                   pElem->physics.ptr->x, pElem->physics.ptr->y, pElem->physics.ptr->z,
+                                                   pElem->physics.ptr->alpha + euler[0],
+                                                   pElem->physics.ptr->beta + euler[1],
+                                                   pElem->physics.ptr->gamma + euler[2],
+                                                   pElem->physics.ptr->vx,
+                                                   pElem->physics.ptr->vy,
+                                                   pElem->physics.ptr->vz);
+                }
+                pInfo->euler_last_interp = time_ms;
+            }
+        }
+        pInfo = pInfo->next;
+    }
 }
 
 void
@@ -1816,38 +1890,34 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                         (msg->params.f[3] - pPlayerElem->physics.ptr->z) * (1000.0 / (t - playerInfo->timestamp_last[0]))
                     };
                     
-                    world_replace_object(pPlayerElem->elem_id, pPlayerElem->type,
-                                         msg->params.f[1], msg->params.f[2], msg->params.f[3],
-                                         msg->params.f[4], msg->params.f[5], msg->params.f[6],
-                                         pPlayerElem->scale, pPlayerElem->texture_id);
-                    pPlayerElem->object_type = OBJ_PLAYER;
-                    
                     // log location
                     for(int i = 2; i > 0; i--)
                     {
                         for(int d = 0; d < 3; d++)
                         {
                             playerInfo->loc_last[d][i] = playerInfo->loc_last[d][i-1];
+                            playerInfo->euler_last[d][i] = playerInfo->euler_last[d][i-1];
                         }
                         playerInfo->timestamp_last[i] = playerInfo->timestamp_last[i-1];
                     }
-                    playerInfo->loc_last[0][0] = pPlayerElem->physics.ptr->x;
-                    playerInfo->loc_last[1][0] = pPlayerElem->physics.ptr->y;
-                    playerInfo->loc_last[2][0] = pPlayerElem->physics.ptr->z;
+                    playerInfo->loc_last[0][0] = msg->params.f[1];
+                    playerInfo->loc_last[1][0] = msg->params.f[2];
+                    playerInfo->loc_last[2][0] = msg->params.f[3];
+                    playerInfo->euler_last[0][0] = msg->params.f[4];
+                    playerInfo->euler_last[1][0] = msg->params.f[5];
+                    playerInfo->euler_last[2][0] = msg->params.f[6];
                     playerInfo->timestamp_last[0] = t;
                     
+                    float v[3] = {
+                        pPlayerElem->physics.ptr->x,
+                        pPlayerElem->physics.ptr->y,
+                        pPlayerElem->physics.ptr->z
+                    };
                     float time_win = playerInfo->timestamp_last[0] - playerInfo->timestamp_last[2];
-                    if(interp_velo && time_win < 1000 && time_win > 0)
+                    if(interp_velo && time_win < update_frequency_ms * velo_interp_update_mult && time_win > 0)
                     {
                         // predict velocity
                         float v1[3];
-                        float v[3] =
-                        {
-                            pPlayerElem->physics.ptr->x,
-                            pPlayerElem->physics.ptr->y,
-                            pPlayerElem->physics.ptr->z
-                        };
-                        
                         for(int d = 0; d < 3; d++)
                         {
                             v1[d] = predict_a1_at_b1_for_a_over_b(playerInfo->loc_last[d],
@@ -1855,8 +1925,6 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                                                                   t + 1000);
                             v[d] = v1[d] - v[d];
                         }
-                        
-                        update_object_velocity(pPlayerElem->elem_id, v[0], v[1], v[2], 0);
                         
                         // calculate delta between predicted vel and sent-velocity
                         playerInfo->vel_predict_delta = pPlayerElem->physics.ptr->velocity -
@@ -1866,11 +1934,15 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                     }
                     else
                     {
-                        /*
-                        update_object_velocity(pPlayerElem->elem_id, msg->params.f[7],
-                                               msg->params.f[8], msg->params.f[9], 0);
-                         */
+                        v[0] = pPlayerElem->physics.ptr->vx;
+                        v[1] = pPlayerElem->physics.ptr->vy;
+                        v[2] = pPlayerElem->physics.ptr->vz;
                     }
+                    
+                    gameNetwork_updatePlayerObject(playerInfo,
+                                                   msg->params.f[1], msg->params.f[2], msg->params.f[3],
+                                                   msg->params.f[4], msg->params.f[5], msg->params.f[6],
+                                                   v[0], v[1], v[2]);
 
                     //pPlayerElem->stuff.player.player_id = playerInfo->player_id;
                     pPlayerElem->stuff.affiliation = pPlayerElem->stuff.game_object_id = playerInfo->player_id;

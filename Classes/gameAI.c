@@ -25,6 +25,7 @@ float boundary_avoid_distance = 10;
 float fire_dist = 70;
 float diff_m = 0.1;
 float forget_thresh_increase = 0.5;
+float game_ai_fire_rate_ms = 500.0;
 
 gameAIState_t gameAIState;
 
@@ -91,7 +92,7 @@ game_ai_find_target(WorldElem *pElem)
                 float w = (1/dist) * priority;
                 
                 // don't always take highest-weighted target, some element of randomness
-                if(w > wMin || rand() % 4 == 0)
+                if(w > wMin || rand_in_range(1, 4) == 1)
                 {
                     minId = pTarget->elem->elem_id;
                     minDist = dist;
@@ -117,7 +118,11 @@ game_ai_find_target(WorldElem *pElem)
         return minId;
     }
     
-    if(pElem->stuff.u.enemy.scan_distance > 0) pElem->stuff.u.enemy.scan_distance += forget_thresh_increase;
+    if(pElem->stuff.u.enemy.scan_distance > 0 &&
+       pElem->stuff.u.enemy.scan_distance < GAME_VARIABLE("ENEMY1_SCAN_DISTANCE_MAX"))
+    {
+        pElem->stuff.u.enemy.scan_distance += forget_thresh_increase;
+    }
     
     return WORLD_ELEM_ID_INVALID;
 }
@@ -350,7 +355,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         if(time_ms >= elem->stuff.u.enemy.time_next_decision && zdot < zdot_juke &&
            elem->stuff.u.enemy.enemy_state != ENEMY_STATE_JUKE)
         {
-            if (rand() % 4 == 0)
+            if (rand_in_range(1, 100) <= 25)
             {
                 elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
                 elem->stuff.u.enemy.time_next_decision = 3000;
@@ -376,7 +381,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
            /* zdot < zdot_juke && */
            elem->stuff.u.enemy.enemy_state != ENEMY_STATE_JUKE)
         {
-            if (rand_in_range(0, 3) == 0)
+            if (rand_in_range(1, 100) <= 25)
             {
                 elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
                 
@@ -388,7 +393,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
            /* || time_ms - elem->stuff.u.enemy.time_last_decision > 2000 */
            || zdot <= 0)
         {
-            if(rand_in_range(0, 3) == 0)
+            if(rand_in_range(1, 100) <= 25)
             {
                 elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
             }
@@ -509,7 +514,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     // fire a bullet
     if(fireBullet &&
-       time_ms - elem->stuff.u.enemy.time_last_bullet > (1000.0-(1000.0*(diff_m/skill))))
+       time_ms - elem->stuff.u.enemy.time_last_bullet > (game_ai_fire_rate_ms-(game_ai_fire_rate_ms*(diff_m/skill))))
     {
         elem->stuff.u.enemy.collided = 0;
         
@@ -580,12 +585,15 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     }
     
     if(!elemAI || !elemC) return;
-    
+     
     elemAI->stuff.u.enemy.collided = 1;
     
     elemAI->stuff.u.enemy.time_last_trail = time_ms + pooped_cube_interval_ms;
     
     elemAI->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
+    
+    // drop tow
+    //if(elemC->elem_id != elemAI->stuff.towed_elem_id) elemAI->stuff.towed_elem_id = WORLD_ELEM_ID_INVALID;
     
     if(elemAI && elemC->physics.ptr->velocity == 0)
     {

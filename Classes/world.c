@@ -849,9 +849,53 @@ void world_free()
             boundingRegionUninit(gWorld->boundingRegion);
         }
         
+        if(gWorld->elements_by_region) free(gWorld->elements_by_region);
+        if(gWorld->elements_by_region_vis) free(gWorld->elements_by_region_vis);
+        
 		free(gWorld);
 		gWorld = NULL;
 	}
+}
+
+void
+region_for_coord(float x, float y, float z, int rgn[3])
+{
+    rgn[0] = floor(x / (gWorld->bound_x/gWorld->regions_x));
+    rgn[1] = floor(y / (gWorld->bound_y/gWorld->regions_y));
+    rgn[2] = floor(z / (gWorld->bound_z/gWorld->regions_z));
+}
+
+WorldElemListNode*
+world_region_head(float x, float y, float z)
+{
+    int rgn[3];
+    region_for_coord(x, y, z, rgn);
+    
+    WorldElemListNode* pNode = gWorld->elements_by_region;
+    
+    pNode += rgn[0] * (int) gWorld->regions_y * (int) gWorld->regions_z;
+    pNode += rgn[1] * (int) gWorld->regions_z;
+    pNode += rgn[2];
+    
+    return pNode;
+}
+
+WorldElemListNode*
+world_vis_region_head(float x, float y, float z)
+{
+    WorldElemListNode* pNode = gWorld->elements_by_region_vis;
+    
+    float m[3] = {
+        gWorld->bound_x / gWorld->vis_regions_x,
+        gWorld->bound_y / gWorld->vis_regions_y,
+        gWorld->bound_z / gWorld->vis_regions_z,
+    };
+    
+    pNode += (int) (x/m[0]) * (int) gWorld->vis_regions_y * (int)gWorld->vis_regions_z;
+    pNode += (int) (y/m[1]) * (int) gWorld->vis_regions_z;
+    pNode += (int) (z/m[2]);
+    
+    return pNode;
 }
 
 void world_init(float size_x, float size_y, float size_z)
@@ -860,6 +904,29 @@ void world_init(float size_x, float size_y, float size_z)
     
 	gWorld = malloc(sizeof(world_t));
 	memset(gWorld, 0, sizeof(world_t));
+    
+    float ws = 25;
+    gWorld->bound_x = size_x;
+    gWorld->bound_y = size_y;
+    gWorld->bound_z = size_z;
+    
+    gWorld->regions_x = gWorld->bound_x / ws;
+    gWorld->regions_y = gWorld->bound_y / ws;
+    gWorld->regions_z = gWorld->bound_z / ws;
+    
+    int k = (size_x/ws) * (size_y/ws) * (size_z/ws);
+    float alloc_size = sizeof(WorldElemListNode) * k;
+    gWorld->elements_by_region = (WorldElemListNode*) malloc(alloc_size);
+    for(int i = 0; i < k; i++) memset(gWorld->elements_by_region+i, 0, sizeof(WorldElemListNode));
+    
+    float vws = visible_distance;
+    gWorld->vis_regions_x = (size_x/vws);
+    gWorld->vis_regions_y = (size_y/vws);
+    gWorld->vis_regions_z = (size_z/vws);
+    k = (size_x/vws) * (size_y/vws) * (size_z/vws);
+    alloc_size = sizeof(WorldElemListNode) * k;
+    gWorld->elements_by_region_vis = (WorldElemListNode*) malloc(alloc_size);
+    for(int i = 0; i < k; i++) memset(gWorld->elements_by_region_vis+i, 0, sizeof(WorldElemListNode));
         
     if(size_x == -1 && size_y == -1 && size_z == -1)
     {
@@ -873,18 +940,10 @@ void world_init(float size_x, float size_y, float size_z)
     
     gWorld->element_id_hash = simple_hash_table_init(1024);
     gWorld->elements_list.hash_ptr = gWorld->element_id_hash;
-	
-	gWorld->bound_x = size_x;
-	gWorld->bound_y = size_y;
-	gWorld->bound_z = size_z;
     
-    gWorld->region_size_x = gWorld->bound_x / WORLD_MAX_REGIONS;
-    gWorld->region_size_y = gWorld->bound_y / WORLD_MAX_REGIONS;
-    gWorld->region_size_z = gWorld->bound_z / WORLD_MAX_REGIONS;
-    
-    assert(floor(gWorld->region_size_x) == gWorld->region_size_x);
-    assert(floor(gWorld->region_size_y) == gWorld->region_size_y);
-    assert(floor(gWorld->region_size_z) == gWorld->region_size_z);
+    assert(floor(gWorld->regions_x) == gWorld->regions_x);
+    assert(floor(gWorld->regions_y) == gWorld->regions_y);
+    assert(floor(gWorld->regions_z) == gWorld->regions_z);
     
     // build bounding vectors
     boundingRegion* br = boundingRegionInit(6);
@@ -1051,6 +1110,12 @@ void world_init(float size_x, float size_y, float size_z)
     }
     
     //world_build_visibility_data();
+    
+    world_clear_arrows();
+    
+    world_add_arrow(0, gWorld->bound_y / 2, gWorld->bound_z / 2);
+    world_add_arrow(gWorld->bound_x / 2, 0, gWorld->bound_z / 2);
+    world_add_arrow(gWorld->bound_x / 2, gWorld->bound_y / 2, 0);
 
 	return;
 }
@@ -1286,9 +1351,9 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc)
 inline static void
 get_region_bounding_box(float x, float y, float z, float region_bbox[6])
 {
-    float xm = gWorld->bound_x / WORLD_MAX_REGIONS;
-    float ym = gWorld->bound_y / WORLD_MAX_REGIONS;
-    float zm = gWorld->bound_z / WORLD_MAX_REGIONS;
+    float xm = gWorld->bound_x / gWorld->regions_x;
+    float ym = gWorld->bound_y / gWorld->regions_y;
+    float zm = gWorld->bound_z / gWorld->regions_z;
     
     region_bbox[0] = x * xm; // xmin
     region_bbox[3] = (x+1) * xm; // ymax
@@ -1376,25 +1441,14 @@ froundlong(float f)
     return rintf(f);
 }
 
-static inline void
-region_for_coord(float x, float y, float z, int rgn[3])
-{
-    rgn[0] = floor(x / gWorld->region_size_x);
-    rgn[1] = floor(y / gWorld->region_size_y);
-    rgn[2] = floor(z / gWorld->region_size_z);
-}
-
 WorldElemListNode*
 get_region_list_head(float x, float y, float z)
 {
-    int rgn[3];
-    region_for_coord(x, y, z, rgn);
+    if(x < 0.0 || x >= gWorld->bound_x ||
+       y < 0.0 || y >= gWorld->bound_y ||
+       z < 0.0 || z >= gWorld->bound_z) return NULL;
     
-    if(rgn[0] < 0 || rgn[0] >= WORLD_MAX_REGIONS ||
-       rgn[1] < 0 || rgn[1] >= WORLD_MAX_REGIONS ||
-       rgn[2] < 0 || rgn[2] >= WORLD_MAX_REGIONS) return NULL;
-    
-    return &(gWorld->elements_by_region[rgn[0]][rgn[1]][rgn[2]]);
+    return world_region_head(x, y, z);
 }
 
 WorldElemListNode*
@@ -1432,19 +1486,6 @@ add_element_to_region(WorldElem* pElem)
     {
         get_element_bounding_box(pElem, elem_bbox);
         
-        /*
-        for(float rx = elem_bbox[0]; rx <= elem_bbox[3]; rx += gWorld->region_size_x)
-        {
-            for(float ry = elem_bbox[1]; ry <= elem_bbox[4]; ry += gWorld->region_size_y)
-            {
-                for(float rz = elem_bbox[2]; rz <= elem_bbox[5]; rz += gWorld->region_size_z)
-                {
-                    add_element_to_region_for_coord(pElem, rx, ry, rz);
-                }
-            }
-        }
-         */
-        
         int regions_spanned = 0;
         
         int rgn_b[3];
@@ -1453,21 +1494,25 @@ add_element_to_region(WorldElem* pElem)
         int rgn_e[3];
         region_for_coord(elem_bbox[3], elem_bbox[4], elem_bbox[5], rgn_e);
         
-        //memset(regions_filled, 0, sizeof(regions_filled));
-        
         for(int xr = rgn_b[0]; xr <= rgn_e[0]; xr++)
         {
             for(int yr = rgn_b[1]; yr <= rgn_e[1]; yr++)
             {
                 for(int zr = rgn_b[2]; zr <= rgn_e[2]; zr++)
                 {
-                    if(xr >= 0 && xr < WORLD_MAX_REGIONS && yr >= 0 && yr < WORLD_MAX_REGIONS && zr >= 0 && zr < WORLD_MAX_REGIONS)
+                    if(xr < 0 || xr >= gWorld->regions_x ||
+                       yr < 0 || yr >= gWorld->regions_y ||
+                       zr < 0 || zr >= gWorld->regions_z)
                     {
-                        WorldElemListNode* pListHead = get_region_list_head(xr*gWorld->region_size_x, yr*gWorld->region_size_y, zr*gWorld->region_size_z);
-                    
-                        if(pListHead) world_elem_list_add_fast(pElem, pListHead, LIST_TYPE_REGION);
-                        regions_spanned++;
+                        continue;
                     }
+                    
+                    WorldElemListNode* pListHead = world_region_head(xr*(gWorld->bound_x/gWorld->regions_x),
+                                                                     yr*(gWorld->bound_y/gWorld->regions_y),
+                                                                     zr*(gWorld->bound_z/gWorld->regions_z));
+                
+                    if(pListHead) world_elem_list_add_fast(pElem, pListHead, LIST_TYPE_REGION);
+                    regions_spanned++;
                 }
             }
         }
@@ -1733,6 +1778,10 @@ world_update(float tc)
                                                     // repulse
                                                     world_repulse_elem(elemB, elemA, tc);
                                                     
+                                                    game_handle_collision(elemA, elemB, colact);
+                                                    gameNetwork_handle_collision(elemA, elemB, colact);
+                                                    game_ai_collision(elemA, elemB, colact);
+                                                    
                                                     if(elemB->elem_id == my_ship_id && !sound_played)
                                                     {
                                                         sound_played = 1;
@@ -1741,6 +1790,8 @@ world_update(float tc)
                                                                                      elemA->physics.ptr->y,
                                                                                      elemA->physics.ptr->z);
                                                     }
+                                                    
+                                                    
                                                 }
                                                 else if(colact == COLLISION_ACTION_NONE)
                                                 {
@@ -2088,6 +2139,20 @@ world_set_plane(int idx, float ox, float oy, float oz, float x1, float y1, float
     gWorld->world_planes[idx].v2[2] = z2;
 }
 
+void
+world_add_arrow(float x, float y, float z)
+{
+    gWorld->world_arrows[gWorld->num_world_arrows].x = x;
+    gWorld->world_arrows[gWorld->num_world_arrows].y = y;
+    gWorld->world_arrows[gWorld->num_world_arrows].z = z;
+    gWorld->num_world_arrows++;
+}
+
+void
+world_clear_arrows()
+{
+    gWorld->num_world_arrows = 0;
+}
 
 void
 world_vis_rgn_remove(WorldElem* elem)
@@ -2123,9 +2188,11 @@ void
 world_vis_rgn_add(float vis_dist, WorldElem* elem)
 {
     float m[3] = {
-        gWorld->bound_x / WORLD_VIS_REGIONS_X,
-        gWorld->bound_y / WORLD_VIS_REGIONS_Y,
-        gWorld->bound_z / WORLD_VIS_REGIONS_Z
+        gWorld->bound_x / gWorld->vis_regions_x,
+        
+        gWorld->bound_y / gWorld->vis_regions_y,
+        
+        gWorld->bound_z / gWorld->vis_regions_z
     };
     
     if(elem->visible_list_by_region_sorted)
@@ -2133,11 +2200,11 @@ world_vis_rgn_add(float vis_dist, WorldElem* elem)
         return;
     }
     
-    for(int x = 0; x < WORLD_VIS_REGIONS_X; x++)
+    for(int x = 0; x < gWorld->vis_regions_x; x++)
     {
-        for(int y = 0; y < WORLD_VIS_REGIONS_Y; y++)
+        for(int y = 0; y < gWorld->vis_regions_y; y++)
         {
-            for(int z = 0; z < WORLD_VIS_REGIONS_Z; z++)
+            for(int z = 0; z < gWorld->vis_regions_z; z++)
             {
                 float p[3] = {
                     m[0] * x + (m[0] / 2),
@@ -2150,8 +2217,12 @@ world_vis_rgn_add(float vis_dist, WorldElem* elem)
                 
                 if(fabs(d) <= vis_dist)
                 {
-                    world_elem_list_add_fast(elem, &gWorld->elements_visible_by_region[x][y][z],
+                    WorldElemListNode* pHead = world_vis_region_head(x, y, z);
+                    if(world_elem_list_find_elem(elem, pHead)) {
+                    }else {
+                    world_elem_list_add_fast(elem, pHead,
                                              LIST_TYPE_REGION_VIS);
+                    }
                 }
             }
         }

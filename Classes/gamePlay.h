@@ -99,6 +99,7 @@ const static char *game_variables_name[] = {
     "ENEMY1_PATROLS_NO_TARGET",
     "ENEMY1_RUN_INTERVAL_MS",
     "ENEMY1_LEAVES_TRAIL",
+    "ENEMY1_SCAN_DISTANCE_MAX",
     NULL
 };
 
@@ -106,7 +107,7 @@ static char *game_log_messages[] = {
     "^D: firewalled :-)",
     "detected: virus",
     "detected: bounty hunter",
-    "^D: deleted :-(",
+    "virus deleted ^D :-(",
     "detected: ally AI",
     "warning: virus capturing ^D",
     "killed: virus",
@@ -154,7 +155,8 @@ const static float game_variables_default[] = {
     1,           // PATROLS
     50,          // RUN_INTERVAL_MS
     1,           // LEAVES TRAIL
-    0,0,0,
+    50.0,
+    0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0            // END
 };
@@ -204,7 +206,7 @@ struct
     
     int powerup_lifetime_frames;
     
-    int enemy1_ignore_player;
+    int enemy1_ignore_player_pct;
     
     int points;
     struct
@@ -344,7 +346,7 @@ game_elem_setup_ship(WorldElem* elem, int skill)
     elem->stuff.u.enemy.time_run_interval = GAME_VARIABLE("ENEMY1_RUN_INTERVAL_MS")
     //MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
     ;
-    elem->stuff.u.enemy.scan_distance = GAME_VARIABLE("ENEMY1_FORGET_DISTANCE")
+    elem->stuff.u.enemy.scan_distance = /*GAME_VARIABLE("ENEMY1_FORGET_DISTANCE")*/ 1.0
     //50 + (10 * skill);
     ;
     elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE")

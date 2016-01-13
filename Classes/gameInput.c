@@ -469,6 +469,18 @@ gameInput()
         float cs = (speed - minSpeed) / (maxSpeed*2);
         float speedC = 1.0 - (cs*cs*0.9);
         
+        if(gameSettingsSimpleControls)
+        {
+            // simplified controls (roll buttons)? on-screen controls?
+            gameInterfaceSetInterfaceState(INTERFACE_STATE_ONSCREEN_INPUT_CONTROL);
+            if(!gameInterfaceControls.altControl.touched)
+            {
+                roll_m = deviceRoll;
+                input_roll = 0.0;
+                fcr += 0;
+            }
+        }
+        
         if(fabs(input_roll) > dz_roll*dz_m[0] /*&& touchThrottle*/)
         {
             //printf("-----------ROLLING-----------\n");

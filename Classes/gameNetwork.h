@@ -134,6 +134,7 @@ struct gameNetworkPlayerInfo
     game_timeval_t network_latency;
     game_timeval_t time_status_last;
     game_timeval_t time_cube_pooped_last;
+    game_timeval_t euler_last_interp;
     
     struct
     {
@@ -145,6 +146,7 @@ struct gameNetworkPlayerInfo
     } stats;
     
     float loc_last[3][3];
+    float euler_last[3][3];
     float vel_predict_delta;
     
     int shot_fired;

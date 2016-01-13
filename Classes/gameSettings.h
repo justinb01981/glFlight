@@ -31,7 +31,7 @@ typedef struct
 } glFlightPrefs;
 
 // TODO:bump this every time settings change
-const static int settings_version = 31;
+const static int settings_version = 33;
 
 // HACK: externs built in .m files
 extern double dz_roll, dz_pitch, dz_yaw;
@@ -47,6 +47,7 @@ extern char gameSettingsDirectoryServerName[255];
 extern int gameSettingsNetworkFrequency;
 extern int gameSettingsPortNumber;
 extern char gameSettingsLocalIPOverride[255];
+extern int gameSettingsSimpleControls;
 
 static void
 gameSettingsStatsReset()
@@ -88,6 +89,7 @@ gameSettingsDefaults()
     gameSettingsNetworkFrequency = 50;
     gameSettingsPortNumber = 52000;
     gameStateSinglePlayer.lifetime_credits = 0;
+    gameSettingsSimpleControls = 0;
 }
 
 static void
@@ -122,6 +124,7 @@ gameSettingsWrite(const char *filename)
         fprintf(fp, "%d\n", gameSettingsNetworkFrequency);
         fprintf(fp, "%d\n", gameSettingsPortNumber);
         fprintf(fp, "%lu\n", gameStateSinglePlayer.lifetime_credits);
+        fprintf(fp, "%d\n", gameSettingsSimpleControls);
         
         fclose(fp);
     }
@@ -139,6 +142,18 @@ gameSettingsRead(const char *filename)
         // append at END
         if(fscanf(fp, "%d", &settings_ver) < 1) break;
         
+        if(settings_version == 32 && settings_ver == 31)
+        {
+            // migrate from 31->32
+            gameSettingsRatingGiven = 0;
+            gameSettingsLaunchCount = 0;
+            
+        }
+        else if(settings_version == 33 && settings_ver == 32)
+        {
+            gameSettingsSimpleControls = 0;
+        }
+        else
         // settings are from old binary, force defaults
         if(settings_ver != settings_version) break;
         
@@ -170,6 +185,7 @@ gameSettingsRead(const char *filename)
         if(fscanf(fp, "%d", &gameSettingsNetworkFrequency) < 1) break;
         if(fscanf(fp, "%d", &gameSettingsPortNumber) < 1) break;
         if(fscanf(fp, "%lu", &gameStateSinglePlayer.lifetime_credits) < 1) break;
+        if(fscanf(fp, "%d", &gameSettingsSimpleControls) < 1) break;
         
         fclose(fp);
         

@@ -56,6 +56,7 @@ extern int numEnemies;
 extern float block_scale;
 extern int radar_mode;
 extern int save_map;
+extern int controls_simple;
 
 #if GAME_PLATFORM_ANDROID
 #define GAME_PLATFORM_IS_LANDSCAPE 0
@@ -71,10 +72,10 @@ extern int save_map;
 
 #define GYRO_SAMPLE_RATE (30)
 
-#define MAX_SPEED /*(15)*/ (10)
+#define MAX_SPEED /*(15)*/ (15)
 #define MAX_SPEED_PLAYER_SCALE (2.0)
 
-const static char* GAME_VERSION_STR = "0.9.15.1 core";
+const static char* GAME_VERSION_STR = "0.9.16.5 core";
 
 const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2.5);
 const static float SPEED_BOOST_FRAMES = 60 * 5;

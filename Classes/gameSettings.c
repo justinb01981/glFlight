@@ -21,3 +21,4 @@ char gameSettingsDirectoryServerName[255];
 char gameSettingsLocalIPOverride[255];
 int gameSettingsNetworkFrequency;
 int gameSettingsPortNumber;
+int gameSettingsSimpleControls;

@@ -55,6 +55,8 @@ typedef struct {
     
     controlRect dialogRectDefault;
     
+    controlRect altControl;
+    
     unsigned long dialogLifeFrames;
     
     int menuAction;
@@ -126,7 +128,8 @@ typedef enum
     INTERFACE_STATE_BOOST_AVAIL_NO,
     INTERFACE_STATE_TOWING,
     INTERFACE_STATE_TOWING_NONE,
-    INTERFACE_STATE_TRIM_BLINKING
+    INTERFACE_STATE_TRIM_BLINKING,
+    INTERFACE_STATE_ONSCREEN_INPUT_CONTROL
 } InterfaceMiscState;
 
 void

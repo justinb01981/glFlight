@@ -436,12 +436,8 @@ glFlightFrameStage1()
         {
             WorldElemListNode* pVisCheckWorldHead = &gWorld->elements_list;
             
-            float visRgn[3];
-            
-            VIS_REGION_FOR_COORD(visRgn, gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
-            
-            WorldElemListNode* pVisRegionHead =
-                &(gWorld->elements_visible_by_region[(int)visRgn[0]][(int)visRgn[1]][(int)visRgn[2]]);
+
+            WorldElemListNode* pVisRegionHead = world_vis_region_head(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
             
             if(VIS_COORD_VALID(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ()) && pVisRegionHead->next) {
                 pVisCheckWorldHead = pVisRegionHead;
@@ -585,16 +581,13 @@ glFlightFrameStage1()
     
     // draw bounding lines
     drawLineBegin();
-    
     float lineBounds = 5;
-    
     if(my_ship_x <= lineBounds || my_ship_x >= gWorld->bound_x-lineBounds ||
        my_ship_y <= lineBounds || my_ship_y >= gWorld->bound_y-lineBounds ||
        my_ship_z <= lineBounds || my_ship_z >= gWorld->bound_z-lineBounds)
     {
         drawBoundingLineGrid();
     }
-    
     drawLineEnd();
     
     // actual drawing (happens asynchronouly)
@@ -644,6 +637,7 @@ glFlightFrameStage1()
         strcpy(gameInterfaceControls.statsTextRect.text, statsMessage);
     }
     
+    drawLineBegin();
     if(pWorldElemMyShip && pWorldElemMyShip->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID)
     {
         WorldElemListNode *pNodeTowed = world_elem_list_find(pWorldElemMyShip->stuff.towed_elem_id,
@@ -658,11 +652,63 @@ glFlightFrameStage1()
                 pNodeTowed->elem->physics.ptr->z
             };
             float lineColor[] = {1.0, 0.5, 0.0};
-            drawLineBegin();
             drawLineWithColorAndWidth(lineA, lineB, lineColor, 2.0);
-            drawLineEnd();
         }
     }
+    /*
+    int al = 0;
+    for(al = 0; al < gWorld->num_world_arrows; al++)
+    {
+        if(gWorld->world_arrows[al].x != 0 ||
+           gWorld->world_arrows[al].y != 0 ||
+           gWorld->world_arrows[al].z != 0)
+        {
+            float j[3] = {
+                my_ship_x,
+                my_ship_y + 3,
+                my_ship_z
+            };
+            float k1[3] = {
+                gWorld->world_arrows[al].x,
+                gWorld->world_arrows[al].y,
+                gWorld->world_arrows[al].z
+            };
+            float k[3];
+            int ki;
+            for(ki = 0; ki < 3; ki++) k[ki] = j[ki] + (0.01 * (k1[ki]));
+            drawLine(j, k);
+        }
+    }
+     */
+    /*
+    float a[] = {0, 0, 0};
+    for(int i = 0; i < 3; i++)
+    {
+        a[i] = 1;
+        float j[3] = {
+            my_ship_x,
+            my_ship_y,
+            my_ship_z
+        };
+        float d = 1.5;
+        float k1[3] = {
+            j[0] + d*a[0],
+            j[1] + d*a[1],
+            j[2] + d*a[2]
+        };
+        float k2[3] = {
+            j[0] + -d*a[0],
+            j[1] + -d*a[1],
+            j[2] + -d*a[2]
+        };
+        drawLine(j, k1);
+        float color[] = {0xff, 0x00, 0x00};
+        drawLineWithColorAndWidth(j, k2, color, 1);
+        a[i] = 0;
+    }
+     */
+    
+    drawLineEnd();
     
     drawRadar();
     drawControls();

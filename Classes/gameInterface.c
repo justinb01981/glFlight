@@ -24,6 +24,7 @@
 #include "glFlight.h"
 #include "gameDebug.h"
 #include "gameSettings.h"
+#include "gameDialogs.h"
 
 int texture_id_block = TEXTURE_ID_BLOCK;
 
@@ -188,6 +189,10 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.statsTextRect.visible = 1;
     gameInterfaceControls.statsTextRect.tex_id = -1;
     
+    gameInterfaceControls.altControl = gameInterfaceControls.fireRectBoost;
+    gameInterfaceControls.altControl.tex_id = TEXTURE_ID_CONTROLS_ROLL;
+    gameInterfaceControls.altControl.visible = 0;
+    
     i = 0;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.mainMenu;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.accelerator;
@@ -209,6 +214,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.consoleTextRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.statsTextRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.textEditControl;
+    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.altControl;
     gameInterfaceControls.controlArray[i++] = NULL;
     
     i = 0;
@@ -278,6 +284,18 @@ gameInterfaceFindControl(float x, float y)
 void
 gameInterfaceHandleTouchMove(float x, float y)
 {
+    static float x_last = -1;
+    static float y_last = -1;
+    const float move_thresh = 3;
+    
+    if(fabs(x-x_last) < move_thresh &&
+       fabs(y-y_last) < move_thresh)
+    {
+        return;
+    }
+    x_last = x;
+    y_last = y;
+    
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
     if(touchedControl)
     {
@@ -525,6 +543,13 @@ gameInterfaceHandleTouchBegin(float x, float y)
                     {
                         int model_new = MODEL_SHIP1;
                         
+                        if(!gameSettingsRatingGiven)
+                        {
+                            gameDialogRating();
+                            break;
+                        }
+                            
+                        
                         switch(model_my_ship)
                         {
                             case MODEL_SHIP1:
@@ -540,6 +565,10 @@ gameInterfaceHandleTouchBegin(float x, float y)
                         model_my_ship = model_new;
                         console_write("model %d (on next respawn)", model_my_ship);
                     }
+                        break;
+                        
+                    case ACTION_SETTING_CONTROL_TYPE:
+                        gameSettingsSimpleControls = !gameSettingsSimpleControls;
                         break;
                         
                     case ACTION_SETTING_LOCK_CAMERA:
@@ -718,6 +747,8 @@ gameInterfaceHandleTouchEnd(float x, float y)
         needTrim = 0;
     }
     
+    gameInterfaceControls.touchUnmappedX = gameInterfaceControls.touchUnmappedY = -1;
+    
     gameInterfaceControls.touchCount--;
 }
 
@@ -730,6 +761,8 @@ gameInterfaceHandleAllTouchEnd()
     {
         controlSet[i]->touched = 0;
     }
+    
+    gameInterfaceControls.touchUnmappedX = gameInterfaceControls.touchUnmappedY = -1;
 }
 
 void
@@ -784,6 +817,11 @@ gameInterfaceSetInterfaceState(InterfaceMiscState state)
             
         case INTERFACE_STATE_TRIM_BLINKING:
             gameInterfaceControls.trim.blinking = 1;
+            break;
+            
+        case INTERFACE_STATE_ONSCREEN_INPUT_CONTROL:
+            gameInterfaceControls.altControl.visible = 1;
+            gameInterfaceControls.fireRectBoost.visible = 0;
             break;
             
         default:

@@ -144,9 +144,11 @@ do_world_collision_handling(float tc)
             {
             // JB: this should now be handled in world_update()
             case COLLISION_ACTION_REPULSE:
+                /*
                 game_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
                 gameNetwork_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
                 game_ai_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
+                */
                 break;
     
             case COLLISION_ACTION_NONE:
