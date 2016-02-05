@@ -25,7 +25,7 @@
 #include "gameNetwork.h"
 
 #define BACKGROUND_MODEL model_cube
-#define BACKGROUND_MODEL_TEXCOORDS model_cube_texcoords_alt
+#define BACKGROUND_MODEL_TEXCOORDS /*model_cube_texcoords_alt*/ model_cube_texcoords
 #define BACKGROUND_MODEL_INDICES model_cube_indices
 
 extern int isLandscape;
@@ -442,6 +442,11 @@ int drawRadar()
             {
                 tex_id = TEXTURE_ID_RADAR_OBJECTIVE;
                 if(!minimal_overlay) tex_icon = zdot >= 0? cur->elem->texture_id: TEXTURE_ID_RADAR_BEHIND;
+                
+                if(cur->elem->object_type == OBJ_SPAWNPOINT)
+                {
+                    tex_id = TEXTURE_ID_OBJECTIVE_FIREWALL;
+                }
                 
                 scale = 4;
             }

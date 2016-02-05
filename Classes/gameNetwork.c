@@ -2560,6 +2560,8 @@ gameNetwork_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_a
     gameNetworkPlayerInfo *pInfo = NULL;
     WorldElem* pElemMyShip = NULL, *pElemC = NULL;
     
+    if(!elemB) return;
+    
     if(elemA->elem_id == my_ship_id)
     {
         pElemMyShip = elemA;

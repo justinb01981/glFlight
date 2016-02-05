@@ -336,6 +336,10 @@ game_add_powerup(float x, float y, float z, int type, int lifetime)
             tex_id = TEXTURE_ID_POWERUP_MISSLE;
             break;
             
+        case GAME_SUBTYPE_POINTS:
+            tex_id = TEXTURE_ID_POWERUP_POINTS;
+            break;
+            
         default:
             tex_id = TEXTURE_ID_CAPTUREPOINT;
             radar_visible = 1;
@@ -616,7 +620,7 @@ game_init_objects()
         switch(pCur->elem->object_type)
         {
             case OBJ_SPAWNPOINT_ENEMY:
-                pCur->elem->stuff.u.spawnpoint.time_spawn_interval = (1000 * 1) / gameStateSinglePlayer.difficulty;
+                pCur->elem->stuff.u.spawnpoint.time_spawn_interval = (1000 * gameStateSinglePlayer.enemy_spawnpoint_interval) / gameStateSinglePlayer.difficulty;
                 pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000 * 2;
                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence = 3 + gameStateSinglePlayer.difficulty;
                 break;
@@ -644,6 +648,8 @@ game_start(float difficulty, int type)
 {
     char dialogStr[255];
     
+    int game_ai_debug = 1;
+    
     console_log_clear(0, 1);
     
     if(difficulty <= 1)
@@ -658,8 +664,9 @@ game_start(float difficulty, int type)
     {
         gameStateSinglePlayer.last_game.difficulty = difficulty;
         gameStateSinglePlayer.last_game.score = gameStateSinglePlayer.stats.score;
-        score_newlevel();
     }
+    
+    score_newlevel();
     
     game_setup_needed = 1;
     
@@ -678,7 +685,7 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.spawn_powerup_lifetime = 0;
     gameStateSinglePlayer.spawn_powerup_m = 0;
     gameStateSinglePlayer.enemy_durability = DURABILITY_ENEMY_DEATHMATCH;
-    gameStateSinglePlayer.max_enemies = 3 + difficulty;
+    gameStateSinglePlayer.max_enemies = 0;
     gameStateSinglePlayer.max_enemies_spawned = 99999;
     gameStateSinglePlayer.n_turrets = 0;
     gameStateSinglePlayer.n_asteroids = 30;
@@ -698,6 +705,7 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.player_drops_powerup = 0;
     gameStateSinglePlayer.enemy1_ignore_player_pct = 0;
     gameStateSinglePlayer.score_pop_threshold = 10;
+    gameStateSinglePlayer.enemy_spawnpoint_interval = 1;
     
     collision_actions_set_default();
     
@@ -750,7 +758,7 @@ game_start(float difficulty, int type)
         
         game_reset();
         
-        //gameStateSinglePlayer.n_caps = 2 + gameStateSinglePlayer.difficulty;
+        gameStateSinglePlayer.max_enemies = 1 + difficulty;
         gameStateSinglePlayer.enemy_durability = 1 + (gameStateSinglePlayer.difficulty/2);
         gameStateSinglePlayer.n_turrets = gameStateSinglePlayer.difficulty * 1;
         gameStateSinglePlayer.n_collect_points = 1 + 2*gameStateSinglePlayer.difficulty;
@@ -762,11 +770,12 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.turret_destruction_change_alliance = 0;
         gameStateSinglePlayer.max_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
+        gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
         
-        gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/5;
-        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/5;
+        gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/10;
+        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/10;
         
-        gameStateSinglePlayer.enemy1_ignore_player_pct = 50;
+        gameStateSinglePlayer.enemy1_ignore_player_pct = 10;
         
         // different map for "collection" game type
         gameMapSetMap(initial_map_collection);
@@ -787,7 +796,7 @@ game_start(float difficulty, int type)
         
         game_reset();
         
-        //gameStateSinglePlayer.n_caps = 2 + gameStateSinglePlayer.difficulty;
+        gameStateSinglePlayer.max_enemies = 3 + difficulty;
         gameStateSinglePlayer.n_turrets = gameStateSinglePlayer.difficulty * 4;
         gameStateSinglePlayer.n_collect_points = 0;
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
@@ -817,7 +826,7 @@ game_start(float difficulty, int type)
         
         game_reset();
         
-        //gameStateSinglePlayer.n_caps = 2 + gameStateSinglePlayer.difficulty;
+        gameStateSinglePlayer.max_enemies = 3 + difficulty;
         gameStateSinglePlayer.n_turrets = gameStateSinglePlayer.difficulty * 4;
         gameStateSinglePlayer.n_collect_points = 0;
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
@@ -835,6 +844,38 @@ game_start(float difficulty, int type)
         
         // different map for "collection" game typ
         //gameMapSetMapData(initial_map_survival);
+    }
+    else if(gameStateSinglePlayer.game_type == GAME_TYPE_TURRET)
+    {
+        strcpy(gameStateSinglePlayer.game_help_message, "defend your base!");
+        
+        game_reset();
+        
+        gameStateSinglePlayer.max_enemies = 3 + difficulty;
+        gameStateSinglePlayer.n_turrets = 0;
+        gameStateSinglePlayer.n_collect_points = 0;
+        gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
+        gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
+        gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
+        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
+        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_ALLY;
+        gameStateSinglePlayer.ship_destruction_change_alliance = 0;
+        gameStateSinglePlayer.turret_destruction_change_alliance = 1;
+        gameStateSinglePlayer.enemy_durability = 3;
+        
+        gameStateSinglePlayer.rate_enemy_skill_increase = 1/10;
+        
+        gameStateSinglePlayer.invuln_time_after_hit = 3;
+        
+        gameStateSinglePlayer.enemy1_ignore_player_pct = 100;
+        
+        gameMapSetMap(initial_map_turret);
+    }
+    
+    if(GAME_AI_DEBUG)
+    {
+        gameStateSinglePlayer.n_turrets = 0;
+        gameStateSinglePlayer.max_enemies = 1;
     }
     
     gameAIState.started = 1;
@@ -1013,10 +1054,10 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
             {
                 int models_list[] = {MODEL_SHIP1, MODEL_SHIP2, MODEL_SHIP3};
                 int mi = rand_in_range(0, 2);
-                if(elemB == myShipListNode->elem)
+                if(elemA == myShipListNode->elem)
                 {
                     model_my_ship = models_list[mi];
-                    world_remove_object(elemB->elem_id);
+                    world_remove_object(elemA->elem_id);
                     my_ship_changed = 1;
                 }
             }
@@ -1194,14 +1235,29 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                     world_object_set_lifetime(obj_id, 60);
                     
                     console_write(game_log_messages[GAME_LOG_FILESAVED]);
-                    
+                    /*
+                    if(gameStateSinglePlayer.collects_found == 1)
                     {
-                        // replace
-                        game_add_powerup(rand_in_range(1, gWorld->bound_x),
-                                         rand_in_range(1, gWorld->bound_y),
-                                         rand_in_range(1, gWorld->bound_z),
-                                         GAME_SUBTYPE_COLLECT, 0);
+                        int added = 0;
+                        
+                        console_write(game_log_messages[GAME_LOG_NEWDATA]);
+                        
+                        while(added < gameStateSinglePlayer.n_collect_points)
+                        {
+                            // replace
+                            game_add_powerup(rand_in_range(1, gWorld->bound_x),
+                                             rand_in_range(1, gWorld->bound_y),
+                                             rand_in_range(1, gWorld->bound_z),
+                                             GAME_SUBTYPE_COLLECT, 0);
+                            added++;
+                        }
                     }
+                     */
+                    
+                    game_add_powerup(rand_in_range(0, gWorld->bound_x),
+                                     rand_in_range(0, gWorld->bound_y),
+                                     rand_in_range(0, gWorld->bound_z),
+                                     GAME_SUBTYPE_COLLECT, 0);
                 }
             }
             break;
@@ -1537,6 +1593,14 @@ game_run()
                 }
             }
             
+            if(pCur->elem->elem_id == my_ship_id)
+            {
+                if(gameStateSinglePlayer.game_type == GAME_TYPE_TURRET)
+                {
+                    world_move_elem(pCur->elem, gWorld->bound_x/2, gWorld->bound_y/2, gWorld->bound_z/2, 0);
+                }
+            }
+            
             pCur = pCur->next;
         }
         
@@ -1547,7 +1611,7 @@ game_run()
             
             game_target_objective_id = gameStateSinglePlayer.elem_id_spawnpoint;
             
-            if(strncmp(gameNetworkState.hostInfo.name, "god", 3) == 0) pMyShipNode->elem->durability = 9999;
+            if(strncmp(gameSettingsPlayerName, "god", 3) == 0) pMyShipNode->elem->durability = 9999;
          
             if(gameStateSinglePlayer.started)
             {
@@ -1728,6 +1792,15 @@ game_run()
                         game_add_turret(loc_powerup[0], loc_powerup[1], loc_powerup[2]);
                     }
                 }
+                
+                if(gameStateSinglePlayer.game_type == GAME_TYPE_TURRET)
+                {
+                    if(collects_found <= 0)
+                    {
+                        game_over();
+                        gameStateSinglePlayer.started = 0;
+                    }
+                }
             }
             
             if(invuln_count > 0)
@@ -1755,16 +1828,13 @@ game_run()
                 }
             }
             
-            if(gameStateSinglePlayer.rate_collect_increase > 0)
-            {
-                gameStateSinglePlayer.enemy_intelligence *= 1 + gameStateSinglePlayer.rate_enemy_skill_increase;
-                gameStateSinglePlayer.max_enemies *= 1 + gameStateSinglePlayer.rate_enemy_count_increase;
-                
-                gameStateSinglePlayer.stats.score += gameStateSinglePlayer.rate_point_increase;
-                
-                caps_found_last = caps_found;
-                gameStateSinglePlayer.caps_found = caps_found;
-            }
+            gameStateSinglePlayer.enemy_intelligence += gameStateSinglePlayer.rate_enemy_skill_increase;
+            gameStateSinglePlayer.max_enemies += gameStateSinglePlayer.rate_enemy_count_increase;
+            
+            gameStateSinglePlayer.stats.score += gameStateSinglePlayer.rate_point_increase;
+            
+            caps_found_last = caps_found;
+            gameStateSinglePlayer.caps_found = caps_found;
             
             gameShip_getZVector(v);
             
@@ -1852,7 +1922,7 @@ game_run()
             char *mapBuffer = NULL;
             
             /* single-player games disconnect from network */
-            if((gameInterfaceControls.menuAction >= ACTION_START_DEFEND_GAME &&
+            if((gameInterfaceControls.menuAction >= ACTION_START_TURRET_GAME &&
                 gameInterfaceControls.menuAction <= ACTION_START_SURVIVAL_GAME) ||
                gameInterfaceControls.menuAction == ACTION_MAP_EDIT)
             {
@@ -2015,6 +2085,15 @@ game_run()
                     save_map = 0;
                     break;
                     
+                case ACTION_START_TURRET_GAME:
+                    gameInterfaceControls.mainMenu.visible = 0;
+                    sprintf(alertmsg, "turret started!\n");
+                    gameStateSinglePlayer.started = 1;
+                    game_start(1, GAME_TYPE_TURRET);
+                    gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
+                    save_map = 0;
+                    break;
+                    
                 case ACTION_NETWORK_MULTIPLAYER_MENU:
                     action_sub_next();
                     break;
@@ -2155,6 +2234,8 @@ game_add_bullet(float pos[3], float euler[3], float vel, float leadV, int bullet
         world_get_last_object()->stuff.affiliation = affiliation;
         world_get_last_object()->stuff.bullet.action = bulletAction;
         world_get_last_object()->durability = DURABILITY_BULLET;
+        
+        world_get_last_object()->physics.ptr->gravity = gameStateSinglePlayer.game_type == GAME_TYPE_TURRET;
         
         if(missle_target >= 0)
         {
@@ -2334,7 +2415,9 @@ firePoopedCube(WorldElem *elem)
     elem->stuff.line_id_last = obj;
     world_object_set_lifetime(obj, pooped_cube_lifetime);
     
+    /*
     update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);
+    */
     
     return obj;
 }

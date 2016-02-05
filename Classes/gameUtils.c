@@ -237,6 +237,26 @@ element_dist_compare(WorldElem* pElemA, WorldElem* pElemB)
     return 0;
 }
 
+void
+get_time_ms_init()
+{
+    struct timeval tv;
+    static struct timeval tv_start = {0};
+     
+    // Warning: unsigned long cannot contain this value
+    gettimeofday(&tv, NULL);
+     
+    if(tv_start.tv_sec == 0)
+    {
+        tv_start = tv;
+    }
+     
+    game_timeval_t tvs = tv.tv_sec - tv_start.tv_sec;
+    game_timeval_t tvus = tv.tv_usec / 1000;
+     
+    time_ms = tvs * 1000 + tvus;
+}
+
 game_timeval_t
 get_time_ms()
 {
@@ -264,7 +284,7 @@ get_time_ms()
 void
 update_time_ms_frame_tick()
 {
-    time_ms += 1000 / GAME_TICK_RATE;
+    time_ms += (1000 / GAME_TICK_RATE);
 }
 
 unsigned long

@@ -667,12 +667,6 @@ gameInterfaceHandleTouchBegin(float x, float y)
                         console_write("Bot skill:%d\n", gameStateSinglePlayer.setting_bot_intelligence);
                         break;
                         
-                    case ACTION_SETTING_DIFFICULTY:
-                        gameStateSinglePlayer.difficulty++;
-                        if(gameStateSinglePlayer.difficulty > 20) gameStateSinglePlayer.difficulty = 0;
-                        console_write("Difficulty:%d\n", gameStateSinglePlayer.difficulty);
-                        break;
-                        
                     case ACTION_SETTING_AUDIO:
                         gameAudioMuted = !gameAudioMuted;
                         console_write("Audio muted:%d\n", gameAudioMuted);

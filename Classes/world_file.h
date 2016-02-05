@@ -32,17 +32,20 @@ typedef enum
     MAP_ADD_TELEPORTER,
     MAP_REGISTER_PARAMS,
     MAP_REGISTER_UPDATE_PARAMS,
+    MAP_REGISTER_CLEAR_PARAMS,
     MAP_REGISTER_UPDATE_MUL_PARAMS,
     MAP_DEFINE_PLANE,
     MAP_SET_BG_INFO,
     MAP_ADD_VECTOR,
-    MAP_SET_OBJECT_VELOCITY
+    MAP_SET_OBJECT_VELOCITY,
+    MAP_IDENT_OBJECT
 } world_map_command_type;
 
 typedef struct
 {
     world_map_command_type type;
     float params[WORLD_MAP_COMMAND_PARAMS_MAX];
+    char cparams[255];
     int n_params;
 } world_map_command;
 

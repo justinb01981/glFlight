@@ -75,7 +75,9 @@ extern int controls_simple;
 #define MAX_SPEED /*(15)*/ (15)
 #define MAX_SPEED_PLAYER_SCALE (2.0)
 
-const static char* GAME_VERSION_STR = "0.9.16.5 core";
+#define GAME_AI_DEBUG 0
+
+const static char* GAME_VERSION_STR = "0.9.17.0 core";
 
 const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2.5);
 const static float SPEED_BOOST_FRAMES = 60 * 5;

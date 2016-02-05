@@ -16,8 +16,14 @@ enum
     ENEMY_STATE_PURSUE = 0,
     ENEMY_STATE_RUN = 1,
     ENEMY_STATE_PATROL = 2,
-    ENEMY_STATE_GOHOME = 3,
+    //ENEMY_STATE_GOHOME = 3,
     ENEMY_STATE_JUKE = 4
+};
+
+enum
+{
+    ENEMY_COLLIDE_OBJECT = 1,
+    ENEMY_COLLIDE_BOUNDARY = 2
 };
 
 typedef struct

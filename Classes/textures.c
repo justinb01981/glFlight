@@ -54,7 +54,7 @@ convert_to_le_u32(u_int32_t v)
 static int
 read_bitmap_to_gltexture_with_replace(char* file_name, char replace_rgb_pixel_from[3], char replace_rgb_pixel_to[3])
 {
-    const int max_bitmap_dim = 2048;
+    const int max_bitmap_dim = 4096;
     const int pixel_size = sizeof(char[4]);
     
     FILE* fp = NULL;

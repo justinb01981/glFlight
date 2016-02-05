@@ -44,8 +44,8 @@ void world_update(float tc);
 world_t *gWorld = NULL;
 game_lock_t gWorldLock;
 
-float C_THRUST = /*0.05*/ 0.035; // higher values = more speed
-float C_FRICTION = /*0.04*/ 0.03; // higher values = more friction
+float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
+float C_FRICTION = /*0.04*/ 0.05; // higher values = more friction
 float GYRO_FEEDBACK = GYRO_FEEDBACK_DEFAULT;
 float GYRO_DC = GYRO_DC_DEFAULT;
 float visible_distance = 100;
@@ -901,11 +901,13 @@ world_vis_region_head(float x, float y, float z)
 void world_init(float size_x, float size_y, float size_z)
 {			
     int use_test_level = 0;
+    float ws = 25;
     
 	gWorld = malloc(sizeof(world_t));
 	memset(gWorld, 0, sizeof(world_t));
     
-    float ws = 25;
+    assert(size_x >= ws && size_y >= ws && size_z >= ws);
+    
     gWorld->bound_x = size_x;
     gWorld->bound_y = size_y;
     gWorld->bound_z = size_z;
@@ -914,20 +916,24 @@ void world_init(float size_x, float size_y, float size_z)
     gWorld->regions_y = gWorld->bound_y / ws;
     gWorld->regions_z = gWorld->bound_z / ws;
     
-    int k = (size_x/ws) * (size_y/ws) * (size_z/ws);
-    float alloc_size = sizeof(WorldElemListNode) * k;
+    float alloc_size = sizeof(WorldElemListNode) * (size_x/ws) * (size_y/ws) * (size_z/ws);
     gWorld->elements_by_region = (WorldElemListNode*) malloc(alloc_size);
-    for(int i = 0; i < k; i++) memset(gWorld->elements_by_region+i, 0, sizeof(WorldElemListNode));
+    for(int i = 0; i < ((size_x/ws) * (size_y/ws) * (size_z/ws)); i++)
+    {
+        memset(gWorld->elements_by_region+i, 0, sizeof(WorldElemListNode));
+    }
     
     float vws = visible_distance;
-    gWorld->vis_regions_x = (size_x/vws);
-    gWorld->vis_regions_y = (size_y/vws);
-    gWorld->vis_regions_z = (size_z/vws);
-    k = (size_x/vws) * (size_y/vws) * (size_z/vws);
-    alloc_size = sizeof(WorldElemListNode) * k;
+    gWorld->vis_regions_x = MAX((size_x/vws), 1);
+    gWorld->vis_regions_y = MAX((size_y/vws), 1);
+    gWorld->vis_regions_z = MAX((size_z/vws), 1);
+    alloc_size = sizeof(WorldElemListNode) * gWorld->vis_regions_x * gWorld->vis_regions_y * gWorld->vis_regions_z;
     gWorld->elements_by_region_vis = (WorldElemListNode*) malloc(alloc_size);
-    for(int i = 0; i < k; i++) memset(gWorld->elements_by_region_vis+i, 0, sizeof(WorldElemListNode));
-        
+    for(int i = 0; i < (gWorld->vis_regions_x * gWorld->vis_regions_y * gWorld->vis_regions_z); i++)
+    {
+        memset(gWorld->elements_by_region_vis+i, 0, sizeof(WorldElemListNode));
+    }
+    
     if(size_x == -1 && size_y == -1 && size_z == -1)
     {
         use_test_level = 1;
@@ -1597,6 +1603,7 @@ world_update(float tc)
             {
                 int out_of_bounds_remove = 0;
                 int my_ship_oob = 0;
+                int object_oob = 0;
                 
                 if(pCur->elem->physics.ptr->gravity)
                 {
@@ -1657,6 +1664,8 @@ world_update(float tc)
                                 {
                                     my_ship_oob = 1;
                                 }
+                                
+                                object_oob = 1;
                             }
                             else
                             {
@@ -1664,6 +1673,7 @@ world_update(float tc)
                             }
                             
                             g *= 1.2;
+                        
                         }
                         
                         add_element_to_region(pCur->elem);
@@ -1675,6 +1685,13 @@ world_update(float tc)
                                                          pCur->elem->physics.ptr->x,
                                                          pCur->elem->physics.ptr->y,
                                                          pCur->elem->physics.ptr->z);
+                        }
+                        
+                        if(object_oob)
+                        {
+                            game_handle_collision(pCur->elem, NULL, COLLISION_ACTION_REPULSE);
+                            gameNetwork_handle_collision(pCur->elem, NULL, COLLISION_ACTION_REPULSE);
+                            game_ai_collision(pCur->elem, NULL, COLLISION_ACTION_REPULSE);
                         }
                     }
                     else

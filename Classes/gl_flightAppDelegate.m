@@ -92,7 +92,8 @@ void glFlightInit(gl_flightViewController* viewController)
     glFlightPrefs prefs;
     
     NSString *docsPrefix = get_docs_prefix();
-    get_time_ms();
+    
+    get_time_ms_init();
     
     rand_seed(time_ms);
     

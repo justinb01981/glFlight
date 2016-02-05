@@ -63,6 +63,8 @@
 		6DF655D415D1EA100015D5DF /* texture5.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DF655D315D1EA100015D5DF /* texture5.bmp */; };
 		6DF655DD15E6CFF70015D5DF /* gameCamera.c in Sources */ = {isa = PBXBuildFile; fileRef = 6DF655DC15E6CFF70015D5DF /* gameCamera.c */; };
 		6DF655E415EAB3EE0015D5DF /* texture8.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DF655E315EAB3EE0015D5DF /* texture8.bmp */; };
+		D0017FC51C62B524003F0368 /* texture95.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0017FC41C62B524003F0368 /* texture95.bmp */; };
+		D0017FC71C62B9D4003F0368 /* texture96.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0017FC61C62B9D4003F0368 /* texture96.bmp */; };
 		D00D78CA19FB18EC00E701B9 /* flyby.wav in Resources */ = {isa = PBXBuildFile; fileRef = D00D78C919FB18EC00E701B9 /* flyby.wav */; };
 		D00D78CC1A02BF8B00E701B9 /* texture76.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D00D78CB1A02BF8B00E701B9 /* texture76.bmp */; };
 		D00D78D11A09525100E701B9 /* texture77.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D00D78CD1A09525100E701B9 /* texture77.bmp */; };
@@ -173,6 +175,7 @@
 		D0EECB301757D69300B5B815 /* texture35.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2F1757D69200B5B815 /* texture35.bmp */; };
 		D0EECB321757D9B300B5B815 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB311757D9B200B5B815 /* Default-568h@2x.png */; };
 		D0EFCAA91C3A4E3700731FAF /* texture93.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EFCAA81C3A4E3700731FAF /* texture93.bmp */; };
+		D0EFCAAB1C54A2CD00731FAF /* texture94.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EFCAAA1C54A2CD00731FAF /* texture94.bmp */; };
 		D0F33ADE1BBF453C00215953 /* texture87.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F33ADD1BBF453C00215953 /* texture87.bmp */; };
 		D0F3BE2417DFEDE100E9C49E /* texture42.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F3BE2317DFEDE100E9C49E /* texture42.bmp */; };
 		D0F3BE2617E3C72400E9C49E /* texture43.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F3BE2517E3C72300E9C49E /* texture43.bmp */; };
@@ -268,6 +271,8 @@
 		6DF655DE15E6D0000015D5DF /* gameCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameCamera.h; sourceTree = "<group>"; };
 		6DF655E315EAB3EE0015D5DF /* texture8.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture8.bmp; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* gl_flight-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "gl_flight-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		D0017FC41C62B524003F0368 /* texture95.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture95.bmp; sourceTree = "<group>"; };
+		D0017FC61C62B9D4003F0368 /* texture96.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture96.bmp; sourceTree = "<group>"; };
 		D00D78C919FB18EC00E701B9 /* flyby.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = flyby.wav; sourceTree = "<group>"; };
 		D00D78CB1A02BF8B00E701B9 /* texture76.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture76.bmp; sourceTree = "<group>"; };
 		D00D78CD1A09525100E701B9 /* texture77.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture77.bmp; sourceTree = "<group>"; };
@@ -397,6 +402,7 @@
 		D0EECB311757D9B200B5B815 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		D0EF8AFD170CCF0C00BDD4B7 /* collision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision.h; sourceTree = "<group>"; };
 		D0EFCAA81C3A4E3700731FAF /* texture93.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture93.bmp; sourceTree = "<group>"; };
+		D0EFCAAA1C54A2CD00731FAF /* texture94.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture94.bmp; sourceTree = "<group>"; };
 		D0F33ADD1BBF453C00215953 /* texture87.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture87.bmp; sourceTree = "<group>"; };
 		D0F3BE2317DFEDE100E9C49E /* texture42.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture42.bmp; sourceTree = "<group>"; };
 		D0F3BE2517E3C72300E9C49E /* texture43.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture43.bmp; sourceTree = "<group>"; };
@@ -558,6 +564,9 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D0017FC61C62B9D4003F0368 /* texture96.bmp */,
+				D0017FC41C62B524003F0368 /* texture95.bmp */,
+				D0EFCAAA1C54A2CD00731FAF /* texture94.bmp */,
 				D0EFCAA81C3A4E3700731FAF /* texture93.bmp */,
 				D0CB80E61BFF9A5C00E52F43 /* texture92.bmp */,
 				D0CB80E41BFD9F0100E52F43 /* texture91.bmp */,
@@ -798,6 +807,7 @@
 				6DEFF8ED15A60C310078E98E /* texture3.bmp in Resources */,
 				D0A5536918BC16C700F7E798 /* towing.wav in Resources */,
 				D0A66F41194B9497004A5E42 /* texture68.bmp in Resources */,
+				D0017FC71C62B9D4003F0368 /* texture96.bmp in Resources */,
 				6DF4AFBF15B2531C00A5C8B9 /* texture4.bmp in Resources */,
 				D0A5536018B6DDD700F7E798 /* texture58.bmp in Resources */,
 				D0CB80E31BFB9F5500E52F43 /* texture90.bmp in Resources */,
@@ -823,6 +833,7 @@
 				D0DD22E7182A0C5200A51D34 /* texture49.bmp in Resources */,
 				6D595F6C1655A85600C21926 /* texture12.bmp in Resources */,
 				6D595F6D1655A85600C21926 /* texture13.bmp in Resources */,
+				D0EFCAAB1C54A2CD00731FAF /* texture94.bmp in Resources */,
 				D0FE6D0818570BD0007D67CF /* texture53.bmp in Resources */,
 				6D595F6E1655A85600C21926 /* texture14.bmp in Resources */,
 				6D595F7116563FD600C21926 /* texture15.bmp in Resources */,
@@ -902,6 +913,7 @@
 				D034416C1A1E7B9200C89475 /* texture82.bmp in Resources */,
 				D0F3BE2617E3C72400E9C49E /* texture43.bmp in Resources */,
 				D0F3BE2817E8D8EB00E9C49E /* texture44.bmp in Resources */,
+				D0017FC51C62B524003F0368 /* texture95.bmp in Resources */,
 				D0D661B417EA6C4B00E44885 /* texture45.bmp in Resources */,
 				D0A6367217F382A60088F0AD /* texture46.bmp in Resources */,
 				D09893511937FD7D00298C8E /* texture67.bmp in Resources */,

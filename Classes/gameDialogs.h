@@ -173,7 +173,7 @@ gameDialogWelcome()
     if(gameSettingsLaunchCount % 2 == 1 && !gameSettingsRatingGiven)
     {
         gameInterfaceModalDialog(WELCOMESTR
-                                 "Please rate d0gf1ght!\n(and unlock new ships!)\n"
+                                 "Please rate d0gf1ght!\n"
                                  "It only takes a second!\n",
                                  "Sure", "No way",
                                  gameDialogWelcomeRating, gameDialogWelcomeNoRating);
@@ -246,6 +246,27 @@ gameDialogStartNetworkGame2()
     gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
 }
 
+static void
+gameDialogStartNetworkGameBotAdded();
+
+static void
+gameDialogStartNetworkGameBotAdded()
+{
+    gameStateSinglePlayer.setting_n_bots++;
+    
+    gameInterfaceModalDialog("Ready to start game, add a bot?", "+1", "Start",
+                             gameDialogStartNetworkGameBotAdded,
+                             gameDialogStartNetworkGame2);
+}
+
+static void
+gameDialogStartNetworkGameAddBots()
+{
+    gameInterfaceModalDialog("Ready to start game (or add a bot)?", "+1", "Start",
+                             gameDialogStartNetworkGameBotAdded,
+                             gameDialogStartNetworkGame2);
+}
+
 static void gameDialogStartNetworkGame();
 
 static void
@@ -269,7 +290,7 @@ static void
 gameDialogStartNetworkGame()
 {
     gameStateSinglePlayer.map_use_current = 1;
-    gameInterfaceModalDialog("Gathering players...\nWait...\nStart when ready\n", "Start", "Change\nmap", gameDialogStartNetworkGame2, gameDialogStartNetworkGameNewMap);
+    gameInterfaceModalDialog("Gathering players...\nWait...\nStart when ready\n", "Start", "Change\nmap", gameDialogStartNetworkGameAddBots, gameDialogStartNetworkGameNewMap);
 }
 
 static char gameDialogDisplayStringStr[16][1024];
@@ -309,11 +330,12 @@ static char gameDialogScoresString[1024];
 static void
 gameDialogScores()
 {
-    sprintf(gameDialogScoresString, "firewall:%d\nSurvival:%d\nDefend:%d\nDeathmatch:%d\n",
+    sprintf(gameDialogScoresString, "firewall:%d\nSurvival:%d\nDefend:%d\nDeathmatch:%d\nTurret:%d\n",
             gameStateSinglePlayer.high_score[GAME_TYPE_COLLECT],
             gameStateSinglePlayer.high_score[GAME_TYPE_SURVIVAL],
             gameStateSinglePlayer.high_score[GAME_TYPE_DEFEND],
-            gameStateSinglePlayer.high_score[GAME_TYPE_DEATHMATCH]);
+            gameStateSinglePlayer.high_score[GAME_TYPE_DEATHMATCH],
+            gameStateSinglePlayer.high_score[GAME_TYPE_TURRET]);
     
     gameInterfaceModalDialog(gameDialogScoresString,
                              "OK", "OK",

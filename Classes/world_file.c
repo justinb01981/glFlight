@@ -87,6 +87,12 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
             map_cmd->type = MAP_SET_BLOCK_SCALE;
             n_params = 1;
         }
+        else if(strcmp(token, "object_identify") == 0)
+        {
+            map_cmd->type = MAP_IDENT_OBJECT;
+            if(line) strncpy(map_cmd->cparams, line, sizeof(map_cmd->cparams)-1);
+            n_params = 1;
+        }
         else if(strcmp(token, "object_set_sub_info") == 0)
         {
             map_cmd->type = MAP_SET_OBJECT_SUB_INFO;
@@ -191,6 +197,11 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
         else if(strcmp(token, "register_params_update") == 0)
         {
             map_cmd->type = MAP_REGISTER_UPDATE_PARAMS;
+            n_params = WORLD_MAP_COMMAND_PARAMS_MAX;
+        }
+        else if(strcmp(token, "register_params_clear") == 0)
+        {
+            map_cmd->type = MAP_REGISTER_CLEAR_PARAMS;
             n_params = WORLD_MAP_COMMAND_PARAMS_MAX;
         }
         else if(strcmp(token, "register_params_mul") == 0)
@@ -389,6 +400,14 @@ void map_render(char *map_buf)
                     line_tok = strtok(NULL, line_token);
                     continue;
                 }
+                else if(map_cmd.type == MAP_REGISTER_CLEAR_PARAMS)
+                {
+                    for(int i = 0; i < WORLD_MAP_COMMAND_PARAMS_MAX; i++)
+                        if(map_cmd.params[i] != 0) register_params[i] = 0;
+                    
+                    line_tok = strtok(NULL, line_token);
+                    continue;
+                }
                 else if(map_cmd.type == MAP_REGISTER_UPDATE_PARAMS)
                 {
                     for(int i = 0; i < sizeof(map_cmd.params)/sizeof(map_cmd.params[0]); i++)
@@ -479,6 +498,10 @@ void map_render(char *map_buf)
                             default:
                                 break;
                         }
+                        break;
+                        
+                    case MAP_IDENT_OBJECT:
+                        game_elem_identify(world_get_last_object(), map_cmd.cparams);
                         break;
                         
                     case MAP_SET_OBJECT_VELOCITY:

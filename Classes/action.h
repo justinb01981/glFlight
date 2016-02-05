@@ -10,6 +10,7 @@
 #define gl_flight_action_h
 
 #include <string.h>
+#include "action.h"
 
 #define ACTIONS_CURSOR_STR "->"
 typedef enum
@@ -20,24 +21,21 @@ typedef enum
     ACTION_RESUME_GAME,
     ACTION_START_SURVIVAL_GAME,
     ACTION_START_DEFEND_GAME,
+    ACTION_START_TURRET_GAME,
     ACTION_NETWORK_MULTIPLAYER_MENU,
     ACTION_DISPLAY_SCORES,
-    ACTION_HELP,
-    
+    ACTION_HELP, /**/
     ACTION_BROWSE_GAMES,
     ACTION_CONNECT_TO_LAN_GAME,
     ACTION_HOST_LAN_GAME,
     ACTION_CONNECT_TO_GAME,
     ACTION_HOST_GAME,
-    ACTION_START_DEATHMATCH_GAME,
-    
+    ACTION_START_DEATHMATCH_GAME,  /**/
     ACTION_FIRE_BULLET,
     ACTION_FIRE_MISSLE,
-    ACTION_DROP_TOW,
-    
+    ACTION_DROP_TOW,  /**/
     ACTION_PLACE_SHIP,
-    ACTION_PLACE_TURRET,
-    
+    ACTION_PLACE_TURRET,  /**/
     ACTION_MAP_EDIT,
     ACTION_MAP_SAVE,
     ACTION_SHOOT_BLOCK,
@@ -45,14 +43,12 @@ typedef enum
     ACTION_BLOCK_TEXTURE,
     ACTION_SCALE_OBJECT,
     ACTION_REPLACE_OBJECT,
-    ACTION_CLEAR_MAP,
-    
+    ACTION_CLEAR_MAP,  /**/
     ACTION_SETTING_SHIP_MODEL,
     ACTION_SETTING_CONTROL_TYPE,
     ACTION_SETTING_INPUT_SENSITIVITY,
     ACTION_SETTING_NUMAIS,
     ACTION_SETTING_BOTINTELLIGENCE,
-    ACTION_SETTING_DIFFICULTY,
     ACTION_SETTING_AUDIO,
     ACTION_SETTING_SHIP_TEXTURE,
     ACTION_SETTING_PLAYER_NAME,
@@ -66,21 +62,25 @@ typedef enum
     ACTION_SETTING_PORT_NUMBER,
     ACTION_SETTING_LOCAL_IP_OVERRIDE,
     ACTION_SETTING_RESET_SCORE,
-    ACTION_LAST
+    ACTION_LAST /* 46 */
 } action_t;
 
 static int actions_sub[][ACTION_LAST] =
 {
     // main
-    {1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {1,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // net
-    {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    //{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0,0,0,0,0,0,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // game
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // build
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // settings
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+    //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 };
 
 extern int *actions_enabled;
@@ -88,12 +88,13 @@ extern int *actions_enabled;
 static const int actions_sub_last = 5;
 extern int actions_sub_cur;
 
-static const char* action_strings[] =
+static const char* action_strings[ACTION_LAST] =
 {
     "game: firewall",
     "game: resume",
     "game: survival",
     "game: defend",
+    "game: turret",
     "game: network multiplayer DM",
     "display scores",
     "help/about",
@@ -121,7 +122,6 @@ static const char* action_strings[] =
     "input sensitivity",
     "deathmatch num bots",
     "deathmatch bot skill",
-    "difficulty",
     "mute audio",
     "ship appearance",
     "player name",
@@ -134,8 +134,7 @@ static const char* action_strings[] =
     "gyroscope drift correct",
     "server port number",
     "local IP detect/override",
-    "reset scores",
-    "UNKNOWN"
+    "reset scores"
 };
 
 extern int fireAction;
@@ -226,7 +225,7 @@ static void actions_display_menu(char *dest)
     }
     
     for(int i = (lines <= maxlines? ACTION_FIRST: fireAction); i < ACTION_LAST && maxlines > 0; i++)
-    {
+    {    
         if(actions_enabled[i])
         {
             sprintf(dest+strlen(dest), "%s%s\n", (fireAction == i? ACTIONS_CURSOR_STR: ""), action_strings[i]);

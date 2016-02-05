@@ -33,7 +33,7 @@ enum
     GAME_TYPE_COLLECT,
     GAME_TYPE_SURVIVAL,
     GAME_TYPE_DEFEND,
-    GAME_TYPE_RESERVED1,
+    GAME_TYPE_TURRET,
     GAME_TYPE_RESERVED2,
     GAME_TYPE_RESERVED3,
     GAME_TYPE_RESERVED4,
@@ -117,6 +117,7 @@ static char *game_log_messages[] = {
     "****NEW HIGH SCORE!****",
     "^K^K^KSYSTEM_COMPROMISED (GAME_OVER)^K^K^K\n",
     "HIDDEN: points collected",
+    "detected: ^D vulnerable (next wave!)",
     NULL
 };
 
@@ -134,6 +135,7 @@ enum {
     GAME_LOG_HIGHSCORE,
     GAME_LOG_GAMEOVER,
     GAME_LOG_POWERUP_POINTS,
+    GAME_LOG_NEWDATA,
     GAME_LOG_LAST
 };
 
@@ -155,7 +157,7 @@ const static float game_variables_default[] = {
     1,           // PATROLS
     50,          // RUN_INTERVAL_MS
     1,           // LEAVES TRAIL
-    50.0,
+    100.0,        // SCAN_DISTANCE_MAX
     0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0            // END
@@ -166,7 +168,6 @@ struct
     int started;
     int delay_new_level;
     
-    int n_caps;
     float n_collect_points;
     float max_enemies;
     float max_enemies_spawned;
@@ -225,6 +226,7 @@ struct
     float points_enemy_bh_killed;
     float points_data_grabbed;
     float points_per_second_elapsed;
+    float enemy_spawnpoint_interval;
     
     game_timeval_t last_run;
     game_timeval_t time_elapsed;
@@ -339,7 +341,7 @@ game_elem_setup_ship(WorldElem* elem, int skill)
     elem->stuff.u.enemy.changes_target = GAME_VARIABLE("ENEMY1_CHANGES_TARGET");
     elem->stuff.u.enemy.fires = GAME_VARIABLE("ENEMY1_FIRES_LASERS");
     elem->stuff.u.enemy.patrols_no_target = GAME_VARIABLE("ENEMY1_PATROLS_NO_TARGET");
-    elem->stuff.u.enemy.max_speed = MIN(GAME_VARIABLE("ENEMY1_SPEED_MAX"), GAME_VARIABLE("ENEMY1_SPEED_MAX") * (0.5 + 0.1*skill));
+    elem->stuff.u.enemy.max_speed = GAME_VARIABLE("ENEMY1_SPEED_MAX");
     elem->stuff.u.enemy.max_turn = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS")
     //1.0 +  (0.2*skill);
     ;
@@ -384,7 +386,6 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.u.enemy.leaves_trail = 0;
     x->stuff.u.enemy.run_distance = 0;
     x->stuff.u.enemy.fixed = 0;
-    x->stuff.u.enemy.changes_target = 0;
     x->stuff.u.enemy.fires = 0;
     x->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
     x->stuff.u.enemy.time_last_run = time_ms;
@@ -403,6 +404,20 @@ game_elem_setup_powerup(WorldElem* elem)
 }
 
 inline static void
+game_elem_setup_collect(WorldElem* elem)
+{
+    world_get_last_object()->durability = 0;
+    world_get_last_object()->destructible = 1;
+    world_get_last_object()->object_type = OBJ_POWERUP_GENERIC;
+    world_get_last_object()->stuff.subtype = GAME_SUBTYPE_COLLECT;
+    world_get_last_object()->stuff.radar_visible = 0;
+    world_get_last_object()->stuff.affiliation = AFFILIATION_POWERUP;
+    world_get_last_object()->bounding_remain = 1;
+    world_get_last_object()->physics.ptr->friction = 1;
+    update_object_velocity(elem->elem_id, 0, 1, 0, 0);
+}
+
+inline static void
 game_elem_setup_spawnpoint_enemy(WorldElem* elem)
 {
     //elem->renderInfo.tex_adjust = 1;
@@ -414,6 +429,19 @@ game_elem_setup_spawnpoint(WorldElem* elem)
 {
     //elem->renderInfo.tex_adjust = 1;
     elem->renderInfo.priority = 1;
+}
+
+inline static void
+game_elem_identify(WorldElem* elem, char* name)
+{
+    if(strcmp(name, "collect") == 0)
+    {
+        game_elem_setup_collect(elem);
+    }
+    else if(strcmp(name, "turret") == 0)
+    {
+        game_elem_setup_turret(elem, gameStateSinglePlayer.difficulty);
+    }
 }
 
 void

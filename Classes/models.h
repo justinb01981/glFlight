@@ -248,22 +248,22 @@ static model_texcoord_t model_ship1_texcoords[] = {
 static model_coord_t model_turret1[] =
 {
     // center diamond
-    0,0.5,0, // top       0
-    0,-0.5,0, //bottom    1
-    0,0,-0.8, //front     2
+    0,0.3,0, // top       0
+    0,-0.3,0, //bottom    1
+    0,0,-0.6, //front     2
     0,0,0.5, //back       3
     -0.5,0,0, //left      4
     0.5,0,0, //right      5
     
     // left gun
-    -0.5,-0.1,-1.0, //    6
-    -0.5,0.1,-0.5, //     7
-    -0.5,0.1,-1.0, //     8
+    -0.5,-0.1,-0.5, //    6
+    -0.5,0.1,-1.0, //     7
+    -0.5,0.1,-0.5, //     8
     
     // right gun
-    0.5,-0.1,-1.0, //     9
-    0.5,0.1,-0.5,  //     10
-    0.5,0.1,-1.0,  //     11
+    0.5,-0.1,-0.5, //     9
+    0.5,0.1,-1.0,  //     10
+    0.5,0.1,-0.5,  //     11
 };
 
 static model_index_t model_turret_indices[] = {

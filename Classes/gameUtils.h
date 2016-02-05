@@ -49,6 +49,9 @@ element_visible(WorldElem* pElem, float visibleDistance, float min_dot);
 int
 element_dist_compare(WorldElem* pElemA, WorldElem* pElemB);
 
+void
+get_time_ms_init();
+
 float
 get_time_ms();
 
