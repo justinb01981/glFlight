@@ -6,6 +6,7 @@ CMD_EXTRACT=unzip
 CMD_RMDIR=rm -rf
 CMD_RM=rm -f
 PATH=$PATH:.
+CMD_MAKE=make
 else
 CMD_COPY=cp -r
 CMD_MKDIR=mkdir
@@ -14,6 +15,7 @@ CMD_EXTRACT=unzip
 CMD_RMDIR=rm -rf
 CMD_RM=rm -f
 CMD_LIST=ls -l
+CMD_MAKE=make
 endif
 ARCHIVE_PATH=android
 ARCHIVE_FILE=glFlightAndroidBase.zip
@@ -85,7 +87,10 @@ gradle_workspace: android_workspace
 	${CMD_RM} ${GRADLE_DIR}/res/raw/Default*
 	${CMD_RM} ${GRADLE_DIR}/res/raw/app_icon*
 	${CMD_LIST} ${GRADLE_DIR}
-	echo "remember to do make in " ${GRADLE_IMPORT_ROOT}
+	echo "remember to do make gradle_ndk_libs to compile ndk .SO files!"
+
+gradle_ndk_libs:
+	${CMD_MAKE} -C ${GRADLE_IMPORT_ROOT}
 
 android_ndk_libs:
 	echo "TODO: call ndk-build and copy .so files to " ${GRADLE_DIR}/libs
