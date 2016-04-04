@@ -60,7 +60,8 @@ PROJ_DIR_RESRAW=${BUILD_DIR_ANDROID}/glFlight/res/raw/
 PROJ_DIR_JNI=${BUILD_DIR_ANDROID}/glFlight/jni
 PROJ_DIR_GAME=${BUILD_DIR_ANDROID}/glFlight/jni/game/
 PROJ_DIR_LIBS=${BUILD_DIR_ANDROID}/glFlight/libs
-GRADLE_DIR=${PROJ_DIR}/gradle-build/glFlightImport/app/src/main
+GRADLE_IMPORT_ROOT=${PROJ_DIR}/gradle-build/glFlightImport
+GRADLE_DIR=${GRADLE_IMPORT_ROOT}/app/src/main
 
 android_workspace: base_ws
 	${CMD_MKDIR} ${BUILD_DIR_ANDROID}
@@ -84,6 +85,7 @@ gradle_workspace: android_workspace
 	${CMD_RM} ${GRADLE_DIR}/res/raw/Default*
 	${CMD_RM} ${GRADLE_DIR}/res/raw/app_icon*
 	${CMD_LIST} ${GRADLE_DIR}
+	echo "remember to do make in " ${GRADLE_IMPORT_ROOT}
 
 android_ndk_libs:
 	echo "TODO: call ndk-build and copy .so files to " ${GRADLE_DIR}/libs

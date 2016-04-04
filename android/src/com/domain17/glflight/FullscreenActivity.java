@@ -59,9 +59,10 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 			int[] config_attrs = {
 					EGL10.EGL_LEVEL, 0,
 					EGL10.EGL_COLOR_BUFFER_TYPE, EGL10.EGL_RGB_BUFFER,
-					EGL10.EGL_RED_SIZE, 4,
-					EGL10.EGL_GREEN_SIZE, 4,
-					EGL10.EGL_BLUE_SIZE, 4,
+					EGL10.EGL_RED_SIZE, 8,
+					EGL10.EGL_GREEN_SIZE, 8,
+					EGL10.EGL_BLUE_SIZE, 8,
+					EGL10.EGL_ALPHA_SIZE, 8,
 					EGL10.EGL_DEPTH_SIZE, 16,
 					EGL10.EGL_RENDERABLE_TYPE, 4,
 					EGL10.EGL_STENCIL_SIZE, 8,
