@@ -112,7 +112,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.mainMenu.y = 0;
     gameInterfaceControls.mainMenu.xw = screenWidth;
     gameInterfaceControls.mainMenu.yw = screenHeight;
-    gameInterfaceControls.mainMenu.tex_id = /*29*/ 43;
+    gameInterfaceControls.mainMenu.tex_id = /*29*/ TEXTURE_ID_MAINMENU;
     gameInterfaceControls.mainMenu.visible = 1;
     
     float menuHeight = gameInterfaceControls.interfaceHeight * 0.7;
@@ -286,7 +286,7 @@ gameInterfaceHandleTouchMove(float x, float y)
 {
     static float x_last = -1;
     static float y_last = -1;
-    const float move_thresh = 3;
+    const float move_thresh = 10;
     
     if(fabs(x-x_last) < move_thresh &&
        fabs(y-y_last) < move_thresh)

@@ -25,7 +25,7 @@ float boundary_avoid_distance = 10;
 float fire_dist = 70;
 float diff_m = 0.1;
 float scan_dist_increase = 10;
-float game_ai_fire_rate_ms = 500.0;
+float game_ai_fire_rate_ms = 800.0;
 float patrol_area_reached = 2.0;
 float tow_v_scale = 0.5;
 float min_patrol_distance = 20;
@@ -193,6 +193,30 @@ game_ai_run()
                 goto game_ai_run_skip_ai;
             }
             
+            if(pCurElem->stuff.u.enemy.collided != 0 ||
+               pCurElem->stuff.u.enemy.enemy_state == ENEMY_STATE_PULLUP)
+            {
+                pCurElem->stuff.u.enemy.collided = 0;
+                
+                if(pCurElem->stuff.u.enemy.enemy_state != ENEMY_STATE_PULLUP)
+                {
+                    pCurElem->stuff.u.enemy.last_state = pCurElem->stuff.u.enemy.enemy_state;
+                    pCurElem->stuff.u.enemy.enemy_state = ENEMY_STATE_PULLUP;
+                    pCurElem->stuff.u.enemy.time_next_decision = time_ms + 1000;
+                    
+                    pCurElem->stuff.u.enemy.tgt_x = pCurElem->stuff.u.enemy.tgt_y = pCurElem->stuff.u.enemy.tgt_z = 0;
+                    pCurElem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
+                }
+                
+                if(GAME_AI_DEBUG)
+                {
+                    gameAudioPlaySoundAtLocation("bump", my_ship_x, my_ship_y, my_ship_z);
+                }
+                
+                pi = 1;
+                goto enemy_pullup;
+            }
+            
             //printf("%p: %d [%f, %f, %f]\n", pCurElem, pCurElem->stuff.u.enemy.enemy_state,
             //       pCurElem->stuff.u.enemy.tgt_x, pCurElem->stuff.u.enemy.tgt_y, pCurElem->stuff.u.enemy.tgt_z);
             
@@ -265,7 +289,7 @@ game_ai_run()
                                   patrol_retries > 0);
                             */
                             
-                            float rvec[3], rdist = 20;
+                            float rvec[3], rdist = 50;
                             random_heading_vector(rvec);
                             
                             pCurElem->stuff.u.enemy.tgt_x = pCurElem->physics.ptr->x + rvec[0] * rdist;
@@ -301,6 +325,7 @@ game_ai_run()
                 }
             }
             
+        enemy_pullup:
             if(pi > 0)
             {
                 object_pursue(pv[0], pv[1], pv[2],
@@ -330,6 +355,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     Object targetElemType = OBJ_UNKNOWN;
     float zdot_ikillyou = 0.5;
     float zdot_juke = 0.3;
+    float direction = 1.0;
     
     //if(time_ms - elem->stuff.u.enemy.time_last_run < elem->stuff.u.enemy.time_run_interval) return;
     
@@ -388,23 +414,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     float zdot = zq.x*(ax/dist) + zq.y*(ay/dist) + zq.z*(az/dist);
     
     unsigned long prev_state = elem->stuff.u.enemy.enemy_state;
-    
-    if(elem->stuff.u.enemy.collided == ENEMY_COLLIDE_BOUNDARY)
-    {
-        elem->stuff.u.enemy.collided = 0;
-        
-        if(elem->stuff.u.enemy.enemy_state != ENEMY_STATE_PATROL)
-        {
-            elem->stuff.u.enemy.last_state = prev_state;
-            elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
-            elem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
-            
-            elem->stuff.u.enemy.tgt_x = 0;
-            elem->stuff.u.enemy.tgt_y = 0;
-            elem->stuff.u.enemy.tgt_z = 0;
-            elem->stuff.u.enemy.time_next_decision = time_ms + 2000;
-        }
-    }
     
     ai_debug("object_pursue state:", elem, elem->stuff.u.enemy.enemy_state);
     
@@ -468,11 +477,24 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     }
     else if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PATROL)
     {
-        if(time_ms > elem->stuff.u.enemy.time_next_decision &&
-           elem->stuff.u.enemy.target_id >= 0)
+        if(time_ms >= elem->stuff.u.enemy.time_next_decision)
         {
-            ai_debug("PATROL->PURSUE:", elem, 0);
-            elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
+            if(elem->stuff.u.enemy.target_id >= 0)
+            {
+                ai_debug("PATROL->PURSUE:", elem, 0);
+                elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
+            }
+            
+            // add unpredictable behavior by heading off on a tangent periodically for a short period
+            if (rand_in_range(1, 100) <= 25)
+            {
+                elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
+                
+                elem->stuff.u.enemy.tgt_x = elem->stuff.u.enemy.tgt_x = elem->stuff.u.enemy.tgt_x = 0;
+                
+                ai_debug("PATROL->JUKE:", elem, 0);
+                game_ai_juke(elem);
+            }
         }
     }
     else if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_RUN)
@@ -501,6 +523,15 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             {
                 elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
             }
+        }
+    }
+    else if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PULLUP)
+    {
+        if(time_ms > elem->stuff.u.enemy.time_next_decision)
+        {
+            ai_debug("JUKE->", elem, elem->stuff.u.enemy.last_state);
+            
+            elem->stuff.u.enemy.enemy_state = elem->stuff.u.enemy.last_state;
         }
     }
     else if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_JUKE)
@@ -540,7 +571,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     //tow_turn_v_scale *= (rand_in_range(75, 125)/100.0);
     
     // rate at which enemy rotates
-    float r = elem->stuff.u.enemy.max_turn * tc;
+    float r = (elem->stuff.u.enemy.max_turn + (0.1*skill)) * tc;
     
     // rate at which object accelerates
     float accel = 0;
@@ -557,6 +588,17 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     float xdot = xq.x*(ax/dist) + xq.y*(ay/dist) + xq.z*(az/dist);
     float ydot = yq.x*(ax/dist) + yq.y*(ay/dist) + yq.z*(az/dist);
+    
+    if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PULLUP)
+    {
+        xdot = ydot = -1;
+        direction = -4;
+        
+        // force firing a bullet (in case of object-collision, run through)
+        fireBullet = 1;
+        dist = 0;
+        zdot = zdot_ikillyou;
+    }
     
     if(do_pitch)
     {
@@ -602,7 +644,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             -zq.z * v
         };
         
-        update_object_velocity(elem->elem_id, tv[0], tv[1], tv[2], 1);
+        update_object_velocity(elem->elem_id, tv[0], tv[1], tv[2], direction * 1.0);
     }
     else
     {
@@ -618,15 +660,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
        dist < fire_dist)
     {
         fireBullet = 1;
-    }
-    
-    if(elem->stuff.u.enemy.collided == ENEMY_COLLIDE_OBJECT)
-    {
-        elem->stuff.u.enemy.collided = 0;
-        // force firing a bullet
-        fireBullet = 1;
-        zdot = zdot_ikillyou;
-        dist = 0;
     }
     
     // fire a bullet
@@ -707,7 +740,10 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     }
     
     if(!elemAI || !elemC) return;
-     
+    
+    // ignore towing-collisions
+    if(elemAI->stuff.towed_elem_id == elemC->elem_id) return;
+    
     elemAI->stuff.u.enemy.collided = ENEMY_COLLIDE_OBJECT;
     
     elemAI->stuff.u.enemy.time_last_trail = time_ms + pooped_cube_interval_ms;

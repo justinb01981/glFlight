@@ -74,6 +74,8 @@ static game_timeval_t world_update_time_last;
 static int do_track_fps = 0;
 WorldElemListNode visibleSkipList;
 
+unsigned int draw_elem_max = PLATFORM_DRAW_ELEMS_MAX;
+
 void
 glFlightFrameStage1()
 {
@@ -117,12 +119,17 @@ glFlightFrameStage1()
         //do_draw_bail = 1;
         // 1.x clear pending removals from last pass
         // 1.1 walk list of pending removals, removing from visible list
+        
         goto draw_bail;
-    }
-    
+    } 
+
     extern void update_time_ms_frame_tick();
-    update_time_ms_frame_tick(); // relocated to bg-worker
+    update_time_ms_frame_tick();
+    
     get_time_ms();
+#if GAME_PLATFORM_ANDROID
+    time_ms = time_ms_wall;
+#endif
     
     if(game_paused)
     {
@@ -271,7 +278,7 @@ glFlightFrameStage1()
                              1, texture_id_playership);
         world_get_last_object()->object_type = OBJ_PLAYER;
         targetSpeed = minSpeed;
-        speed = 3;
+        speed = 6;
         update_object_velocity(my_ship_id, ship_z_vec[0]*speed, ship_z_vec[1]*speed, ship_z_vec[2]*speed, 0);
         world_get_last_object()->bounding_remain = 1;
         world_get_last_object()->durability = ship_durability;
@@ -591,25 +598,28 @@ glFlightFrameStage1()
     drawLineEnd();
     
     // actual drawing (happens asynchronouly)
-    int drawn_elems = 0;
+    unsigned int count_elems = 0, drawn_elems = 0;
     drawElemStart(pDrawCur);
     while(pDrawCur)
     {
-        WorldElem* pElem = pDrawCur->elem;
-        
-        if(pElem->renderInfo.wireframe || (pElem->head_elem && pElem->head_elem->renderInfo.wireframe))
+        if((visibleElementsLen-count_elems) <= draw_elem_max)
         {
-            drawLineBegin();
-            drawLinesElemTriangles(pElem);
-            drawLineEnd();
+            WorldElem* pElem = pDrawCur->elem;
+            
+            if(pElem->renderInfo.wireframe || (pElem->head_elem && pElem->head_elem->renderInfo.wireframe))
+            {
+                drawLineBegin();
+                drawLinesElemTriangles(pElem);
+                drawLineEnd();
+            }
+            else
+            {
+                drawElem(pElem);
+            }
+            drawn_elems++;
         }
-        else
-        {
-            drawElem(pElem);
-        }
-        
         pDrawCur = pDrawCur->next;
-        drawn_elems++;
+        count_elems++;
     }
     drawElemEnd();
     

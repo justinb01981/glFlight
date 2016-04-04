@@ -74,6 +74,7 @@ struct WorldElem {
         GLint priority;
         char wireframe;
         char tex_adjust;
+        char tex_phase;
 	} renderInfo;
     
     struct 
@@ -114,6 +115,7 @@ struct WorldElem {
     int collision_handle_remove:1;
     int remove_pending:1;
     int moving:1;
+    game_timeval_t collision_start_time;
     
     struct
     {

@@ -37,7 +37,8 @@ int playSound = 1;
     audioPlayersPreloaded.clone = 0;
     audioPlayersPreloaded.available = MAX_CONCURRENT_SOUNDS;
     
-    NSError* err = [[NSError alloc] init];
+    NSError* err = [NSError errorWithDomain:@"cocoaGameAudio" code:0 userInfo:NULL];
+    
     int i = 0;
     // 0 is "invalid"
     while(i < GAME_SOUND_NAMES_MAX && gameSoundNames[i])

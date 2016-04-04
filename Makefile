@@ -5,6 +5,7 @@ CMD_CHDIR=cd
 CMD_EXTRACT=unzip
 CMD_RMDIR=rm -rf
 CMD_RM=rm -f
+PATH=$PATH:.
 else
 CMD_COPY=cp -r
 CMD_MKDIR=mkdir
@@ -22,7 +23,7 @@ BUILD_DIR_IOS=build/ios
 BUILD_DIR_ANDROID=build/android
 CMD_NDK_BUILD=ndk-build
 
-all: android_workspace ios_workspace
+all: gradle_workspace ios_workspace
 	echo "done"
 
 clean:

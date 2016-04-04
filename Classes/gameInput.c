@@ -52,6 +52,10 @@
 
 #define AVG_INPUTS_LENGTH 5
 
+void gameInputStatsCollectStart();
+void gameInputStatsAppend(float ypr[3]);
+void gameInputStatsCalc();
+
 
 double rm[3][3];
 int rm_count = 0;
@@ -86,6 +90,20 @@ unsigned int gyroInputCount = 0;
 int gyroStableCount = 0;
 float gyroInputDeltaLast[3] = {0, 0, 0};
 float fcr = 0.0, fcp = 0.0, fcy = 0.0;
+float gyroInputStableThresh = 0.01;
+
+const float tex_pass_initial_sample = 60;
+
+struct
+{
+    float* buf, *dest;
+    float storage[4096];
+    unsigned long samples, x;
+    float min[3];
+    float max[3];
+    float avg[3];
+} gameInputStats;
+int gameInputStatsInited = 0;
 
 void
 gameInputInit()
@@ -100,12 +118,14 @@ gameInputInit()
     // movement speed
     speed = minSpeed;
     targetSpeed = speed;
-    maxSpeed = MAX_SPEED * MAX_SPEED_PLAYER_SCALE;
+    maxSpeed = MAX_SPEED;
     maxAccelDecel = /*5*/ MAX_SPEED/2; // change per second
     minSpeed = 0;
     bulletVel = 40;
     
     isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
+    
+    gameInputStatsCollectStart();
 }
 
 void
@@ -114,6 +134,17 @@ gameInputTrimBegin()
     needTrim = 1;
     needTrimLast = 0;
     trimCount++;
+}
+
+void
+gameInputTrimAbort()
+{
+    needTrim = 0;
+    needTrimLast = 0;
+    trimCount = trimCountLast = 9999;
+    gyroStableCount = 9999;
+    
+    gameDialogWelcome();
 }
 
 int
@@ -172,7 +203,6 @@ void
 gameInput()
 {
 	double pi = M_PI;
-    float tex_pass_initial_sample = 30;
     static float deviceLast[3];
     static unsigned long gyroInputCountLast = 0;
     
@@ -194,13 +224,18 @@ gameInput()
     float dz_m[3] = {0.5, 0.5, 0.5}; // deadzone-multiplier
 #endif
     
-    float gyroInputStableThresh = 0.01;
-    if(fabs(devicePitch-gyroInputDeltaLast[0]) >= gyroInputStableThresh ||
-       fabs(deviceYaw-gyroInputDeltaLast[1]) >= gyroInputStableThresh ||
-        fabs(deviceRoll-gyroInputDeltaLast[2]) >= gyroInputStableThresh)
+    float s[3] = {deviceRoll, devicePitch, deviceYaw};
+    gameInputStatsAppend(s);
+    
+    if(gyroStableCount > 0 &&
+       (fabs(devicePitch-gyroInputDeltaLast[0]) >= gyroInputStableThresh ||
+        fabs(deviceYaw-gyroInputDeltaLast[1]) >= gyroInputStableThresh ||
+        fabs(deviceRoll-gyroInputDeltaLast[2]) >= gyroInputStableThresh))
     {
         gyroStableCount = 0;
-        gyroInputStableThresh *= 2.0;
+#if GAME_PLATFORM_ANDROID
+        gyroInputStableThresh *= 1.01;
+#endif
     }
     else
     {
@@ -244,7 +279,7 @@ gameInput()
         }
     }
     
-    /* wait for sensor to calibrate */
+    /* wait for sensor to come to rest */
     if(gameInputTrimPending()) return;
     
     if(gyroInputCount == gyroInputCountLast) return;
@@ -320,7 +355,8 @@ gameInput()
     if(!needTrim && needTrimLast)
     {
         // short trim-length means few input values to calculate range, ignore
-        if(tex_pass - trimStartTime >= tex_pass_initial_sample)
+        if(tex_pass - trimStartTime >= tex_pass_initial_sample ||
+           !controlsCalibrated)
         {
             // TODO: could maybe store these in settings so they didnt have to calibrate every time
             // ... or just tell the user "hold still" and sample on startup...
@@ -345,6 +381,14 @@ gameInput()
                 console_write("\n");
             }
             
+            float div = 6;
+            gameInputStatsCalc();
+            trim_dz[0] = ((gameInputStats.max[0] - gameInputStats.min[0]) / div);
+            trim_dz[1] = ((gameInputStats.max[1] - gameInputStats.min[1]) / div);
+            trim_dz[2] = ((gameInputStats.max[2] - gameInputStats.min[2]) / div);
+            
+            roll_m  = gameInputStats.avg[0]; pitch_m  = gameInputStats.avg[1]; yaw_m  = gameInputStats.avg[2];
+            
             controlsCalibrated = 1;
         }
         else
@@ -360,9 +404,11 @@ gameInput()
             inputAvg[2][a] = deviceYaw;
         }
     }
-    
+
     if(needTrim)
     {
+        if(!needTrimLast) trimStartTime = tex_pass;
+#if 0
         if(!needTrimLast)
         {
             // begin learning trim
@@ -390,6 +436,7 @@ gameInput()
         
         // uncomment this to cause holding trim button to not continue reading input
         //needTrim = false;
+#endif
     }
     needTrimLast = needTrim;
     
@@ -446,8 +493,8 @@ gameInput()
 	rm_count--;
     
     static float time_input_last = 0;
-    float tc = time_ms - time_input_last;
-    time_input_last = time_ms;
+    float tc = time_ms_wall - time_input_last;
+    time_input_last = time_ms_wall;
     
     if(!needTrim)
     {
@@ -554,3 +601,59 @@ gameInput()
      */
 }
 
+void
+gameInputStatsCollectStart()
+{
+    gameInputStats.buf = gameInputStats.storage;
+    gameInputStats.x = 0;
+    gameInputStats.samples = /*gameInputStats.max_samples*/ tex_pass_initial_sample;
+}
+
+void
+gameInputStatsAppend(float ypr[3])
+{
+    unsigned int l = gameInputStats.samples * 3;
+    
+    gameInputStats.buf[(gameInputStats.x) % l] = ypr[0];
+    gameInputStats.buf[(gameInputStats.x+1) % l] = ypr[1];
+    gameInputStats.buf[(gameInputStats.x+2) % l] = ypr[2];
+    gameInputStats.x += 3;
+}
+
+void
+gameInputStatsCalc()
+{
+    int j;
+    unsigned int l = gameInputStats.samples * 3;
+    
+    if(gameInputStats.buf)
+    {
+        float *src = gameInputStats.buf;
+        
+        for(j = 0; j < 3; j++)
+        {
+            gameInputStats.avg[j] = 0;
+            gameInputStats.min[j] = 9999;
+            gameInputStats.max[j] = -9999;
+        }
+        
+        int i = 0;
+        while(i < l)
+        {
+            for(j = 0; j < 3; j++)
+            {
+                float s = *(src+j);
+                gameInputStats.avg[j] += s/gameInputStats.samples;
+                if(s < gameInputStats.min[j]) gameInputStats.min[j] = s;
+                if(s > gameInputStats.max[j]) gameInputStats.max[j] = s;
+            }
+            
+            src++;
+            i++;
+        }
+    }
+    
+    printf("gameInputStats avg:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.avg[j]); printf("\n");
+    printf("gameInputStats min:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.min[j]); printf("\n");
+    printf("gameInputStats max:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.max[j]); printf("\n");
+}

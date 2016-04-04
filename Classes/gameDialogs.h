@@ -186,6 +186,15 @@ gameDialogWelcome()
 }
 
 static void
+gameDialogCancelTrim()
+{
+    extern void gameInputTrimAbort(void);
+    
+    gameInputTrimAbort();
+    gameDialogCancel();
+}
+
+static void
 gameDialogCalibrate()
 {
     gameInterfaceModalDialog(
@@ -195,7 +204,7 @@ gameDialogCalibrate()
                              "^C (to re-calibrate later use  ^C\n"
                              "^C  flashing TRIM button)      ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
-                             "", "cancel", gameDialogCancel, gameDialogCancel);
+                             "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
 }
 
 static void
@@ -254,7 +263,7 @@ gameDialogStartNetworkGameBotAdded()
 {
     gameStateSinglePlayer.setting_n_bots++;
     
-    gameInterfaceModalDialog("Ready to start game, add a bot?", "+1", "Start",
+    gameInterfaceModalDialog("(Added)\nReady to start game, add a bot?", "+1", "Start",
                              gameDialogStartNetworkGameBotAdded,
                              gameDialogStartNetworkGame2);
 }

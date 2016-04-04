@@ -29,6 +29,7 @@ enum {
 
 extern int tex_pass;
 extern volatile float time_ms;
+extern volatile float time_ms_wall;
 extern double speed;
 extern double maxAccelDecel;
 extern double maxSpeed;
@@ -63,21 +64,25 @@ extern int controls_simple;
 #define GYRO_FEEDBACK_COEFF (0.001)
 #define GYRO_DC_DEFAULT /*0.004*/ (0.001)
 #define GYRO_FEEDBACK_DEFAULT (0.01)
+#define PLATFORM_TICK_RATE 30
+#define PLATFORM_DRAW_ELEMS_MAX 200
 #else
 #define GAME_PLATFORM_IS_LANDSCAPE 0
 #define GYRO_FEEDBACK_COEFF (0.002)
 #define GYRO_DC_DEFAULT /*0.004*/ (0.05)
 #define GYRO_FEEDBACK_DEFAULT (0.1)
+#define PLATFORM_TICK_RATE 60
+#define PLATFORM_DRAW_ELEMS_MAX 1000
 #endif
 
 #define GYRO_SAMPLE_RATE (30)
 
-#define MAX_SPEED /*(15)*/ (15)
-#define MAX_SPEED_PLAYER_SCALE (2.0)
+/* reducing friction influences this... should be MAX_THRUST really */
+#define MAX_SPEED /*(15)*/ (10)
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "0.9.17.0 core";
+const static char* GAME_VERSION_STR = "0.9.19.0 core";
 
 const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2.5);
 const static float SPEED_BOOST_FRAMES = 60 * 5;
@@ -98,7 +103,7 @@ const static float TOW_DISTANCE_MAX = 20;
 const static float GAME_AI_UPDATE_INTERVAL_MS = 50;
 
 #define GAME_FRAME_RATE 60
-#define GAME_TICK_RATE 60
+#define GAME_TICK_RATE PLATFORM_TICK_RATE
 
 extern int controlsCalibrated;
 

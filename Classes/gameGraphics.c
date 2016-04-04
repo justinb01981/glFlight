@@ -431,24 +431,27 @@ int drawRadar()
                 tex_id = TEXTURE_ID_RADAR_BEHIND;
             }
             
-            if(cur->elem->elem_id == game_target_missle_id && zdot > 0)
+            if(cur->elem->stuff.nametag)
             {
-                // currently missle-targeted
-                tex_id = TEXTURE_ID_LOCKEDON;
-                scale = (4.0*50) / dist;
-                if(scale > 6) scale = 6;
+                if(strcmp(cur->elem->stuff.nametag, "Firewall") == 0)
+                {
+                    tex_id = TEXTURE_ID_OBJECTIVE_FIREWALL;
+                    scale = 4;
+                }
             }
             else if(cur->elem->elem_id == game_target_objective_id /* && zdot > 0*/)
             {
                 tex_id = TEXTURE_ID_RADAR_OBJECTIVE;
                 if(!minimal_overlay) tex_icon = zdot >= 0? cur->elem->texture_id: TEXTURE_ID_RADAR_BEHIND;
                 
-                if(cur->elem->object_type == OBJ_SPAWNPOINT)
-                {
-                    tex_id = TEXTURE_ID_OBJECTIVE_FIREWALL;
-                }
-                
                 scale = 4;
+            }
+            else if(cur->elem->elem_id == game_target_missle_id && zdot > 0)
+            {
+                // currently missle-targeted
+                tex_id = TEXTURE_ID_LOCKEDON;
+                scale = (4.0*50) / dist;
+                if(scale > 6) scale = 6;
             }
             else
             {

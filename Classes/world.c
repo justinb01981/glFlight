@@ -45,7 +45,7 @@ world_t *gWorld = NULL;
 game_lock_t gWorldLock;
 
 float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
-float C_FRICTION = /*0.04*/ 0.05; // higher values = more friction
+float C_FRICTION = /*0.04*/ 0.02; // higher values = more friction
 float GYRO_FEEDBACK = GYRO_FEEDBACK_DEFAULT;
 float GYRO_DC = GYRO_DC_DEFAULT;
 float visible_distance = 100;
@@ -1734,7 +1734,7 @@ world_update(float tc)
                     {
                         collision_action_table_t *collision_actions_cur = collision_actions_table_list[cl];
                         
-                        if(do_check_collisions)
+                        if(do_check_collisions && pCur->elem->collision_start_time <= time_ms)
                         {
                             int sound_played = 0;
                             int repulsed;

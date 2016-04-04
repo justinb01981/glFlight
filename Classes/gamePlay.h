@@ -104,20 +104,21 @@ const static char *game_variables_name[] = {
 };
 
 static char *game_log_messages[] = {
-    "^D: firewalled :-)",
-    "detected: virus",
-    "detected: bounty hunter",
-    "virus deleted ^D :-(",
-    "detected: ally AI",
-    "warning: virus capturing ^D",
-    "killed: virus",
-    "killed: bounty-hunter",
-    "killed: turret",
-    "HIDDEN: shot-fired",
-    "****NEW HIGH SCORE!****",
+    /*"^D: firewalled :-)\n"*/ "^D saved - system integrity restored\n",
+    "detected: virus\n",
+    "detected: bounty hunter\n",
+    "virus deleted ^D :-(\n",
+    "detected: ally AI\n",
+    "warning: virus capturing ^D\n",
+    "killed: virus\n",
+    "killed: bounty-hunter\n",
+    "killed: turret\n",
+    "HIDDEN: shot-fired\n",
+    "****NEW HIGH SCORE!****\n",
     "^K^K^KSYSTEM_COMPROMISED (GAME_OVER)^K^K^K\n",
-    "HIDDEN: points collected",
-    "detected: ^D vulnerable (next wave!)",
+    "HIDDEN: points collected\n",
+    "HIDDEN: detected: ^D vulnerable\n",
+    "enemies spawning faster!\n",
     NULL
 };
 
@@ -136,6 +137,7 @@ enum {
     GAME_LOG_GAMEOVER,
     GAME_LOG_POWERUP_POINTS,
     GAME_LOG_NEWDATA,
+    GAME_LOG_SPAWNFASTER,
     GAME_LOG_LAST
 };
 
@@ -150,7 +152,7 @@ const static float game_variables_default[] = {
     50,          // ENEMY1_FORGET_DISTANCE
     30,          // ENEMY1_PURSUE_DISTANCE
     MAX_SPEED,          // MAX_SPEED
-    1.2,         // MAX_RADIANS
+    /*1.2*/0.8,         // MAX_TURN_RADIANS
     0,           // FIRES MISSLES
     1,           // FIRES LASERS
     1,           // CHANGES_TARGET
@@ -190,11 +192,13 @@ struct
     int turret_destruction_change_alliance;
     int one_collect_at_a_time;
     
+    float base_spawn_collect_pct;
+    float base_spawn_collect_pct_rate_increase;
+    
     float rate_enemy_skill_increase;
     float rate_point_increase;
     float rate_enemy_count_increase;
     float rate_enemy_p_increase;
-    float rate_collect_increase;
     
     float enemy_durability;
     

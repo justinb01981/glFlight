@@ -17,7 +17,8 @@ enum
     ENEMY_STATE_RUN = 1,
     ENEMY_STATE_PATROL = 2,
     //ENEMY_STATE_GOHOME = 3,
-    ENEMY_STATE_JUKE = 4
+    ENEMY_STATE_JUKE = 4,
+    ENEMY_STATE_PULLUP = 5
 };
 
 enum

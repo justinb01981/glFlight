@@ -56,8 +56,16 @@ int new_level = 0;
 int game_delay_frames = 0;
 int invuln_count = 0;
 unsigned int score_last_checked = 0;
+float collects_count_gameover = 10;
+int collects_obj_type_score = OBJ_PLAYER;
+int texture_sequence_obj_base[] = {88, 88, 88, 88, 88, 88, 97, 88, 88, 88, 88, 88, 88, 98, 88, 88, 88, 88, 88, 88, 99, 99};
+
+game_timeval_t firedLast = 0, firedLastMissle = 0;
+float blr_last = 1;
 
 float game_variables_val[GAME_VARIABLES_MAX];
+
+extern void random_heading_vector(float v[3]);
 
 int
 game_add_ally(float x, float y, float z);
@@ -240,6 +248,8 @@ game_over()
                                  my_ship_x,
                                  my_ship_y,
                                  my_ship_z);
+    
+    gameStateSinglePlayer.started = 0;
 }
 
 int
@@ -625,6 +635,10 @@ game_init_objects()
                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence = 3 + gameStateSinglePlayer.difficulty;
                 break;
                 
+            case OBJ_BASE:
+                pCur->elem->destructible = 0;
+                break;
+                
             default:
                 break;
         }
@@ -706,6 +720,7 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.enemy1_ignore_player_pct = 0;
     gameStateSinglePlayer.score_pop_threshold = 10;
     gameStateSinglePlayer.enemy_spawnpoint_interval = 1;
+    gameStateSinglePlayer.base_spawn_collect_pct_rate_increase = 0;
     
     collision_actions_set_default();
     
@@ -751,7 +766,7 @@ game_start(float difficulty, int type)
          */
         sprintf(dialogStr, "^D^D^DWARNING: INTRUDER_ALERT^D^D^D\n"
                            "^D^D^D   ACTIVATE_FIREWALL   ^D^D^D\n"
-                           "^D^D^D (COPY ^D TO FIREWALL) ^D^D^D\n"
+                           "^D^D^D       CAPTURE ^D       ^D^D^D\n"
                            "****   High Score: %d  ****",
                 gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
         gameDialogDisplayString(dialogStr);
@@ -760,8 +775,8 @@ game_start(float difficulty, int type)
         
         gameStateSinglePlayer.max_enemies = 1 + difficulty;
         gameStateSinglePlayer.enemy_durability = 1 + (gameStateSinglePlayer.difficulty/2);
-        gameStateSinglePlayer.n_turrets = gameStateSinglePlayer.difficulty * 1;
-        gameStateSinglePlayer.n_collect_points = 1 + 2*gameStateSinglePlayer.difficulty;
+        gameStateSinglePlayer.n_turrets = 2 + gameStateSinglePlayer.difficulty * 1;
+        gameStateSinglePlayer.n_collect_points = 0;
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
@@ -771,11 +786,13 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.turret_destruction_change_alliance = 0;
         gameStateSinglePlayer.max_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
         gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
+        gameStateSinglePlayer.base_spawn_collect_pct = 10;
+        //gameStateSinglePlayer.base_spawn_collect_pct_rate_increase = 0.2;
         
-        gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/10;
-        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/10;
+        gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/20;
+        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/20;
         
-        gameStateSinglePlayer.enemy1_ignore_player_pct = 10;
+        gameStateSinglePlayer.enemy1_ignore_player_pct = 25;
         
         // different map for "collection" game type
         gameMapSetMap(initial_map_collection);
@@ -1072,42 +1089,44 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
             break;
             
         case GAME_SUBTYPE_COLLECT:
-            if(elemA->object_type == OBJ_PLAYER || elemA->object_type == OBJ_SHIP)
+            if(elemA->object_type == collects_obj_type_score)
             {
-                if(!do_data_grab_score_immediate)
+                world_remove_object(elemB->elem_id);
+                gameStateSinglePlayer.stats.data_collected++;
+                collect_sound = 1;
+                camera_locked_frames = 120;
+                
+                // points-indicator
+                world_add_object(MODEL_CUBE2,
+                                 elemB->physics.ptr->x,
+                                 elemB->physics.ptr->y,
+                                 elemB->physics.ptr->z,
+                                 0, 0, 0, elemB->scale, TEXTURE_ID_DATA_GRABBED);
+                world_get_last_object()->object_type = OBJ_WRECKAGE;
+                world_object_set_lifetime(world_get_last_object()->elem_id, 60);
+                update_object_velocity(world_get_last_object()->elem_id,
+                                       elemA->physics.ptr->vx * 1.5,
+                                       elemA->physics.ptr->vy * 1.5,
+                                       elemA->physics.ptr->vz * 1.5,
+                                       0);
+                
+                console_append(game_log_messages[GAME_LOG_FILESAVED]);
+            }
+            else
+            {
+                if(elemA->stuff.towed_elem_id == WORLD_ELEM_ID_INVALID)
                 {
-                    if(elemA->stuff.towed_elem_id == WORLD_ELEM_ID_INVALID)
+                    if(elemA->elem_id != my_ship_id)
                     {
-                        if(elemA->elem_id != my_ship_id)
-                        {
-                            console_write(game_log_messages[GAME_LOG_WARN_CAPTURE]);
-                        }
-                        
-                        elemA->stuff.towed_elem_id = elemB->elem_id;
-                        collect_sound = 1;
-                        camera_locked_frames = 0;
+                        console_write(game_log_messages[GAME_LOG_WARN_CAPTURE]);
                     }
-                }
-                else
-                {
-                    world_remove_object(elemB->elem_id);
-                    gameStateSinglePlayer.stats.data_collected++;
-                    collect_sound = 1;
-                    //camera_locked_frames = 60;
+                    else
+                    {
+                        camera_locked_frames = 120;
+                    }
                     
-                    // points-indicator
-                    world_add_object(MODEL_CUBE2,
-                                     elemB->physics.ptr->x,
-                                     elemB->physics.ptr->y,
-                                     elemB->physics.ptr->z,
-                                     0, 0, 0, elemB->scale, TEXTURE_ID_DATA_GRABBED);
-                    world_get_last_object()->object_type = OBJ_WRECKAGE;
-                    world_object_set_lifetime(world_get_last_object()->elem_id, 60);
-                    update_object_velocity(world_get_last_object()->elem_id,
-                                           elemA->physics.ptr->vx * 1.5,
-                                           elemA->physics.ptr->vy * 1.5,
-                                           elemA->physics.ptr->vz * 1.5,
-                                           0);
+                    elemA->stuff.towed_elem_id = elemB->elem_id;
+                    collect_sound = 1;
                 }
             }
             break;
@@ -1215,6 +1234,8 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                     
                     gameStateSinglePlayer.stats.data_collected++;
                     
+                    camera_locked_frames = 120;
+                    
                     gameAudioPlaySoundAtLocation("dropoff",
                                                  myShipListNode->elem->physics.ptr->x,
                                                  myShipListNode->elem->physics.ptr->y,
@@ -1254,10 +1275,12 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                     }
                      */
                     
-                    game_add_powerup(rand_in_range(0, gWorld->bound_x),
+                    int powerup_obj_id =
+                        game_add_powerup(rand_in_range(0, gWorld->bound_x),
                                      rand_in_range(0, gWorld->bound_y),
                                      rand_in_range(0, gWorld->bound_z),
                                      GAME_SUBTYPE_COLLECT, 0);
+                    
                 }
             }
             break;
@@ -1499,6 +1522,9 @@ game_run()
         int asteroids_found = 0;
         float objective_target_dist = 99999999;
         static int caps_found_last = 0;
+        int obj_id_enemy_spawn = WORLD_ELEM_ID_INVALID;
+        int obj_id_friendly_spawn = WORLD_ELEM_ID_INVALID;
+        int obj_id_base = WORLD_ELEM_ID_INVALID;
         
         pCur = gWorld->elements_moving.next;
         while(pCur)
@@ -1517,8 +1543,19 @@ game_run()
                     turrets_found++;
                     break;
                     
+                case OBJ_SPAWNPOINT:
+                    obj_id_friendly_spawn = pCur->elem->elem_id;
+                    break;
+                    
                 case OBJ_SPAWNPOINT_ENEMY:
                     spawn_points_found++;
+                    obj_id_enemy_spawn = pCur->elem->elem_id;
+                    break;
+                    
+                case OBJ_BASE:
+                    pCur->elem->renderInfo.tex_phase++;
+                    pCur->elem->texture_id = texture_sequence_obj_base[pCur->elem->renderInfo.tex_phase % (sizeof(texture_sequence_obj_base)/sizeof(int))];
+                    obj_id_base = pCur->elem->elem_id;
                     break;
                     
                 case OBJ_POWERUP_GENERIC:
@@ -1630,7 +1667,7 @@ game_run()
                     {
                         case OBJ_SPAWNPOINT:
                             pCur->elem->stuff.affiliation = gameNetworkState.my_player_id;
-                            world_object_set_nametag(pCur->elem->elem_id, "Firewall");
+                            //world_object_set_nametag(pCur->elem->elem_id, "Firewall");
                             
                             gameStateSinglePlayer.elem_id_spawnpoint = pCur->elem->elem_id;
                             
@@ -1646,6 +1683,12 @@ game_run()
                             {
                                 pCur->elem->stuff.u.spawnpoint.time_last_spawn = time_ms;
                                 gameStateSinglePlayer.max_enemies_spawned--;
+                                
+                                // spawn faster
+                                pCur->elem->stuff.u.spawnpoint.time_spawn_interval *= 0.9;
+                                pCur->elem->stuff.u.spawnpoint.spawn_intelligence *= 1.1;
+                            
+                                console_append(game_log_messages[GAME_LOG_SPAWNFASTER]);
                                 
                                 if(rand_in_range(1, 4) == 4)
                                 {
@@ -1669,7 +1712,6 @@ game_run()
                             }
                             
                             game_move_spawnpoint(pCur->elem);
-
                             break;
                             
                         case OBJ_POWERUP_GENERIC:
@@ -1746,7 +1788,8 @@ game_run()
                 
                 if(gameStateSinglePlayer.game_type == GAME_TYPE_COLLECT)
                 {
-                    if(collects_found <= 0 && gameStateSinglePlayer.rate_collect_increase == 0)
+                    /*
+                    if(collects_found <= 0)
                     {
                         if(console_log_search(game_log_messages[GAME_LOG_GAMEOVER], 0) == NULL)
                         {
@@ -1791,6 +1834,46 @@ game_run()
                         
                         game_add_turret(loc_powerup[0], loc_powerup[1], loc_powerup[2]);
                     }
+                     */
+                }
+                
+                if(obj_id_base != WORLD_ELEM_ID_INVALID)
+                {
+                    if(rand_in_range(1, 100) <= gameStateSinglePlayer.base_spawn_collect_pct)
+                    {
+                        // spawn a random collect powerup
+                        WorldElemListNode* pElemNodeSpawn = world_elem_list_find(obj_id_base, &gWorld->elements_list);
+                        
+                        if(pElemNodeSpawn)
+                        {
+                            float v[3];
+                            float vel = rand_in_range(50, 300);
+                            
+                            game_add_powerup(pElemNodeSpawn->elem->physics.ptr->x,
+                                             pElemNodeSpawn->elem->physics.ptr->y,
+                                             pElemNodeSpawn->elem->physics.ptr->z,
+                                             GAME_SUBTYPE_COLLECT, 0);
+                            
+                            world_get_last_object()->collision_start_time = time_ms + 1000;
+                            random_heading_vector(v);
+                            v[0] *= vel; v[1] *= vel; v[2] *= vel;
+                            update_object_velocity(world_get_last_object()->elem_id, v[0], v[1], v[2], 0);
+                            
+                            console_write(game_log_messages[GAME_LOG_NEWDATA]);
+                        }
+                        
+                        console_append("vulnerable ^D:%d system integrity:%f\n",
+                                       gameStateSinglePlayer.collects_found,
+                                       ((collects_count_gameover-gameStateSinglePlayer.collects_found) / collects_count_gameover) * 100.0);
+                    }
+                    
+                    gameStateSinglePlayer.base_spawn_collect_pct +=
+                        gameStateSinglePlayer.base_spawn_collect_pct_rate_increase;
+                    
+                    if(gameStateSinglePlayer.collects_found >= collects_count_gameover)
+                    {
+                        game_over();
+                    }
                 }
                 
                 if(gameStateSinglePlayer.game_type == GAME_TYPE_TURRET)
@@ -1798,7 +1881,6 @@ game_run()
                     if(collects_found <= 0)
                     {
                         game_over();
-                        gameStateSinglePlayer.started = 0;
                     }
                 }
             }
@@ -1880,9 +1962,9 @@ game_run()
         console_write(game_log_messages[GAME_LOG_SHOTFIRED]);
     }
     
-    if(gameInterfaceControls.fireRectMissle.touched && time_ms - firedLast > 200)
+    if(gameInterfaceControls.fireRectMissle.touched && time_ms - firedLastMissle > 200)
     {
-        firedLast = time_ms;
+        firedLastMissle = time_ms;
         fireBullet(ACTION_FIRE_MISSLE);
     }
     
@@ -2268,9 +2350,6 @@ game_add_bullet(float pos[3], float euler[3], float vel, float leadV, int bullet
     return obj;
 }
 
-game_timeval_t firedLast = 0;
-float blr_last = 1;
-
 void
 fireBullet(int bulletAction)
 {
@@ -2408,6 +2487,7 @@ firePoopedCube(WorldElem *elem)
                          0.15,
                          texture_id);
     world_get_last_object()->object_type = OBJ_POOPEDCUBE;
+    world_get_last_object()->renderInfo.priority = 1;
     world_get_last_object()->destructible = 0;
     world_get_last_object()->physics.ptr->friction = 1;
     world_get_last_object()->is_line = 1;

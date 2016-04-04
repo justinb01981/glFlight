@@ -5,6 +5,7 @@ import static android.opengl.GLES10.*;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
 
 public class GameRenderer implements Renderer {
@@ -20,11 +21,13 @@ public class GameRenderer implements Renderer {
 	public static int clientVersion = 1;
 
 	public static long lastDrawTime = 0;
-	public static long fps = 60;
+	public static long fps = 30;
+
+	public GLSurfaceView surfaceView;
 
 	@Override
 	public void onDrawFrame(GL10 arg0) {
-		onDrawFrame();
+			onDrawFrame();
 	}
 
 	@Override
@@ -38,4 +41,5 @@ public class GameRenderer implements Renderer {
 		onSurfaceCreated();
 	}
 
+	public void requestRender() { if(surfaceView != null) surfaceView.requestRender(); }
 }

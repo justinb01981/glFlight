@@ -16,7 +16,7 @@ public class GameResources {
 	
 	// this needs to be bumped every time you add/modify a resource
 	// so that the java code unpacks resource so that JNI code can reach it
-	public static int version = /* TODO: use android-version-string */ 10114;
+	public static int version = /* TODO: use android-version-string */ 10117;
 	
 	public static String resPrefix = /*"gameResources/"*/ "";
 	public static String resVersionFilename = "resVersion";
@@ -117,6 +117,10 @@ public class GameResources {
         R.raw.texture90,
         R.raw.texture91,
         R.raw.texture92,
+            R.raw.texture93,
+            R.raw.texture94,
+            R.raw.texture95,
+            R.raw.texture96,
 	};
 	
 	public static String[] resFilename = {
@@ -215,6 +219,10 @@ public class GameResources {
         "texture90.bmp",
         "texture91.bmp",
         "texture92.bmp",
+            "texture93.bmp",
+            "texture94.bmp",
+            "texture95.bmp",
+            "texture96.bmp",
 	};
 	
 	public static String[] sndNameList = {
@@ -280,8 +288,10 @@ public class GameResources {
 		}
 		
 		System.out.println("init resources");
-		
-		String envPrefix = Environment.getExternalStorageDirectory().getAbsolutePath() + "/";
+
+
+		String envPrefix = c.getExternalCacheDir() + "/";
+		/*Environment.getExternalStorageDirectory().getAbsolutePath() + "/";*/
 		
 		glFlightGameResourceInit(envPrefix);
 		

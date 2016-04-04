@@ -206,8 +206,8 @@ ADD_OBJ_END(4, 40) \
 "register_params_update 0 rnd_-4_4 4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
 "add_object r r r r 0 0 0 r r\n"
 
-#define BASE_FRIENDLY_1                        \
-"register_params 10 "/*"rndx"*/"wx0.5"" 50 "/*"rndz"*/"wz0.5"" 0 0 0 8 "/*"42"*/"92"" 0 0 0 0 0 0 0\n"                 \
+#define BASE_FRIENDLY_1(x,y,z)                        \
+"register_params 10 "/*"rndx"*/#x" "#y" "#z" 0 0 0 8 "/*"42"*/"92"" 0 0 0 0 0 0 0\n"                 \
 "add_object r r r r r r r r " "r" "\n" \
 "object_set_info 8\n" 
 
@@ -219,6 +219,11 @@ ADD_OBJ_END(4, 40) \
 "register_params 10 "/*"rndx"*/"wx0.5"" 50 "/*"rndz"*/"wz0.5"" 0 0 0 1 "/*"42"*/"92"" 0 0 0 0 0 0 0\n"                 \
 "add_object r r r r r r r r " "r" "\n" \
 "object_set_info 8\n"
+
+#define BASE_GENERIC(x,y,z)                            \
+"register_params 10 "/*"rndx"*/#x" "#y" "/*"rndz"*/#z" 0 0 0 8 "/*"42"*/"88"" 0 0 0 0 0 0 0\n"                 \
+"add_object r r r r r r r r " "r" "\n" \
+"object_set_info 13\n"
 
 #define ASTEROID_FIELD_BEGIN_1(x, y, z)                      \
 "register_params 15 """#x" "#y" "#z""" 0 0 0 4 14 0 0 0 0 0 0 0\n"
@@ -546,10 +551,13 @@ BUILDING_1(rndx, 0, rndz)
 
 // add test tower
 // add base
-BASE_FRIENDLY_1
+BASE_FRIENDLY_1(rndx, rndy, rndz)
 
 // enemy base
 BASE_ENEMY_1
+
+// "core" that spits out data
+BASE_GENERIC(100, 50, 100)
 
 // air platform
 /*

@@ -100,6 +100,9 @@ glFlightJNIInit()
 	game_init();
 	gameAudioInit();
 
+    get_time_ms_init();
+    rand_seed(time_ms);
+
 	world_lock_init();
 
 	gameSettingsPlatformInit(glFlightDefaultPlayerName(), glFlightDefaultGameName());
@@ -164,6 +167,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 }
 
 static game_timeval_t gameInputTimeLast = 0;
+static game_timeval_t gameDrawTimeLast = 0;
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jobject o)
 {
@@ -177,15 +181,19 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 		return;
 	}
 
-    if(time_ms - gameInputTimeLast >= (1000/60))
+	glFlightFrameStage1();
+	glFlightFrameStage2();
+
+    if(time_ms_wall - gameInputTimeLast >= (1000/GYRO_SAMPLE_RATE))
 	{
 		gameInput();
 
-		gameInputTimeLast = time_ms;
+		gameInputTimeLast = time_ms_wall;
 	}
 
-	glFlightFrameStage1();
-	glFlightFrameStage2();
+    DBPRINTF(("drawFrame time delta:%f", time_ms_wall - gameDrawTimeLast));
+
+    gameDrawTimeLast = time_ms_wall;
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIEnv *e, jobject o)
@@ -200,7 +208,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JN
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightRunTimerThread(JNIEnv *e, jobject o)
 {
-	update_time_ms_frame_tick();
+	//update_time_ms_frame_tick();
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightRunBGThread(JNIEnv *e, jobject o)
@@ -259,9 +267,9 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 		gameInputGyro(roll, pitch, yaw);
 	}
 
-	if(/*get_time_ms() - sensorInputLast > 1000/GAME_FRAME_RATE*/1)
+	if(/*get_time_ms() - sensorInputLast > 1000/GAME_TICK_RATE*/1)
 	{
-		gameInputGyro2(roll, pitch, yaw, 0.06);
+		gameInputGyro2(roll, pitch, yaw, 0.1);
 		sensorInputLast = get_time_ms();
 	}
 }

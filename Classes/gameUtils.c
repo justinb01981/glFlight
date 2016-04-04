@@ -27,6 +27,7 @@ const static int FALSE = 0;
 
 int n_elements_compared = 0;
 volatile float time_ms = 1;
+volatile float time_ms_wall = 1;
 
 float drawDistanceFar = 200;
 
@@ -237,8 +238,8 @@ element_dist_compare(WorldElem* pElemA, WorldElem* pElemB)
     return 0;
 }
 
-void
-get_time_ms_init()
+float
+get_time_ms_wall()
 {
     struct timeval tv;
     static struct timeval tv_start = {0};
@@ -254,7 +255,13 @@ get_time_ms_init()
     game_timeval_t tvs = tv.tv_sec - tv_start.tv_sec;
     game_timeval_t tvus = tv.tv_usec / 1000;
      
-    time_ms = tvs * 1000 + tvus;
+    return tvs * 1000 + tvus;
+}
+
+void
+get_time_ms_init()
+{
+    time_ms = get_time_ms_wall();
 }
 
 game_timeval_t
@@ -277,6 +284,8 @@ get_time_ms()
 
     time_ms = tvs * 1000 + tvus;
     */
+    
+    time_ms_wall = get_time_ms_wall();
     
     return time_ms;
 }

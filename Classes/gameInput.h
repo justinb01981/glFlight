@@ -27,6 +27,9 @@ void
 gameInputTrimBegin();
 
 void
+gameInputTrimAbort();
+
+void
 gameInputGyro(float roll, float pitch, float yaw);
 
 void
