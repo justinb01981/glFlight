@@ -48,6 +48,10 @@ void
 gameCamera_init(float x, float y, float z,
                 float eulerAlpha, float eulerBeta, float eulerGamma);
 
+void
+gameCamera_initWithHeading(float x, float y, float z,
+                           float vx, float vy, float vz);
+
 // called periodically to fix-up body axes which suffer from drift
 void
 gameCamera_normalize();

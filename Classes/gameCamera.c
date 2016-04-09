@@ -49,6 +49,28 @@ gameCamera_init(float x, float y, float z,
 }
 
 void
+gameCamera_initWithHeading(float x, float y, float z,
+                           float vx, float vy, float vz)
+{
+    float cam[] = {
+        x,
+        y,
+        z
+    };
+    
+    float d = sqrt(vx*vx + vy*vy + vz*vz);
+    float o = atan2(vx / d, vz / d);
+    
+    float k = sqrt(vx*vx + 0 + vz*vz);
+    float p = atan2(vy / d, k / d);
+    
+    gameCamera_init(cam[0], cam[1], cam[2],
+                    0.0, 0.0, 0.0);
+    gameCamera_yawRadians(M_PI+o);
+    gameCamera_pitchRadians(-p);
+}
+
+void
 gameCamera_normalize()
 {
     camera_position_t tmp;

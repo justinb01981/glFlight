@@ -62,6 +62,19 @@ struct
     int fps;
 } perf_data;
 
+struct
+{
+    int frames;
+    int elem_id;
+} camera_fix = {0, WORLD_ELEM_ID_INVALID};
+
+void
+glFlightCamFix(int elem_id)
+{
+    camera_fix.frames = 120;
+    camera_fix.elem_id = elem_id;
+}
+
 int drawElemsGoal = 200;
 
 int partial_sort_count = 1;
@@ -293,6 +306,9 @@ glFlightFrameStage1()
         
         /* TODO: figure out why a crash in visible-checks if this isn't here */
         // bail this draw
+        
+        console_write(game_log_messages[GAME_LOG_TELEPORT]);
+        gameAudioPlaySoundAtLocationWithRate("teleport", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
         return;
     }
     else
@@ -321,6 +337,21 @@ glFlightFrameStage1()
             if(camera_locked_frames > 0)
             {
                 camera_locked_frames--;
+            }
+            else if(camera_fix.frames > 0)
+            {
+                camera_fix.frames--;
+                
+                WorldElemListNode* pWatchNode = world_elem_list_find(camera_fix.elem_id, &gWorld->elements_moving);
+                if(pWatchNode)
+                {
+                    gameCamera_initWithHeading(my_ship_x, my_ship_y, my_ship_z,
+                                               pWatchNode->elem->physics.ptr->x - my_ship_x,
+                                               pWatchNode->elem->physics.ptr->y - my_ship_y,
+                                               pWatchNode->elem->physics.ptr->z - my_ship_z);
+                    gameCamera_MoveZ(-4);
+                    gameCamera_MoveY(1);
+                }
             }
             else
             {

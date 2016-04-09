@@ -191,7 +191,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 		gameInputTimeLast = time_ms_wall;
 	}
 
-    DBPRINTF(("drawFrame time delta:%f", time_ms_wall - gameDrawTimeLast));
+    //DBPRINTF(("drawFrame time delta:%f", time_ms_wall - gameDrawTimeLast));
 
     gameDrawTimeLast = time_ms_wall;
 }

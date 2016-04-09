@@ -470,6 +470,11 @@ game_add_enemy_core(float x, float y, float z, int model)
     update_object_velocity(obj_id, 1, 1, 1, 0);
     
     console_write(game_log_messages[GAME_LOG_NEWENEMY1]);
+    if(gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWENEMY1] > 0)
+    {
+        gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWENEMY1]--;
+        glFlightCamFix(obj_id);
+    }
     
     return obj_id;
 }
@@ -721,6 +726,12 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.score_pop_threshold = 10;
     gameStateSinglePlayer.enemy_spawnpoint_interval = 1;
     gameStateSinglePlayer.base_spawn_collect_pct_rate_increase = 0;
+    gameStateSinglePlayer.base_spawn_collect_initial = 0;
+    
+    for(int t = 0; t < GAME_LOG_LAST; t++) gameStateSinglePlayer.log_event_camwatch[t] = 0;
+    
+    gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWENEMY1] = 2;
+    gameStateSinglePlayer.log_event_camwatch[GAME_LOG_WARN_CAPTURE] = 1;
     
     collision_actions_set_default();
     
@@ -757,13 +768,6 @@ game_start(float difficulty, int type)
     }
     else if(gameStateSinglePlayer.game_type == GAME_TYPE_COLLECT)
     {
-        //strcpy(gameStateSinglePlayer.game_help_message, "Collect data and return to node");
-        /*
-        sprintf(dialogStr, "^D^D^DTELEPORT SUCCESSFUL^D^D^D\n"
-                "SYSTEM DEFENSES ONLINE!!!\nCollect ^D at node ^H\n"
-                "**** High Score: %d ****",
-                gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
-         */
         sprintf(dialogStr, "^D^D^DWARNING: INTRUDER_ALERT^D^D^D\n"
                            "^D^D^D   ACTIVATE_FIREWALL   ^D^D^D\n"
                            "^D^D^D       CAPTURE ^D       ^D^D^D\n"
@@ -788,6 +792,8 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
         gameStateSinglePlayer.base_spawn_collect_pct = 10;
         //gameStateSinglePlayer.base_spawn_collect_pct_rate_increase = 0.2;
+        gameStateSinglePlayer.base_spawn_collect_initial = 2;
+        gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/20;
         gameStateSinglePlayer.rate_enemy_count_increase = 1.0/20;
@@ -1110,7 +1116,7 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
                                        elemA->physics.ptr->vz * 1.5,
                                        0);
                 
-                console_append(game_log_messages[GAME_LOG_FILESAVED]);
+                console_write(game_log_messages[GAME_LOG_FILESAVED]);
             }
             else
             {
@@ -1119,6 +1125,11 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
                     if(elemA->elem_id != my_ship_id)
                     {
                         console_write(game_log_messages[GAME_LOG_WARN_CAPTURE]);
+                        if(gameStateSinglePlayer.log_event_camwatch[GAME_LOG_WARN_CAPTURE] > 0)
+                        {
+                            gameStateSinglePlayer.log_event_camwatch[GAME_LOG_WARN_CAPTURE]--;
+                            glFlightCamFix(elemA->elem_id);
+                        }
                     }
                     else
                     {
@@ -1290,6 +1301,7 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
             {
                 console_write(game_log_messages[GAME_LOG_FILELOST]);
                 world_remove_object(elemA->elem_id);
+                gameAudioPlaySoundAtLocationWithRate("filelost", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
             }
             break;
             
@@ -1839,8 +1851,11 @@ game_run()
                 
                 if(obj_id_base != WORLD_ELEM_ID_INVALID)
                 {
-                    if(rand_in_range(1, 100) <= gameStateSinglePlayer.base_spawn_collect_pct)
+                    if(rand_in_range(1, 100) <= gameStateSinglePlayer.base_spawn_collect_pct ||
+                       gameStateSinglePlayer.base_spawn_collect_initial > 0)
                     {
+                        gameStateSinglePlayer.base_spawn_collect_initial--;
+                        
                         // spawn a random collect powerup
                         WorldElemListNode* pElemNodeSpawn = world_elem_list_find(obj_id_base, &gWorld->elements_list);
                         
@@ -1849,10 +1864,11 @@ game_run()
                             float v[3];
                             float vel = rand_in_range(50, 300);
                             
-                            game_add_powerup(pElemNodeSpawn->elem->physics.ptr->x,
-                                             pElemNodeSpawn->elem->physics.ptr->y,
-                                             pElemNodeSpawn->elem->physics.ptr->z,
-                                             GAME_SUBTYPE_COLLECT, 0);
+                            int collect_elem_new_id =
+                                game_add_powerup(pElemNodeSpawn->elem->physics.ptr->x,
+                                                 pElemNodeSpawn->elem->physics.ptr->y,
+                                                 pElemNodeSpawn->elem->physics.ptr->z,
+                                                 GAME_SUBTYPE_COLLECT, 0);
                             
                             world_get_last_object()->collision_start_time = time_ms + 1000;
                             random_heading_vector(v);
@@ -1860,11 +1876,18 @@ game_run()
                             update_object_velocity(world_get_last_object()->elem_id, v[0], v[1], v[2], 0);
                             
                             console_write(game_log_messages[GAME_LOG_NEWDATA]);
+                            
+                            if(gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] > 0)
+                            {
+                                gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA]--;
+                                glFlightCamFix(collect_elem_new_id);
+                            }
                         }
                         
-                        console_append("vulnerable ^D:%d system integrity:%f\n",
-                                       gameStateSinglePlayer.collects_found,
-                                       ((collects_count_gameover-gameStateSinglePlayer.collects_found) / collects_count_gameover) * 100.0);
+                        int integritypct = 100 - (100/collects_count_gameover)*gameStateSinglePlayer.collects_found;
+                        console_write(game_log_messages[GAME_LOG_SYSTEMINTEGRITY],
+                                      gameStateSinglePlayer.collects_found,
+                                      integritypct);
                     }
                     
                     gameStateSinglePlayer.base_spawn_collect_pct +=

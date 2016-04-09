@@ -94,6 +94,8 @@ float gyroInputStableThresh = 0.01;
 
 const float tex_pass_initial_sample = 60;
 
+static double trim_dz[3];
+
 struct
 {
     float* buf, *dest;
@@ -143,6 +145,9 @@ gameInputTrimAbort()
     needTrimLast = 0;
     trimCount = trimCountLast = 9999;
     gyroStableCount = 9999;
+    controlsCalibrated = 1;
+    
+    trim_dz[0] = trim_dz[1] = trim_dz[2] = 0;
     
     gameDialogWelcome();
 }
@@ -221,7 +226,8 @@ gameInput()
     deviceYaw = motionYaw;
     deviceRoll = motionRoll;
     
-    float dz_m[3] = {0.5, 0.5, 0.5}; // deadzone-multiplier
+    //float dz_m[3] = {0.5, 0.5, 0.5}; // deadzone-multiplier
+    float dz_m[3] = {0.0, 0.0, 0.0};
 #endif
     
     float s[3] = {deviceRoll, devicePitch, deviceYaw};
@@ -293,7 +299,6 @@ gameInput()
 	}
     
     static double trimStart[3];
-    static double trim_dz[3];
     static int trimStartTime;
     
     /*

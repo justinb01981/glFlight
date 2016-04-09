@@ -100,6 +100,7 @@ const static char *game_variables_name[] = {
     "ENEMY1_RUN_INTERVAL_MS",
     "ENEMY1_LEAVES_TRAIL",
     "ENEMY1_SCAN_DISTANCE_MAX",
+    "ENEMY1_MAX_TURN_SKILL_SCALE",
     NULL
 };
 
@@ -119,6 +120,8 @@ static char *game_log_messages[] = {
     "HIDDEN: points collected\n",
     "HIDDEN: detected: ^D vulnerable\n",
     "enemies spawning faster!\n",
+    "vulnerable ^D:%d system integrity:%d \045\n",
+    "HIDDEN: connection successful",
     NULL
 };
 
@@ -138,6 +141,8 @@ enum {
     GAME_LOG_POWERUP_POINTS,
     GAME_LOG_NEWDATA,
     GAME_LOG_SPAWNFASTER,
+    GAME_LOG_SYSTEMINTEGRITY,
+    GAME_LOG_TELEPORT,
     GAME_LOG_LAST
 };
 
@@ -159,8 +164,9 @@ const static float game_variables_default[] = {
     1,           // PATROLS
     50,          // RUN_INTERVAL_MS
     1,           // LEAVES TRAIL
-    100.0,        // SCAN_DISTANCE_MAX
-    0,0,
+    100.0,       // SCAN_DISTANCE_MAX
+    0.05,        // ENEMY1_MAX_TURN_SKILL_SCALE
+    0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0            // END
 };
@@ -194,6 +200,9 @@ struct
     
     float base_spawn_collect_pct;
     float base_spawn_collect_pct_rate_increase;
+    float base_spawn_collect_initial;
+    
+    float log_event_camwatch[GAME_LOG_LAST];
     
     float rate_enemy_skill_increase;
     float rate_point_increase;
@@ -346,9 +355,7 @@ game_elem_setup_ship(WorldElem* elem, int skill)
     elem->stuff.u.enemy.fires = GAME_VARIABLE("ENEMY1_FIRES_LASERS");
     elem->stuff.u.enemy.patrols_no_target = GAME_VARIABLE("ENEMY1_PATROLS_NO_TARGET");
     elem->stuff.u.enemy.max_speed = GAME_VARIABLE("ENEMY1_SPEED_MAX");
-    elem->stuff.u.enemy.max_turn = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS")
-    //1.0 +  (0.2*skill);
-    ;
+    elem->stuff.u.enemy.max_turn = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS")+ GAME_VARIABLE("ENEMY1_MAX_TURN_SKILL_SCALE")*skill;
     elem->stuff.u.enemy.time_run_interval = GAME_VARIABLE("ENEMY1_RUN_INTERVAL_MS")
     //MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
     ;

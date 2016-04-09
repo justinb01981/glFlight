@@ -571,7 +571,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     //tow_turn_v_scale *= (rand_in_range(75, 125)/100.0);
     
     // rate at which enemy rotates
-    float r = (elem->stuff.u.enemy.max_turn + (0.1*skill)) * tc;
+    float r = elem->stuff.u.enemy.max_turn * tc;
     
     // rate at which object accelerates
     float accel = 0;
@@ -600,24 +600,30 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         zdot = zdot_ikillyou;
     }
     
+    float course_change_div = 8;
+    
     if(do_pitch)
     {
         float p = ydot < 0? r: -r;
-
-        //if(elem->stuff.u.enemy.pitch_last != p) p /= 2;
+        float cp = p;
+         
+        if(elem->stuff.u.enemy.pitch_last != p) cp /= course_change_div;
+        
         elem->stuff.u.enemy.pitch_last = p;
-        quaternion_rotate_inplace(&yq, &xq, p);
-        quaternion_rotate_inplace(&zq, &xq, p);
+        quaternion_rotate_inplace(&yq, &xq, cp);
+        quaternion_rotate_inplace(&zq, &xq, cp);
     }
 
     if(do_yaw)
     {
         float y = xdot > 0? r: -r;
+        float cy = y;
         
-        //if(elem->stuff.u.enemy.yaw_last != y) y /= 2;
+        if(elem->stuff.u.enemy.yaw_last != y) cy /= course_change_div;
+        
         elem->stuff.u.enemy.yaw_last = y;
-        quaternion_rotate_inplace(&xq, &yq, y);
-        quaternion_rotate_inplace(&zq, &yq, y);
+        quaternion_rotate_inplace(&xq, &yq, cy);
+        quaternion_rotate_inplace(&zq, &yq, cy);
     }
     
     // convert new heading vector back

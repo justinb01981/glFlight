@@ -67,7 +67,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 					EGL10.EGL_RENDERABLE_TYPE, 4,
 					EGL10.EGL_STENCIL_SIZE, 8,
 					EGL10.EGL_SAMPLE_BUFFERS, 1,
-					EGL10.EGL_SAMPLES, 2,
+					EGL10.EGL_SAMPLES, 0,
 					EGL10.EGL_NONE
 			};
 			num_config = new int[1];
@@ -95,8 +95,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-		running = true;
-
         appCtx = this.getApplicationContext();
         
         // terminate when leaving front
@@ -119,7 +117,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
 		SurfaceHolder h = gameRenderer.surfaceView.getHolder();
 
-		double sh = 640;
+        /* iOS on iPhone5:320/568 */
+		double sh = 320;
 		double sw = sh * 1.5;
 
 		viewWidthScaled = sw;
@@ -128,6 +127,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 		h.setFixedSize((int) sw, (int) sh);
 
 		GameGLConfigChooser glConfigChooser = new GameGLConfigChooser();
+		gameRenderer.surfaceView.setEGLConfigChooser(false);
 		gameRenderer.surfaceView.setEGLConfigChooser(glConfigChooser);
 		gameRenderer.surfaceView.setDrawingCacheEnabled(false);
 
@@ -143,9 +143,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
-		mBGThread.start();
-		mTimerThread.start();
         
         if(mSensorGyro != null)
         {
@@ -159,6 +156,9 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
 		GameRunnable.glFlightInit(gameRenderer);
 
+		running = true;
+		mBGThread.start();
+		mTimerThread.start();
     }
     
     @Override
@@ -291,13 +291,15 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 		Timer t;
 		public GameTimer() {
 			t = new Timer();
-			t.scheduleAtFixedRate(this, 0, 1000 / GameRenderer.fps);
+			t.scheduleAtFixedRate(this, 0, 1000 / (GameRenderer.fps*8));
 		}
 
 		public void run() {
-			GameRunnable.runTimerThread();
+            if(running) {
+			    GameRunnable.runTimerThread();
 
-			gameRenderer.requestRender();
+			    gameRenderer.requestRender();
+            }
 		}
 
 		public void start() {

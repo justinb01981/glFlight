@@ -337,6 +337,14 @@ gameDialogCancelString()
 static char gameDialogScoresString[1024];
 
 static void
+gameDialogScoresDone()
+{
+    gameStateSinglePlayer.stats.score = 0;
+    
+    gameDialogWelcome();
+}
+
+static void
 gameDialogScores()
 {
     sprintf(gameDialogScoresString, "firewall:%d\nSurvival:%d\nDefend:%d\nDeathmatch:%d\nTurret:%d\n",
@@ -348,7 +356,7 @@ gameDialogScores()
     
     gameInterfaceModalDialog(gameDialogScoresString,
                              "OK", "OK",
-                             gameDialogCancelString, gameDialogCancelString);
+                             gameDialogScoresDone, gameDialogScoresDone);
 }
 
 static void

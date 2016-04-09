@@ -20,4 +20,7 @@ glFlightFrameStage1();
 void
 glFlightFrameStage2();
 
+void
+glFlightCamFix(int elem_id);
+
 #endif

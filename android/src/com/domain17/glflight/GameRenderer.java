@@ -21,7 +21,7 @@ public class GameRenderer implements Renderer {
 	public static int clientVersion = 1;
 
 	public static long lastDrawTime = 0;
-	public static long fps = 30;
+	public static long fps = 60;
 
 	public GLSurfaceView surfaceView;
 
