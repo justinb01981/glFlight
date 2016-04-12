@@ -30,6 +30,9 @@ int texture_id_block = TEXTURE_ID_BLOCK;
 
 const char *charMap = "abcdefghijklmnopqrstuvwxyz0123456789. _-@!$%^&*";
 
+static float x_last = -1;
+static float y_last = -1;
+
 void
 gameInterfaceInit(double screenWidth, double screenHeight)
 {
@@ -284,8 +287,6 @@ gameInterfaceFindControl(float x, float y)
 void
 gameInterfaceHandleTouchMove(float x, float y)
 {
-    static float x_last = -1;
-    static float y_last = -1;
     const float move_thresh = 10;
     
     if(fabs(x-x_last) < move_thresh &&
@@ -647,13 +648,6 @@ gameInterfaceHandleTouchBegin(float x, float y)
                         gameInterfaceControls.textMenuControl.hide_frames = 120;
                         break;
                         
-                    case ACTION_SETTING_NUMAIS:
-                        gameStateSinglePlayer.setting_n_bots++;
-                        if(gameStateSinglePlayer.setting_n_bots > 20)
-                            gameStateSinglePlayer.setting_n_bots = 0;
-                        console_write("Bots:%d\n", gameStateSinglePlayer.setting_n_bots);
-                        break;
-                        
                     case ACTION_SETTING_INPUT_SENSITIVITY:
                         GYRO_DC += 0.001;
                         if(GYRO_DC >= 0.01) GYRO_DC = 0.001;
@@ -728,6 +722,8 @@ void
 gameInterfaceHandleTouchEnd(float x, float y)
 {
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
+    
+    x_last = y_last = -1;
     
     if(touchedControl)
     {

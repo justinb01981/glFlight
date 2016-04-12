@@ -67,7 +67,6 @@ static void
 gameSettingsDefaults()
 {
     // default values
-    gameStateSinglePlayer.setting_n_bots = 0;
     gameStateSinglePlayer.difficulty = 1;
     gameStateSinglePlayer.setting_bot_intelligence = 1;
     gameAudioMuted = 0;
@@ -102,7 +101,7 @@ gameSettingsWrite(const char *filename)
     {
         // append at END
         fprintf(fp, "%d\n", settings_version);
-        fprintf(fp, "%d\n", gameStateSinglePlayer.setting_n_bots);
+        fprintf(fp, "%d\n", 0); // previously gameStateSinglePlayer.setting_n_bots
         fprintf(fp, "%d\n", gameStateSinglePlayer.difficulty);
         fprintf(fp, "%d\n", texture_id_playership);
         fprintf(fp, "%d\n", gameAudioMuted);
@@ -136,6 +135,7 @@ gameSettingsRead(const char *filename)
     FILE* fp = fopen(filename, "r");
     int settings_ver;
     int err = 0;
+    int ignored = 0;
     
     while(fp)
     {
@@ -157,7 +157,7 @@ gameSettingsRead(const char *filename)
         // settings are from old binary, force defaults
         if(settings_ver != settings_version) break;
         
-        if(fscanf(fp, "%d", &gameStateSinglePlayer.setting_n_bots) < 1) break;
+        if(fscanf(fp, "%d", &ignored) < 1) break;
         if(fscanf(fp, "%d", &gameStateSinglePlayer.difficulty) < 1) break;
         if(fscanf(fp, "%d", &texture_id_playership) < 1) break;
         if(fscanf(fp, "%d", &gameAudioMuted) < 1) break;

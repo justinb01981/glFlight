@@ -129,6 +129,8 @@ glFlightFrameStage1()
         gameGraphicsInit();
         gameInterfaceReset();
         
+        visibleElementsLen = 0;
+        
         //do_draw_bail = 1;
         // 1.x clear pending removals from last pass
         // 1.1 walk list of pending removals, removing from visible list
@@ -268,6 +270,8 @@ glFlightFrameStage1()
     if(my_ship_id == WORLD_ELEM_ID_INVALID) // respawn
     {
         respawned = 1;
+        
+        pWorldElemMyShip = NULL;
         
         game_ammo_missles = game_ammo_missles_max;
         

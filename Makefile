@@ -93,6 +93,4 @@ gradle_ndk_libs:
 	${CMD_MAKE} -C ${GRADLE_IMPORT_ROOT}
 
 android_ndk_libs:
-	echo "TODO: call ndk-build and copy .so files to " ${GRADLE_DIR}/libs
-	${CMD_CHDIR} ${GRADLE_DIR}/jni
-	${CMD_NDK_BUILD} 
+	${CMD_NDK_BUILD} -C ${GRADLE_DIR}

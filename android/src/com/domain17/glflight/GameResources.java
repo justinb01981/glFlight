@@ -117,10 +117,13 @@ public class GameResources {
         R.raw.texture90,
         R.raw.texture91,
         R.raw.texture92,
-            R.raw.texture93,
-            R.raw.texture94,
-            R.raw.texture95,
-            R.raw.texture96,
+        R.raw.texture93,
+        R.raw.texture94,
+        R.raw.texture95,
+        R.raw.texture96,
+        R.raw.texture97,
+        R.raw.texture98,
+        R.raw.texture99,
 	};
 	
 	public static String[] resFilename = {
@@ -219,10 +222,13 @@ public class GameResources {
         "texture90.bmp",
         "texture91.bmp",
         "texture92.bmp",
-            "texture93.bmp",
-            "texture94.bmp",
-            "texture95.bmp",
-            "texture96.bmp",
+        "texture93.bmp",
+        "texture94.bmp",
+        "texture95.bmp",
+        "texture96.bmp",
+        "texture97.bmp",
+        "texture98.bmp",
+        "texture99.bmp",
 	};
 	
 	public static String[] sndNameList = {
@@ -242,7 +248,8 @@ public class GameResources {
 		"speedboost",
 		"towing",
 		"victory",
-		"warning"
+		"warning",
+		"teleport"
 		
 	};
 	
@@ -263,7 +270,8 @@ public class GameResources {
 		R.raw.speedboost,
 		R.raw.towing,
 		R.raw.victory,
-		R.raw.warning
+		R.raw.warning,
+        R.raw.teleport
 	};
 	
 	static GameResources inst = null;

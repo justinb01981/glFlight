@@ -2479,7 +2479,7 @@ gameNetwork_sendStatsAlert()
     pInfo = gameNetworkState.player_list_head.next;
     while(pInfo && strlen(str) < sizeof(str)-64)
     {
-        char *statsPrefix = "";
+        char *statsPrefix = clear_stats? "ALERT:": "";
         if(clear_stats) statsPrefix = "***FINAL SCORE***\n";
         
         sprintf(tmp, "%s%s: Ping:%.0f K:%d D:%d Shots:%d Points:%d\n",

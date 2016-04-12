@@ -22,7 +22,9 @@ struct gameDialogStateStruct
     int controlsResuming;
 };
 
-struct gameDialogStateStruct gameDialogState;
+extern struct gameDialogStateStruct gameDialogState;
+
+extern int gameDialogCounter;
 
 static void
 gameDialogCancel(void)
@@ -250,9 +252,15 @@ gameDialogBrowseGames()
 static void
 gameDialogStartNetworkGame2()
 {
+    gameNetwork_disconnect();
+    
     game_start(1, GAME_TYPE_DEATHMATCH);
     gameNetwork_startGame(300);
+    gameStateSinglePlayer.max_enemies = gameDialogCounter;
+    
     gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
+    
+    gameNetwork_alert("ALERT:game started!");
 }
 
 static void
@@ -261,7 +269,14 @@ gameDialogStartNetworkGameBotAdded();
 static void
 gameDialogStartNetworkGameBotAdded()
 {
-    gameStateSinglePlayer.setting_n_bots++;
+    gameDialogCounter++;
+    if(world_find_elem_with_attrs(&gWorld->elements_list, OBJ_SPAWNPOINT_ENEMY, AFFILIATION_NONE) == NULL)
+    {
+        game_add_spawnpoint(rand_in_range(1, gWorld->bound_x),
+                            rand_in_range(1, gWorld->bound_y),
+                            rand_in_range(1, gWorld->bound_z),
+                            NULL);
+    }
     
     gameInterfaceModalDialog("(Added)\nReady to start game, add a bot?", "+1", "Start",
                              gameDialogStartNetworkGameBotAdded,
@@ -286,18 +301,19 @@ gameDialogStartNetworkGameNewMap()
     maps_list_idx++;
     if(maps_list[maps_list_idx] == NULL) maps_list_idx = 0;
     
+    gameDialogStartNetworkGame();
+    
     gameMapSetMap(maps_list[maps_list_idx]);
     
     gameStateSinglePlayer.map_use_current = 1;
     
-    console_append("MAP: %s", maps_list_names[maps_list_idx]);
-
-    gameDialogStartNetworkGame();
+    console_append("MAP: %s\n", maps_list_names[maps_list_idx]);
 }
 
 static void
 gameDialogStartNetworkGame()
 {
+    gameDialogCounter = 0;
     gameStateSinglePlayer.map_use_current = 1;
     gameInterfaceModalDialog("Gathering players...\nWait...\nStart when ready\n", "Start", "Change\nmap", gameDialogStartNetworkGameAddBots, gameDialogStartNetworkGameNewMap);
 }

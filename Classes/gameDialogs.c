@@ -11,3 +11,5 @@
 #include "gameDialogs.h"
 
 struct gameDialogStateStruct gameDialogState = { 0, 0 };
+
+int gameDialogCounter = 0;

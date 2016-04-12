@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.domain17.glflight"
-    android:versionCode="00091702"
-    android:versionName="0.9.17.2" >
+    android:versionCode="00092002"
+    android:versionName="0.9.20.2" >
 
     <uses-sdk
         android:minSdkVersion="19"

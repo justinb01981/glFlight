@@ -492,7 +492,59 @@ BUILDING_1(rndx, 8, rndz)
 BUILDING_1(rndx, 8, rndz)
 BUILDING_1(rndx, 8, rndz)
 
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz)
+
 "register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
+"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 r r\n"
 "register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
 "add_object r r r r 0 0 0 r r\n"
 "register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"

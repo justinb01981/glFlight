@@ -439,7 +439,8 @@ int drawRadar()
                     scale = 4;
                 }
             }
-            else if(cur->elem->elem_id == game_target_objective_id /* && zdot > 0*/)
+            
+            if(cur->elem->elem_id == game_target_objective_id /* && zdot > 0*/)
             {
                 tex_id = TEXTURE_ID_RADAR_OBJECTIVE;
                 if(!minimal_overlay) tex_icon = zdot >= 0? cur->elem->texture_id: TEXTURE_ID_RADAR_BEHIND;

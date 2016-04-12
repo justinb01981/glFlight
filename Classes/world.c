@@ -1681,7 +1681,7 @@ world_update(float tc)
                         if(my_ship_oob && !sound_played)
                         {
                             sound_played = 1;
-                            gameAudioPlaySoundAtLocation("bump",
+                            gameAudioPlaySoundAtLocation("bump_boundary",
                                                          pCur->elem->physics.ptr->x,
                                                          pCur->elem->physics.ptr->y,
                                                          pCur->elem->physics.ptr->z);

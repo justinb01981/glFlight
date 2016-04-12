@@ -19,6 +19,7 @@
 #include "gameUtils.h"
 #include "action.h"
 #include "gameInterface.h"
+#include "gameDialogs.h"
 
 
 typedef int BOOL;
@@ -421,10 +422,15 @@ console_write(char* fmt, ...)
     int append = 0;
     char *msgPtr;
     char consoleMessageHidden[2048];
+    char *pAlert = NULL;
   
     if(strncmp(fmt, "HIDDEN:", 7) == 0)
     {
         msgPtr = consoleMessageHidden;
+    }
+    else if((pAlert = strstr(fmt, "ALERT:")))
+    {
+        gameDialogDisplayString(&pAlert[7]);
     }
     else
     {

@@ -178,7 +178,7 @@ struct
     
     float n_collect_points;
     float max_enemies;
-    float max_enemies_spawned;
+    float counter_enemies_spawned;
     float n_turrets;
     int n_asteroids;
     int n_spawnpoints;
@@ -187,7 +187,6 @@ struct
     float ally_intelligence;
     int defend_id;
     
-    int setting_n_bots;
     int setting_bot_intelligence;
     
     int ship_destruction_change_alliance;
@@ -431,14 +430,12 @@ game_elem_setup_collect(WorldElem* elem)
 inline static void
 game_elem_setup_spawnpoint_enemy(WorldElem* elem)
 {
-    //elem->renderInfo.tex_adjust = 1;
     elem->renderInfo.priority = 1;
 }
 
 inline static void
 game_elem_setup_spawnpoint(WorldElem* elem)
 {
-    //elem->renderInfo.tex_adjust = 1;
     elem->renderInfo.priority = 1;
 }
 

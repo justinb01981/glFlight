@@ -561,10 +561,10 @@ game_add_spawnpoint(float x, float y, float z, char* game_name)
     spawn[3] = spawn[4] = spawn[5] = 0;
     
     int obj_id =
-    world_add_object(MODEL_CUBE2,
+    world_add_object(MODEL_SPRITE,
                      spawn[0], spawn[1], spawn[2],
                      spawn[3], spawn[4], spawn[5],
-                     scale, TEXTURE_ID_SPAWNPOINT);
+                     scale, TEXTURE_ID_ENEMY_SPAWNPOINT);
     
     world_get_last_object()->durability = 0;
     world_get_last_object()->destructible = 1;
@@ -705,7 +705,7 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.spawn_powerup_m = 0;
     gameStateSinglePlayer.enemy_durability = DURABILITY_ENEMY_DEATHMATCH;
     gameStateSinglePlayer.max_enemies = 0;
-    gameStateSinglePlayer.max_enemies_spawned = 99999;
+    gameStateSinglePlayer.counter_enemies_spawned = 99999;
     gameStateSinglePlayer.n_turrets = 0;
     gameStateSinglePlayer.n_asteroids = 30;
     
@@ -750,8 +750,6 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.turret_destruction_change_alliance = 1;
         gameStateSinglePlayer.n_asteroids = 0;
         
-        gameStateSinglePlayer.max_enemies = gameStateSinglePlayer.setting_n_bots;
-        
         gameStateSinglePlayer.spawn_powerup_lifetime = 60*10;
         gameStateSinglePlayer.spawn_powerup_m = 20;
         
@@ -788,7 +786,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_POINTS;
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.turret_destruction_change_alliance = 0;
-        gameStateSinglePlayer.max_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
+        gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
         gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
         gameStateSinglePlayer.base_spawn_collect_pct = 10;
         //gameStateSinglePlayer.base_spawn_collect_pct_rate_increase = 0.2;
@@ -1688,13 +1686,13 @@ game_run()
                             break;
                             
                         case OBJ_SPAWNPOINT_ENEMY:
-                            if (gameStateSinglePlayer.max_enemies_spawned > 0 &&
+                            if (gameStateSinglePlayer.counter_enemies_spawned > 0 &&
                                 enemies_found < floor(gameStateSinglePlayer.max_enemies) &&
                                 time_ms - pCur->elem->stuff.u.spawnpoint.time_last_spawn >
                                 pCur->elem->stuff.u.spawnpoint.time_spawn_interval)
                             {
                                 pCur->elem->stuff.u.spawnpoint.time_last_spawn = time_ms;
-                                gameStateSinglePlayer.max_enemies_spawned--;
+                                gameStateSinglePlayer.counter_enemies_spawned--;
                                 
                                 // spawn faster
                                 pCur->elem->stuff.u.spawnpoint.time_spawn_interval *= 0.9;
@@ -2161,10 +2159,8 @@ game_run()
                     
                 case ACTION_START_DEATHMATCH_GAME:
                     gameInterfaceControls.mainMenu.visible = 0;
-                    sprintf(alertmsg, "5m deathmatch started!\nNetworked:%s\nBots:%d/Skill:%d",
-                            gameNetworkState.hostInfo.hosting? "YES": "NO",
-                            gameStateSinglePlayer.setting_n_bots,
-                            gameStateSinglePlayer.setting_bot_intelligence);
+                    sprintf(alertmsg, "5m deathmatch started!\nNetworked:%s",
+                            gameNetworkState.hostInfo.hosting? "YES": "NO");
                     gameNetwork_alert(alertmsg);
                     gameNetwork_startGame(300);
                     game_start(1, GAME_TYPE_DEATHMATCH);
