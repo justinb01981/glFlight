@@ -252,7 +252,9 @@ gameDialogBrowseGames()
 static void
 gameDialogStartNetworkGame2()
 {
-    gameNetwork_disconnect();
+ 
+    //gameNetwork_disconnectPlayers();
+    gameNetwork_sendPlayersDisconnect();
     
     game_start(1, GAME_TYPE_DEATHMATCH);
     gameNetwork_startGame(300);

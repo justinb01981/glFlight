@@ -584,16 +584,22 @@ gameNetwork_worldInit()
         pInfo = pInfo->next;
     }
 }
+    
+void
+gameNetwork_sendPlayersDisconnect()
+{
+    gameNetworkMessage msg;
+    
+    msg.cmd = GAME_NETWORK_MSG_DISCONNECT;
+    gameNetwork_send(&msg);
+}
 
 void
 gameNetwork_disconnect()
 {
-    gameNetworkMessage msg;
-    
     if(gameNetworkState.connected)
     {
-        msg.cmd = GAME_NETWORK_MSG_DISCONNECT;
-        gameNetwork_send(&msg);
+        gameNetwork_sendPlayersDisconnect();
         
         gameNetworkState.connected = 0;
     }

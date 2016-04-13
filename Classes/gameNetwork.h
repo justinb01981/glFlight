@@ -259,6 +259,9 @@ gameNetwork_directoryList();
 void
 gameNetwork_disconnect();
 
+void
+gameNetwork_sendPlayersDisconnect();
+
 int
 gameNetwork_countPlayers();
 
