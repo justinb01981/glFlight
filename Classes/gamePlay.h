@@ -101,6 +101,7 @@ const static char *game_variables_name[] = {
     "ENEMY1_LEAVES_TRAIL",
     "ENEMY1_SCAN_DISTANCE_MAX",
     "ENEMY1_MAX_TURN_SKILL_SCALE",
+    "ENEMY1_JUKE_PCT",
     NULL
 };
 
@@ -116,12 +117,14 @@ static char *game_log_messages[] = {
     "killed: turret\n",
     "HIDDEN: shot-fired\n",
     "****NEW HIGH SCORE!****\n",
+    "^K^K^KYOU WERE DESTROYED (GAME_OVER)^K^K^K\n",
     "^K^K^KSYSTEM_COMPROMISED (GAME_OVER)^K^K^K\n",
     "HIDDEN: points collected\n",
     "HIDDEN: detected: ^D vulnerable\n",
     "enemies spawning faster!\n",
     "vulnerable ^D:%d system integrity:%d \045\n",
     "HIDDEN: connection successful",
+    "detected: new turret",
     NULL
 };
 
@@ -137,12 +140,14 @@ enum {
     GAME_LOG_KILLED_TURRET,
     GAME_LOG_SHOTFIRED,
     GAME_LOG_HIGHSCORE,
+    GAME_LOG_GAMEOVER_KILLED,
     GAME_LOG_GAMEOVER,
     GAME_LOG_POWERUP_POINTS,
     GAME_LOG_NEWDATA,
     GAME_LOG_SPAWNFASTER,
     GAME_LOG_SYSTEMINTEGRITY,
     GAME_LOG_TELEPORT,
+    GAME_LOG_NEWTURRET,
     GAME_LOG_LAST
 };
 
@@ -164,9 +169,9 @@ const static float game_variables_default[] = {
     1,           // PATROLS
     50,          // RUN_INTERVAL_MS
     1,           // LEAVES TRAIL
-    100.0,       // SCAN_DISTANCE_MAX
+    200.0,       // SCAN_DISTANCE_MAX
     0.05,        // ENEMY1_MAX_TURN_SKILL_SCALE
-    0,
+    25,          // ENEMY1_JUKE_PCT
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0            // END
 };
@@ -239,6 +244,7 @@ struct
     float points_data_grabbed;
     float points_per_second_elapsed;
     float enemy_spawnpoint_interval;
+    float collect_system_integrity;
     
     game_timeval_t last_run;
     game_timeval_t time_elapsed;
@@ -282,6 +288,7 @@ extern float game_ammo_bullets;
 extern float game_ammo_missle_recharge;
 extern float game_ammo_bullets_recharge;
 const static float GAME_MISSLE_LIFETIME = (60*6);
+extern char *game_status_string;
 extern int model_my_ship;
 
 /*
@@ -382,8 +389,8 @@ game_elem_setup_turret(WorldElem* elem, int skill)
     elem->stuff.u.enemy.max_speed = 0;
     elem->stuff.u.enemy.max_turn = 0.8;
     elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
-    elem->stuff.u.enemy.scan_distance = 70;
-    elem->stuff.u.enemy.pursue_distance = 70;
+    elem->stuff.u.enemy.scan_distance = 1;
+    elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE");
 }
 
 inline static void
@@ -401,7 +408,7 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.u.enemy.time_last_run = time_ms;
     x->durability = DURABILITY_MISSLE;
     x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
-    x->stuff.u.enemy.max_turn = 2.0; // radians per second
+    x->stuff.u.enemy.max_turn = 4.0; // radians per second
     x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     x->stuff.u.enemy.scan_distance = 50;
     x->stuff.u.enemy.pursue_distance = 30;

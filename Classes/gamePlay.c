@@ -56,9 +56,11 @@ int new_level = 0;
 int game_delay_frames = 0;
 int invuln_count = 0;
 unsigned int score_last_checked = 0;
-float collects_count_gameover = 10;
+//float collects_count_gameover = 10;
 int collects_obj_type_score = OBJ_PLAYER;
 int texture_sequence_obj_base[] = {88, 88, 88, 88, 88, 88, 97, 88, 88, 88, 88, 88, 88, 98, 88, 88, 88, 88, 88, 88, 99, 99};
+char game_status_string_[255] = {0};
+char *game_status_string = game_status_string_;
 
 game_timeval_t firedLast = 0, firedLastMissle = 0;
 float blr_last = 1;
@@ -100,7 +102,7 @@ score_total()
     
     fscore += point_bonus_collected * 10;
     
-    gameStateSinglePlayer.stats.score = gameStateSinglePlayer.stats.score_last + (fscore * m);
+    gameStateSinglePlayer.stats.score = /*gameStateSinglePlayer.stats.score_last + */ (fscore * m);
     
     if(gameStateSinglePlayer.stats.score > *high_score)
     {
@@ -114,7 +116,7 @@ score_total()
 }
 
 static void
-score_newlevel()
+score_clear()
 {
     score_total();
     
@@ -133,11 +135,14 @@ score_display()
 {
     int *high_score;
     int *high_score_session;
+    char* score_prefix = "";
     
     high_score = &(gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
     high_score_session = &(gameStateSinglePlayer.high_score_session[gameStateSinglePlayer.game_type]);
     
     score_total();
+    
+    if(console_log_search(game_log_messages[GAME_LOG_GAMEOVER_KILLED], 0) != NULL) score_prefix = "KILLED\n";
     
     float capture_log_count = 0;
     while(console_log_search(game_log_messages[GAME_LOG_FILESAVED], capture_log_count) != NULL) capture_log_count++;
@@ -160,7 +165,7 @@ score_display()
     float enemies_killed = enemies_killed1 + enemies_killed2;
     
     char scoreStr[255];
-    sprintf(scoreStr, "Score:** %d **\n"
+    sprintf(scoreStr, "%sScore:** %d **\n"
             "^D saved/lost: %.0f/%.0f (%.0fpct)\n"
             "bot kills:%d\n"
             "bounty-hunter kills:%d\n"
@@ -170,6 +175,7 @@ score_display()
             "High score:%d\n"
             /* "Session High score:%d\n" */
             "",
+            score_prefix,
             gameStateSinglePlayer.stats.score,
             capture_log_count,
             lost_log_count,
@@ -667,7 +673,7 @@ game_start(float difficulty, int type)
 {
     char dialogStr[255];
     
-    int game_ai_debug = 1;
+    score_clear();
     
     console_log_clear(0, 1);
     
@@ -684,8 +690,6 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.last_game.difficulty = difficulty;
         gameStateSinglePlayer.last_game.score = gameStateSinglePlayer.stats.score;
     }
-    
-    score_newlevel();
     
     game_setup_needed = 1;
     
@@ -728,6 +732,8 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.base_spawn_collect_pct_rate_increase = 0;
     gameStateSinglePlayer.base_spawn_collect_initial = 0;
     
+    gameStateSinglePlayer.collect_system_integrity = 100;
+    
     for(int t = 0; t < GAME_LOG_LAST; t++) gameStateSinglePlayer.log_event_camwatch[t] = 0;
     
     gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWENEMY1] = 2;
@@ -738,8 +744,6 @@ game_start(float difficulty, int type)
     for(int t = 0; t < OBJ_LAST; t++) gameStateSinglePlayer.object_types_towed[t] = 0;
     
     for(int t = 0; t < GAME_POWERUP_DROP_TABLE_LEN; t++) gameStateSinglePlayer.powerup_drop_chance[t] = 0.0;
-    
-    if(difficulty == 1) gameStateSinglePlayer.stats.score = 0;
     
     if(gameStateSinglePlayer.game_type == GAME_TYPE_DEATHMATCH)
     {
@@ -1044,13 +1048,6 @@ game_setup()
         world_get_last_object()->durability = 999999;
          */
     }
-    
-    for(int i = 0; i < gameStateSinglePlayer.n_turrets; i++)
-    {
-        game_add_turret(rand_in_range(1, gWorld->bound_x),
-                        rand_in_range(1, gWorld->bound_y),
-                        rand_in_range(1, gWorld->bound_z));
-    }
 }
 
 void
@@ -1265,24 +1262,12 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                     world_object_set_lifetime(obj_id, 60);
                     
                     console_write(game_log_messages[GAME_LOG_FILESAVED]);
-                    /*
-                    if(gameStateSinglePlayer.collects_found == 1)
+                    
+                    gameStateSinglePlayer.collect_system_integrity += 10;
+                    if(gameStateSinglePlayer.collect_system_integrity >= 100)
                     {
-                        int added = 0;
-                        
-                        console_write(game_log_messages[GAME_LOG_NEWDATA]);
-                        
-                        while(added < gameStateSinglePlayer.n_collect_points)
-                        {
-                            // replace
-                            game_add_powerup(rand_in_range(1, gWorld->bound_x),
-                                             rand_in_range(1, gWorld->bound_y),
-                                             rand_in_range(1, gWorld->bound_z),
-                                             GAME_SUBTYPE_COLLECT, 0);
-                            added++;
-                        }
+                        gameStateSinglePlayer.collect_system_integrity = 100;
                     }
-                     */
                     
                     int powerup_obj_id =
                         game_add_powerup(rand_in_range(0, gWorld->bound_x),
@@ -1297,6 +1282,8 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
         case OBJ_SPAWNPOINT_ENEMY:
             if(elemA->object_type == OBJ_POWERUP_GENERIC)
             {
+                gameStateSinglePlayer.collect_system_integrity -= 10;
+                
                 console_write(game_log_messages[GAME_LOG_FILELOST]);
                 world_remove_object(elemA->elem_id);
                 gameAudioPlaySoundAtLocationWithRate("filelost", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
@@ -1399,6 +1386,7 @@ game_handle_destruction(WorldElem* elem)
         case OBJ_PLAYER:
             if(gameStateSinglePlayer.game_type != GAME_TYPE_DEATHMATCH)
             {
+                console_write(game_log_messages[GAME_LOG_GAMEOVER_KILLED]);
                 game_over();
             }
             
@@ -1496,6 +1484,11 @@ game_run()
     int target_types[] = {OBJ_SHIP, OBJ_PLAYER, OBJ_TURRET, OBJ_UNKNOWN};
     static int game_map_custom_loaded = 0;
     static game_timeval_t logSoundTimeLast = 0;
+    
+    static int elem_id_arrow3[] = {
+        WORLD_ELEM_ID_INVALID, WORLD_ELEM_ID_INVALID,
+        WORLD_ELEM_ID_INVALID, WORLD_ELEM_ID_INVALID
+    };
     
     if(game_delay_frames > 0)
     {
@@ -1677,12 +1670,8 @@ game_run()
                     {
                         case OBJ_SPAWNPOINT:
                             pCur->elem->stuff.affiliation = gameNetworkState.my_player_id;
-                            //world_object_set_nametag(pCur->elem->elem_id, "Firewall");
-                            
                             gameStateSinglePlayer.elem_id_spawnpoint = pCur->elem->elem_id;
-                            
                             game_move_spawnpoint(pCur->elem);
-                            
                             break;
                             
                         case OBJ_SPAWNPOINT_ENEMY:
@@ -1860,7 +1849,7 @@ game_run()
                         if(pElemNodeSpawn)
                         {
                             float v[3];
-                            float vel = rand_in_range(50, 300);
+                            float vel = rand_in_range(10, 300);
                             
                             int collect_elem_new_id =
                                 game_add_powerup(pElemNodeSpawn->elem->physics.ptr->x,
@@ -1882,16 +1871,15 @@ game_run()
                             }
                         }
                         
-                        int integritypct = 100 - (100/collects_count_gameover)*gameStateSinglePlayer.collects_found;
                         console_write(game_log_messages[GAME_LOG_SYSTEMINTEGRITY],
                                       gameStateSinglePlayer.collects_found,
-                                      integritypct);
+                                      gameStateSinglePlayer.collect_system_integrity);
                     }
                     
                     gameStateSinglePlayer.base_spawn_collect_pct +=
                         gameStateSinglePlayer.base_spawn_collect_pct_rate_increase;
                     
-                    if(gameStateSinglePlayer.collects_found >= collects_count_gameover)
+                    if(gameStateSinglePlayer.collect_system_integrity <= 0)
                     {
                         game_over();
                     }
@@ -1903,6 +1891,18 @@ game_run()
                     {
                         game_over();
                     }
+                }
+                
+                // add a turret which comes online in X seconds
+                if(turrets_found < gameStateSinglePlayer.n_turrets)
+                {
+                    console_write(game_log_messages[GAME_LOG_NEWTURRET]);
+                    
+                    game_add_turret(rand_in_range(1, gWorld->bound_x),
+                                    rand_in_range(1, gWorld->bound_y),
+                                    rand_in_range(1, gWorld->bound_z));
+                    
+                    world_get_last_object()->stuff.u.enemy.time_last_run = time_ms + 2000;
                 }
             }
             
@@ -1972,8 +1972,70 @@ game_run()
             gameAudioPlaySoundAtLocation(soundName, my_ship_x, my_ship_y, my_ship_z);
             logSoundTimeLast = console_write_time;
         }
+        
+        // update game status string
+        if(game_status_string)
+        {
+            if(gameStateSinglePlayer.game_type == GAME_TYPE_COLLECT)
+            {
+                sprintf(game_status_string, "integrity:%.0f%%",
+                        gameStateSinglePlayer.collect_system_integrity);
+            }
+        }
     }
     
+    static game_timeval_t game_target_objective_update_last = 0;
+    
+    if(game_target_objective_id != WORLD_ELEM_ID_INVALID &&
+       time_ms - game_target_objective_update_last >= (1000/GAME_FRAME_RATE))
+    {
+        game_target_objective_update_last = time_ms;
+        
+        WorldElemListNode* pNodeObjective = world_elem_list_find(game_target_objective_id, &gWorld->elements_moving);
+        
+        if(pNodeObjective)
+        {
+            int a = 0;
+            float arrowD = 2.0;
+            
+            float h[3] = {
+                pNodeObjective->elem->physics.ptr->x - my_ship_x,
+                pNodeObjective->elem->physics.ptr->y - my_ship_y,
+                pNodeObjective->elem->physics.ptr->z - my_ship_z
+            };
+            float d = sqrt(h[0]*h[0] + h[1]*h[1] + h[2]*h[2]);
+            float eu[3];
+            
+            eulerHeading1(h, eu);
+         
+            //TODO: tank skin on model_turret_indices
+            //TODO: animate data leaks to look like portals?
+            //TODO: pause to show game state
+            
+            if(elem_id_arrow3[a] == WORLD_ELEM_ID_INVALID)
+            {
+                elem_id_arrow3[a] = world_add_object(MODEL_BULLET,
+                                                     my_ship_x + (h[0]/d)*arrowD,
+                                                     my_ship_y + (h[1]/d)*arrowD,
+                                                     my_ship_z + (h[2]/d)*arrowD,
+                                                     eu[0], eu[1], eu[2],
+                                                     1, TEXTURE_ID_ARROW_OBJ);
+                world_get_last_object()->object_type = OBJ_DISPLAYONLY;
+                world_get_last_object()->destructible = 0;
+            }
+            else
+            {
+                elem_id_arrow3[a] =
+                world_replace_object(elem_id_arrow3[a],
+                                     MODEL_BULLET,
+                                     my_ship_x + (h[0]/d)*arrowD,
+                                     my_ship_y + (h[1]/d)*arrowD,
+                                     my_ship_z + (h[2]/d)*arrowD,
+                                     eu[0], eu[1], eu[2],
+                                     1, TEXTURE_ID_ARROW_OBJ);
+            }
+        }
+    }
     
     if(gameInterfaceControls.fire.touched && time_ms - firedLast > 200)
     {
@@ -2075,6 +2137,7 @@ game_run()
                     gameNetwork_directoryList();
                     gameDialogBrowseGames();
                     console_write("browsing game directory...\n%s", gameNetworkState.gameDirectory.directory_name);
+                    gameStateSinglePlayer.started = 0;
                     break;
                     
                 case ACTION_CONNECT_TO_GAME:
@@ -2085,10 +2148,14 @@ game_run()
                         actions_menu_reset();
                         gameMapSetMap(gameNetworkState.server_map_data);
                         gameStateSinglePlayer.started = 0;
+                        
+                        gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);
+                        gameDialogConnectToGameSuccessful();
                     }
                     else
                     {
                         console_write("Game %s not found\n(see help)\n", gameNetworkState.hostInfo.name);
+                        gameDialogConnectToGameFailed();
                     }
                     break;
                     
@@ -2100,10 +2167,14 @@ game_run()
                         actions_menu_reset();
                         gameMapSetMap(gameNetworkState.server_map_data);
                         gameStateSinglePlayer.started = 0;
+                        
+                        gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);
+                        gameDialogConnectToGameSuccessful();
                     }
                     else
                     {
-                        console_write("LAN Game not found\n(maybe enter IP addr manually)");
+                        console_write("LAN Game not found\n(see help)\n");
+                        gameDialogConnectToGameFailed();
                     }
                     break;
                     

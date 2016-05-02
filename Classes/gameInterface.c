@@ -489,6 +489,8 @@ gameInterfaceHandleTouchBegin(float x, float y)
                     gameInterfaceEditDone();
                     break;
             default:
+                    gameAudioPlaySoundAtLocation("bump", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
+                    console_write("use menu arrows/ok");
                 break;
             }
             
@@ -812,6 +814,11 @@ gameInterfaceSetInterfaceState(InterfaceMiscState state)
         case INTERFACE_STATE_ONSCREEN_INPUT_CONTROL:
             gameInterfaceControls.altControl.visible = 1;
             gameInterfaceControls.fireRectBoost.visible = 0;
+            break;
+            
+        case INTERFACE_STATE_CLOSE_MENU:
+            gameInterfaceControls.textMenuControl.visible = 0;
+            gameInterfaceControls.menuControl.visible = 0;
             break;
             
         default:

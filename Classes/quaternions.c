@@ -277,7 +277,7 @@ void quaternion_rotate2(float qvw, float qvx, float qvy, float qvz,
 }
 
 // rotate v around axis u by r
-void quaternion_rotate_inplace(quaternion_t* v, quaternion_t* _u, float r)
+void quaternion_rotate_inplace(quaternion_t* v, const quaternion_t* _u, float r)
 {
     quaternion_t u_inv;
     quaternion_t u;
@@ -380,6 +380,29 @@ get_body_vectors_for_euler2(float euler[3], float vecx[3], float vecy[3], float 
     vecz[0] = qz.x; vecz[1] = qz.y; vecz[2] = qz.z;
 }
 
+void
+eulerHeading1(float arrowV[3], float eu[3])
+{
+    float d = sqrt(arrowV[0]*arrowV[0] + arrowV[1]*arrowV[1] + arrowV[2]*arrowV[2]);
+    
+    float o = atan2(arrowV[0] / d, arrowV[2] / d);
+    
+    float k = sqrt(arrowV[0]*arrowV[0] + 0 + arrowV[2]*arrowV[2]);
+    float p = atan2(arrowV[1] / d, k / d);
+    
+    quaternion_t bx = QX;
+    quaternion_t by = QY;
+    quaternion_t bz = QZ;
+    
+    quaternion_rotate_inplace(&bz, &QY, o+M_PI);
+    quaternion_rotate_inplace(&bx, &QY, o+M_PI);
+    quaternion_rotate_inplace(&bz, &bx, p);
+    quaternion_rotate_inplace(&by, &bx, p);
+    
+    get_euler_from_body_vectors(&bx, &by, &bz,
+                                &eu[0], &eu[1], &eu[2]);
+    
+}
 
 /*
 int main(int argc, char** argv)

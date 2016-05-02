@@ -291,7 +291,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 		Timer t;
 		public GameTimer() {
 			t = new Timer();
-			t.scheduleAtFixedRate(this, 0, 1000 / (GameRenderer.fps*8));
+			t.scheduleAtFixedRate(this, 0, 1000 / (GameRenderer.fps*16));
 		}
 
 		public void run() {

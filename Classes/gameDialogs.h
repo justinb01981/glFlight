@@ -175,8 +175,8 @@ gameDialogWelcome()
     if(gameSettingsLaunchCount % 2 == 1 && !gameSettingsRatingGiven)
     {
         gameInterfaceModalDialog(WELCOMESTR
-                                 "Please rate d0gf1ght!\n"
-                                 "It only takes a second!\n",
+                                 "Please rate d0gf1ght\n"
+                                 "to get new jets/levels!\n",
                                  "Sure", "No way",
                                  gameDialogWelcomeRating, gameDialogWelcomeNoRating);
     }
@@ -202,11 +202,12 @@ gameDialogCalibrate()
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
                              "^C Calibrating controls:       ^C\n"
-                             "^C Hold device still...        ^C\n"
+                             "^C Turn left/right             ^C\n"
+                             "^C then hold device still      ^C\n"
                              "^C (to re-calibrate later use  ^C\n"
                              "^C  flashing TRIM button)      ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
-                             "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
+                             "", "skip", gameDialogCancelTrim, gameDialogCancelTrim);
 }
 
 static void
@@ -250,6 +251,20 @@ gameDialogBrowseGames()
 }
 
 static void
+gameDialogConnectToGameSuccessful()
+{
+    gameInterfaceModalDialog("Connect successful! Scoring begins...\n", "Ok", "",
+                             gameDialogCancel, gameDialogCancel);
+}
+
+static void
+gameDialogConnectToGameFailed()
+{
+    gameInterfaceModalDialog("Connect failed retry?\n", "Yes", "No",
+                             gameDialogConnectToGameYes, gameDialogCancel);
+}
+
+static void
 gameDialogStartNetworkGame2()
 {
  
@@ -280,17 +295,15 @@ gameDialogStartNetworkGameBotAdded()
                             NULL);
     }
     
-    gameInterfaceModalDialog("(Added)\nReady to start game, add a bot?", "+1", "Start",
-                             gameDialogStartNetworkGameBotAdded,
-                             gameDialogStartNetworkGame2);
+    gameInterfaceModalDialog("(Added)\nReady to start game, add a bot?", "Start", "+1",
+                             gameDialogStartNetworkGame2, gameDialogStartNetworkGameBotAdded);
 }
 
 static void
 gameDialogStartNetworkGameAddBots()
 {
-    gameInterfaceModalDialog("Ready to start game (or add a bot)?", "+1", "Start",
-                             gameDialogStartNetworkGameBotAdded,
-                             gameDialogStartNetworkGame2);
+    gameInterfaceModalDialog("Everyone here?\nReady to start game/scoring?\n(or add a bot)?", "Start", "+1",
+                             gameDialogStartNetworkGame2, gameDialogStartNetworkGameBotAdded);
 }
 
 static void gameDialogStartNetworkGame();

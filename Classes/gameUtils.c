@@ -382,11 +382,10 @@ console_log_search(char *key, unsigned idx)
 void
 console_append(char* fmt, ...)
 {
-    int i = strlen(consoleMessage);
+    size_t i = strlen(consoleMessage);
     int newlines = 0;
     int newlinesMax = 5;
     
-    i = 0;
     while(consoleMessage[i])
     {
         if(consoleMessage[i] == '\n') newlines++;

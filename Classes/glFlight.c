@@ -55,6 +55,8 @@ float block_scale = 1;
 WorldElem targetingReticleElem;
 float reticleZDist = -10;
 
+unsigned int count_elems_last = 0, count_elems_grid = 100;
+
 struct
 {
     int tex_pass_last;
@@ -119,7 +121,7 @@ glFlightFrameStage1()
     world_lock();
     
     if(!world_inited && world_data)
-    {
+    {        
         gameGraphicsUninit();
         gameMapReRender();
         gameNetwork_worldInit();
@@ -626,7 +628,8 @@ glFlightFrameStage1()
     float lineBounds = 5;
     if(my_ship_x <= lineBounds || my_ship_x >= gWorld->bound_x-lineBounds ||
        my_ship_y <= lineBounds || my_ship_y >= gWorld->bound_y-lineBounds ||
-       my_ship_z <= lineBounds || my_ship_z >= gWorld->bound_z-lineBounds)
+       my_ship_z <= lineBounds || my_ship_z >= gWorld->bound_z-lineBounds ||
+       count_elems_last <= count_elems_grid)
     {
         drawBoundingLineGrid();
     }
@@ -657,6 +660,7 @@ glFlightFrameStage1()
         count_elems++;
     }
     drawElemEnd();
+    count_elems_last = count_elems;
     
     if(pWorldElemMyShip)
     {
@@ -670,7 +674,7 @@ glFlightFrameStage1()
         
         sprintf(statsMessage, "^C:%.0f ^B:%.0f ^A:%.0f "
                 //"CP:%d/%d Trt:%d Ally:%d "
-                "Score:%d Time:%d",
+                "Score:%d Time:%d %s",
                 (pWorldElemMyShip->durability / (float) DURABILITY_PLAYER) * 100.0,
                 (game_ammo_bullets / game_ammo_bullets_max) * 100,
                 game_ammo_missles,
@@ -678,7 +682,8 @@ glFlightFrameStage1()
                 //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_TURRET? 1: 0,
                 //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_SHIP? 1: 0,
                 gameStateSinglePlayer.stats.score,
-                game_time_elapsed());
+                game_time_elapsed(),
+                game_status_string);
         strcpy(gameInterfaceControls.statsTextRect.text, statsMessage);
     }
     
@@ -764,7 +769,7 @@ glFlightFrameStage1()
         {
             consoleMessage[0] = '\0';
         }
-        strcpy(gameInterfaceControls.consoleTextRect.text, consoleMessage);
+        strncpy(gameInterfaceControls.consoleTextRect.text, consoleMessage, sizeof(gameInterfaceControls.consoleTextRect.text)-1);
     }
     
     /****************************************

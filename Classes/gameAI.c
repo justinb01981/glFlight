@@ -22,9 +22,8 @@
 float skill_m = 0.1; // 10% per skill-level
 
 float boundary_avoid_distance = 10;
-float fire_dist = 70;
 float diff_m = 0.1;
-float scan_dist_increase = 10;
+float scan_dist_increase = 15;
 float game_ai_fire_rate_ms = 800.0;
 float patrol_area_reached = 2.0;
 float tow_v_scale = 0.5;
@@ -465,7 +464,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             */
            elem->stuff.u.enemy.enemy_state != ENEMY_STATE_JUKE)
         {
-            if (rand_in_range(1, 100) <= 25)
+            if (rand_in_range(1, 100) <= game_variable_get("ENEMY1_JUKE_PCT"))
             {
                 ai_debug("juking:", elem, 0);
                 elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
@@ -662,8 +661,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
        elem->stuff.u.enemy.fires &&
        (collision_actions[OBJ_BULLET][targetElemType] == COLLISION_ACTION_DAMAGE ||
         collision_actions[OBJ_MISSLE][targetElemType] == COLLISION_ACTION_DAMAGE) &&
-       zdot >= zdot_ikillyou &&
-       dist < fire_dist)
+       zdot >= zdot_ikillyou)
     {
         fireBullet = 1;
     }
@@ -809,7 +807,8 @@ pursuit_speed_for_object(WorldElem* elem, float* accel)
             
         default:
             v = (elem->stuff.u.enemy.enemy_state == ENEMY_STATE_RUN ||
-                 elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PATROL) ?
+                 elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PATROL ||
+                 elem->stuff.u.enemy.enemy_state == ENEMY_STATE_JUKE) ?
                  elem->stuff.u.enemy.max_speed:
                  elem->stuff.u.enemy.max_speed * 0.5;
             *accel = 2;

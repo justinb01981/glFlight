@@ -31,7 +31,7 @@ typedef struct
 } glFlightPrefs;
 
 // TODO:bump this every time settings change
-const static int settings_version = 33;
+const static int settings_version = 34;
 
 // HACK: externs built in .m files
 extern double dz_roll, dz_pitch, dz_yaw;
@@ -48,6 +48,7 @@ extern int gameSettingsNetworkFrequency;
 extern int gameSettingsPortNumber;
 extern char gameSettingsLocalIPOverride[255];
 extern int gameSettingsSimpleControls;
+extern char gameSettingsVersionStr[255];
 
 static void
 gameSettingsStatsReset()
@@ -89,6 +90,7 @@ gameSettingsDefaults()
     gameSettingsPortNumber = 52000;
     gameStateSinglePlayer.lifetime_credits = 0;
     gameSettingsSimpleControls = 0;
+    strcpy(gameSettingsVersionStr, GAME_VERSION_STR);
 }
 
 static void
@@ -124,6 +126,7 @@ gameSettingsWrite(const char *filename)
         fprintf(fp, "%d\n", gameSettingsPortNumber);
         fprintf(fp, "%lu\n", gameStateSinglePlayer.lifetime_credits);
         fprintf(fp, "%d\n", gameSettingsSimpleControls);
+        fprintf(fp, "%s\n", GAME_VERSION_STR);
         
         fclose(fp);
     }
@@ -186,10 +189,17 @@ gameSettingsRead(const char *filename)
         if(fscanf(fp, "%d", &gameSettingsPortNumber) < 1) break;
         if(fscanf(fp, "%lu", &gameStateSinglePlayer.lifetime_credits) < 1) break;
         if(fscanf(fp, "%d", &gameSettingsSimpleControls) < 1) break;
+        if(fscanf(fp, "%s", gameSettingsVersionStr) < 1) break;
         
         fclose(fp);
         
         err = 1;
+    }
+    
+    // version changed
+    if(strncmp(gameSettingsVersionStr, GAME_VERSION_STR, sizeof(gameSettingsVersionStr)) != 0)
+    {
+        gameSettingsRatingGiven = 0;
     }
     
     if(fp) fclose(fp);

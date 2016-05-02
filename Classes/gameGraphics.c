@@ -147,6 +147,12 @@ bindTexture(unsigned int tex_id)
 {
     static unsigned int drawn_texture_last;
     
+    if(!bindTextureRequest(tex_id))
+    {
+        glBindTexture(GL_TEXTURE_2D, TEXTURE_ID_UNKNOWN);
+        return;
+    }
+    
     if(tex_id != drawn_texture_last && tex_id < n_textures)
     {
         glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);

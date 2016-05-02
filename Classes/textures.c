@@ -13,14 +13,16 @@
 #include <sys/types.h>
 #include "gameIncludes.h"
 #include "gameDebug.h"
+#include "assert.h"
 
 #include "textures.h"
 
 unsigned int texture_list[MAX_TEXTURES];
+unsigned int texture_list_loaded[MAX_TEXTURES];
 int n_textures = 0;
-int textures_inited = 0;
 const static unsigned char alpha_black = 0x00;
 const static unsigned char alpha_semitrans = 0xD0;
+char initTexturesPrefix[255];
 
 static u_int32_t
 convert_to_le_u32(u_int32_t v)
@@ -52,7 +54,7 @@ convert_to_le_u32(u_int32_t v)
 }
 
 static int
-read_bitmap_to_gltexture_with_replace(char* file_name, char replace_rgb_pixel_from[3], char replace_rgb_pixel_to[3])
+read_bitmap_to_gltexture_with_replace(char* file_name, char replace_rgb_pixel_from[3], char replace_rgb_pixel_to[3], int tex_id)
 {
     const int max_bitmap_dim = 4096;
     const int pixel_size = sizeof(char[4]);
@@ -145,8 +147,8 @@ read_bitmap_to_gltexture_with_replace(char* file_name, char replace_rgb_pixel_fr
                 
                 if(offset >= (pixel_size * width * height))
                 {
-                    glGenTextures(1, &texture_list[n_textures]);
-                    glBindTexture(GL_TEXTURE_2D, texture_list[n_textures]);
+                    glGenTextures(1, &texture_list[tex_id]);
+                    glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
                     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
                     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
                     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -157,6 +159,7 @@ read_bitmap_to_gltexture_with_replace(char* file_name, char replace_rgb_pixel_fr
                     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
                                  /*GL_BGRA*/ GL_RGBA, GL_UNSIGNED_BYTE, data);
                     
+                    texture_list_loaded[tex_id] = 1;
                     err = 0;
                 }
                 
@@ -175,33 +178,40 @@ read_bitmap_to_gltexture_with_replace(char* file_name, char replace_rgb_pixel_fr
 }
 
 static int
-read_bitmap_to_gltexture(char* file_name)
+read_bitmap_to_gltexture(char* file_name, int tex_id)
 {
     char key_pixel[] = {0xFF, 0xFF, 0xFF};
     
-    return read_bitmap_to_gltexture_with_replace(file_name, key_pixel, key_pixel);
+    return read_bitmap_to_gltexture_with_replace(file_name, key_pixel, key_pixel, tex_id);
 }
 
 void initTextures(const char *prefix)
 {
-	n_textures = 0;
-    char file_name[1024];
-
-    while(n_textures < MAX_TEXTURES)
+    strcpy(initTexturesPrefix, prefix);
+    
+    n_textures = 0;
+    
+    for(int i = 0; i < MAX_TEXTURES; i++)
     {
-        sprintf(file_name, "%s""texture%d.bmp", prefix, n_textures);
-        
-        if(read_bitmap_to_gltexture(file_name) >= 0)
+        texture_list_loaded[i] = 0;
+    }
+}
+
+int bindTextureRequest(int tex_id)
+{
+    int load_count = 2;
+    char file_name[255];
+    
+    if(!texture_list_loaded[tex_id])
+    {
+        while(n_textures <= tex_id && load_count > 0)
         {
+            sprintf(file_name, "%s""texture%d.bmp", initTexturesPrefix, n_textures);
+            if(read_bitmap_to_gltexture(file_name, n_textures) != 0) return 0;
             n_textures++;
-        }
-        else
-        {
-            break;
+            load_count--;
         }
     }
     
-    DBPRINTF(("initTextures: read %d textures\n", n_textures));
-    
-    textures_inited = 1;
+    return texture_list_loaded[tex_id];
 }

@@ -260,7 +260,7 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
     
     gameNetworkState.hostInfo.hosting = 0;
     gameNetworkState.broadcast_mode = broadcast_mode;
-    gameNetworkState.my_player_id = rand() % GAME_NETWORK_PLAYER_ID_HOST;
+    gameNetworkState.my_player_id = rand_in_range(1, GAME_NETWORK_PLAYER_ID_HOST-1);
     strcpy(gameNetworkState.my_player_name, player_name);
     strcpy(gameNetworkState.gameDirectory.directory_name, directory_name);
  
@@ -310,6 +310,8 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
     int map_downloaded = 0;
     int lan_bcast_retries = 4, directory_search_retries = 3, search_retries = 0;
     unsigned short server_port_resolved = htons(gameNetworkState.hostInfo.port);
+    int retries_udp = 10;
+    int delay_udp = 100;
     
     gameNetworkState.hostInfo.lan_only = lan_only;
     
@@ -369,7 +371,11 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
     {
         gameNetworkState.hostInfo.hosting = 0;
         
-        gameNetworkState.my_player_id = rand() % GAME_NETWORK_PLAYER_ID_HOST;
+        // moving to gameNetwork_init
+        if(gameNetworkState.my_player_id == 0 || gameNetworkState.my_player_id == GAME_NETWORK_PLAYER_ID_HOST)
+        {
+            gameNetworkState.my_player_id = rand_in_range(1, GAME_NETWORK_PLAYER_ID_HOST-1);
+        }
         
         // attempt to find on lan
         search_retries = lan_bcast_retries;
@@ -423,9 +429,9 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
                 
                 send_to_address_udp(&msgSearch, &gameNetworkState.gameDirectory.directory_address);
                 
-                int recv_retries = 100;
+                int recv_retries = retries_udp;
                 while(recv_retries > 0 &&
-                      gameNetwork_receive(&msgSearchResponse, &responseAddr, 2000) == GAME_NETWORK_ERR_NONE)
+                      gameNetwork_receive(&msgSearchResponse, &responseAddr, delay_udp) == GAME_NETWORK_ERR_NONE)
                 {
                     GAMENET_TRACE();
                     if(msgSearchResponse.cmd == GAME_NETWORK_MSG_DIRECTORY_RESPONSE)
@@ -471,21 +477,25 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
             memcpy(&playerInfo->address, &addr, sizeof(addr));
             playerInfo->address.len = sizeof(addr);
         
-            retries = 5;
+            retries = retries_udp;
             while(retries > 0)
             {
                 gameNetwork_send(&connectMsg);
                 
-                if(gameNetwork_receive(&netMsg, &gameAddress, 1000) == GAME_NETWORK_ERR_NONE)
+                if(gameNetwork_receive(&netMsg, &gameAddress, delay_udp) == GAME_NETWORK_ERR_NONE)
                 {
                     if(gameNetwork_getPlayerInfo(netMsg.player_id, &playerInfo, 1) == GAME_NETWORK_ERR_NONE)
                     {
                         console_write("connecting to game...");
                         
+                        socket_set_blocking(download_sock, 0);
+                        
                         // TODO: make connect non-blocking/timing-out here
                         if(!map_downloaded && connect(download_sock, (struct sockaddr*) &addr, sizeof(addr)) == 0)
                         {
                             console_write("downloading map...");
+                            
+                            socket_set_blocking(download_sock, 1);
                             
                             // download map
                             size_t map_data_size = 1024*1024;
@@ -562,7 +572,10 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
         
         if(retries <= 0 || !map_downloaded)
         {
-            console_write("connect failed");
+            console_write("connect failed\n");
+            console_append("(server %s:%d)\n",
+                           server_ip_resolved,
+                           server_port_resolved);
             gameNetwork_removePlayer(host_player_id);
             return GAME_NETWORK_ERR_FAIL;
         }
@@ -1085,7 +1098,7 @@ gameNetwork_alert(char* alert)
     
     char* p = alert;
     do{
-        int l = strlen(p);
+        size_t l = strlen(p);
         
         if(l >= sizeof(msg.params.c)-1) l = sizeof(msg.params.c)-1;
         
@@ -2208,7 +2221,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
             case GAME_NETWORK_MSG_ALERT_BEGIN:
                 console_clear();
                 msg->params.c[sizeof(msg->params.c)-1] = '\0';
-                console_write("%s: %s", playerInfo->name, msg->params.c);
+                console_write("%s:\n%s", playerInfo->name, msg->params.c);
                 break;
                 
             case GAME_NETWORK_MSG_ALERT_CONTINUE:
@@ -2370,10 +2383,16 @@ do_game_network_read()
         
         // clean up processed messages
         gameNetworkMessageQueued* pMsgCur = &gameNetworkState.msgQueue.head;
+        gameNetworkMessageQueued* pMsgProcessed = NULL;
         while(pMsgCur->next && pMsgCur->next->processed)
         {
-            gameNetworkMessageQueued* pMsgFree = pMsgCur->next;
+            if(!pMsgProcessed) pMsgProcessed = pMsgCur->next;
             pMsgCur->next = pMsgCur->next->next;
+        }
+        while(pMsgProcessed && pMsgProcessed->processed)
+        {
+            gameNetworkMessageQueued* pMsgFree = pMsgProcessed;
+            pMsgProcessed = pMsgProcessed->next;
             free(pMsgFree);
         }
         
@@ -2471,8 +2490,10 @@ gameNetwork_sendStatsAlert()
     gameNetworkPlayerInfo* pInfo;
     char str[1024];
     char tmp[128];
+    char nameBuf[32];
     static int time_remaining_last = 1;
     int clear_stats = 0;
+    const char* decor = "^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L\n";
     
     if(game_time_remaining() <= 0 && time_remaining_last > 0)
     {
@@ -2480,7 +2501,10 @@ gameNetwork_sendStatsAlert()
     }
     time_remaining_last = game_time_remaining();
     
-    sprintf(str, "Game stats:\nTime Remaining:%.0f\n", game_time_remaining());
+    sprintf(str, "Game stats:\n"
+            "%s"
+            "Time Remaining:%.0f\n"
+            "NAME            : KILL^N:   DEATH^M:   SHOTS:   PING:   POINTS:  \n", decor, game_time_remaining());
     
     pInfo = gameNetworkState.player_list_head.next;
     while(pInfo && strlen(str) < sizeof(str)-64)
@@ -2488,13 +2512,16 @@ gameNetwork_sendStatsAlert()
         char *statsPrefix = clear_stats? "ALERT:": "";
         if(clear_stats) statsPrefix = "***FINAL SCORE***\n";
         
-        sprintf(tmp, "%s%s: Ping:%.0f K:%d D:%d Shots:%d Points:%d\n",
+        strncpy(nameBuf, pInfo->name, 16);
+        while(strlen(nameBuf) < 16) strcat(nameBuf, " ");
+        
+        sprintf(tmp, "%s%s: %02d       %02d        %04d     %02.0f      %02d\n",
                 statsPrefix,
-                pInfo->name,
-                pInfo->network_latency,
+                nameBuf,
                 pInfo->stats.killer,
                 pInfo->stats.killed,
                 pInfo->stats.shots_fired,
+                pInfo->network_latency,
                 pInfo->stats.points);
         strcat(str, tmp);
         
@@ -2506,11 +2533,12 @@ gameNetwork_sendStatsAlert()
         
         pInfo = pInfo->next;
     }
+    strcat(str, decor);
     
     gameNetwork_alert(str);
     
-    console_clear();
-    console_write(str);
+    //console_clear();
+    //console_write(str);
 }
 
 void

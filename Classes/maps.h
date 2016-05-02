@@ -35,7 +35,7 @@
 "register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
 "set_world_size r r r\n"                                                 \
-"mesh_manip_add 0 " "1" " 0" " 4 0 0" " 0 0 4" " wx0.2 wz0.2\n" \
+"mesh_manip_add 0 " "1" " 0" " 4 0 0" " 0 0 4" " wx0.25 wz0.25\n" \
 /*
 WORLD_SCALED_FRAME_MESH_PULL_RANDOM(10, 0.93) \
 WORLD_SCALED_FRAME_MESH_PULL_RANDOM(10, 0.93) \
@@ -478,89 +478,6 @@ RANDOM_FLOATING_BLOCKS_1
 "add_object 1 50 80 150 0 0 0 16 3\n"
 "add_object 1 50 90 150 0 0 0 16 3\n"
 */
-;
-
-const static char initial_map_asteroid1[] = ""
-BACKGROUND_TEX_SPACE
-
-WORLD_SCALED_FRAME(1, 80, 4)
-
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-
-"register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
 ;
 
 const static char initial_map_collection[] = ""
@@ -1042,6 +959,24 @@ ASTEROID_FIELD_5
 ASTEROID_FIELD_5
 ASTEROID_FIELD_5
 ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
+ASTEROID_FIELD_5
 ;
 
 const static char initial_map_survival[] = ""
@@ -1508,11 +1443,12 @@ const static char* maps_list[] =
 {
     initial_map_collection,
     initial_map_deathmatch,
+    /*
     initial_map_200x100x200,
     map_400x100x400,
     map_portal_lobby,
+     */
     map_200x100x200_pits,
-    initial_map_asteroid1,
     initial_map_turret,
     NULL
 };
@@ -1521,11 +1457,11 @@ const static char* maps_list_names[] =
 {
     "map hack-grid",
     "map asteroidfield",
-    "map canvas",
+    /*"map canvas",
     "map bigcanvas",
     "lobby",
+     */
     "pit",
-    "asteroid",
     "map turret-defense",
     NULL
 };

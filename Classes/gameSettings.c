@@ -22,3 +22,4 @@ char gameSettingsLocalIPOverride[255];
 int gameSettingsNetworkFrequency;
 int gameSettingsPortNumber;
 int gameSettingsSimpleControls;
+char gameSettingsVersionStr[255];

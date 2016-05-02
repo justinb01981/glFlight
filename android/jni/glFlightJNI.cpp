@@ -171,6 +171,8 @@ static game_timeval_t gameDrawTimeLast = 0;
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jobject o)
 {
+    // TODO: draw a 'wait...loading' status string each frame until load
+    // complete
 	if(!glFlightInited)
 	{
 		DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
@@ -198,7 +200,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIEnv *e, jobject o)
 {
-
+    glFlightInited = false;
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JNIEnv *e, jobject o)
@@ -269,7 +271,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 
 	if(/*get_time_ms() - sensorInputLast > 1000/GAME_TICK_RATE*/1)
 	{
-		gameInputGyro2(roll, pitch, yaw, 0.1);
+		gameInputGyro2(roll, pitch, yaw, 0.08);
 		sensorInputLast = get_time_ms();
 	}
 }

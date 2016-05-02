@@ -44,7 +44,7 @@
 
 @implementation cocoaGyroManager
 
-CMDeviceMotion* refMotion;
+CMDeviceMotion* refMotion = nil;
 int resumeCountDown = 0;
 
 +(cocoaGyroManager*) instance
@@ -69,7 +69,7 @@ int resumeCountDown = 0;
 #if DEVICEMOTION_USE_GYRO_DATA
     if(!refMotion || gameInputTrimPending())
     {
-        if(refMotion) [refMotion release];
+        //if(refMotion) [refMotion release];
         
         refMotion = [motion copy];
     }

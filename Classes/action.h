@@ -25,11 +25,11 @@ typedef enum
     ACTION_NETWORK_MULTIPLAYER_MENU,
     ACTION_DISPLAY_SCORES,
     ACTION_HELP, /**/
-    ACTION_BROWSE_GAMES,
     ACTION_CONNECT_TO_LAN_GAME,
     ACTION_HOST_LAN_GAME,
-    ACTION_CONNECT_TO_GAME,
+    ACTION_BROWSE_GAMES,
     ACTION_HOST_GAME,
+    ACTION_CONNECT_TO_GAME,
     ACTION_START_DEATHMATCH_GAME,  /**/
     ACTION_FIRE_BULLET,
     ACTION_FIRE_MISSLE,
@@ -68,10 +68,10 @@ typedef enum
 static int actions_sub[][ACTION_LAST] =
 {
     // main
-    {1,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {1,0,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // net
     //{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0,0,0,0,0,0,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // game
     //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -95,14 +95,14 @@ static const char* action_strings[ACTION_LAST] =
     "game: survival",
     "game: defend",
     "game: turret",
-    "game: network multiplayer DM",
+    "game: multiplayer",
     "display scores",
     "help/about",
-    "game directory",
     "join (LAN/WiFi local)",
     "host (LAN/WiFi local)",
-    "join (Internet directory)",
-    "host (Internet directory)",
+    "search (Internet)",
+    "host (Internet)",
+    "join (Internet)",
     "start game",
     "shoot",
     "shoot missle",
@@ -218,6 +218,9 @@ static void actions_display_menu(char *dest)
             (actions_sub_cur == 2? "*GAME*": "GAME"),
             (actions_sub_cur == 3? "*BUILD*": "BUILD"),
             (actions_sub_cur == 4? "*SETTINGS*": "SETTINGS"));
+    int dlen = strlen(dest);
+    while(dlen > 0 ) { strcat(dest, "-"); dlen--; }
+    strcat(dest, "\n");
     
     for(int i = ACTION_FIRST; i < ACTION_LAST; i++)
     {
