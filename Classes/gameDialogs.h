@@ -182,7 +182,7 @@ gameDialogWelcome()
     }
     else
     {
-        gameInterfaceModalDialog(WELCOMESTR, "New Game", "Menu",
+        gameInterfaceModalDialog(WELCOMESTR, "Quick Game", "Menu",
                                  /*gameDialogWelcomeQuick*/ gameDialogWelcomeSingle, gameDialogWelcomeMenu);
     }
 }
@@ -202,12 +202,13 @@ gameDialogCalibrate()
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
                              "^C Calibrating controls:       ^C\n"
-                             "^C Turn left/right             ^C\n"
-                             "^C then hold device still      ^C\n"
-                             "^C (to re-calibrate later use  ^C\n"
-                             "^C  flashing TRIM button)      ^C\n"
+                             "^C 1. Turn left/right          ^C\n"
+                             "^C 2. Center controls          ^C\n"
+                             "^C 3. Hold still               ^C\n"
+                             "^C Use flashing trim button    ^C\n"
+                             "^C to calibrate later          ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
-                             "", "skip", gameDialogCancelTrim, gameDialogCancelTrim);
+                             "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
 }
 
 static void

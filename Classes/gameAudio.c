@@ -98,7 +98,9 @@ gameAudioPlaySoundAtLocationWithRate(const char* filename, float x, float y, flo
     float vol_distance = cam_distance(x, y, z);
     float vol_distance_max = 50;
     float v = (vol_distance / vol_distance_max);
-    float vol_c[] = {1, 0.8, 0.5, 0.2, 0.1, 0, 0};
+    float vol_c[] = {1, 0.5, 0.3, 0.2, 0.1, 0.01, 0}; //{1, 0.8, 0.5, 0.2, 0.1, 0, 0};
+    
+    if(v > 1.0) v = 1.0;
     
     if(vol_distance < vol_distance_max)
     {
@@ -107,7 +109,7 @@ gameAudioPlaySoundAtLocationWithRate(const char* filename, float x, float y, flo
         
         float vol = vol_c[(int) idx];
         
-        if(vol > 0)
+        if(vol > 0 && vol < 1.0)
         {
             msg.f[0] = vol;
             msg.f[1] = rate;
@@ -117,7 +119,7 @@ gameAudioPlaySoundAtLocationWithRate(const char* filename, float x, float y, flo
             cocoaMessageListAdd(&msg, &cocoaMessageAudioList);
             gameAudioUnlock();
             
-            /*printf("Playing sound with vol:%f\n", msg.f[0]);*/
+            printf("Playing sound %s with vol:%f\n", msg.str, msg.f[0]);
         }
     }
 }

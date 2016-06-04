@@ -54,10 +54,11 @@ convert_to_le_u32(u_int32_t v)
 }
 
 static int
-read_bitmap_to_gltexture_with_replace(char* file_name, char replace_rgb_pixel_from[3], char replace_rgb_pixel_to[3], int tex_id)
+read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char replace_rgb_pixel_to[3], int tex_id)
 {
     const int max_bitmap_dim = 4096;
     const int pixel_size = sizeof(char[4]);
+    char file_name[255];
     
     FILE* fp = NULL;
     int err = -1;
@@ -65,6 +66,8 @@ read_bitmap_to_gltexture_with_replace(char* file_name, char replace_rgb_pixel_fr
     unsigned char* data;
     int width = max_bitmap_dim;
     int height = max_bitmap_dim;
+    
+    sprintf(file_name, "%s""texture%d.bmp", initTexturesPrefix, n_textures);
 
     /*
      * bitmaps are 24-bit BMP files (usually 512x512 but some power of 2)
@@ -101,7 +104,7 @@ read_bitmap_to_gltexture_with_replace(char* file_name, char replace_rgb_pixel_fr
             pixel_offset = convert_to_le_u32(pixel_offset);
             fseek(fp, pixel_offset, SEEK_SET);
             
-            DBPRINTF(("texture: size:%lu pixel_offset:%d\n", file_size, pixel_offset));
+            DBPRINTF(("texture %s: size:%lu pixel_offset:%d\n", file_name, file_size, pixel_offset));
             
             if(data)
             {
@@ -178,11 +181,11 @@ read_bitmap_to_gltexture_with_replace(char* file_name, char replace_rgb_pixel_fr
 }
 
 static int
-read_bitmap_to_gltexture(char* file_name, int tex_id)
+read_bitmap_to_gltexture(int tex_id)
 {
     char key_pixel[] = {0xFF, 0xFF, 0xFF};
     
-    return read_bitmap_to_gltexture_with_replace(file_name, key_pixel, key_pixel, tex_id);
+    return read_bitmap_to_gltexture_with_replace(key_pixel, key_pixel, tex_id);
 }
 
 void initTextures(const char *prefix)
@@ -195,19 +198,23 @@ void initTextures(const char *prefix)
     {
         texture_list_loaded[i] = 0;
     }
+    
+    // load the first N textures
+    for(int i = 0; i < 32; i++)
+    {
+        bindTextureRequest(i);
+    }
 }
 
 int bindTextureRequest(int tex_id)
 {
     int load_count = 2;
-    char file_name[255];
     
     if(!texture_list_loaded[tex_id])
     {
         while(n_textures <= tex_id && load_count > 0)
         {
-            sprintf(file_name, "%s""texture%d.bmp", initTexturesPrefix, n_textures);
-            if(read_bitmap_to_gltexture(file_name, n_textures) != 0) return 0;
+            if(read_bitmap_to_gltexture(n_textures) != 0) return 0;
             n_textures++;
             load_count--;
         }

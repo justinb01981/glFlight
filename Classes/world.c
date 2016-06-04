@@ -593,6 +593,26 @@ int world_replace_object(int elem_id, Model type, float x, float y, float z, flo
     return world_add_object_core(type, x, y, z, yaw, pitch, roll, scale, texture_id, elem_id);
 }
 
+void
+world_replace_add_object(int* elem_id_storage,
+                         Model type,
+                         float x, float y, float z,
+                         float yaw, float pitch, float roll,
+                         float scale, int texture_id,
+                         WorldElem** elem_out)
+{
+    while(*elem_id_storage == WORLD_ELEM_ID_INVALID)
+    {
+        *elem_id_storage = world_add_object(type, x, y, z, yaw, pitch, roll, scale, texture_id);
+    }
+    
+    *elem_id_storage = world_replace_object(*elem_id_storage, type, x, y, z, yaw, pitch, roll, scale, texture_id);
+    
+    WorldElemListNode* foundNode = world_elem_list_find(*elem_id_storage, &gWorld->elements_list);
+    
+    if(elem_out && foundNode) *elem_out = foundNode->elem;
+}
+
 WorldElem* world_get_last_object()
 {
     return gWorld->last_elem_added;

@@ -121,7 +121,7 @@ glFlightFrameStage1()
     world_lock();
     
     if(!world_inited && world_data)
-    {        
+    {
         gameGraphicsUninit();
         gameMapReRender();
         gameNetwork_worldInit();

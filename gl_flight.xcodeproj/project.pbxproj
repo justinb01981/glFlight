@@ -1015,8 +1015,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: JUSTIN Brady (FP3HEP75WZ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: JUSTIN Brady (ZQVH66AQJ9)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1031,8 +1031,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = d0gf1ght;
-				PROVISIONING_PROFILE = "bf826cd8-f070-44bd-b73c-7aa52e917776";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "bf826cd8-f070-44bd-b73c-7aa52e917776";
+				PROVISIONING_PROFILE = "a0614c67-9d2c-473c-813e-9e0f4875d711";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "a0614c67-9d2c-473c-813e-9e0f4875d711";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7 arm7s";
 			};
@@ -1042,8 +1042,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: JUSTIN Brady (FP3HEP75WZ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: JUSTIN Brady (ZQVH66AQJ9)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1056,8 +1056,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = d0gf1ght;
-				PROVISIONING_PROFILE = "bf826cd8-f070-44bd-b73c-7aa52e917776";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "bf826cd8-f070-44bd-b73c-7aa52e917776";
+				PROVISIONING_PROFILE = "a0614c67-9d2c-473c-813e-9e0f4875d711";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "a0614c67-9d2c-473c-813e-9e0f4875d711";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 arm7s arm64";

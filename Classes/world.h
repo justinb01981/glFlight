@@ -137,6 +137,13 @@ void world_remove_object(int elem_id);
 
 int world_replace_object(int elem_id, Model type, float x, float y, float z, float yaw, float pitch, float roll, float scale, int texture_id);
 
+void
+world_replace_add_object(int* elem_id_storage, Model type,
+                         float x, float y, float z,
+                         float yaw, float pitch, float roll,
+                         float scale, int texture_id,
+                         WorldElem** elem_out);
+
 WorldElem* world_get_object_n_at_loc(int n, float x, float y, float z, float range);
 
 WorldElem* world_find_elem_with_attrs(WorldElemListNode* head, int object_type, int affiliation);

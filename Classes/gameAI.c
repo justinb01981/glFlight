@@ -21,18 +21,16 @@
 
 float skill_m = 0.1; // 10% per skill-level
 
-float boundary_avoid_distance = 10;
 float diff_m = 0.1;
-float scan_dist_increase = 15;
+float scan_dist_increase = 30;
 float game_ai_fire_rate_ms = 800.0;
 float patrol_area_reached = 2.0;
 float tow_v_scale = 0.5;
 float min_patrol_distance = 20;
+float collect_deploy_distance = -2.5;
 
 gameAIState_t gameAIState;
 
-static int
-near_boundary(float pos, float boundary);
 
 static float
 pursuit_speed_for_object(WorldElem* elem, float* accel);
@@ -222,19 +220,16 @@ game_ai_run()
             // if towing, aim for base to drop off
             if(pCurElem->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID)
             {
-                if(pCurElem->stuff.u.enemy.enemy_state != ENEMY_STATE_PATROL)
+                WorldElem* pBaseElem = world_find_elem_with_attrs(&gWorld->elements_list,
+                                                                  OBJ_SPAWNPOINT_ENEMY,
+                                                                  pCurElem->stuff.affiliation);
+                if(pBaseElem)
                 {
-                    WorldElem* pBaseElem = world_find_elem_with_attrs(&gWorld->elements_list,
-                                                                      OBJ_SPAWNPOINT_ENEMY,
-                                                                      pCurElem->stuff.affiliation);
-                    if(pBaseElem)
-                    {
-                        pCurElem->stuff.u.enemy.tgt_x = pBaseElem->physics.ptr->x;
-                        pCurElem->stuff.u.enemy.tgt_y = pBaseElem->physics.ptr->y;
-                        pCurElem->stuff.u.enemy.tgt_z = pBaseElem->physics.ptr->z;
-                        pCurElem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
-                        pCurElem->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
-                    }
+                    pCurElem->stuff.u.enemy.tgt_x = pBaseElem->physics.ptr->x;
+                    pCurElem->stuff.u.enemy.tgt_y = pBaseElem->physics.ptr->y;
+                    pCurElem->stuff.u.enemy.tgt_z = pBaseElem->physics.ptr->z;
+                    pCurElem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
+                    pCurElem->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
                 }
             }
             
@@ -331,9 +326,16 @@ game_ai_run()
                               pv[3], pv[4], pv[5],
                               pCurElem);
             }
+            
+            if(GAME_AI_DEBUG)
+            {
+                char tag_debug[255];
+                sprintf(tag_debug, "%d,%d", pCurElem->stuff.u.enemy.enemy_state, pCurElem->stuff.u.enemy.target_id);
+                world_object_set_nametag(pCurElem->elem_id, tag_debug);
+            }
+            
+            pCurElem->stuff.u.enemy.time_last_run = time_ms;
         }
-        
-        pCurElem->stuff.u.enemy.time_last_run = time_ms;
         
         game_ai_run_skip_ai:
         
@@ -355,6 +357,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     float zdot_ikillyou = 0.5;
     float zdot_juke = 0.3;
     float direction = 1.0;
+    float course_change_div = 8;
     
     //if(time_ms - elem->stuff.u.enemy.time_last_run < elem->stuff.u.enemy.time_run_interval) return;
     
@@ -370,22 +373,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     // AI speed
     float vcur = world_elem_get_velocity(elem);
-    
-    // test if nearing world boundary and avoid it (head to dead-middle of world
-    // until sufficiently distant)
-    /*
-    if(!elem->stuff.u.enemy.fixed &&
-       elem->stuff.u.enemy.run_distance > 0)
-    {
-        if(near_boundary(elem->physics.ptr->x, gWorld->bound_x) ||
-           near_boundary(elem->physics.ptr->y, gWorld->bound_y) ||
-           near_boundary(elem->physics.ptr->z, gWorld->bound_z))
-        {
-            elem->stuff.u.enemy.enemy_state = ENEMY_STATE_GOHOME;
-            elem->stuff.u.enemy.time_next_decision = time_ms + 2000;
-        }
-    }
-     */
     
     float ax = elem->physics.ptr->x - x;
     float ay = elem->physics.ptr->y - y;
@@ -546,19 +533,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             elem->stuff.u.enemy.enemy_state = elem->stuff.u.enemy.last_state;
         }
     }
-    /*
-    else if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_GOHOME)
-    {
-        if(time_ms > elem->stuff.u.enemy.time_next_decision)
-        {
-            elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
-        }
-        
-        ax = elem->physics.ptr->x - gWorld->bound_x/2;
-        ay = elem->physics.ptr->y - gWorld->bound_y/2;
-        az = elem->physics.ptr->z - gWorld->bound_z/2;
-    }
-     */
     
     // on state change, default to 1s between decision
     if(elem->stuff.u.enemy.enemy_state != prev_state && time_ms > elem->stuff.u.enemy.time_next_decision)
@@ -598,8 +572,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         dist = 0;
         zdot = zdot_ikillyou;
     }
-    
-    float course_change_div = 8;
     
     if(do_pitch)
     {
@@ -703,7 +675,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     {
         elem->stuff.u.enemy.time_last_deploy = time_ms;
      
-        float bv = -2.5 * elem->scale;
+        float bv = collect_deploy_distance * elem->scale;
         
         game_add_powerup(elem->physics.ptr->x - zq.x*bv,
                          elem->physics.ptr->y - zq.y*bv,
@@ -755,7 +727,14 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     elemAI->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
     
     // drop tow
-    if(elemC->elem_id != elemAI->stuff.towed_elem_id) elemAI->stuff.towed_elem_id = WORLD_ELEM_ID_INVALID;
+    elemAI->stuff.towed_elem_id = WORLD_ELEM_ID_INVALID;
+    
+    if(elemAI->stuff.u.enemy.target_id == WORLD_ELEM_ID_INVALID &&
+       elemC->stuff.affiliation != 0)
+    {
+        elemAI->stuff.u.enemy.target_id = elemC->stuff.affiliation;
+        ai_debug("enemy targeting affiliation:%d", elemAI, elemC->stuff.affiliation);
+    }
     
     if(elemAI && elemC->physics.ptr->velocity == 0)
     {
@@ -780,13 +759,6 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
             elemAI->stuff.u.enemy.time_next_decision = time_ms + 2000;
         }
     }
-}
-
-static int
-near_boundary(float pos, float boundary)
-{
-    if(pos > boundary_avoid_distance && boundary - pos > boundary_avoid_distance) return 0;
-    return 1;
 }
 
 static float

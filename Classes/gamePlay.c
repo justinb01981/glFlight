@@ -499,8 +499,9 @@ game_add_enemy_ace(float x, float y, float z)
     int obj_id = game_add_enemy_core(x, y, z, MODEL_SHIP3);
     game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence + 2);
     world_get_last_object()->texture_id = TEXTURE_ID_ENEMYSHIP_ACE;
-    world_get_last_object()->stuff.u.enemy.fires_missles = 1;
+    world_get_last_object()->stuff.u.enemy.fires_missles = 0;
     world_get_last_object()->durability *= 4;
+    world_get_last_object()->stuff.u.enemy.ignore_collect = 1;
     console_write(game_log_messages[GAME_LOG_NEWENEMY2]);
     return obj_id;
 }
@@ -780,7 +781,7 @@ game_start(float difficulty, int type)
         game_reset();
         
         gameStateSinglePlayer.max_enemies = 1 + difficulty;
-        gameStateSinglePlayer.enemy_durability = 1 + (gameStateSinglePlayer.difficulty/2);
+        gameStateSinglePlayer.enemy_durability = game_variable_get("ENEMY1_COLLECT_DURABILITY");
         gameStateSinglePlayer.n_turrets = 2 + gameStateSinglePlayer.difficulty * 1;
         gameStateSinglePlayer.n_collect_points = 0;
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
@@ -1484,6 +1485,7 @@ game_run()
     int target_types[] = {OBJ_SHIP, OBJ_PLAYER, OBJ_TURRET, OBJ_UNKNOWN};
     static int game_map_custom_loaded = 0;
     static game_timeval_t logSoundTimeLast = 0;
+    static int game_target_enemy_near = WORLD_ELEM_ID_INVALID;
     
     static int elem_id_arrow3[] = {
         WORLD_ELEM_ID_INVALID, WORLD_ELEM_ID_INVALID,
@@ -1528,6 +1530,8 @@ game_run()
         int obj_id_enemy_spawn = WORLD_ELEM_ID_INVALID;
         int obj_id_friendly_spawn = WORLD_ELEM_ID_INVALID;
         int obj_id_base = WORLD_ELEM_ID_INVALID;
+        float enemy_dist_near = 0;
+        
         
         pCur = gWorld->elements_moving.next;
         while(pCur)
@@ -1536,6 +1540,17 @@ game_run()
             {                    
                 case OBJ_SHIP:
                     enemies_found++;
+                    {
+                        float d = distance(my_ship_x, my_ship_y, my_ship_z,
+                                           pCur->elem->physics.ptr->x,
+                                           pCur->elem->physics.ptr->y,
+                                           pCur->elem->physics.ptr->z);
+                        if(enemy_dist_near == 0 || d < enemy_dist_near)
+                        {
+                            enemy_dist_near = d;
+                            game_target_enemy_near = pCur->elem->elem_id;
+                        }
+                    }
                     break;
                     
                 case OBJ_MISSLE:
@@ -1986,53 +2001,52 @@ game_run()
     
     static game_timeval_t game_target_objective_update_last = 0;
     
-    if(game_target_objective_id != WORLD_ELEM_ID_INVALID &&
-       time_ms - game_target_objective_update_last >= (1000/GAME_FRAME_RATE))
+    if(time_ms - game_target_objective_update_last >= (1000/GAME_FRAME_RATE))
     {
         game_target_objective_update_last = time_ms;
         
-        WorldElemListNode* pNodeObjective = world_elem_list_find(game_target_objective_id, &gWorld->elements_moving);
+        int* arrow_objects[] = {
+            &game_target_objective_id,
+            &game_target_enemy_near
+        };
         
-        if(pNodeObjective)
+        for(int a = 0; a < sizeof(arrow_objects)/sizeof(int*); a++)
         {
-            int a = 0;
-            float arrowD = 2.0;
-            
-            float h[3] = {
-                pNodeObjective->elem->physics.ptr->x - my_ship_x,
-                pNodeObjective->elem->physics.ptr->y - my_ship_y,
-                pNodeObjective->elem->physics.ptr->z - my_ship_z
-            };
-            float d = sqrt(h[0]*h[0] + h[1]*h[1] + h[2]*h[2]);
-            float eu[3];
-            
-            eulerHeading1(h, eu);
-         
-            //TODO: tank skin on model_turret_indices
-            //TODO: animate data leaks to look like portals?
-            //TODO: pause to show game state
-            
-            if(elem_id_arrow3[a] == WORLD_ELEM_ID_INVALID)
+            WorldElemListNode* pNodeObjective = world_elem_list_find(*arrow_objects[a], &gWorld->elements_moving);
+            if(pNodeObjective)
             {
-                elem_id_arrow3[a] = world_add_object(MODEL_BULLET,
-                                                     my_ship_x + (h[0]/d)*arrowD,
-                                                     my_ship_y + (h[1]/d)*arrowD,
-                                                     my_ship_z + (h[2]/d)*arrowD,
-                                                     eu[0], eu[1], eu[2],
-                                                     1, TEXTURE_ID_ARROW_OBJ);
-                world_get_last_object()->object_type = OBJ_DISPLAYONLY;
-                world_get_last_object()->destructible = 0;
+                float arrowD = 2.0;
+                WorldElem* elemArrow = NULL;
+                
+                float h[3] = {
+                    pNodeObjective->elem->physics.ptr->x - my_ship_x,
+                    pNodeObjective->elem->physics.ptr->y - my_ship_y,
+                    pNodeObjective->elem->physics.ptr->z - my_ship_z
+                };
+                float d = sqrt(h[0]*h[0] + h[1]*h[1] + h[2]*h[2]);
+                float eu[3];
+                
+                eulerHeading1(h, eu);
+                
+                world_replace_add_object(&elem_id_arrow3[a],
+                                         MODEL_BULLET,
+                                         my_ship_x + (h[0]/d)*arrowD,
+                                         my_ship_y + (h[1]/d)*arrowD,
+                                         my_ship_z + (h[2]/d)*arrowD,
+                                         eu[0], eu[1], eu[2],
+                                         1,
+                                         a == 0? TEXTURE_ID_ARROW_OBJ: TEXTURE_ID_ARROW_ENEMY,
+                                         &elemArrow);
+                
+                if(elemArrow)
+                {
+                    elemArrow->object_type = OBJ_DISPLAYONLY;
+                    elemArrow->destructible = 0;
+                }
             }
             else
             {
-                elem_id_arrow3[a] =
-                world_replace_object(elem_id_arrow3[a],
-                                     MODEL_BULLET,
-                                     my_ship_x + (h[0]/d)*arrowD,
-                                     my_ship_y + (h[1]/d)*arrowD,
-                                     my_ship_z + (h[2]/d)*arrowD,
-                                     eu[0], eu[1], eu[2],
-                                     1, TEXTURE_ID_ARROW_OBJ);
+                *arrow_objects[a] = WORLD_ELEM_ID_INVALID;
             }
         }
     }
@@ -2614,6 +2628,7 @@ game_ai_target_priority(WorldElem* pSearchElem, WorldElem* pTargetElem, float* d
         else if(pTargetElem->object_type == OBJ_SHIP) return 2;
         else if(pTargetElem->object_type == OBJ_TURRET) return 1;
         else if(!pSearchElem->stuff.u.enemy.fixed && pTargetElem->object_type == OBJ_POWERUP_GENERIC &&
+                !pSearchElem->stuff.u.enemy.ignore_collect &&
                 pTargetElem->stuff.subtype == GAME_SUBTYPE_COLLECT &&
                 pTargetElem->physics.ptr->velocity <= velocity_pickup)
         {

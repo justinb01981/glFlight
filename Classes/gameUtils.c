@@ -32,6 +32,8 @@ volatile float time_ms_wall = 1;
 
 float drawDistanceFar = 200;
 
+const int console_write_append_thresh_ms = 1000;
+
 float 
 distance(float x1, float y1, float z1, float x2, float y2, float z2)
 {
@@ -433,7 +435,7 @@ console_write(char* fmt, ...)
     }
     else
     {
-        if(time_ms - console_write_time < 5000) append = 1;
+        if(time_ms - console_write_time < console_write_append_thresh_ms) append = 1;
         msgPtr = append? consoleMessageTemp: consoleMessage;
         
         if(append) strcat(consoleMessage, "\n");
@@ -449,7 +451,7 @@ console_write(char* fmt, ...)
     
     vsnprintf(msgPtr, sizeof(consoleMessage), fmt, list);
      
-    int l = strlen(msgPtr);
+    size_t l = strlen(msgPtr);
     //if(l > 0 && msgPtr[l-1] == '\n') msgPtr[l-1] = '\0';
      
     va_end(list);

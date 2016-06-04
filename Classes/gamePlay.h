@@ -88,7 +88,6 @@ const static char *game_variables_name[] = {
     "ENEMY_SPAWN_MAX_COUNT",
     "ENEMY_SPAWN_MAX_ALIVE",
     "PHYSICS_FRICTION_C",
-    
     "ENEMY1_FORGET_DISTANCE",
     "ENEMY1_PURSUE_DISTANCE",
     "ENEMY1_SPEED_MAX",
@@ -102,6 +101,8 @@ const static char *game_variables_name[] = {
     "ENEMY1_SCAN_DISTANCE_MAX",
     "ENEMY1_MAX_TURN_SKILL_SCALE",
     "ENEMY1_JUKE_PCT",
+    "ENEMY1_COLLECT_DURABILITY",
+    "ENEMY_RUN_DISTANCE",
     NULL
 };
 
@@ -122,7 +123,7 @@ static char *game_log_messages[] = {
     "HIDDEN: points collected\n",
     "HIDDEN: detected: ^D vulnerable\n",
     "enemies spawning faster!\n",
-    "vulnerable ^D:%d system integrity:%d \045\n",
+    "vulnerable ^D:%d system integrity:%f \045\n",
     "HIDDEN: connection successful",
     "detected: new turret",
     NULL
@@ -158,21 +159,22 @@ const static float game_variables_default[] = {
     99999999,    // MAX_SPAWN_COUNT
     10,          // MAX_ALIVE_COUNT
     1,           // PHYSICS_FRICTION_C
-    
     50,          // ENEMY1_FORGET_DISTANCE
     30,          // ENEMY1_PURSUE_DISTANCE
-    MAX_SPEED,          // MAX_SPEED
-    /*1.2*/0.8,         // MAX_TURN_RADIANS
+    MAX_SPEED,   // MAX_SPEED
+    /*1.2*/0.8,  // MAX_TURN_RADIANS
     0,           // FIRES MISSLES
     1,           // FIRES LASERS
     1,           // CHANGES_TARGET
     1,           // PATROLS
     50,          // RUN_INTERVAL_MS
     1,           // LEAVES TRAIL
-    200.0,       // SCAN_DISTANCE_MAX
+    800.0,       // SCAN_DISTANCE_MAX
     0.05,        // ENEMY1_MAX_TURN_SKILL_SCALE
     25,          // ENEMY1_JUKE_PCT
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    2,           // ENEMY1_COLLECT_DURABILITY
+    20,          // ENEMY_RUN_DISTANCE
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0            // END
 };
 
@@ -355,7 +357,7 @@ game_elem_setup_ship(WorldElem* elem, int skill)
     if(skill > 5) skill = 5;
     
     elem->stuff.u.enemy.leaves_trail = GAME_VARIABLE("ENEMY1_LEAVES_TRAIL");
-    elem->stuff.u.enemy.run_distance = rand_in_range(4, 14);
+    elem->stuff.u.enemy.run_distance = rand_in_range(4, GAME_VARIABLE("ENEMY_RUN_DISTANCE"));
     elem->stuff.u.enemy.fixed = 0;
     elem->stuff.u.enemy.changes_target = GAME_VARIABLE("ENEMY1_CHANGES_TARGET");
     elem->stuff.u.enemy.fires = GAME_VARIABLE("ENEMY1_FIRES_LASERS");
@@ -371,6 +373,7 @@ game_elem_setup_ship(WorldElem* elem, int skill)
     elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE")
     //30 - (5 * skill);
     ;
+    elem->stuff.u.enemy.ignore_collect = 0;
 }
 
 inline static void
