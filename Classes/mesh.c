@@ -204,8 +204,35 @@ void free_mesh(struct mesh_t* mesh)
     free(mesh);
 }
 
+void
+mesh_opengl_index_sort(float pos[3], struct mesh_opengl_t* ogl_mesh)
+{
+    unsigned int i;
+    int c = 3;
+    for(i = 0; i < ogl_mesh->n_indices-c; i += c)
+    {
+        
+        float da = (pos[0]-ogl_mesh->coords[ogl_mesh->indices[i]]) *
+                   (pos[1]-ogl_mesh->coords[ogl_mesh->indices[i]+1])*
+                   (pos[2]-ogl_mesh->coords[ogl_mesh->indices[i]+2]);
+        float db = (pos[0]-ogl_mesh->coords[ogl_mesh->indices[i+c]]) *
+                    (pos[1]-ogl_mesh->coords[ogl_mesh->indices[i+c]+1]) *
+                    (pos[2]-ogl_mesh->coords[ogl_mesh->indices[i+c]+2]);
+        if(da < db) {
+            // swap
+            unsigned int tmp;
+            tmp = ogl_mesh->indices[i];
+            ogl_mesh->indices[i] = ogl_mesh->indices[i+c]; ogl_mesh->indices[i+c] = tmp;
+            tmp = ogl_mesh->indices[i+1];
+            ogl_mesh->indices[i+1] = ogl_mesh->indices[i+c+1]; ogl_mesh->indices[i+c+1] = tmp;
+            tmp = ogl_mesh->indices[i+2];
+            ogl_mesh->indices[i+2] = ogl_mesh->indices[i+c+2]; ogl_mesh->indices[i+c+2] = tmp;
+        }
+    }
+}
+
 struct mesh_opengl_t*
-mesh_to_opengl_triangles(struct mesh_t* mesh)
+mesh_to_opengl_triangles(struct mesh_t* mesh, float tx_m, float ty_m)
 {
     struct mesh_opengl_t* ogl_mesh;
     
@@ -221,7 +248,7 @@ mesh_to_opengl_triangles(struct mesh_t* mesh)
     // build indices from triangles
     for(unsigned int t = 0; t < mesh->n_triangles; t++)
     {
-        unsigned long coord_idx;
+        unsigned int coord_idx;
         
         coord_idx = MESH_COORD_IDX(mesh, mesh->triangles[t].points[0].x,
                                    mesh->triangles[t].points[0].y);
@@ -244,21 +271,17 @@ mesh_to_opengl_triangles(struct mesh_t* mesh)
         ogl_mesh->coords[c*3] = mesh->coordinates[c].x;
         ogl_mesh->coords[c*3+1] = mesh->coordinates[c].y;
         ogl_mesh->coords[c*3+2] = mesh->coordinates[c].z;
-        printf("%s:%d coodinate: %f %f %f\n",__FILE__, __LINE__,
-               mesh->coordinates[c].x, mesh->coordinates[c].y, mesh->coordinates[c].z);
         
         mesh_glfloat_t tx;
         if(MESH_X_FOR_COORD(mesh, c) == 0) tx = 0;
-        else tx = (float) MESH_X_FOR_COORD(mesh, c)/mesh->dim_x;
+        else tx = (float) MESH_X_FOR_COORD(mesh, c)/(mesh->dim_x*tx_m);
         
         mesh_glfloat_t ty;
         if(MESH_Y_FOR_COORD(mesh, c) == 0) ty = 0;
-        else ty = (float) MESH_Y_FOR_COORD(mesh, c)/mesh->dim_y;
+        else ty = (float) MESH_Y_FOR_COORD(mesh, c)/(mesh->dim_y*ty_m);
         
         ogl_mesh->tex_coords[c*2] = tx;
         ogl_mesh->tex_coords[c*2+1] = ty;
-
-        printf("%s:%d tex-coodinate: %f %f\n",__FILE__, __LINE__, tx, ty);
     }
     
     return ogl_mesh;

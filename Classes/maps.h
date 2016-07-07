@@ -48,6 +48,13 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(10, 0.93) \
 "mesh_manip_round 0 4 0\n" \
 "mesh_manip_complete 2 "#tex" 1 "#scale"\n"
 
+#define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
+"register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
+"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
+"set_world_size r r r\n"                                                 \
+"mesh_manip_add 0 " "0" " 0" " 4 0 0" " 0 0 4" " wx0.25 wz0.25\n" \
+"mesh_manip_gltriangles_complete "#tex"\n"
+
 
 #define MESH_CUBES_2(tex, scale)                                    \
 "mesh_manip_add wx0.1 " "-4" " wz0.1" " 4 0 0" " 0 0 4" " 40 40\n"  \
@@ -488,6 +495,7 @@ BACKGROUND_TEX_RANDOM
 
 //MESH_CUBES_2(28, 4)
 WORLD_SCALED_FRAME(1, 57, 4)
+//WORLD_SCALED_FRAME_GL_TERRAIN(1, 83, 4)
 
 // else
 GREEN_TENDRILS_1
@@ -782,7 +790,8 @@ RANDOM_DECORATION_1
 
 const static char initial_map_deathmatch[] = ""
 
-"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
+//"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
+WORLD_SCALED_FRAME_GL_TERRAIN(1, 83, 4)
 //"set_background_info 27\n"
 "set_background_info "TEXTURE_ID_STARFIELD"\n"
 

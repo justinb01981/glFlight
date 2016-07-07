@@ -370,7 +370,7 @@ glFlightFrameStage1()
                 gameCamera_MoveZ(-camera_z_trail);
                 gameCamera_MoveY(1);
             }
-            
+
             respawned = 0;
         }
         else
@@ -635,6 +635,17 @@ glFlightFrameStage1()
     }
     drawLineEnd();
     
+    // draw mesh
+    WorldElemListNode* cur = gWorld->triangle_mesh_head.next;
+    while(cur)
+    {
+        float c[] = {gameCamera_getX(), gameCamera_getY(), gameCamera_getZ()};
+        struct mesh_opengl_t* mesh = (struct mesh_opengl_t*) cur->elem->pVoid;
+        mesh_opengl_index_sort(c, mesh);
+        drawTriangleMesh(mesh, cur->elem->texture_id);
+        cur = cur->next;
+    }
+    
     // actual drawing (happens asynchronouly)
     unsigned int count_elems = 0, drawn_elems = 0;
     drawElemStart(pDrawCur);
@@ -659,6 +670,7 @@ glFlightFrameStage1()
         pDrawCur = pDrawCur->next;
         count_elems++;
     }
+    
     drawElemEnd();
     count_elems_last = count_elems;
     
@@ -705,31 +717,32 @@ glFlightFrameStage1()
             drawLineWithColorAndWidth(lineA, lineB, lineColor, 2.0);
         }
     }
-    /*
-    int al = 0;
-    for(al = 0; al < gWorld->num_world_arrows; al++)
+    
+    // draw world-defined lines
+    WorldElemListNode* lineCur = gWorld->drawline_list_head.next;
+    while(lineCur)
     {
-        if(gWorld->world_arrows[al].x != 0 ||
-           gWorld->world_arrows[al].y != 0 ||
-           gWorld->world_arrows[al].z != 0)
+        WorldElem* pElem = lineCur->elem;
+        lineCur = lineCur->next;
+        
+        float lineA[3] = {pElem->coords[0], pElem->coords[1], pElem->coords[2]};
+        float lineB[3] = {pElem->coords[3], pElem->coords[4], pElem->coords[5]};
+        float lineColor[] = {pElem->texcoords[0], pElem->texcoords[1], pElem->texcoords[2]};
+        if(distance(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(),
+                    lineA[0], lineA[1], lineA[2]) <= visible_distance ||
+           distance(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(),
+                    lineB[0], lineB[1], lineB[2]) <= visible_distance)
         {
-            float j[3] = {
-                my_ship_x,
-                my_ship_y + 3,
-                my_ship_z
-            };
-            float k1[3] = {
-                gWorld->world_arrows[al].x,
-                gWorld->world_arrows[al].y,
-                gWorld->world_arrows[al].z
-            };
-            float k[3];
-            int ki;
-            for(ki = 0; ki < 3; ki++) k[ki] = j[ki] + (0.01 * (k1[ki]));
-            drawLine(j, k);
+            drawLineWithColorAndWidth(lineA, lineB, lineColor, 2.0);
+        }
+        pElem->lifetime--;
+        if(pElem->lifetime <= 0)
+        {
+            world_elem_list_remove(pElem, &gWorld->drawline_list_head);
+            world_elem_free(pElem);
         }
     }
-     */
+
     /*
     float a[] = {0, 0, 0};
     for(int i = 0; i < 3; i++)

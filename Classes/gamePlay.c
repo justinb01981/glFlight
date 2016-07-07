@@ -737,7 +737,7 @@ game_start(float difficulty, int type)
     
     for(int t = 0; t < GAME_LOG_LAST; t++) gameStateSinglePlayer.log_event_camwatch[t] = 0;
     
-    gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWENEMY1] = 2;
+    gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWENEMY1] = 1;
     gameStateSinglePlayer.log_event_camwatch[GAME_LOG_WARN_CAPTURE] = 1;
     
     collision_actions_set_default();
@@ -1286,6 +1286,25 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                 gameStateSinglePlayer.collect_system_integrity -= 10;
                 
                 console_write(game_log_messages[GAME_LOG_FILELOST]);
+                
+                // add an explosion
+                {
+                    int obj_id =
+                    world_add_object(MODEL_ICOSAHEDRON,
+                                     elemA->physics.ptr->x,
+                                     elemA->physics.ptr->y,
+                                     elemA->physics.ptr->z,
+                                     elemA->physics.ptr->alpha,
+                                     elemA->physics.ptr->beta,
+                                     elemA->physics.ptr->gamma,
+                                     elemA->scale, TEXTURE_ID_FILELOST);
+                    world_get_last_object()->object_type = OBJ_BLOCK;
+                    
+                    world_get_last_object()->destructible = 0;
+                    //world_object_set_lifetime(obj_id, 15);
+                    update_object_velocity(obj_id, 0, 0, 0, 0);
+                }
+                
                 world_remove_object(elemA->elem_id);
                 gameAudioPlaySoundAtLocationWithRate("filelost", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
             }
@@ -2553,6 +2572,7 @@ fireBullet(int bulletAction)
 int
 firePoopedCube(WorldElem *elem)
 {
+    int use_drawline = 1;
     quaternion_t qx, qy, qz;
     
     if(elem->physics.ptr->velocity <= 1) return WORLD_ELEM_ID_INVALID;
@@ -2582,28 +2602,58 @@ firePoopedCube(WorldElem *elem)
         if(elem->durability <= DURABILITY_LOW) texture_id = TEXTURE_ID_POOPED_CUBE_SHIELDLOW;
     }
     
-    int obj =
-        world_add_object(model,
-                         elem->physics.ptr->x + qz.x*1,
-                         elem->physics.ptr->y + qz.y*1,
-                         elem->physics.ptr->z + qz.z*1,
-                         elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
-                         0.15,
-                         texture_id);
-    world_get_last_object()->object_type = OBJ_POOPEDCUBE;
-    world_get_last_object()->renderInfo.priority = 1;
-    world_get_last_object()->destructible = 0;
-    world_get_last_object()->physics.ptr->friction = 1;
-    world_get_last_object()->is_line = 1;
-    world_get_last_object()->elem_id_line_next = elem->stuff.line_id_last;
-    elem->stuff.line_id_last = obj;
-    world_object_set_lifetime(obj, pooped_cube_lifetime);
-    
-    /*
-    update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);
-    */
-    
-    return obj;
+    if(!use_drawline)
+    {
+        int obj =
+            world_add_object(model,
+                             elem->physics.ptr->x + qz.x*1,
+                             elem->physics.ptr->y + qz.y*1,
+                             elem->physics.ptr->z + qz.z*1,
+                             elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
+                             0.15,
+                             texture_id);
+        world_get_last_object()->object_type = OBJ_POOPEDCUBE;
+        world_get_last_object()->renderInfo.priority = 1;
+        world_get_last_object()->destructible = 0;
+        world_get_last_object()->physics.ptr->friction = 1;
+        world_get_last_object()->is_line = 1;
+        world_get_last_object()->elem_id_line_next = elem->stuff.line_id_last;
+        elem->stuff.line_id_last = obj;
+        world_object_set_lifetime(obj, pooped_cube_lifetime);
+        
+        /*
+         update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);
+         */
+        
+        return obj;
+    }
+    else
+    {
+        float m = 0.1;
+        float n = -1.0;
+        float lineA[] = {
+            elem->physics.ptr->x - qz.x*n,
+            elem->physics.ptr->y - qz.y*n,
+            elem->physics.ptr->z - qz.z*n
+        };
+        float lineB[] = {
+            lineA[0]-elem->physics.ptr->vx*m,
+            lineA[1]-elem->physics.ptr->vy*m,
+            lineA[2]-elem->physics.ptr->vz*m
+        };
+
+        static float lineColorMine[3] = {0, 1, 0};
+        static float lineColorEnemy[3] = {1, 0, 0};
+        static float lineColorLowShield[3] = {1, 1, 0};
+        float *lineColor = lineColorEnemy;
+
+        if(elem->elem_id == my_ship_id) lineColor = lineColorMine;
+        if(elem->durability <= DURABILITY_LOW) lineColor = lineColorLowShield;
+        
+        world_add_drawline(lineA, lineB, lineColor, 240);
+        
+        return WORLD_ELEM_ID_INVALID;
+    }
 }
 
 int

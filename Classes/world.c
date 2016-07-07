@@ -50,6 +50,9 @@ float GYRO_FEEDBACK = GYRO_FEEDBACK_DEFAULT;
 float GYRO_DC = GYRO_DC_DEFAULT;
 float visible_distance = 100;
 
+static struct mesh_t* world_pending_mesh = NULL;
+static float world_pending_mesh_info[3];
+
 static int
 world_add_object_core(Model type,
                       float x, float y, float z,
@@ -858,6 +861,7 @@ void world_free()
                 world_elem_list_remove(pCurElem, pListHead);
             }
             world_elem_free(pCurElem);
+            
             pCur = pNext;
         }
         
@@ -872,9 +876,41 @@ void world_free()
         if(gWorld->elements_by_region) free(gWorld->elements_by_region);
         if(gWorld->elements_by_region_vis) free(gWorld->elements_by_region_vis);
         
+        // release meshes
+        WorldElemListNode* pHead = &gWorld->triangle_mesh_head;
+        pCur = pHead->next;
+        while(pCur)
+        {
+            WorldElemListNode* pNext = pCur->next;
+            WorldElem* pElem = pCur->elem;
+            
+            world_elem_list_remove(pCur->elem, pHead);
+            world_elem_free(pElem);
+            pCur = pNext;
+        }
+        
+        // release lines
+        pHead = &gWorld->drawline_list_head;
+        pCur = pHead->next;
+        while(pCur)
+        {
+            WorldElemListNode* pNext = pCur->next;
+            WorldElem* pElem = pCur->elem;
+            
+            world_elem_list_remove(pCur->elem, pHead);
+            world_elem_free(pElem);
+            pCur = pNext;
+        }
+        
 		free(gWorld);
 		gWorld = NULL;
 	}
+    
+    if(world_pending_mesh)
+    {
+        free(world_pending_mesh);
+        world_pending_mesh = NULL;
+    }
 }
 
 void
@@ -1136,12 +1172,6 @@ void world_init(float size_x, float size_y, float size_z)
     }
     
     //world_build_visibility_data();
-    
-    world_clear_arrows();
-    
-    world_add_arrow(0, gWorld->bound_y / 2, gWorld->bound_z / 2);
-    world_add_arrow(gWorld->bound_x / 2, 0, gWorld->bound_z / 2);
-    world_add_arrow(gWorld->bound_x / 2, gWorld->bound_y / 2, 0);
 
 	return;
 }
@@ -2071,9 +2101,6 @@ world_add_mesh(float x, float y, float z,
     }
 }
 
-static struct mesh_t* world_pending_mesh = NULL;
-static float world_pending_mesh_info[3];
-
 int
 world_prepare_mesh(float x, float y, float z,
                    float dx_r, float dy_r, float dz_r,
@@ -2144,6 +2171,22 @@ world_complete_mesh(int type, int tex_id, float tiling_m, float scale)
 }
 
 void
+world_convert_mesh_to_gltriangles(int tex_id)
+{
+    struct mesh_opengl_t* glmesh = mesh_to_opengl_triangles(world_pending_mesh, 1, 1);
+    if(glmesh)
+    {
+        WorldElem* elemMesh = world_elem_alloc();
+        if(elemMesh)
+        {
+            elemMesh->pVoid = (void*) glmesh;
+            elemMesh->texture_id = tex_id;
+            world_elem_list_add(elemMesh, &gWorld->triangle_mesh_head);
+        }
+    }
+}
+
+void
 world_manip_mesh(float xy_coord[2], float d_xyz[3], float m_c)
 {
     if(world_pending_mesh)
@@ -2174,21 +2217,6 @@ world_set_plane(int idx, float ox, float oy, float oz, float x1, float y1, float
     gWorld->world_planes[idx].v2[0] = x2;
     gWorld->world_planes[idx].v2[1] = y2;
     gWorld->world_planes[idx].v2[2] = z2;
-}
-
-void
-world_add_arrow(float x, float y, float z)
-{
-    gWorld->world_arrows[gWorld->num_world_arrows].x = x;
-    gWorld->world_arrows[gWorld->num_world_arrows].y = y;
-    gWorld->world_arrows[gWorld->num_world_arrows].z = z;
-    gWorld->num_world_arrows++;
-}
-
-void
-world_clear_arrows()
-{
-    gWorld->num_world_arrows = 0;
 }
 
 void
@@ -2266,4 +2294,29 @@ world_vis_rgn_add(float vis_dist, WorldElem* elem)
     }
     
     elem->visible_list_by_region_sorted = 1;
+}
+
+void
+world_add_drawline(float a[3], float b[3], float color[3], unsigned int lifetime)
+{
+    WorldElem* pElem = world_elem_alloc();
+    if(pElem)
+    {
+        int i = 0;
+        pElem->coords[i++] = a[0];
+        pElem->coords[i++] = a[1];
+        pElem->coords[i++] = a[2];
+        pElem->coords[i++] = b[0];
+        pElem->coords[i++] = b[1];
+        pElem->coords[i++] = b[2];
+        
+        i = 0;
+        pElem->texcoords[i] = color[i]; i++;
+        pElem->texcoords[i] = color[i]; i++;
+        pElem->texcoords[i] = color[i]; i++;
+        
+        pElem->lifetime = lifetime;
+        
+        world_elem_list_add(pElem, &gWorld->drawline_list_head);
+    }
 }

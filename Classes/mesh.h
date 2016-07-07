@@ -48,7 +48,7 @@ struct mesh_t {
 struct mesh_opengl_t
 {
     mesh_glfloat_t *coords;
-    mesh_glubyte_t *indices;
+    /*mesh_glubyte_t*/unsigned int *indices;
     unsigned int n_indices;
     mesh_glfloat_t *tex_coords;
     unsigned int u;
@@ -72,7 +72,10 @@ pull_mesh(struct mesh_t* mesh,
           float transfer_c);
 
 struct mesh_opengl_t*
-mesh_to_opengl_triangles(struct mesh_t*);
+mesh_to_opengl_triangles(struct mesh_t*, float tx_m, float ty_m);
+
+void
+mesh_opengl_index_sort(float pos[3], struct mesh_opengl_t* ogl_mesh);
 
 void
 free_mesh_opengl(struct mesh_opengl_t* ogl_mesh);

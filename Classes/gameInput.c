@@ -451,7 +451,8 @@ gameInput()
     }
     needTrimLast = needTrim;
     
-    if(needTrim) return;
+    // commented to out to allow game-input to continue while trimming
+    //if(needTrim) return;
     
     // average values between inputs
     inputAvg[0][inputAvg_i] = deviceRoll;

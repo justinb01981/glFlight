@@ -179,6 +179,11 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
             map_cmd->type = MAP_MANIP_MESH_COMPLETE;
             n_params = 7;
         }
+        else if(strcmp(token, "mesh_manip_gltriangles_complete") == 0)
+        {
+            map_cmd->type = MAP_MANIP_MESH_TO_GLTRIANGLES;
+            n_params = 1;
+        }
         else if(strcmp(token, "set_world_size") == 0)
         {
             map_cmd->type = MAP_SET_SIZE;
@@ -585,6 +590,10 @@ void map_render(char *map_buf)
                         
                     case MAP_MANIP_MESH_COMPLETE:
                         world_complete_mesh(map_cmd.params[0], map_cmd.params[1], map_cmd.params[2], map_cmd.params[3]);
+                        break;
+                        
+                    case MAP_MANIP_MESH_TO_GLTRIANGLES:
+                        world_convert_mesh_to_gltriangles(map_cmd.params[0]);
                         break;
                         
                     case MAP_SET_BLOCK_SCALE:

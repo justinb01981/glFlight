@@ -96,6 +96,9 @@ void
 drawBoundingLineGrid();
 
 void
+drawTriangleMesh(struct mesh_opengl_t* glmesh, int tex_id);
+
+void
 drawLines(float start[3], float vend[3], float step_v[3], int step_n);
 
 void

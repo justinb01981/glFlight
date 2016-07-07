@@ -23,6 +23,7 @@
 #include "textures.h"
 #include "gameUtils.h"
 #include "gameNetwork.h"
+#include "mesh.h"
 
 #define BACKGROUND_MODEL model_cube
 #define BACKGROUND_MODEL_TEXCOORDS /*model_cube_texcoords_alt*/ model_cube_texcoords
@@ -1517,6 +1518,18 @@ drawBoundingLineGrid()
     drawLineGrid(lstart, u, v, gWorld->bound_x / linter, gWorld->bound_z / linter);
     lstart[1] = gWorld->bound_y;
     drawLineGrid(lstart, u, v, gWorld->bound_z / linter, gWorld->bound_z / linter);
+}
+
+void
+drawTriangleMesh(struct mesh_opengl_t* glmesh, int tex_id)
+{
+    glVertexPointer(3, GL_FLOAT, 0, glmesh->coords);
+    
+    glTexCoordPointer(2, GL_FLOAT, 0, glmesh->tex_coords);
+    
+    bindTexture(tex_id);
+    
+    glDrawElements(GL_TRIANGLES, glmesh->n_indices, index_type_enum, glmesh->indices);
 }
 
 void

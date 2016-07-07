@@ -23,7 +23,7 @@
 // MUST DIVIDE bound_x, bound_y, bound_z evenly!
 //#define WORLD_MAX_REGIONS /*50*/ 25
 #define WORLD_MAX_PLANES 16
-#define WORLD_MAX_ARROWS 16
+#define WORLD_MAX_TRIANGLE_MESH 16
 //#define WORLD_VIS_REGIONS_X ((int) gWorld->bound_x / gWorld->vis_region_m)
 //#define WORLD_VIS_REGIONS_Y ((int) gWorld->bound_y / gWorld->vis_region_m)
 //#define WORLD_VIS_REGIONS_Z ((int) gWorld->bound_z / gWorld->vis_region_m)
@@ -84,12 +84,17 @@ typedef struct
         float v1[3], v2[3];
     } world_planes[WORLD_MAX_PLANES];
     
-    struct
+    /*
+    struct world_triangle_mesh_head
     {
-        float x, y, z;
-        
-    } world_arrows[WORLD_MAX_ARROWS];
-    int num_world_arrows;
+        struct mesh_opengl_t* glmesh;
+        int tex_id;
+    } world_triangle_meshes[WORLD_MAX_TRIANGLE_MESH];
+    int world_triangle_meshes_n;
+     */
+    
+    WorldElemListNode triangle_mesh_head;
+    WorldElemListNode drawline_list_head;
     
     float vec_gravity[3];
     
@@ -187,12 +192,13 @@ float
 world_mesh_pending_y();
 
 void
+world_convert_mesh_to_gltriangles(int tex_id);
+
+void
 world_set_plane(int idx, float ox, float oy, float oz, float x1, float y1, float z1, float x2, float y2, float z2);
 
 void
-world_add_arrow(float x, float y, float z);
-void
-world_clear_arrows();
+world_add_drawline(float a[3], float b[3], float color[3], unsigned int lifetime);
 
 void
 world_random_spawn_location(float loc[6], int affiliation);
