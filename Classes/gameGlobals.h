@@ -66,6 +66,7 @@ extern int controls_simple;
 #define GYRO_FEEDBACK_DEFAULT (0.01)
 #define PLATFORM_TICK_RATE 60
 #define PLATFORM_DRAW_ELEMS_MAX 500
+#define GYRO_SAMPLE_RATE (60)
 #else
 #define GAME_PLATFORM_IS_LANDSCAPE 0
 #define GYRO_FEEDBACK_COEFF (0.002)
@@ -73,9 +74,8 @@ extern int controls_simple;
 #define GYRO_FEEDBACK_DEFAULT (0.1)
 #define PLATFORM_TICK_RATE 60
 #define PLATFORM_DRAW_ELEMS_MAX 1000
-#endif
-
 #define GYRO_SAMPLE_RATE (30)
+#endif
 
 /* reducing friction influences this... should be MAX_THRUST really */
 #define MAX_SPEED /*(15)*/ (10)

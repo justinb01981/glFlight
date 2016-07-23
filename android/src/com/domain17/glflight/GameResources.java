@@ -24,7 +24,7 @@ public class GameResources {
 	public static Integer[] resObj = {
 		//R.drawable.abc_ab_bottom_solid_light_holo,
 
-		R.raw.texture0,
+        R.raw.texture0,
         R.raw.texture1,
         R.raw.texture2,
         R.raw.texture3,
@@ -124,12 +124,16 @@ public class GameResources {
         R.raw.texture97,
         R.raw.texture98,
         R.raw.texture99,
+        R.raw.texture100,
+        R.raw.texture101,
+        R.raw.texture102,
+        R.raw.texture103,
 	};
 	
 	public static String[] resFilename = {
 		//"abc_ab_bottom_solid_light_holo.png",
 		
-		"texture0.bmp",
+        "texture0.bmp",
         "texture1.bmp",
         "texture2.bmp",
         "texture3.bmp",
@@ -229,6 +233,10 @@ public class GameResources {
         "texture97.bmp",
         "texture98.bmp",
         "texture99.bmp",
+        "texture100.bmp",
+        "texture101.bmp",
+        "texture102.bmp",
+        "texture103.bmp",
 	};
 	
 	public static String[] sndNameList = {
