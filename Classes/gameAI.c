@@ -25,7 +25,7 @@ float diff_m = 0.1;
 float scan_dist_increase = 30;
 float game_ai_fire_rate_ms = 800.0;
 float patrol_area_reached = 2.0;
-float tow_v_scale = 0.5;
+float tow_v_scale = /*0.5*/ 0.9;
 float min_patrol_distance = 20;
 float collect_deploy_distance = -2.5;
 
@@ -782,7 +782,7 @@ pursuit_speed_for_object(WorldElem* elem, float* accel)
                  elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PATROL ||
                  elem->stuff.u.enemy.enemy_state == ENEMY_STATE_JUKE) ?
                  elem->stuff.u.enemy.max_speed:
-                 elem->stuff.u.enemy.max_speed * 0.5;
+                 elem->stuff.u.enemy.max_speed * 1.0;
             *accel = 2;
             break;
     }

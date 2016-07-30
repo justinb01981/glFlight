@@ -130,6 +130,7 @@
 		D077557E152588C800DF2E0B /* quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = D077557C152588C800DF2E0B /* quaternions.c */; };
 		D07B356618527FE200900D60 /* texture50.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D07B356518527FE200900D60 /* texture50.bmp */; };
 		D07B35681853A5CF00900D60 /* missle.wav in Resources */ = {isa = PBXBuildFile; fileRef = D07B35671853A5CF00900D60 /* missle.wav */; };
+		D08C196D1D4455D1003EE6B2 /* texture104.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D08C196C1D4455D1003EE6B2 /* texture104.bmp */; };
 		D09051CA196DD87200E5F29E /* texture74.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09051C9196DD87200E5F29E /* texture74.bmp */; };
 		D098934D1937F44400298C8E /* speedboost.wav in Resources */ = {isa = PBXBuildFile; fileRef = D098934C1937F44400298C8E /* speedboost.wav */; };
 		D098934F1937FA4100298C8E /* texture66.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D098934E1937FA4100298C8E /* texture66.bmp */; };
@@ -360,6 +361,7 @@
 		D077557D152588C800DF2E0B /* quaternions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quaternions.h; sourceTree = "<group>"; };
 		D07B356518527FE200900D60 /* texture50.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture50.bmp; sourceTree = "<group>"; };
 		D07B35671853A5CF00900D60 /* missle.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = missle.wav; sourceTree = "<group>"; };
+		D08C196C1D4455D1003EE6B2 /* texture104.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture104.bmp; sourceTree = "<group>"; };
 		D09051C9196DD87200E5F29E /* texture74.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture74.bmp; sourceTree = "<group>"; };
 		D098934C1937F44400298C8E /* speedboost.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = speedboost.wav; sourceTree = "<group>"; };
 		D098934E1937FA4100298C8E /* texture66.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture66.bmp; sourceTree = "<group>"; };
@@ -582,6 +584,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D08C196C1D4455D1003EE6B2 /* texture104.bmp */,
 				D02D0BFE1CC7DF8B0016A619 /* texture103.bmp */,
 				D02D0BFB1CC7DF050016A619 /* texture102.bmp */,
 				D02D0BFA1CC7DF050016A619 /* texture101.bmp */,
@@ -926,6 +929,7 @@
 				D00D78D21A09525100E701B9 /* texture78.bmp in Resources */,
 				D07B35681853A5CF00900D60 /* missle.wav in Resources */,
 				D02DAC0E17C72E9700035601 /* engine2.wav in Resources */,
+				D08C196D1D4455D1003EE6B2 /* texture104.bmp in Resources */,
 				D02D0BFC1CC7DF050016A619 /* texture101.bmp in Resources */,
 				D0CB80E51BFD9F0100E52F43 /* texture91.bmp in Resources */,
 				D02DAC1017D145A100035601 /* bump.wav in Resources */,

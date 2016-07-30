@@ -209,24 +209,26 @@ mesh_opengl_index_sort(float pos[3], struct mesh_opengl_t* ogl_mesh)
 {
     unsigned int i;
     int c = 3;
-    for(i = 0; i < ogl_mesh->n_indices-c; i += c)
+    for(i = 0; i < ogl_mesh->n_indices-c; i += 3)
     {
         
-        float da = (pos[0]-ogl_mesh->coords[ogl_mesh->indices[i]]) *
-                   (pos[1]-ogl_mesh->coords[ogl_mesh->indices[i]+1])*
-                   (pos[2]-ogl_mesh->coords[ogl_mesh->indices[i]+2]);
-        float db = (pos[0]-ogl_mesh->coords[ogl_mesh->indices[i+c]]) *
-                    (pos[1]-ogl_mesh->coords[ogl_mesh->indices[i+c]+1]) *
-                    (pos[2]-ogl_mesh->coords[ogl_mesh->indices[i+c]+2]);
+        float da = ((ogl_mesh->coords[ogl_mesh->indices[i]] - pos[0]) * (ogl_mesh->coords[ogl_mesh->indices[i]] - pos[0])) +
+                   ((ogl_mesh->coords[ogl_mesh->indices[i]+1] - pos[1]) * (ogl_mesh->coords[ogl_mesh->indices[i]+1] - pos[1])) +
+                   ((ogl_mesh->coords[ogl_mesh->indices[i]+2] - pos[2]) * (ogl_mesh->coords[ogl_mesh->indices[i]+2] - pos[2]));
+        float db = ((ogl_mesh->coords[ogl_mesh->indices[i+c]] - pos[0]) * (ogl_mesh->coords[ogl_mesh->indices[i+c]] - pos[0])) +
+                    ((ogl_mesh->coords[ogl_mesh->indices[i+c]+1] - pos[1]) * (ogl_mesh->coords[ogl_mesh->indices[i+c]+1] - pos[1])) +
+                    ((ogl_mesh->coords[ogl_mesh->indices[i+c]+2] - pos[2]) * (ogl_mesh->coords[ogl_mesh->indices[i+c]+2] - pos[2]));
+        
         if(da < db) {
             // swap
-            unsigned int tmp;
+            unsigned int tmp;	
             tmp = ogl_mesh->indices[i];
             ogl_mesh->indices[i] = ogl_mesh->indices[i+c]; ogl_mesh->indices[i+c] = tmp;
             tmp = ogl_mesh->indices[i+1];
             ogl_mesh->indices[i+1] = ogl_mesh->indices[i+c+1]; ogl_mesh->indices[i+c+1] = tmp;
             tmp = ogl_mesh->indices[i+2];
             ogl_mesh->indices[i+2] = ogl_mesh->indices[i+c+2]; ogl_mesh->indices[i+c+2] = tmp;
+            continue;
         }
     }
 }

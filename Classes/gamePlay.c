@@ -801,7 +801,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/20;
         gameStateSinglePlayer.rate_enemy_count_increase = 1.0/20;
         
-        gameStateSinglePlayer.enemy1_ignore_player_pct = 25;
+        gameStateSinglePlayer.enemy1_ignore_player_pct = 75;
         
         // different map for "collection" game type
         gameMapSetMap(initial_map_collection);
@@ -1290,7 +1290,7 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                 // add an explosion
                 {
                     int obj_id =
-                    world_add_object(MODEL_ICOSAHEDRON,
+                    world_add_object(MODEL_SPRITE,
                                      elemA->physics.ptr->x,
                                      elemA->physics.ptr->y,
                                      elemA->physics.ptr->z,
@@ -1761,12 +1761,6 @@ game_run()
                                         }
                                     }
                                 }
-                                
-                                float vr = 2 + (0.5 * gameStateSinglePlayer.difficulty);
-                                update_object_velocity(pCur->elem->elem_id,
-                                                       rand_in_range(-vr, vr),
-                                                       rand_in_range(-vr, vr),
-                                                       rand_in_range(-vr, vr), 1);
                             }
                             break;
                             
@@ -2439,6 +2433,7 @@ game_add_bullet(float pos[3], float euler[3], float vel, float leadV, int bullet
         world_get_last_object()->stuff.affiliation = affiliation;
         world_get_last_object()->stuff.bullet.action = bulletAction;
         world_get_last_object()->durability = DURABILITY_BULLET;
+        world_object_set_lifetime(obj, GAME_BULLET_LIFETIME);
         
         world_get_last_object()->physics.ptr->gravity = gameStateSinglePlayer.game_type == GAME_TYPE_TURRET;
         
@@ -2648,7 +2643,7 @@ firePoopedCube(WorldElem *elem)
         float *lineColor = lineColorEnemy;
 
         if(elem->elem_id == my_ship_id) lineColor = lineColorMine;
-        if(elem->durability <= DURABILITY_LOW) lineColor = lineColorLowShield;
+        //if(elem->durability <= DURABILITY_LOW) lineColor = lineColorLowShield;
         
         world_add_drawline(lineA, lineB, lineColor, 240);
         

@@ -438,7 +438,7 @@ console_write(char* fmt, ...)
         if(time_ms - console_write_time < console_write_append_thresh_ms) append = 1;
         msgPtr = append? consoleMessageTemp: consoleMessage;
         
-        if(append) strcat(consoleMessage, "\n");
+        if(append && strchr(fmt, '\n') == NULL) strcat(consoleMessage, "\n");
         
         console_write_time = time_ms;
     }

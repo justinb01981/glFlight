@@ -303,6 +303,7 @@ int drawRadar()
     gameGraphics_drawState2d *ds = &drawRadar_ds;
     int i;
     int minimal_overlay = 1;
+    int objective_marker = 0;
     
     WorldElemListNode* cur = gWorld->elements_moving.next;
     
@@ -447,7 +448,7 @@ int drawRadar()
                 }
             }
             
-            if(cur->elem->elem_id == game_target_objective_id /* && zdot > 0*/)
+            if(cur->elem->elem_id == game_target_objective_id /* && zdot > 0*/ && objective_marker)
             {
                 tex_id = TEXTURE_ID_RADAR_OBJECTIVE;
                 if(!minimal_overlay) tex_icon = zdot >= 0? cur->elem->texture_id: TEXTURE_ID_RADAR_BEHIND;

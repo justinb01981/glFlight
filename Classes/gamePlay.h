@@ -289,6 +289,7 @@ extern float game_ammo_missles;
 extern float game_ammo_bullets;
 extern float game_ammo_missle_recharge;
 extern float game_ammo_bullets_recharge;
+const static float GAME_BULLET_LIFETIME = (60*6);
 const static float GAME_MISSLE_LIFETIME = (60*6);
 extern char *game_status_string;
 extern int model_my_ship;

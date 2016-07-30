@@ -336,7 +336,7 @@ world_add_object_core(Model type,
             pElem->renderInfo.priority = 1;
             new_durability = 5;
             pElem->spans_regions = 0;
-            pElem->bounding_remain = 1;
+            pElem->bounding_remain = 0;
             pElem->bounding_wrap = 0;
             pElem->stuff.radar_visible = 1;
             break;
@@ -346,7 +346,7 @@ world_add_object_core(Model type,
             pElem->renderInfo.priority = 1;
             new_durability = 5;
             pElem->spans_regions = 0;
-            pElem->bounding_remain = 1;
+            pElem->bounding_remain = 0;
             pElem->stuff.radar_visible = 1;
             break;
             
@@ -1625,6 +1625,7 @@ world_update(float tc)
     int do_check_boundaries = 1;
     int do_oob_gravity_sound = 1;
     int do_sound_checks = 1;
+    int allow_oob_moving_objects = 0;
     
     
     WorldElemListNode* pRegionElemsHead;
@@ -1652,6 +1653,7 @@ world_update(float tc)
             if(pCur->elem->physics.ptr->vx != 0 || pCur->elem->physics.ptr->vy != 0 || pCur->elem->physics.ptr->vz != 0 || pCur->elem->physics.ptr->gravity)
             {
                 int out_of_bounds_remove = 0;
+                int out_of_bounds_moving = 0;
                 int my_ship_oob = 0;
                 int object_oob = 0;
                 
@@ -1699,6 +1701,7 @@ world_update(float tc)
                                                               v_oob))
                         {
                             out_of_bounds_remove = 0;
+                            
                             
                             if(!pCur->elem->bounding_wrap)
                             {
@@ -1748,7 +1751,14 @@ world_update(float tc)
                     {
                         if(!add_element_to_region(pCur->elem))
                         {
-                            out_of_bounds_remove = 1;
+                            if(allow_oob_moving_objects && pCur->elem->moving)
+                            {
+                                out_of_bounds_moving = 1;
+                            }
+                            else
+                            {
+                                out_of_bounds_remove = 1;
+                            }
                         }
                     }
                 }
@@ -1799,6 +1809,11 @@ world_update(float tc)
                                     get_region_list_head(pCur->elem->physics.ptr->x,
                                                          pCur->elem->physics.ptr->y,
                                                          pCur->elem->physics.ptr->z);
+                                
+                                if(out_of_bounds_moving)
+                                {
+                                    pRegionElemsHead = &gWorld->elements_moving;
+                                }
                                 
                                 if(pRegionElemsHead)
                                 {

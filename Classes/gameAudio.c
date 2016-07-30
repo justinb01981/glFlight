@@ -96,9 +96,9 @@ gameAudioPlaySoundAtLocationWithRate(const char* filename, float x, float y, flo
     // TODO: audio panning
     cocoaMessage msg;
     float vol_distance = cam_distance(x, y, z);
-    float vol_distance_max = 50;
+    float vol_distance_max = 25;
     float v = (vol_distance / vol_distance_max);
-    float vol_c[] = {1, 0.5, 0.3, 0.2, 0.1, 0.01, 0}; //{1, 0.8, 0.5, 0.2, 0.1, 0, 0};
+    float vol_c[] = {0.5, 0.3, 0.2, 0.1, 0.1, 0.01, 0}; //{1, 0.8, 0.5, 0.2, 0.1, 0, 0};
     
     if(v > 1.0) v = 1.0;
     

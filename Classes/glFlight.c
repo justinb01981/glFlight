@@ -733,7 +733,7 @@ glFlightFrameStage1()
            distance(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(),
                     lineB[0], lineB[1], lineB[2]) <= visible_distance)
         {
-            drawLineWithColorAndWidth(lineA, lineB, lineColor, 2.0);
+            drawLineWithColorAndWidth(lineA, lineB, lineColor, 1.0);
         }
         pElem->lifetime--;
         if(pElem->lifetime <= 0)
