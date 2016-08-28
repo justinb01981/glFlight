@@ -897,6 +897,45 @@ game_start(float difficulty, int type)
         
         gameMapSetMap(initial_map_turret);
     }
+    else if(gameStateSinglePlayer.game_type == GAME_TYPE_LOBBALL)
+    {
+        sprintf(dialogStr, "^D^D^D1. Throw energy balls!^D^D^D\n"
+                "^D^D^D   2. SURVIVE   ^D^D^D\n"
+                "^D^D^D       3. PROFIT!!! ^D       ^D^D^D\n"
+                "****   High Score: %d  ****",
+                gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
+        gameDialogDisplayString(dialogStr);
+        
+        game_reset();
+        
+        gameStateSinglePlayer.max_enemies = 3 + difficulty;
+        gameStateSinglePlayer.n_turrets = 0;
+        gameStateSinglePlayer.n_collect_points = 0;
+        gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
+        gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
+        gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
+        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
+        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_ALLY;
+        gameStateSinglePlayer.ship_destruction_change_alliance = 0;
+        gameStateSinglePlayer.turret_destruction_change_alliance = 1;
+        gameStateSinglePlayer.enemy_durability = 3;
+        
+        gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
+        gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
+        gameStateSinglePlayer.base_spawn_collect_pct = 10;
+        //gameStateSinglePlayer.base_spawn_collect_pct_rate_increase = 0.2;
+        gameStateSinglePlayer.base_spawn_collect_initial = 2;
+        gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
+        
+        gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/10;
+        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/20;
+        
+        gameStateSinglePlayer.invuln_time_after_hit = 3;
+        
+        gameStateSinglePlayer.enemy1_ignore_player_pct = 0;
+        
+        gameMapSetMap(pokeball_map);
+    }
     
     if(GAME_AI_DEBUG)
     {
@@ -1505,6 +1544,7 @@ game_run()
     static int game_map_custom_loaded = 0;
     static game_timeval_t logSoundTimeLast = 0;
     static int game_target_enemy_near = WORLD_ELEM_ID_INVALID;
+    WorldElem* pElemBallHeld = NULL;
     
     static int elem_id_arrow3[] = {
         WORLD_ELEM_ID_INVALID, WORLD_ELEM_ID_INVALID,
@@ -1614,6 +1654,13 @@ game_run()
                     break;
                     
                 case OBJ_PLAYER:
+                    break;
+                    
+                case OBJ_TOUCHCONTROLBALL:
+                    if(!pCur->elem->physics.ptr->gravity)
+                    {
+                        pElemBallHeld = pCur->elem;
+                    }
                     break;
                     
                 default:
@@ -2064,6 +2111,90 @@ game_run()
         }
     }
     
+    // ball handling
+    while(gameStateSinglePlayer.game_type == GAME_TYPE_LOBBALL)
+    {
+        static float ballXLast, ballYLast;
+        static int touchUnmappedLast = 0;
+        
+        float m = 10;
+        float cvz[3];
+        float cvx[3];
+        float cvy[3];
+        
+        gameCamera_getZVector(cvz);
+        gameCamera_getXVector(cvx);
+        gameCamera_getYVector(cvy);
+        
+        float pos[3] = {
+            gameCamera_getX() + cvz[0] * m,
+            gameCamera_getY() + cvz[1] * m,
+            gameCamera_getZ() + cvz[2] * m
+        };
+        
+        pMyShipNode = world_elem_list_find(my_ship_id, &gWorld->elements_moving);
+        if(!pMyShipNode) break;
+        
+        // allow moving along x/z plane only
+        update_object_velocity(pMyShipNode->elem->elem_id, 0, -pMyShipNode->elem->physics.ptr->vy, 0, 1);
+        
+        pElemBallHeld = world_find_elem_with_attrs(&gWorld->elements_moving, OBJ_TOUCHCONTROLBALL,
+                                                   pMyShipNode->elem->stuff.affiliation);
+        
+        if(gameInterfaceControls.touchUnmapped && !touchUnmappedLast) // touch started
+        {
+            // add ball
+            float ball_scale = 2.0;
+            
+            world_add_object(MODEL_ICOSAHEDRON, pos[0], pos[1], pos[2], 0, 0, 0, ball_scale, TEXTURE_ID_BALL);
+            if((pElemBallHeld = world_get_last_object()))
+            {
+                update_object_velocity(pElemBallHeld->elem_id, 0, 0, 0, 0);
+                
+                pElemBallHeld->object_type = OBJ_TOUCHCONTROLBALL;
+                pElemBallHeld->physics.ptr->gravity = 0;
+                pElemBallHeld->stuff.affiliation = pMyShipNode->elem->stuff.affiliation;
+            }
+            
+            ballXLast = gameInterfaceControls.touchUnmappedX;
+            ballYLast = gameInterfaceControls.touchUnmappedY;
+        }
+        else if(touchUnmappedLast && !gameInterfaceControls.touchUnmapped) //touch ended
+        {
+            if(pElemBallHeld)
+            {
+                // indicate "released" ball if gravity set
+                pElemBallHeld->physics.ptr->gravity = 1;
+                pElemBallHeld->bounding_remain = 1;
+                world_object_set_lifetime(pElemBallHeld->elem_id, GAME_BULLET_LIFETIME);
+            }
+        }
+        else if(touchUnmappedLast && gameInterfaceControls.touchUnmapped)
+        {
+            if(pElemBallHeld && pMyShipNode)
+            {
+                // update velocity
+                float touchX = (gameInterfaceControls.touchUnmappedX - ballXLast) * 1.0;
+                float touchY = -(gameInterfaceControls.touchUnmappedY - ballYLast) * 1.0;
+                
+                pElemBallHeld->physics.ptr->friction = 0;
+                pElemBallHeld->renderInfo.priority = 1;
+                
+                for (int i = 0; i < 3; i++) cvz[i] *= 0.8;
+                for (int i = 0; i < 3; i++) cvy[i] *= 1.8;
+                
+                update_object_velocity(pElemBallHeld->elem_id, pMyShipNode->elem->physics.ptr->vx,
+                                       pMyShipNode->elem->physics.ptr->vy, pMyShipNode->elem->physics.ptr->vz, 0);
+                update_object_velocity(pElemBallHeld->elem_id, cvz[0] * touchX, cvz[1] * touchX, cvz[2] * touchX, 1);
+                update_object_velocity(pElemBallHeld->elem_id, cvx[0] * touchY, cvx[1] * touchY, cvx[2] * touchY, 1);
+                update_object_velocity(pElemBallHeld->elem_id, cvy[0] * touchY, cvy[1] * touchY, cvy[2] * touchY, 1);
+            }
+        }
+        
+        touchUnmappedLast = gameInterfaceControls.touchUnmapped;
+        break;
+    }
+    
     if(gameInterfaceControls.fire.touched && time_ms - firedLast > 200)
     {
         firedLast = time_ms;
@@ -2271,6 +2402,15 @@ game_run()
                     sprintf(alertmsg, "survival started!\n");
                     gameStateSinglePlayer.started = 1;
                     game_start(1, GAME_TYPE_SURVIVAL);
+                    gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
+                    save_map = 0;
+                    break;
+                    
+                case ACTION_START_LOBBALL_GAME:
+                    gameInterfaceControls.mainMenu.visible = 0;
+                    sprintf(alertmsg, "lob started!\n");
+                    gameStateSinglePlayer.started = 1;
+                    game_start(1, GAME_TYPE_LOBBALL);
                     gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
                     save_map = 0;
                     break;

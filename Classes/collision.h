@@ -32,8 +32,8 @@ typedef collision_action_t collision_action_table_t[OBJ_LAST][OBJ_LAST];
 const static collision_action_t
 collision_actions_default[OBJ_LAST][OBJ_LAST] =
 {
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // unknown
-    {2, 2, 2, 0, 2, 2, 0, 0, 0, 0, 0,       3, 1, 0, 0, 0, 0, 0, 0, 0}, // ship
+    {0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 2, 0, 0}, // unknown
+    {2, 2, 2, 0, 2, 2, 0, 0, 0, 0, 0,       3, 1, 0, 0, 0, 0, 1, 0, 0}, // ship
     {2, 2, 2, 3, 2, 2, 0, 4, 3, 0, 0, /*3*/ 1, 1, 0, 0, 0, 0, 0, 0, 0}, // player
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // turret
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // block_moving
@@ -48,8 +48,8 @@ collision_actions_default[OBJ_LAST][OBJ_LAST] =
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // base
     {1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,       0, 1, 0, 0, 0, 0, 0, 0, 0}, // missle
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // spawnpoint enemy
-    {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // reserved
-    {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // reserved
+    {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // DISPLAYONLY
+    {2, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // BALL
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // reserved
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // reserved
 };
@@ -79,6 +79,13 @@ collision_actions_set_default()
         {
             collision_actions[r][c] = collision_actions_default[r][c];
             collision_actions_stage1[r][c] = COLLISION_ACTION_NONE;
+        }
+    
+    // check that both actions agree
+    for(int r = 0; r < OBJ_LAST; r++)
+        for(int c = 0; c < OBJ_LAST; c++)
+        {
+            DBPRINTF(("Warning: collision_actions_default row/column mismatch: r=%d c=%d", r, c));
         }
     
     collision_actions_set_stage1();

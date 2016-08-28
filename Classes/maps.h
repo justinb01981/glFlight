@@ -14,6 +14,12 @@
 #define CUBE_TEXTURE_3 52
 #define CUBE_TEXTURE_4 57
 
+/*
+ (Model type, float x, float y, float z, float yaw, float pitch, float roll, float scale, int texture_id)
+*/
+#define WORLD_ADD_OBJECT(model, x, y, z, yaw, pitch, roll, scale, tx_id) \
+"add_object "#model" "#x" "#y" "#z" "#yaw" "#pitch" "#roll" "#scale" "#tx_id"\n"
+
 #define MESH_CUBES_1(tex, scale)                                 \
 "mesh_manip_add wx0.0 " " 5" " wz0" " 5 0 0" " 0 0 5" " 40 40\n" \
 "mesh_manip_pull rnd_40 rnd_40"" 0 rnd_50 0"" 0.90\n"            \
@@ -217,6 +223,11 @@ ADD_OBJ_END(4, 40) \
 "register_params 10 "/*"rndx"*/#x" "#y" "#z" 0 0 0 8 "/*"42"*/"92"" 0 0 0 0 0 0 0\n"                 \
 "add_object r r r r r r r r " "r" "\n" \
 "object_set_info 8\n" 
+
+#define BASE_FRIENDLY_INVISIBLE(x,y,z)                        \
+"register_params 10 "/*"rndx"*/#x" "#y" "#z" 0 0 0 8 "/*"42"*/"0"" 0 0 0 0 0 0 0\n"                 \
+"add_object r r r r r r r r " "r" "\n" \
+"object_set_info 8\n"
 
 #define BASE_ENEMY_1                           \
 "add_object 10 rndx 50 rndz 0 0 0 8 "/*"58"*/"89""\n"       \
@@ -1448,6 +1459,27 @@ const static char map_portal_lobby[] = ""
 "mesh_manip_complete 1 19 1 4\n"
 ;
 
+const static char pokeball_map[] = ""
+
+"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
+
+"set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
+
+BACKGROUND_1
+MESH_CUBES_1(19, 5)
+
+// add test tower
+// add base
+BASE_FRIENDLY_INVISIBLE(100, 20, 100)
+
+// enemy base
+BASE_ENEMY_1
+
+// add ball
+WORLD_ADD_OBJECT(15, 0, 0, 0, 0, 0, 0, 4, 105)
+"object_set_info 17\n"
+;
+
 const static char* maps_list[] =
 {
     initial_map_collection,
@@ -1459,6 +1491,7 @@ const static char* maps_list[] =
      */
     map_200x100x200_pits,
     initial_map_turret,
+    pokeball_map,
     NULL
 };
 
@@ -1472,6 +1505,7 @@ const static char* maps_list_names[] =
      */
     "pit",
     "map turret-defense",
+    "ball-throwing test",
     NULL
 };
 

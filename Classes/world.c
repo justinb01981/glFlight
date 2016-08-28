@@ -1018,7 +1018,7 @@ void world_init(float size_x, float size_y, float size_z)
     gWorld->boundingRegion = br;
     
     // gravity vector
-    gWorld->vec_gravity[1] = -2.0;
+    gWorld->vec_gravity[1] = -32.0;
     
     // map building begins here
     if(use_test_level)

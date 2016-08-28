@@ -360,6 +360,7 @@ gameInterfaceHandleTouchMove(float x, float y)
     {
         gameInterfaceControls.touchUnmappedX = x;
         gameInterfaceControls.touchUnmappedY = y;
+        gameInterfaceControls.touchUnmapped = 1;
     }
 }
 
@@ -739,6 +740,7 @@ gameInterfaceHandleTouchEnd(float x, float y)
         needTrim = 0;
     }
     
+    gameInterfaceControls.touchUnmapped = 0;
     gameInterfaceControls.touchUnmappedX = gameInterfaceControls.touchUnmappedY = -1;
     
     gameInterfaceControls.touchCount--;
@@ -754,6 +756,7 @@ gameInterfaceHandleAllTouchEnd()
         controlSet[i]->touched = 0;
     }
     
+    gameInterfaceControls.touchUnmapped = 0;
     gameInterfaceControls.touchUnmappedX = gameInterfaceControls.touchUnmappedY = -1;
 }
 

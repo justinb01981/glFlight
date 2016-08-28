@@ -28,7 +28,7 @@ typedef enum {
     OBJ_MISSLE,
     OBJ_SPAWNPOINT_ENEMY,
     OBJ_DISPLAYONLY,
-    OBJ_RESERVED4,
+    OBJ_TOUCHCONTROLBALL,
     OBJ_RESERVED5,
     OBJ_RESERVED6,
     // TODO: has gravity, pulls objects towards it when in range

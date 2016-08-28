@@ -128,6 +128,9 @@ public class GameResources {
         R.raw.texture101,
         R.raw.texture102,
         R.raw.texture103,
+        R.raw.texture104,
+        R.raw.texture105,
+
 	};
 	
 	public static String[] resFilename = {
@@ -237,6 +240,8 @@ public class GameResources {
         "texture101.bmp",
         "texture102.bmp",
         "texture103.bmp",
+        "texture104.bmp",
+        "texture105.bmp",
 	};
 	
 	public static String[] sndNameList = {

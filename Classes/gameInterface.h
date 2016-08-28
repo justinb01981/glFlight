@@ -77,6 +77,7 @@ typedef struct {
     float interfaceHeight;
     
     float touchUnmappedX, touchUnmappedY;
+    float touchUnmapped;
 
 } controls;
 

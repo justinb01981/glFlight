@@ -1290,7 +1290,8 @@ do_game_network_write()
             if(pNode->elem->stuff.intelligent ||
                pNode->elem->object_type == OBJ_POWERUP_GENERIC ||
                pNode->elem->object_type == OBJ_SPAWNPOINT ||
-               pNode->elem->object_type == OBJ_SPAWNPOINT_ENEMY)
+               pNode->elem->object_type == OBJ_SPAWNPOINT_ENEMY ||
+               pNode->elem->object_type == OBJ_TOUCHCONTROLBALL)
             {
                 int net_obj_update = 0;
                 
