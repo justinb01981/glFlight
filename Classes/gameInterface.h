@@ -47,7 +47,8 @@ typedef struct {
     
     controlRect menuControl;
     controlRect textMenuControl;
-    controlRect help;
+    //controlRect help;
+    controlRect graphicDialog;
     controlRect dialogRect;
     controlRect consoleTextRect;
     controlRect statsTextRect;

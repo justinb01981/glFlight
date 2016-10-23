@@ -108,7 +108,7 @@ sort_elem_coordinates_furthest_first(WorldElem* pElem, model_coord_t coords_sort
 BOOL
 element_visible(WorldElem* pElem, float visibleDistance, float min_dot)
 {
-    int do_visibility_test = 1;
+    int do_visibility_test = 0;
     
     if(pElem->invisible) return FALSE;
     

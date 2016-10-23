@@ -58,7 +58,7 @@ typedef struct
     WorldElemListNode elements_visible;
     
     //WorldElemListNode elements_visible_by_region[WORLD_VIS_REGIONS_X][WORLD_VIS_REGIONS_Y][WORLD_VIS_REGIONS_Z];
-    WorldElemListNode *elements_by_region_vis;
+    //WorldElemListNode *elements_by_region_vis;
     
     //WorldElemListNode elements_by_type[MODEL_LAST];
     
@@ -130,11 +130,7 @@ void world_free();
 
 void world_optimize();
 
-void
-world_vis_rgn_add(float vis_dist, WorldElem* elem);
-
-void
-world_vis_rgn_remove(WorldElem* elem);
+void world_build_run_program(float x, float y, float z);
 
 int world_add_object(Model type, float x, float y, float z, float euler_alpha, float euler_beta, float euler_gamma, float scale, int texture_id);
 

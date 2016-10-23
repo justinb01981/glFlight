@@ -20,6 +20,7 @@
 unsigned int texture_list[MAX_TEXTURES];
 unsigned int texture_list_loaded[MAX_TEXTURES];
 int n_textures = 0;
+int texture_preload_count = 48;
 const static unsigned char alpha_black = 0x00;
 const static unsigned char alpha_semitrans = 0xD0;
 char initTexturesPrefix[255];
@@ -200,7 +201,7 @@ void initTextures(const char *prefix)
     }
     
     // load the first N textures
-    for(int i = 0; i < 32; i++)
+    for(int i = 0; i < texture_preload_count; i++)
     {
         bindTextureRequest(i);
     }
@@ -212,6 +213,12 @@ int bindTextureRequest(int tex_id)
     
     if(!texture_list_loaded[tex_id])
     {
+        extern void console_clear();
+        extern void console_write(char* fmt, ...);
+        
+        //console_clear();
+        //console_write("loading texture: %d", tex_id);
+        
         while(n_textures <= tex_id && load_count > 0)
         {
             if(read_bitmap_to_gltexture(n_textures) != 0) return 0;

@@ -32,6 +32,7 @@ enum
     GAME_TYPE_DEATHMATCH = 0,
     GAME_TYPE_COLLECT,
     GAME_TYPE_SURVIVAL,
+    GAME_TYPE_SPEEDRUN,
     GAME_TYPE_DEFEND,
     GAME_TYPE_TURRET,
     GAME_TYPE_LOBBALL,
@@ -171,7 +172,7 @@ const static float game_variables_default[] = {
     1,           // LEAVES TRAIL
     800.0,       // SCAN_DISTANCE_MAX
     0.05,        // ENEMY1_MAX_TURN_SKILL_SCALE
-    25,          // ENEMY1_JUKE_PCT
+    /*25*/10,    // ENEMY1_JUKE_PCT
     2,           // ENEMY1_COLLECT_DURABILITY
     20,          // ENEMY_RUN_DISTANCE
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -201,7 +202,6 @@ struct
     //int turret_destruction_drop_powerup;
     int player_drops_powerup;
     float powerup_drop_chance[GAME_POWERUP_DROP_TABLE_LEN];
-    int turret_destruction_change_alliance;
     int one_collect_at_a_time;
     
     float base_spawn_collect_pct;
@@ -275,6 +275,8 @@ struct
     char game_help_message[256];
     
     int object_types_towed[OBJ_LAST];
+    
+    int elem_id_arrow3[4];
     
     struct {
         int difficulty;
@@ -355,14 +357,13 @@ game_variable_set(const char* name, float val)
 inline static void
 game_elem_setup_ship(WorldElem* elem, int skill)
 {
-    if(skill > 5) skill = 5;
-    
+    elem->stuff.u.enemy.intelligence = skill;
     elem->stuff.u.enemy.leaves_trail = GAME_VARIABLE("ENEMY1_LEAVES_TRAIL");
     elem->stuff.u.enemy.run_distance = rand_in_range(4, GAME_VARIABLE("ENEMY_RUN_DISTANCE"));
     elem->stuff.u.enemy.fixed = 0;
     elem->stuff.u.enemy.changes_target = GAME_VARIABLE("ENEMY1_CHANGES_TARGET");
     elem->stuff.u.enemy.fires = GAME_VARIABLE("ENEMY1_FIRES_LASERS");
-    elem->stuff.u.enemy.patrols_no_target = GAME_VARIABLE("ENEMY1_PATROLS_NO_TARGET");
+    elem->stuff.u.enemy.patrols_no_target_jukes = GAME_VARIABLE("ENEMY1_PATROLS_NO_TARGET");
     elem->stuff.u.enemy.max_speed = GAME_VARIABLE("ENEMY1_SPEED_MAX");
     elem->stuff.u.enemy.max_turn = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS")+ GAME_VARIABLE("ENEMY1_MAX_TURN_SKILL_SCALE")*skill;
     elem->stuff.u.enemy.time_run_interval = GAME_VARIABLE("ENEMY1_RUN_INTERVAL_MS")
@@ -375,21 +376,21 @@ game_elem_setup_ship(WorldElem* elem, int skill)
     //30 - (5 * skill);
     ;
     elem->stuff.u.enemy.ignore_collect = 0;
+    elem->bounding_remain = 1;
 }
 
 inline static void
 game_elem_setup_turret(WorldElem* elem, int skill)
 {
-    if(skill > 5) skill = 5;
-    
     elem->stuff.intelligent = 1;
+    elem->stuff.u.enemy.intelligence = skill;
     elem->stuff.u.enemy.leaves_trail = 0;
     elem->stuff.u.enemy.run_distance = 0;
     elem->stuff.u.enemy.fixed = 1;
     elem->stuff.u.enemy.changes_target = 1;
     elem->stuff.u.enemy.fires = 1;
     elem->stuff.u.enemy.fires_missles = 0;
-    elem->stuff.u.enemy.patrols_no_target = 0;
+    elem->stuff.u.enemy.patrols_no_target_jukes = 0;
     elem->stuff.u.enemy.max_speed = 0;
     elem->stuff.u.enemy.max_turn = 0.8;
     elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
@@ -401,9 +402,10 @@ inline static void
 game_elem_setup_missle(WorldElem* x)
 {
     x->stuff.intelligent = 1;
+    x->stuff.u.enemy.intelligence = 1.0;
     x->physics.ptr->friction = 1;
     x->stuff.u.enemy.changes_target = 0;
-    x->stuff.u.enemy.patrols_no_target = 1;
+    x->stuff.u.enemy.patrols_no_target_jukes = 0;
     x->stuff.u.enemy.leaves_trail = 0;
     x->stuff.u.enemy.run_distance = 0;
     x->stuff.u.enemy.fixed = 0;

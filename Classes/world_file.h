@@ -39,7 +39,8 @@ typedef enum
     MAP_SET_BG_INFO,
     MAP_ADD_VECTOR,
     MAP_SET_OBJECT_VELOCITY,
-    MAP_IDENT_OBJECT
+    MAP_IDENT_OBJECT,
+    MAP_RUN_PROGRAM
 } world_map_command_type;
 
 typedef struct

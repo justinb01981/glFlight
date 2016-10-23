@@ -154,7 +154,8 @@ void glFlightInit(gl_flightViewController* viewController)
     gameInterfaceInit(viewWidth, viewHeight);
     gameInterfaceControls.trim.blinking = 1;
     
-    gameDialogCalibrate();
+    
+    gameDialogLoading();
 }
 
 void glFlightResume(time_t time_last_suspend)

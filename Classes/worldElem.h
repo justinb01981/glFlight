@@ -162,12 +162,12 @@ struct WorldElem {
                 float spawn_x, spawn_y, spawn_z;
                 float tgt_x, tgt_y, tgt_z;
                 float max_speed;
-                float max_turn;
+                float max_turn, rate_pitch, rate_yaw;
                 float run_distance, pursue_distance, scan_distance;
                 float intelligence;
-                float pitch_last, yaw_last;
+                //float pitch_last, yaw_last;
                 int appearance;
-                int fixed:1, changes_target:1, fires:1, fires_missles:1, leaves_trail:1, patrols_no_target:1, deploys_collect:1, ignore_player:1, ignore_collect:1;
+                int fixed:1, changes_target:1, fires:1, fires_missles:1, leaves_trail:1, patrols_no_target_jukes:1, deploys_collect:1, ignore_player:1, ignore_collect:1;
                 int collided;
             } enemy;
         } u;
@@ -186,6 +186,8 @@ struct WorldElem {
         int towed_elem_id;
         
         int line_id_last;
+        
+        void* btree_node[2];
         
     } stuff;
     
@@ -237,6 +239,9 @@ world_elem_init(WorldElem* pElem, int elem_id)
 
 void
 world_elem_free(WorldElem* pElem);
+
+void
+world_elem_replace_fix(WorldElem*);
 
 static inline void
 world_elem_get_coord(WorldElem* pElem, int n, model_coord_t dest[3]) {
@@ -309,5 +314,31 @@ world_elem_list_remove_skip_list(WorldElemListNode* pSkipListHead, WorldElem* pE
 
 void
 world_elem_set_nametag(WorldElem* elem, char* tag);
+
+
+typedef struct world_elem_btree_node_ {
+    struct world_elem_btree_node_* left, *right;
+    WorldElem* elem;
+    float order;
+} world_elem_btree_node;
+
+#define WORLD_ELEM_BTREE_NODE_ZERO {NULL, NULL, NULL, 0};
+
+extern volatile unsigned int world_elem_btree_ptr_idx;
+
+unsigned int world_elem_btree_ptr_idx_set(unsigned int i);
+
+void world_elem_btree_insert(world_elem_btree_node* root, WorldElem* elem, float order);
+
+extern unsigned int world_elem_btree_walk_should_abort;
+void world_elem_btree_walk(world_elem_btree_node* root, void ((*walk_func)(WorldElem* elem, float order)));
+
+void world_elem_btree_destroy(world_elem_btree_node* root);
+
+void world_elem_btree_destroy_root(world_elem_btree_node* root);
+
+void world_elem_btree_remove(world_elem_btree_node* root, WorldElem* elem, float order);
+
+void world_elem_btree_remove_all(world_elem_btree_node* root, WorldElem* elem, float order);
 
 #endif

@@ -1082,7 +1082,6 @@ visible_list_remove(WorldElem* elem, unsigned int* n_visible, WorldElemListNode*
         // HACK: temporarily invisible to prevent adding back to list below
         pLinkedElem->invisible = 1;
         world_elem_list_remove(pLinkedElem, &gWorld->elements_visible);
-        world_vis_rgn_remove(pLinkedElem);
         (*n_visible)--;
         pLinkedElem = pLinkedElem->linked_elem;
     }

@@ -229,6 +229,11 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
             map_cmd->type = MAP_SET_OBJECT_VELOCITY;
             n_params = 3;
         }
+        else if(strcmp(token, "map_program_with_args") == 0)
+        {
+            map_cmd->type = MAP_RUN_PROGRAM;
+            n_params = 3;
+        }
         else
         {
             break;
@@ -607,6 +612,10 @@ void map_render(char *map_buf)
                         gWorld->vec[3] = map_cmd.params[3];
                         gWorld->vec[4] = map_cmd.params[4];
                         gWorld->vec[5] = map_cmd.params[5];
+                        break;
+                        
+                    case MAP_RUN_PROGRAM:
+                        world_build_run_program(map_cmd.params[0], map_cmd.params[1], map_cmd.params[2]);
                         break;
                         
                     default:

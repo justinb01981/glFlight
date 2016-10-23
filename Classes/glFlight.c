@@ -35,6 +35,7 @@
 #include "gameGlobals.h"
 
 static void clear_world_pending_removals();
+static void draw_btree_elements(WorldElem* pElem, float priority);
 
 extern int isLandscape;
 
@@ -89,7 +90,36 @@ static game_timeval_t world_update_time_last;
 static int do_track_fps = 0;
 WorldElemListNode visibleSkipList;
 
+
+world_elem_btree_node visibleBtreeRootStorage1 = WORLD_ELEM_BTREE_NODE_ZERO;
+world_elem_btree_node visibleBtreeRootStorage2 = WORLD_ELEM_BTREE_NODE_ZERO;
+world_elem_btree_node *visibleBtreeRoot = &visibleBtreeRootStorage1;
+world_elem_btree_node *visibleBtreeRootBuilding = &visibleBtreeRootStorage2;
+unsigned int visibleBtreeDrawn = 0;
+WorldElemListNode* btreeVisibleTest = NULL;
+
 unsigned int draw_elem_max = PLATFORM_DRAW_ELEMS_MAX;
+
+static void
+world_elem_btree_restart()
+{
+    unsigned int prev = world_elem_btree_ptr_idx_set(0);
+    world_elem_btree_destroy_root(&visibleBtreeRootStorage1);
+    world_elem_btree_ptr_idx_set(1);
+    world_elem_btree_destroy_root(&visibleBtreeRootStorage2);
+    world_elem_btree_ptr_idx_set(prev);
+    btreeVisibleTest = NULL;
+}
+
+static void
+world_elem_btree_add_all(WorldElem* pElem)
+{
+    int prev = world_elem_btree_ptr_idx_set(0);
+    world_elem_btree_insert(&visibleBtreeRootStorage1, pElem, pElem->renderInfo.distance);
+    world_elem_btree_ptr_idx_set(1);
+    world_elem_btree_insert(&visibleBtreeRootStorage2, pElem, pElem->renderInfo.distance);
+    world_elem_btree_ptr_idx_set(prev);
+}
 
 void
 glFlightFrameStage1()
@@ -131,6 +161,8 @@ glFlightFrameStage1()
         gameGraphicsInit();
         gameInterfaceReset();
         
+        world_elem_btree_restart();
+        
         visibleElementsLen = 0;
         
         //do_draw_bail = 1;
@@ -138,7 +170,12 @@ glFlightFrameStage1()
         // 1.1 walk list of pending removals, removing from visible list
         
         goto draw_bail;
-    } 
+    }
+    
+    if(n_textures > TEXTURE_ID_PRELOAD && n_textures <= TEXTURE_ID_LAST)
+    {
+        gameDialogCalibrate();
+    }
 
     extern void update_time_ms_frame_tick();
     update_time_ms_frame_tick();
@@ -147,6 +184,12 @@ glFlightFrameStage1()
 #if GAME_PLATFORM_ANDROID
     time_ms = time_ms_wall;
 #endif
+    
+    if(gameInterfaceControls.textMenuControl.visible && !gameNetworkState.connected && gameInterfaceControls.menuAction == ACTION_INVALID)
+    {
+        game_paused = 1;
+    }
+    else game_paused = 0;
     
     if(game_paused)
     {
@@ -210,7 +253,7 @@ glFlightFrameStage1()
     do_game_network_world_update();
     
     gameNetworkMessageQueued* pNetworkMsg = gameNetworkState.msgQueue.head.next;
-    while(pNetworkMsg)
+    while(pNetworkMsg && gameNetworkState.msgQueue.cleanup == 0)
     {
         gameNetworkMessageQueued* pNetworkMsgNext = pNetworkMsg->next;
         if(!pNetworkMsg->processed)
@@ -416,9 +459,26 @@ glFlightFrameStage1()
      * starts here, no further affecting                 *
      * world-state (drawing happens asynchronously)      *
      *****************************************************/
-     
-     // 1.x clear pending removals from last pass
-     // 1.1 walk list of pending removals, removing from visible list
+    
+    // short-cut adding new elements to visibility trees
+    pVisCheckPtr = gWorld->elements_to_be_added.next;
+    while(pVisCheckPtr)
+    {
+        pVisCheckPtr->elem->renderInfo.distance = distance(gameCamera_getX(),
+                                                       gameCamera_getY(),
+                                                       gameCamera_getZ(),
+                                                       pVisCheckPtr->elem->physics.ptr->x,
+                                                       pVisCheckPtr->elem->physics.ptr->y,
+                                                       pVisCheckPtr->elem->physics.ptr->z);
+        
+        
+        world_elem_btree_add_all(pVisCheckPtr->elem);
+        
+        pVisCheckPtr = pVisCheckPtr->next;
+    }
+    
+    // 1.x clear pending removals from last pass
+    // 1.1 walk list of pending removals, removing from visible list
     clear_world_pending_removals();
     
      // TODO: may be possible to unlock world-state here
@@ -461,110 +521,60 @@ glFlightFrameStage1()
     // sort elements by distance
     static float visible_dot = 0.7;
     
-    // catch our pVisCheckPtr list-node becoming invalid
-    if(world_elem_list_remove_watch_elem == NULL)
-    {
-        pVisCheckPtr = NULL;
-    }
-    
     // start visible-subset building/policing (spans multiple frames) over if necessary
     // alternating between current-visible-list, global moving/nonstatic objects list and
     // potentially-visible list for region XYZ
-    if(pVisCheckPtr == NULL)
+    
+    // visibility-sorting binary tree
+    if(!btreeVisibleTest)
     {
-        if(pVisCheckPtrHead == &gWorld->elements_visible)
+        if(visibleBtreeRoot == &visibleBtreeRootStorage1)
         {
-            pVisCheckPtrHead = &gWorld->elements_moving;
-        }
-        else if(pVisCheckPtrHead == &gWorld->elements_moving)
-        {
-            WorldElemListNode* pVisCheckWorldHead = &gWorld->elements_list;
-            
-
-            WorldElemListNode* pVisRegionHead = world_vis_region_head(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
-            
-            if(VIS_COORD_VALID(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ()) && pVisRegionHead->next) {
-                pVisCheckWorldHead = pVisRegionHead;
-            }
-            
-            pVisCheckPtrHead = pVisCheckWorldHead;
+            visibleBtreeRoot = &visibleBtreeRootStorage2;
+            visibleBtreeRootBuilding = &visibleBtreeRootStorage1;
+            world_elem_btree_ptr_idx_set(0);
         }
         else
         {
-            pVisCheckPtrHead = &gWorld->elements_visible;
+            visibleBtreeRoot = &visibleBtreeRootStorage1;
+            visibleBtreeRootBuilding = &visibleBtreeRootStorage2;
+            world_elem_btree_ptr_idx_set(1);
         }
         
-        pVisCheckPtr = pVisCheckPtrHead->next;
+        world_elem_btree_destroy_root(visibleBtreeRootBuilding);
+        
+        btreeVisibleTest = gWorld->elements_list.next;
     }
-    
-    // prepare a new skip-list to make inserts quicker
-    
-    world_elem_list_init(&visibleSkipList);
-    world_elem_list_build_skip_list(&gWorld->elements_visible, &visibleSkipList, visibleElementsLen / 20);
-    
-    // add non-static (moving) objects to visible-list
     
     // walk part of the list and add some potentially-visible elements
-    while(pVisCheckPtr && n_visibleChecks > 0)
+    unsigned int btreeVisibleTestCount = 400;
+    unsigned int btreeVisIdx = (visibleBtreeRootBuilding == &visibleBtreeRootStorage1 ? 0 : 1);
+    while(btreeVisibleTest && btreeVisibleTestCount > 0)
     {
-        const static int min_tex_passes_between_visibility_test = 5;
-        
-        WorldElem* visListTestCur = pVisCheckPtr->elem;
-        WorldElemListNode* pVisCheckPtrNext = pVisCheckPtr->next;
-        
-        while(visListTestCur)
+        if(btreeVisibleTest->elem->stuff.btree_node[btreeVisIdx])
         {
-            if(!visListTestCur->in_visible_list &&
-               tex_pass - visListTestCur->renderInfo.tex_pass < min_tex_passes_between_visibility_test)
-            {
-                // ignored for now
-            }
-            else
-            {
-                visListTestCur->renderInfo.tex_pass = tex_pass;
-                
-                visListTestCur->renderInfo.distance = distance(gameCamera_getX(),
-                                                           gameCamera_getY(),
-                                                           gameCamera_getZ(),
-                                                           visListTestCur->physics.ptr->x,
-                                                           visListTestCur->physics.ptr->y,
-                                                           visListTestCur->physics.ptr->z);
-                
-                int visible = element_visible(visListTestCur, visible_distance, visible_dot);
-                
-                if(visListTestCur->in_visible_list)
-                {
-                    if(!visible)
-                    {
-                        // catch list-removals that may invalidate our visCheckPtr
-                        if(pVisCheckPtrNext && pVisCheckPtrNext->elem == visListTestCur) pVisCheckPtrNext = pVisCheckPtrNext->next;
-                        
-                        world_elem_list_remove_skip_list(&visibleSkipList, visListTestCur);
-                        world_elem_list_remove(visListTestCur, &gWorld->elements_visible);
-                        visListTestCur->in_visible_list = 0;
-                        visibleElementsLen--;
-                    }
-                }
-                else
-                {
-                    if(visible)
-                    {
-                        world_elem_list_add_sorted(&gWorld->elements_visible, &visibleSkipList,
-                                                   visListTestCur, element_dist_compare);
-                        visListTestCur->in_visible_list = 1;
-                        visibleElementsLen++;
-                    }
-                }
-            }
-            
-            visListTestCur = visListTestCur->linked_elem;
         }
-        
-        pVisCheckPtr = pVisCheckPtrNext;
-        n_visibleChecks--;
+        else
+        {
+            WorldElem* pElem = btreeVisibleTest->elem;
+            
+            pElem->renderInfo.distance = distance(gameCamera_getX(),
+                                                  gameCamera_getY(),
+                                                  gameCamera_getZ(),
+                                                  pElem->physics.ptr->x,
+                                                  pElem->physics.ptr->y,
+                                                  pElem->physics.ptr->z);
+            
+            int visible = element_visible(btreeVisibleTest->elem, visible_distance, visible_dot);
+            
+            if(visible)
+            {
+                world_elem_btree_insert(visibleBtreeRootBuilding, pElem, pElem->renderInfo.distance);
+            }
+        }
+        btreeVisibleTest = btreeVisibleTest->next;
+        btreeVisibleTestCount--;
     }
-    
-    world_elem_list_remove_watch_elem = pVisCheckPtr;
     
     // partially sort current visible subset
     world_elem_list_sort_1(&gWorld->elements_visible, element_dist_compare, 0, INT_MAX);
@@ -610,6 +620,7 @@ glFlightFrameStage1()
     glTranslatef(-gameCamera_getX(), -gameCamera_getY(), -gameCamera_getZ());
     
     // walk list of new elements, adding to visible list
+    // TODO: THIS IS NOT WORKING because added-list is being cleaned in clear_pending
     WorldElemListNode* pAddedPtr = gWorld->elements_to_be_added.next;
     while(pAddedPtr)
     {
@@ -617,6 +628,22 @@ glFlightFrameStage1()
         world_elem_list_add_sorted(&gWorld->elements_visible, &visibleSkipList,
                                    pAddedPtr->elem, element_dist_compare);
         visibleElementsLen++;
+        
+        pAddedPtr->elem->renderInfo.distance = distance(gameCamera_getX(),
+                                                        gameCamera_getY(),
+                                                        gameCamera_getZ(),
+                                                        pAddedPtr->elem->physics.ptr->x,
+                                                        pAddedPtr->elem->physics.ptr->y,
+                                                        pAddedPtr->elem->physics.ptr->z);
+        
+        // insert into all visible-trees immediately
+        unsigned int prev_world_elem_btree_ptr_idx = world_elem_btree_ptr_idx_set(0);
+        world_elem_btree_insert(&visibleBtreeRootStorage1, pAddedPtr->elem, pAddedPtr->elem->renderInfo.distance);
+        world_elem_btree_ptr_idx_set(1);
+        world_elem_btree_insert(&visibleBtreeRootStorage2, pAddedPtr->elem, pAddedPtr->elem->renderInfo.distance);
+        world_elem_btree_ptr_idx = prev_world_elem_btree_ptr_idx;
+        
+        world_elem_list_remove(pAddedPtr->elem, &gWorld->elements_to_be_added);
         
         pAddedPtr = pAddedPtr->next;
     }
@@ -647,32 +674,12 @@ glFlightFrameStage1()
     }
     
     // actual drawing (happens asynchronouly)
-    unsigned int count_elems = 0, drawn_elems = 0;
     drawElemStart(pDrawCur);
-    while(pDrawCur)
-    {
-        if((visibleElementsLen-count_elems) <= draw_elem_max)
-        {
-            WorldElem* pElem = pDrawCur->elem;
-            
-            if(pElem->renderInfo.wireframe || (pElem->head_elem && pElem->head_elem->renderInfo.wireframe))
-            {
-                drawLineBegin();
-                drawLinesElemTriangles(pElem);
-                drawLineEnd();
-            }
-            else
-            {
-                drawElem(pElem);
-            }
-            drawn_elems++;
-        }
-        pDrawCur = pDrawCur->next;
-        count_elems++;
-    }
-    
+    visibleBtreeDrawn = 0;
+    world_elem_btree_walk_should_abort = 0;
+    world_elem_btree_walk(visibleBtreeRoot, draw_btree_elements);
     drawElemEnd();
-    count_elems_last = count_elems;
+    count_elems_last = visibleBtreeDrawn;
     
     if(pWorldElemMyShip)
     {
@@ -834,6 +841,21 @@ glFlightFrameStage2()
 }
 
 static void
+clear_vis_btree_removed(WorldElem* headElem)
+{
+    while(headElem)
+    {
+        if (btreeVisibleTest && btreeVisibleTest->elem == headElem)
+        {
+            btreeVisibleTest = NULL;
+        }
+        world_elem_btree_remove_all(NULL, headElem, headElem->renderInfo.distance);
+        
+        break;
+    }
+}
+
+static void
 clear_world_pending_removals()
 {
 	WorldElemListNode* pRemovedPtr = gWorld->elements_to_be_freed.next;
@@ -844,6 +866,8 @@ clear_world_pending_removals()
 			visible_list_remove(pRemovedPtr->elem, &visibleElementsLen, &pVisCheckPtr);
 		}
         
+        clear_vis_btree_removed(pRemovedPtr->elem);
+        
         // HACK: supposed to be handled by elem_remove(), but android crashes if this isn't here...
         if(world_elem_list_remove_watch_elem == pRemovedPtr) world_elem_list_remove_watch_elem = NULL;
 
@@ -852,4 +876,26 @@ clear_world_pending_removals()
 
 	// 1.2 clear those bitches, fer realz
 	world_clear_pending();
+}
+
+static void
+draw_btree_elements(WorldElem* pElem, float priority)
+{
+    if(priority < /*drawDistanceFar*/ 100 || pElem->renderInfo.priority)
+    {
+        if(pElem->renderInfo.wireframe || (pElem->head_elem && pElem->head_elem->renderInfo.wireframe))
+        {
+            drawLineBegin();
+            drawLinesElemTriangles(pElem);
+            drawLineEnd();
+        }
+        else
+        {
+            drawElem(pElem);
+        }
+    }
+    else
+    {
+        //world_elem_btree_walk_should_abort = 1;
+    }
 }

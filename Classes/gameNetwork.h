@@ -220,6 +220,7 @@ typedef struct
     struct
     {
         gameNetworkMessageQueued head;
+        volatile int cleanup;
     } msgQueue;
     
     game_timeval_t time_last_periodic_check;

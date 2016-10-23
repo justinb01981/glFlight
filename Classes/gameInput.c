@@ -508,7 +508,7 @@ gameInput()
     float tc = time_ms_wall - time_input_last;
     time_input_last = time_ms_wall;
     
-    if(!needTrim)
+    if(!needTrim && !game_paused)
     {
         float driftComp[3] = {
             /*GYRO_FEEDBACK_COEFF*/(trim_dz[0]) * 4.0,

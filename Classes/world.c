@@ -474,6 +474,8 @@ world_add_object_core(Model type,
                 pElemNext->head_elem = elemSave.head_elem;
                 pElemNext->listRefHead = elemSave.listRefHead;
                 memcpy(&pElemNext->stuff, &elemSave.stuff, sizeof(pElemNext->stuff));
+                
+                world_elem_replace_fix(pElemNext);
             }
             else
             {
@@ -496,6 +498,8 @@ world_add_object_core(Model type,
     }
     
     pElem = pElemHead;
+    
+    world_elem_replace_fix(pElem);
     
     if(replace_id < 0)
     {
@@ -550,7 +554,6 @@ world_add_object_core(Model type,
     
     if(replace_id < 0)
     {
-        world_vis_rgn_add(visible_distance, pElem);
         gWorld->last_elem_added = pElem;
     }
     
@@ -816,9 +819,11 @@ world_random_spawn_location(float loc[6], int affiliation)
                     loc[i++] = pCur->elem->physics.ptr->x;
                     loc[i++] = pCur->elem->physics.ptr->y;
                     loc[i++] = pCur->elem->physics.ptr->z;
-                    loc[i++] = rand_in_range(0, M_PI*2 * 100) / 100; // alpha
+                    
+                    // random heading on x/z axis
+                    loc[i++] = M_PI/2; // alpha
                     loc[i++] = rand_in_range(0, M_PI*2 * 100) / 100; // beta
-                    loc[i++] = rand_in_range(0, M_PI*2 * 100) / 100; // gamma
+                    loc[i++] = -M_PI/2; // gamma
                     return;
                 }
             }
@@ -874,7 +879,6 @@ void world_free()
         }
         
         if(gWorld->elements_by_region) free(gWorld->elements_by_region);
-        if(gWorld->elements_by_region_vis) free(gWorld->elements_by_region_vis);
         
         // release meshes
         WorldElemListNode* pHead = &gWorld->triangle_mesh_head;
@@ -936,24 +940,6 @@ world_region_head(float x, float y, float z)
     return pNode;
 }
 
-WorldElemListNode*
-world_vis_region_head(float x, float y, float z)
-{
-    WorldElemListNode* pNode = gWorld->elements_by_region_vis;
-    
-    float m[3] = {
-        gWorld->bound_x / gWorld->vis_regions_x,
-        gWorld->bound_y / gWorld->vis_regions_y,
-        gWorld->bound_z / gWorld->vis_regions_z,
-    };
-    
-    pNode += (int) (x/m[0]) * (int) gWorld->vis_regions_y * (int)gWorld->vis_regions_z;
-    pNode += (int) (y/m[1]) * (int) gWorld->vis_regions_z;
-    pNode += (int) (z/m[2]);
-    
-    return pNode;
-}
-
 void world_init(float size_x, float size_y, float size_z)
 {			
     int use_test_level = 0;
@@ -984,11 +970,6 @@ void world_init(float size_x, float size_y, float size_z)
     gWorld->vis_regions_y = MAX((size_y/vws), 1);
     gWorld->vis_regions_z = MAX((size_z/vws), 1);
     alloc_size = sizeof(WorldElemListNode) * gWorld->vis_regions_x * gWorld->vis_regions_y * gWorld->vis_regions_z;
-    gWorld->elements_by_region_vis = (WorldElemListNode*) malloc(alloc_size);
-    for(int i = 0; i < (gWorld->vis_regions_x * gWorld->vis_regions_y * gWorld->vis_regions_z); i++)
-    {
-        memset(gWorld->elements_by_region_vis+i, 0, sizeof(WorldElemListNode));
-    }
     
     if(size_x == -1 && size_y == -1 && size_z == -1)
     {
@@ -1194,8 +1175,6 @@ void world_clear_pending()
         world_elem_list_remove(pFreeElem, &gWorld->elements_expiring);
         world_elem_list_remove(pFreeElem, &gWorld->elements_moving);
         remove_element_from_region(pFreeElem);
-        
-        world_vis_rgn_remove(pFreeElem);
         
         world_elem_list_remove(pFreeElem, &gWorld->elements_to_be_freed);
         
@@ -2235,83 +2214,6 @@ world_set_plane(int idx, float ox, float oy, float oz, float x1, float y1, float
 }
 
 void
-world_vis_rgn_remove(WorldElem* elem)
-{
-    if(elem->visible_list_by_region_sorted)
-    {
-        // walk list-back references and remove from all LIST_TYPE_REGION lists
-        WorldElemListNode* pListHead;
-        int i = 0;
-        
-        do
-        {
-            pListHead = world_elem_get_member_list_head(elem, i);
-            if(pListHead)
-            {
-                // head-node type is undefined now
-                assert(pListHead->next);
-                
-                if(pListHead->next->type == LIST_TYPE_REGION_VIS)
-                {
-                    world_elem_list_remove(elem, pListHead);
-                    continue;
-                }
-            }
-            i++;
-        } while(pListHead);
-        
-        elem->visible_list_by_region_sorted = 0;
-    }
-}
-
-void
-world_vis_rgn_add(float vis_dist, WorldElem* elem)
-{
-    float m[3] = {
-        gWorld->bound_x / gWorld->vis_regions_x,
-        
-        gWorld->bound_y / gWorld->vis_regions_y,
-        
-        gWorld->bound_z / gWorld->vis_regions_z
-    };
-    
-    if(elem->visible_list_by_region_sorted)
-    {
-        return;
-    }
-    
-    for(int x = 0; x < gWorld->vis_regions_x; x++)
-    {
-        for(int y = 0; y < gWorld->vis_regions_y; y++)
-        {
-            for(int z = 0; z < gWorld->vis_regions_z; z++)
-            {
-                float p[3] = {
-                    m[0] * x + (m[0] / 2),
-                    m[1] * y + (m[1] / 2),
-                    m[2] * z + (m[2] / 2)
-                };
-                
-                float d = distance(elem->physics.ptr->x, elem->physics.ptr->y, elem->physics.ptr->z,
-                                   p[0], p[1], p[2]);
-                
-                if(fabs(d) <= vis_dist)
-                {
-                    WorldElemListNode* pHead = world_vis_region_head(x, y, z);
-                    if(world_elem_list_find_elem(elem, pHead)) {
-                    }else {
-                    world_elem_list_add_fast(elem, pHead,
-                                             LIST_TYPE_REGION_VIS);
-                    }
-                }
-            }
-        }
-    }
-    
-    elem->visible_list_by_region_sorted = 1;
-}
-
-void
 world_add_drawline(float a[3], float b[3], float color[3], unsigned int lifetime)
 {
     WorldElem* pElem = world_elem_alloc();
@@ -2333,5 +2235,20 @@ world_add_drawline(float a[3], float b[3], float color[3], unsigned int lifetime
         pElem->lifetime = lifetime;
         
         world_elem_list_add(pElem, &gWorld->drawline_list_head);
+    }
+}
+
+void
+world_build_run_program(float x, float y, float z)
+{
+    float a, b;
+    for(a = 0; a < M_PI*2; a += 0.4)
+    {
+        for(b = 0; b < 50; b += 10)
+        {
+            float c[] = {sin(a)*b, 0, cos(a)*b};
+            int obj_id =
+                world_add_object(MODEL_ICOSAHEDRON, x + c[0], y + c[1], z + c[2], 0, 0, 0, 2, TEXTURE_ID_BALL);
+        }
     }
 }

@@ -54,6 +54,7 @@ static int gameNetwork_inited = 0;
 static int read_in_render_thread = 0;
 const static float euler_interp_range_max = (M_PI/8);
 const static float velo_interp_update_mult = 8;
+const static char *map_eom = "\nmap_eom\n";
 
 static char *gameKillVerbs[] = {"slaughtered", "evicerated", "de-rezzed", "shot-down", "ended", "terminated"};
 
@@ -312,6 +313,7 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
     unsigned short server_port_resolved = htons(gameNetworkState.hostInfo.port);
     int retries_udp = 10;
     int delay_udp = 100;
+    char download_cmd = '\n';
     
     gameNetworkState.hostInfo.lan_only = lan_only;
     
@@ -497,6 +499,9 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
                             
                             socket_set_blocking(download_sock, 1);
                             
+                            // send '\n'
+                            send(download_sock, &download_cmd, sizeof(download_cmd), 0);
+                            
                             // download map
                             size_t map_data_size = 1024*1024;
                             char* map_data = malloc(map_data_size);
@@ -538,12 +543,13 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
                                     
                                     r = recv(download_sock, read_dest, 1024, 0);
                                     
+                                    if(memcmp(read_dest, map_eom, strlen(map_eom)) == 0) break;
+                                    
                                     if(r > 0)
                                     {
                                         read_dest += r;
                                         map_data_bytes += r;
                                     }
-                                    
                                 } while(r > 0 && !timed_out);
                                 
                                 if(!timed_out && map_data_bytes > 0)
@@ -862,19 +868,33 @@ gameNetwork_accept_map_download(gameNetworkAddress* src_addr, char* (*mapRenderC
             
             int a = accept(s, &from_addr, &from_addr_len);
             
-            char *map_data = mapRenderCallback();
-            
-            if(a > 0 && map_data)
+            if(a > 0)
             {
                 int w;
-                do
+                char inbuf;
+                
+                // wait for a newline to be received
+                while(1)
                 {
-                    int send_len = 128;
-                    if(strlen(map_data) < send_len) send_len = strlen(map_data);
-                    w = send(a, map_data, send_len, 0);
-                    map_data += w;
+                    w = recv(a, &inbuf, sizeof(inbuf), 0);
+
+                    char *map_data = mapRenderCallback();
                     
-                } while(w > 0 && strlen(map_data) > 0);
+                    if(w > 0 && map_data && (inbuf == '\n' || inbuf == '\r'))
+                    {
+                        do
+                        {
+                            int send_len = 128;
+                            if(strlen(map_data) < send_len) send_len = strlen(map_data);
+                            w = send(a, map_data, send_len, 0);
+                            map_data += w;
+                            
+                        } while(w > 0 && strlen(map_data) > 0);
+                        
+                        send(a, map_eom, strlen(map_eom), 0);
+                    }
+                    else break;
+                }
                 
                 close(a);
             }
@@ -2383,6 +2403,7 @@ do_game_network_read()
         }
         
         // clean up processed messages
+        gameNetworkState.msgQueue.cleanup = 1;
         gameNetworkMessageQueued* pMsgCur = &gameNetworkState.msgQueue.head;
         gameNetworkMessageQueued* pMsgProcessed = NULL;
         while(pMsgCur->next && pMsgCur->next->processed)
@@ -2394,8 +2415,10 @@ do_game_network_read()
         {
             gameNetworkMessageQueued* pMsgFree = pMsgProcessed;
             pMsgProcessed = pMsgProcessed->next;
+            pMsgFree->next = NULL;
             free(pMsgFree);
         }
+        gameNetworkState.msgQueue.cleanup = 0;
         
         // add to queue
         gameNetworkMessageQueued* pMsg =
@@ -2410,7 +2433,6 @@ do_game_network_read()
             gameNetworkMessageQueued* pTail = &gameNetworkState.msgQueue.head;
             while(pTail->next) pTail = pTail->next;
             pTail->next = pMsg;
-            
         }
         
         retries--;

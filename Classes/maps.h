@@ -38,21 +38,26 @@
 "add_object 1 r r r 0 0 0 4 16\n"
 
 #define WORLD_SCALED_FRAME(x, tex, scale)                                \
-"register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
+"register_params 400 100 400 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
 "set_world_size r r r\n"                                                 \
 "mesh_manip_add 0 " "1" " 0" " 4 0 0" " 0 0 4" " wx0.25 wz0.25\n" \
-/*
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(10, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(10, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(10, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(10, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(10, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(10, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(10, 0.93) \
-*/ \
-"mesh_manip_round 0 4 0\n" \
-"mesh_manip_complete 2 "#tex" 1 "#scale"\n"
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
+"mesh_manip_round 0 1 0\n" \
+"mesh_manip_complete 1 "#tex" 1 "#scale"\n"
 
 #define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
 "register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
@@ -219,8 +224,12 @@ ADD_OBJ_END(4, 40) \
 "register_params_update 0 rnd_-4_4 4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
 "add_object r r r r 0 0 0 r r\n"
 
+#define BASE_MODEL_ID "10"
+#define BASE_TEXTURE_ID_FRIENDLY /*"106"*/ "106"
+#define BASE_TEXTURE_ID_ENEMY /*58*/ "89"
+
 #define BASE_FRIENDLY_1(x,y,z)                        \
-"register_params 10 "/*"rndx"*/#x" "#y" "#z" 0 0 0 8 "/*"42"*/"92"" 0 0 0 0 0 0 0\n"                 \
+"register_params "BASE_MODEL_ID" "/*"rndx"*/#x" "#y" "#z" 0 0 0 8 "/*"42"*/ /*"92"*/ BASE_TEXTURE_ID_FRIENDLY" 0 0 0 0 0 0 0\n"                 \
 "add_object r r r r r r r r " "r" "\n" \
 "object_set_info 8\n" 
 
@@ -230,7 +239,7 @@ ADD_OBJ_END(4, 40) \
 "object_set_info 8\n"
 
 #define BASE_ENEMY_1                           \
-"add_object 10 rndx 50 rndz 0 0 0 8 "/*"58"*/"89""\n"       \
+"add_object "BASE_MODEL_ID" rndx 50 rndz 0 0 0 8 "BASE_TEXTURE_ID_ENEMY"\n"       \
 "object_set_info 15\n"
 
 #define BASE_TURRET_1                        \
@@ -238,13 +247,18 @@ ADD_OBJ_END(4, 40) \
 "add_object r r r r r r r r " "r" "\n" \
 "object_set_info 8\n"
 
+#define MAP_TEXTURE_ID_ANIMATED_STATIC "18"
 #define BASE_GENERIC(x,y,z)                            \
-"register_params 10 "/*"rndx"*/#x" "#y" "/*"rndz"*/#z" 0 0 0 8 "/*"42"*/"88"" 0 0 0 0 0 0 0\n"                 \
+"register_params 15 "/*"rndx"*/#x" "#y" "/*"rndz"*/#z" 0 0 0 8 "/*"42"*//*"88"*/MAP_TEXTURE_ID_ANIMATED_STATIC" 0 0 0 0 0 0 0\n"                 \
 "add_object r r r r r r r r " "r" "\n" \
 "object_set_info 13\n"
 
 #define ASTEROID_FIELD_BEGIN_1(x, y, z)                      \
 "register_params 15 """#x" "#y" "#z""" 0 0 0 4 14 0 0 0 0 0 0 0\n"
+
+#define ASTEROID_FIELD_ADD_AT_Y(sp, scale, ypos1)                                                       \
+"register_params_update 0 rnd_-"#sp"_"#sp" "#ypos1" rnd_-"#sp"_"#sp" 0 0 0 0 0 0 0 0 0 0 0 0\n" \
+"add_object r r r r 0 0 0 "#scale" r\n"
 
 #define ASTEROID_FIELD_ADD(sp, scale)                                                              \
 "register_params_update 0 rnd_-"#sp"_"#sp" rnd_-"#sp"_"#sp" rnd_-"#sp"_"#sp" 0 0 0 0 0 0 0 0 0 0 0 0\n" \
@@ -252,11 +266,19 @@ ADD_OBJ_END(4, 40) \
 
 #define ASTEROID_FIELD_5 \
 ASTEROID_FIELD_BEGIN_1(rndx, rndy, rndz) \
-ASTEROID_FIELD_ADD(16, rnd_6) \
-ASTEROID_FIELD_ADD(16, rnd_6) \
-ASTEROID_FIELD_ADD(16, rnd_6) \
-ASTEROID_FIELD_ADD(16, rnd_6) \
-ASTEROID_FIELD_ADD(16, rnd_6)
+ASTEROID_FIELD_ADD(16, rnd_8) \
+ASTEROID_FIELD_ADD(16, rnd_8) \
+ASTEROID_FIELD_ADD(16, rnd_8) \
+ASTEROID_FIELD_ADD(16, rnd_8) \
+ASTEROID_FIELD_ADD(16, rnd_8)
+
+#define ASTEROID_FIELD_PLANE(ypos) \
+ASTEROID_FIELD_BEGIN_1(rndx, ypos, rndz) \
+ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0) \
+ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0) \
+ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0) \
+ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0) \
+ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 
 #define BUILDING_1(x, y, z)                         \
 "set_vector "#x" "#y" "#z" 0 1 0\n"                 \
@@ -505,7 +527,7 @@ const static char initial_map_collection[] = ""
 BACKGROUND_TEX_RANDOM
 
 //MESH_CUBES_2(28, 4)
-WORLD_SCALED_FRAME(1, 57, 4)
+WORLD_SCALED_FRAME(1, /*57*/28, 4)
 //WORLD_SCALED_FRAME_GL_TERRAIN(1, 83, 4)
 
 // else
@@ -545,7 +567,7 @@ BASE_FRIENDLY_1(rndx, rndy, rndz)
 BASE_ENEMY_1
 
 // "core" that spits out data
-BASE_GENERIC(100, 50, 100)
+BASE_GENERIC(200, 50, 200)
 
 // air platform
 /*
@@ -801,10 +823,11 @@ RANDOM_DECORATION_1
 
 const static char initial_map_deathmatch[] = ""
 
-//"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
-WORLD_SCALED_FRAME_GL_TERRAIN(1, 83, 4)
+"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
+//WORLD_SCALED_FRAME_GL_TERRAIN(1, 83, 4)
 //"set_background_info 27\n"
 "set_background_info "TEXTURE_ID_STARFIELD"\n"
+//"map_program_with_args 100 50 100\n"
 
 // stuff
 "register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
@@ -1001,25 +1024,10 @@ ASTEROID_FIELD_5
 
 const static char initial_map_survival[] = ""
 
-"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
-//"set_background_info 27\n"
+WORLD_SCALED_FRAME(1, 28, 4)
 "set_background_info "TEXTURE_ID_STARFIELD"\n"
 
-"mesh_manip_add wx0.1 " "-4" " wz0.1" " 4 0 0" " 0 0 4" " 40 40\n"
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"
-
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"
-"mesh_manip_complete "/*"2"*/"1"" "/*"57"*/"28"" 1 4\n"
+BASE_FRIENDLY_1(rndx, rndy, rndz)
 
 // else
 "register_params 2 rndx 20 rndy 0 0 0 10 0 0 0 0 0 0 0 0\n"
@@ -1102,18 +1110,7 @@ const static char initial_map_survival[] = ""
 "add_object 2 rndx 50 rndz 0 0 0 8 " "42" "\n"
 "object_set_info 8\n"
 
-// enemy base
-"add_object 2 rndx 50 rndz 0 0 0 8 58\n"
-"object_set_info 15\n"
-// enemy base
-"add_object 2 rndx 50 rndz 0 0 0 8 58\n"
-"object_set_info 15\n"
-// enemy base
-"add_object 2 rndx 50 rndz 0 0 0 8 58\n"
-"object_set_info 15\n"
-// enemy base
-"add_object 2 rndx 50 rndz 0 0 0 8 58\n"
-"object_set_info 15\n"
+BASE_ENEMY_1
 
 // air platform
 /*
@@ -1480,6 +1477,62 @@ WORLD_ADD_OBJECT(15, 0, 0, 0, 0, 0, 0, 4, 105)
 "object_set_info 17\n"
 ;
 
+const static char map_speedrun[] = "" \
+"register_params 2000 100 100 0 0 0 0 0 0 0 0 0 0 0 0 0\n"               \
+"set_world_size r r r\n"                                                 \
+
+// starting position
+BASE_FRIENDLY_INVISIBLE(50, 50, 50)
+
+// enemy turret
+WORLD_ADD_OBJECT(11, rndx, rndy, rndz, 0, 0, 0, 1, 35) \
+"object_set_info 3\n" \
+WORLD_ADD_OBJECT(11, rndx, rndy, rndz, 0, 0, 0, 1, 35) \
+"object_set_info 3\n" \
+WORLD_ADD_OBJECT(11, rndx, rndy, rndz, 0, 0, 0, 1, 35) \
+"object_set_info 3\n" \
+WORLD_ADD_OBJECT(11, rndx, rndy, rndz, 0, 0, 0, 1, 35) \
+"object_set_info 3\n" \
+WORLD_ADD_OBJECT(11, rndx, rndy, rndz, 0, 0, 0, 1, 35) \
+"object_set_info 3\n" \
+WORLD_ADD_OBJECT(11, rndx, rndy, rndz, 0, 0, 0, 1, 35) \
+"object_set_info 3\n" \
+WORLD_ADD_OBJECT(11, rndx, rndy, rndz, 0, 0, 0, 1, 35) \
+"object_set_info 3\n" \
+WORLD_ADD_OBJECT(11, rndx, rndy, rndz, 0, 0, 0, 1, 35) \
+"object_set_info 3\n" \
+
+//"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
+
+BACKGROUND_TEX_RANDOM
+
+//MESH_CUBES_2(28, 4)
+//WORLD_SCALED_FRAME_GL_TERRAIN(1, 83, 4)
+
+// else
+GREEN_TENDRILS_1
+
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+COIN_LINE_1_4X
+
+/////////////
+
+// buildings
+BUILDING_1(rndx, 0, rndz)
+BUILDING_1(rndx, 0, rndz)
+BUILDING_1(rndx, 0, rndz)
+BUILDING_1(rndx, 0, rndz)
+BUILDING_1(rndx, 0, rndz)
+BUILDING_1(rndx, 0, rndz)
+; // map_trench
+
+
 const static char* maps_list[] =
 {
     initial_map_collection,
@@ -1492,6 +1545,7 @@ const static char* maps_list[] =
     map_200x100x200_pits,
     initial_map_turret,
     pokeball_map,
+    map_speedrun,
     NULL
 };
 
@@ -1506,6 +1560,7 @@ const static char* maps_list_names[] =
     "pit",
     "map turret-defense",
     "ball-throwing test",
+    "speedrun",
     NULL
 };
 

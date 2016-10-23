@@ -136,14 +136,14 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     
     float helpWidth = 0.8;
     float helpHeight = 0.8;
-    gameInterfaceControls.help.x = screenWidth/2 - (helpWidth*gameInterfaceControls.interfaceWidth)/2;
-    gameInterfaceControls.help.y = screenHeight/2 - (helpHeight*gameInterfaceControls.interfaceHeight)/2;
-    gameInterfaceControls.help.xw = helpWidth*gameInterfaceControls.interfaceWidth;
-    gameInterfaceControls.help.yw = helpHeight*gameInterfaceControls.interfaceHeight;
-    gameInterfaceControls.help.tex_id = TEXTURE_ID_CONTROLS_HELP;
-    gameInterfaceControls.help.visible = 0;
+    gameInterfaceControls.graphicDialog.x = screenWidth/2 - (helpWidth*gameInterfaceControls.interfaceWidth)/2;
+    gameInterfaceControls.graphicDialog.y = screenHeight/2 - (helpHeight*gameInterfaceControls.interfaceHeight)/2;
+    gameInterfaceControls.graphicDialog.xw = helpWidth*gameInterfaceControls.interfaceWidth;
+    gameInterfaceControls.graphicDialog.yw = helpHeight*gameInterfaceControls.interfaceHeight;
+    gameInterfaceControls.graphicDialog.tex_id = TEXTURE_ID_CONTROLS_HELP;
+    gameInterfaceControls.graphicDialog.visible = 0;
     
-    float dialogWidth = 0.48;
+    float dialogWidth = /*0.48*/ 0.60;
     float dialogHeight = 0.512;
     gameInterfaceControls.dialogRectDefault.x = gameInterfaceControls.interfaceWidth/2 - (dialogWidth*gameInterfaceControls.interfaceWidth)/2;
     gameInterfaceControls.dialogRectDefault.y = gameInterfaceControls.interfaceHeight/2 - (dialogHeight*gameInterfaceControls.interfaceHeight)/2;
@@ -212,7 +212,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.reticleRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.textMenuControl;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.fireRectMissle;
-    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.help;
+    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.graphicDialog;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.dialogRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.consoleTextRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.statsTextRect;
@@ -304,7 +304,7 @@ gameInterfaceHandleTouchMove(float x, float y)
         touchedControl->touch_ry = (y - touchedControl->y) / touchedControl->yw;
     }
     
-    gameInterfaceControls.help.visible = 0;
+    gameInterfaceControls.graphicDialog.visible = 0;
     
     if(touchedControl == &gameInterfaceControls.accelerator)
     {
@@ -350,7 +350,7 @@ gameInterfaceHandleTouchMove(float x, float y)
     else if(touchedControl == &gameInterfaceControls.textMenuControl)
     {
     }
-    else if(touchedControl == &gameInterfaceControls.help)
+    else if(touchedControl == &gameInterfaceControls.graphicDialog)
     {
     }
     else if(touchedControl == &gameInterfaceControls.fireRectMisc)

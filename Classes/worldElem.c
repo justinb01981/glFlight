@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <assert.h>
 #include "gameDebug.h"
 #include "worldElem.h"
 #include "simple_hash.h"
@@ -37,6 +38,7 @@ world_elem_clone(WorldElem* a)
         memset(&pNew->stuff, 0, sizeof(pNew->stuff));
         pNew->linked_elem = NULL;
         memset(&pNew->listRefHead, 0, sizeof(pNew->listRefHead));
+        pNew->stuff.btree_node[0] = pNew->stuff.btree_node[1] = NULL;
         pNew->elem_id = WORLD_ELEM_ID_INVALID;
     }
     return pNew;
@@ -45,6 +47,8 @@ world_elem_clone(WorldElem* a)
 void
 world_elem_free(WorldElem* pElem)
 {
+    int i;
+    
     if(pElem->listRefHead.listNext != NULL)
     {
         WorldElemListNode* pNode = pElem->listRefHead.listNext->listElem;
@@ -57,6 +61,9 @@ world_elem_free(WorldElem* pElem)
         hack_remove_elem_from_all(pElem);
     }
     
+    // remove from trees
+    for(i = 0; i < 2; i++) if(pElem->stuff.btree_node[i]) ((world_elem_btree_node*) pElem->stuff.btree_node[i])->elem = NULL;
+    
     if(pElem->stuff.nametag)
     {
         char *pfree = pElem->stuff.nametag;
@@ -65,6 +72,13 @@ world_elem_free(WorldElem* pElem)
     }
     
     free(pElem);
+}
+
+void
+world_elem_replace_fix(WorldElem* pElem)
+{
+    int i;
+    for(i = 0; i < 2; i++) if(pElem->stuff.btree_node[i]) ((world_elem_btree_node*) pElem->stuff.btree_node[i])->elem = pElem;
 }
 
 static int
@@ -515,4 +529,137 @@ world_elem_set_nametag(WorldElem* elem, char* tag)
         }
         
     }
+}
+
+volatile unsigned int world_elem_btree_ptr_idx = 0;
+
+unsigned int
+world_elem_btree_ptr_idx_set(unsigned int i)
+{
+    unsigned int prev = world_elem_btree_ptr_idx;
+    world_elem_btree_ptr_idx = i;
+    return prev;
+}
+
+void
+world_elem_btree_insert(world_elem_btree_node* root, WorldElem* elem, float order)
+{
+    if(elem->stuff.btree_node[world_elem_btree_ptr_idx] != NULL) return;
+    
+    if(order > root->order)
+    {
+        if (root->left) world_elem_btree_insert(root->left, elem, order);
+        else
+        {
+            root->left = (world_elem_btree_node*) malloc(sizeof(world_elem_btree_node));
+            if(root->left)
+            {
+                root->left->left = NULL;
+                root->left->right = NULL;
+                root->left->elem = elem;
+                root->left->order = order;
+                elem->stuff.btree_node[world_elem_btree_ptr_idx] = root->left;
+            }
+        }
+    }
+    else {
+        if (root->right) world_elem_btree_insert(root->right, elem, order);
+        else
+        {
+            root->right = (world_elem_btree_node*) malloc(sizeof(world_elem_btree_node));
+            if(root->right)
+            {
+                root->right->left = NULL;
+                root->right->right = NULL;
+                root->right->elem = elem;
+                root->right->order = order;
+                elem->stuff.btree_node[world_elem_btree_ptr_idx] = root->right;
+            }
+        }
+    }
+}
+
+unsigned int world_elem_btree_walk_should_abort = 0;
+
+void
+world_elem_btree_walk(world_elem_btree_node* root, void ((*walk_func)(WorldElem* elem, float order)))
+{
+    if(world_elem_btree_walk_should_abort) return;
+    
+    if(root->left) world_elem_btree_walk(root->left, walk_func);
+    //if(root->elem && (root->elem->btree_node[0] == NULL && root->elem->btree_node[1] == NULL)) assert(0);
+    
+    if(root->elem) walk_func(root->elem, root->order);
+    if(root->right) world_elem_btree_walk(root->right, walk_func);
+}
+
+void
+world_elem_btree_destroy(world_elem_btree_node* root)
+{
+    if(!root) return;
+    if(root->left) world_elem_btree_destroy(root->left);
+    if(root->right) world_elem_btree_destroy(root->right);
+    
+    if(root->elem) {
+        root->elem->stuff.btree_node[world_elem_btree_ptr_idx] = NULL;
+        root->elem = NULL;
+    }
+    
+    free(root);
+}
+
+void
+world_elem_btree_destroy_root(world_elem_btree_node* root)
+{
+    if(root->right) {
+        world_elem_btree_destroy(root->right);
+        root->right = NULL;
+    }
+    if(root->left) {
+        world_elem_btree_destroy(root->left);
+        root->left = NULL;
+    }
+}
+
+void
+world_elem_btree_remove(world_elem_btree_node* root, WorldElem* elem, float order)
+{
+    /*
+    if(root->order == order && elem == root->elem)
+    {
+        // just invalidate for now
+        root->elem = NULL;
+        return;
+    }
+    
+    if(order > root->order)
+    {
+        if(root->left)
+        {
+            world_elem_btree_remove(root->left, elem, order);
+        }
+    }
+    else
+    {
+        if(order <= root->order)
+        {
+            if(root->right)
+            {
+                world_elem_btree_remove(root->right, elem, order);
+            }
+        }
+    }
+     */
+    if(((world_elem_btree_node*)elem->stuff.btree_node[world_elem_btree_ptr_idx])) ((world_elem_btree_node*)elem->stuff.btree_node[world_elem_btree_ptr_idx])->elem = NULL;
+    elem->stuff.btree_node[world_elem_btree_ptr_idx] = NULL;
+}
+
+void
+world_elem_btree_remove_all(world_elem_btree_node* root, WorldElem* elem, float order)
+{
+    if(((world_elem_btree_node*)elem->stuff.btree_node[0])) ((world_elem_btree_node*)elem->stuff.btree_node[0])->elem = NULL;
+    elem->stuff.btree_node[0] = NULL;
+    
+    if(((world_elem_btree_node*)elem->stuff.btree_node[1])) ((world_elem_btree_node*)elem->stuff.btree_node[1])->elem = NULL;
+    elem->stuff.btree_node[1] = NULL;
 }
