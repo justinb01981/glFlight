@@ -124,7 +124,7 @@ static char *game_log_messages[] = {
     "HIDDEN: points collected\n",
     "HIDDEN: detected: ^D vulnerable\n",
     "enemies spawning faster!\n",
-    "vulnerable ^D:%d system integrity:%f \045\n",
+    "vulnerable ^D:%d system integrity:%.0f%% \045\n",
     "HIDDEN: connection successful",
     "detected: new turret",
     NULL
