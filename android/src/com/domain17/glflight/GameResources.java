@@ -130,6 +130,11 @@ public class GameResources {
         R.raw.texture103,
         R.raw.texture104,
         R.raw.texture105,
+        R.raw.texture106,
+        R.raw.texture107,
+        R.raw.texture108,
+        R.raw.texture109,
+        R.raw.texture110
 
 	};
 	
@@ -242,6 +247,11 @@ public class GameResources {
         "texture103.bmp",
         "texture104.bmp",
         "texture105.bmp",
+        "texture106.bmp",
+        "texture107.bmp",
+        "texture108.bmp",
+        "texture109.bmp",
+        "texture110.bmp"
 	};
 	
 	public static String[] sndNameList = {
@@ -262,7 +272,8 @@ public class GameResources {
 		"towing",
 		"victory",
 		"warning",
-		"teleport"
+		"teleport",
+        "filelost"
 		
 	};
 	
@@ -284,7 +295,8 @@ public class GameResources {
 		R.raw.towing,
 		R.raw.victory,
 		R.raw.warning,
-        R.raw.teleport
+        R.raw.teleport,
+        R.raw.filelost
 	};
 	
 	static GameResources inst = null;
