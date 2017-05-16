@@ -51,8 +51,14 @@ model_index_t overlay_indices[6];
 
 int radar_mode = 0;
 
-model_index_t* drawElemBatchedIndices = NULL;
-unsigned long drawElemBatchedIndicesLen = 0;
+model_index_t* drawElem_indicesBatchBuffer = NULL, *drawElem_indicesBatchBufferCur;
+model_coord_t* drawElem_vertexBatchBuffer = NULL, *drawElem_vertexBatchBufferCur;
+model_texcoord_t* drawElem_textCoordBatchBuffer = NULL, *drawElem_textCoordBatchBufferCur;
+unsigned int drawElem_BatchBuffer_max = 0;
+unsigned int drawElem_indicesBatchBuffer_count = 0;
+unsigned int drawElem_vertexBatchBuffer_count = 0;
+unsigned int drawElem_textCoordBatchBuffer_count = 0;
+unsigned int drawElem_batchTotal[3];
 int drawElemAnimationIdx = 0;
 model_coord_t tex_coord_adjust[128] =
 {
@@ -143,22 +149,25 @@ setupGLTextureViewDone()
     glPopMatrix();
 }
 
-void
+static unsigned int drawn_texture_last;
+
+int
 bindTexture(unsigned int tex_id)
 {
-    static unsigned int drawn_texture_last;
-    
     if(!bindTextureRequest(tex_id))
     {
         glBindTexture(GL_TEXTURE_2D, TEXTURE_ID_UNKNOWN);
-        return;
+        return 0;
     }
     
     if(tex_id != drawn_texture_last && tex_id < n_textures)
     {
         glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
         drawn_texture_last = tex_id;
+        return 1;
     }
+    
+    return 0;
 }
 
 static gameGraphics_drawState2d drawText_ds;
@@ -939,12 +948,34 @@ drawState2dDraw()
 }
 
 void
+drawElemBatch()
+{
+    if(drawElem_indicesBatchBuffer_count > 0)
+    {
+        glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBufferCur);
+        gl_vertex_ptr_last = drawElem_vertexBatchBufferCur;
+        glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBufferCur);
+        gl_texcoord_ptr_last = drawElem_textCoordBatchBufferCur;
+        glDrawElements(GL_TRIANGLES, drawElem_indicesBatchBuffer_count, index_type_enum, drawElem_indicesBatchBufferCur);
+        
+        drawElem_indicesBatchBufferCur = drawElem_indicesBatchBufferCur + drawElem_indicesBatchBuffer_count;
+        drawElem_vertexBatchBufferCur = drawElem_vertexBatchBufferCur + drawElem_vertexBatchBuffer_count;
+        drawElem_textCoordBatchBufferCur = drawElem_textCoordBatchBufferCur + drawElem_textCoordBatchBuffer_count;
+        drawElem_batchTotal[0] += drawElem_indicesBatchBuffer_count;
+        drawElem_batchTotal[1] += drawElem_vertexBatchBuffer_count;
+        drawElem_batchTotal[2] += drawElem_textCoordBatchBuffer_count;
+        
+        drawElem_indicesBatchBuffer_count = drawElem_vertexBatchBuffer_count = drawElem_textCoordBatchBuffer_count = 0;
+    }
+}
+
+void
 drawElem(WorldElem* pElem)
 {
-    int batched = 0;
-
     if(pElem->type == MODEL_SPRITE)
     {
+        drawElemBatch();
+        
         // draw billboards
         drawBillboard(pElem);
         
@@ -952,41 +983,7 @@ drawElem(WorldElem* pElem)
         gl_texcoord_ptr_last = NULL;
     }
     else
-    if(pElem->uses_global_coords)
     {
-        if(gl_vertex_ptr_last != gWorld->shared_coordinates)
-        {
-            gl_vertex_ptr_last = gWorld->shared_coordinates;
-            glVertexPointer(3, GL_FLOAT, 0, gWorld->shared_coordinates);
-        }
-        
-        if(gl_texcoord_ptr_last != gWorld->shared_texcoords)
-        {
-            gl_texcoord_ptr_last = gWorld->shared_texcoords;
-            glTexCoordPointer(2, GL_FLOAT, 0, gWorld->shared_texcoords);
-        }
-        
-        bindTexture(pElem->texture_id);
-        
-        if(batched)
-        {
-            // TODO: buffer up all indices and call glDrawElements ONCE for everything
-            memcpy(drawElemBatchedIndices+drawElemBatchedIndicesLen, pElem->global_coord_data.indices, pElem->n_indices);
-            drawElemBatchedIndicesLen += pElem->n_indices;
-        }
-        else
-        {
-            glDrawElements(GL_TRIANGLES, pElem->n_indices, index_type_enum, pElem->global_coord_data.indices);
-        }
-    }
-    else
-    {
-        gl_vertex_ptr_last = pElem->coords;
-        glVertexPointer(3, GL_FLOAT, 0, pElem->coords);
-        
-        gl_texcoord_ptr_last = pElem->texcoords;
-        glTexCoordPointer(2, GL_FLOAT, 0, pElem->texcoords);
-        
         if(pElem->renderInfo.tex_adjust)
         {
             for(int x = 0; x < pElem->n_texcoords; x+=2)
@@ -1007,16 +1004,78 @@ drawElem(WorldElem* pElem)
         
         int texture_id_animated = texture_animated(texture_id, drawElemAnimationIdx);
         
-        bindTexture(texture_id_animated);
-        
-        if(batched)
+        if(drawn_texture_last != texture_id_animated)
         {
-            memcpy(drawElemBatchedIndices+drawElemBatchedIndicesLen, pElem->indices, pElem->n_indices);
-            drawElemBatchedIndicesLen += pElem->n_indices;
+            // dispatch batched drawElements and restart a new batch
+            drawElemBatch();
+        }
+        
+        if(bindTexture(texture_id_animated))
+        {
+        }
+        
+        if(drawElem_indicesBatchBuffer_count+drawElem_batchTotal[0]+pElem->n_indices < drawElem_BatchBuffer_max &&
+           drawElem_vertexBatchBuffer_count+drawElem_batchTotal[1]+pElem->n_coords < drawElem_BatchBuffer_max &&
+           drawElem_textCoordBatchBuffer_count+drawElem_batchTotal[2]+pElem->n_texcoords < drawElem_BatchBuffer_max)
+        {
+            int idx;
+            
+            unsigned long indicesBatchOffset = drawElem_indicesBatchBuffer_count;
+            
+            const int coord_inval = -1;
+            const int coord_size = 3;
+            const int texcoord_size = 2;
+            int coord_table[MAX_ELEM];
+            for(idx = 0; idx < MAX_ELEM; idx++) { coord_table[idx] = coord_inval; }
+            
+            idx = 0;
+            while(idx < pElem->n_indices)
+            {
+                model_index_t index = pElem->indices[idx];
+                
+                if(coord_table[index] == coord_inval)
+                {
+                    coord_table[index] = drawElem_vertexBatchBuffer_count / coord_size;
+                    
+                    // copy coordinates
+                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+0] = pElem->coords[index*coord_size+0];
+                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+1] = pElem->coords[index*coord_size+1];
+                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+2] = pElem->coords[index*coord_size+2];
+                    
+                    // copy texture coordinates
+                    drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+0] = pElem->texcoords[index*texcoord_size+0];
+                    drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+1] = pElem->texcoords[index*texcoord_size+1];
+                    
+                    drawElem_vertexBatchBuffer_count += coord_size;
+                    drawElem_textCoordBatchBuffer_count += texcoord_size;
+                }
+                
+                // remap
+                index = coord_table[index];
+                
+                // copy index
+                drawElem_indicesBatchBufferCur[indicesBatchOffset+idx] = index;
+            
+                idx++;
+            }
+            drawElem_indicesBatchBuffer_count += idx;
+            
+            //if(gl_vertex_ptr_last != drawElem_vertexBatchBuffer)
+            //{
+            //    glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBuffer);
+            //    gl_vertex_ptr_last = drawElem_vertexBatchBuffer;
+            //}
+            
+            
+            //if(gl_texcoord_ptr_last != drawElem_textCoordBatchBuffer)
+            //{
+            //    glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBuffer);
+            //    gl_texcoord_ptr_last = drawElem_textCoordBatchBuffer;
+            //}
         }
         else
         {
-            glDrawElements(GL_TRIANGLES, pElem->n_indices, index_type_enum, pElem->indices);
+            drawElemBatch();
         }
     }
 }
@@ -1038,35 +1097,29 @@ drawElemStart(WorldElemListNode* pVisibleList)
     
     drawElem_newFrame();
     
-    /*
-    int n_vertices = 0;
-    while(pVisibleList)
+    if(!drawElem_indicesBatchBuffer)
     {
-        n_vertices += pVisibleList->elem->n_indices;
-        pVisibleList = pVisibleList->next;
+        drawElem_BatchBuffer_max = 500000;
+        drawElem_indicesBatchBuffer = malloc(drawElem_BatchBuffer_max * sizeof(model_index_t));
+        drawElem_vertexBatchBuffer = malloc(drawElem_BatchBuffer_max * sizeof(model_coord_t));
+        drawElem_textCoordBatchBuffer = malloc(drawElem_BatchBuffer_max * sizeof(model_texcoord_t));
     }
     
-    size_t mem_size = n_vertices*sizeof(*drawElemBatchedIndices);
-    if(drawElemBatchedIndices && drawElemBatchedIndicesLen >= n_vertices)
-    {
-        // reuse buffer
-    }
-    else
-    {
-        free(drawElemBatchedIndices);
-        drawElemBatchedIndices = malloc(mem_size);
-    }
-    drawElemBatchedIndicesLen = 0;
-     */
+    drawElem_indicesBatchBuffer_count = drawElem_vertexBatchBuffer_count = drawElem_textCoordBatchBuffer_count = 0;
+    
+    drawElem_batchTotal[0] = drawElem_batchTotal[1] = drawElem_batchTotal[2] = 0;
+    
+    drawElem_indicesBatchBufferCur = drawElem_indicesBatchBuffer;
+    drawElem_vertexBatchBufferCur = drawElem_vertexBatchBuffer;
+    drawElem_textCoordBatchBufferCur = drawElem_textCoordBatchBuffer;
 }
 
 void
 drawElemEnd()
 {
+    drawElemBatch();
+    
     glDisable(GL_BLEND);
-    /*
-    glDrawElements(GL_TRIANGLES, drawElemBatchedIndicesLen, index_type_enum, drawElemBatchedIndices);
-     */
 }
 
 void
@@ -1541,5 +1594,14 @@ gameGraphicsInit()
 void
 gameGraphicsUninit()
 {
+    int i;
+    void** freeBuffers[] = {
+        (void**) &drawElem_indicesBatchBuffer,
+        (void**) &drawElem_vertexBatchBuffer,
+        (void**) &drawElem_textCoordBatchBuffer
+    };
+    
+    for(i = 0; i < 3; i++) { if(*(freeBuffers[i])) { free(*(freeBuffers[i])); *freeBuffers[i] = NULL; } }
+    
     drawBackgroundUninit();
 }

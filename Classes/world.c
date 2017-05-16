@@ -48,7 +48,7 @@ float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
 float C_FRICTION = /*0.04*/ 0.02; // higher values = more friction
 float GYRO_FEEDBACK = GYRO_FEEDBACK_DEFAULT;
 float GYRO_DC = GYRO_DC_DEFAULT;
-float visible_distance = 100;
+float visible_distance = VISIBLE_DISTANCE_PLATFORM;
 
 static struct mesh_t* world_pending_mesh = NULL;
 static float world_pending_mesh_info[3];
@@ -870,9 +870,6 @@ void world_free()
             pCur = pNext;
         }
         
-        if(gWorld->shared_texcoords) free(gWorld->shared_texcoords);
-        if(gWorld->shared_coordinates) free(gWorld->shared_coordinates);
-        
         if(gWorld->boundingRegion)
         {
             boundingRegionUninit(gWorld->boundingRegion);
@@ -1187,78 +1184,6 @@ void world_clear_pending()
             world_elem_free(pFreeCur);
         }
     }
-}
-
-static void
-world_pack_geometry(WorldElemListNode* listHead)
-{
-    unsigned long coordinates_n = 0;
-    
-    WorldElemListNode* pCurNode = listHead->next;
-    while(pCurNode)
-    {
-        coordinates_n += pCurNode->elem->n_coords;
-        pCurNode = pCurNode->next;
-    }
-    
-    unsigned int coord_size = sizeof(model_coord_t) * coordinates_n;
-    gWorld->shared_coordinates = malloc(coord_size);
-    if(!gWorld->shared_coordinates) return;
-    
-    gWorld->shared_texcoords = malloc((coordinates_n/3) * sizeof(model_texcoord_t) * 2);
-    if(!gWorld->shared_texcoords)
-    {
-        free(gWorld->shared_coordinates);
-        return;
-    }
-    
-    model_coord_t *pCoord = gWorld->shared_coordinates;
-    unsigned long coord_offset = 0;
-    
-    model_texcoord_t* pTexCoord = gWorld->shared_texcoords;
-    
-    pCurNode = gWorld->elements_list.next;
-    while(pCurNode)
-    {
-        // only pack static objects
-        if(/*pCurNode->elem->type != MODEL_CUBE*/ !object_is_static(pCurNode->elem->object_type))
-        {
-            // skip
-            pCurNode = pCurNode->next;
-            continue;
-        }
-        
-        pCurNode->elem->uses_global_coords = 1;
-    
-        for(unsigned int i = 0; i < pCurNode->elem->n_coords; i++)
-        {
-            *pCoord = pCurNode->elem->coords[i];
-            pCoord++;
-        }
-        
-        for(unsigned int i = 0; i < pCurNode->elem->n_texcoords; i++)
-        {
-            *pTexCoord = pCurNode->elem->texcoords[i];
-            pTexCoord++;
-        }
-        
-        for(unsigned int i = 0; i < pCurNode->elem->n_indices; i++)
-        {
-            pCurNode->elem->global_coord_data.indices[i] =
-                pCurNode->elem->indices[i]+coord_offset;
-        }
-        
-        pCurNode->elem->global_coord_data.coord_offset = coord_offset;
-        
-        coord_offset += pCurNode->elem->n_coords/3;
-        
-        pCurNode = pCurNode->next;
-    }
-}
-
-void world_optimize()
-{
-    world_pack_geometry(&gWorld->elements_list);
 }
 
 void world_lock_init()
@@ -1614,13 +1539,6 @@ world_update(float tc)
     {
         int retry = 0;
         WorldElem* pElem = pCur->elem;
-        
-        // elements with packed coords cannot move currently
-        if(pElem->uses_global_coords)
-        {
-            pCur = pCur->next;
-            continue;
-        }
         
         if(!pElem->head_elem) // not a child elem
         {

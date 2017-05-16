@@ -1043,9 +1043,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -1060,7 +1059,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = d0gf1ght;
 				PROVISIONING_PROFILE = "a0614c67-9d2c-473c-813e-9e0f4875d711";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "a0614c67-9d2c-473c-813e-9e0f4875d711";
+				PROVISIONING_PROFILE_SPECIFIER = "Wildcard AppID - macbook pro razr";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7 arm7s";
 			};
@@ -1070,9 +1069,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -1084,8 +1082,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = d0gf1ght;
-				PROVISIONING_PROFILE = "a0614c67-9d2c-473c-813e-9e0f4875d711";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "a0614c67-9d2c-473c-813e-9e0f4875d711";
+				PROVISIONING_PROFILE = "32e4a6d9-12ac-4efe-91de-ba55d1bd6922";
+				PROVISIONING_PROFILE_SPECIFIER = "XC: *";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 arm7s arm64";
@@ -1095,8 +1093,8 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Distribution: JUSTIN Brady (ZQVH66AQJ9)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: JUSTIN Brady (ZQVH66AQJ9)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: JUSTIN Brady (FP3HEP75WZ)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: JUSTIN Brady (FP3HEP75WZ)";
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1110,8 +1108,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = d0gf1ght;
-				PROVISIONING_PROFILE = "D2DE2C0B-D46A-48FA-BEC2-3C92C153F9EE";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "D2DE2C0B-D46A-48FA-BEC2-3C92C153F9EE";
+				PROVISIONING_PROFILE = "5fe03160-0723-4955-8049-f4109b8a60f5";
 				SDKROOT = iphoneos;
 				VALID_ARCHS = "arm64 armv7 arm7s";
 			};
@@ -1132,8 +1129,7 @@
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PREBINDING = NO;
 				PRODUCT_NAME = d0gf1ght;
-				PROVISIONING_PROFILE = "D2DE2C0B-D46A-48FA-BEC2-3C92C153F9EE";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "5fe03160-0723-4955-8049-f4109b8a60f5";
 				SDKROOT = iphoneos;
 			};
 			name = Release;

@@ -766,7 +766,6 @@ void gameMapReRender()
         world_data = strdup(maps_list[0]);
     }
     map_render(world_data);
-    world_optimize();
     
     if(world_data) free(world_data);
     world_data = NULL;

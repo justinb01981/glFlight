@@ -59,13 +59,6 @@ struct WorldElem {
 	
 	model_texcoord_t texcoords[MAX_ELEM];
 	GLint n_texcoords;
-    
-    // TODO: unionize global data with non-global data fields to save mem
-    unsigned int uses_global_coords;
-    struct {
-        model_index_t indices[MAX_ELEM];
-        unsigned long coord_offset;
-    } global_coord_data;
 	
 	struct {
 		float distance;

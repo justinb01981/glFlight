@@ -64,9 +64,6 @@ typedef struct
     
     WorldElem* last_elem_added;
     
-    model_coord_t *shared_coordinates;
-    model_texcoord_t* shared_texcoords;
-    
     int elem_id_next;
 	
 	float bound_x, bound_y, bound_z;
@@ -127,8 +124,6 @@ void world_update(float tc);
 void world_clear_pending();
 
 void world_free();
-
-void world_optimize();
 
 void world_build_run_program(float x, float y, float z);
 
