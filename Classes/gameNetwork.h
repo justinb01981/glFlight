@@ -241,7 +241,6 @@ gameNetwork_init(int broadcast_mode,
                  const char* server_name,
                  const char* player_name,
                  int update_ms,
-                 const char* directory_name,
                  unsigned short host_port,
                  const char* local_inet_addr);
 

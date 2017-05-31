@@ -85,7 +85,7 @@ collision_actions_set_default()
     for(int r = 0; r < OBJ_LAST; r++)
         for(int c = 0; c < OBJ_LAST; c++)
         {
-            DBPRINTF(("Warning: collision_actions_default row/column mismatch: r=%d c=%d", r, c));
+            DBPRINTF(("Warning: collision_actions_default row/column mismatch: r=%d c=%d\n", r, c));
         }
     
     collision_actions_set_stage1();
@@ -485,7 +485,7 @@ do_world_collision_handling(float tc)
                 if(strcmp(/*gameNetworkState.hostInfo.name*/collidedPortalNametagLast, pCollisionB->elem->stuff.nametag) != 0)
                 {
                     strcpy(collidedPortalNametagLast, pCollisionB->elem->stuff.nametag);
-                    gameDialogPortalToGame();
+                    gameDialogPortalToGame("");
                 }
                 strcpy(gameNetworkState.hostInfo.name, pCollisionB->elem->stuff.nametag);
                 console_clear();

@@ -241,9 +241,10 @@ gameInput()
         fabs(deviceRoll-gyroInputDeltaLast[2]) >= gyroInputStableThresh))
     {
         gyroStableCount = 0;
-#if GAME_PLATFORM_ANDROID
-        gyroInputStableThresh *= 1.01;
-#endif
+
+        gyroInputStableThresh += fabs(((devicePitch-gyroInputDeltaLast[0]) +
+                                  (deviceYaw-gyroInputDeltaLast[1]) +
+                                  (deviceRoll-gyroInputDeltaLast[2])) / 3) * 0.1;
     }
     else
     {

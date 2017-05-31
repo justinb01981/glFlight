@@ -70,13 +70,6 @@ gameDialogWelcomeSingle()
 }
 
 static void
-gameDialogWelcomeMultiDirectory()
-{
-    actions_menu_set(ACTION_BROWSE_GAMES);
-    gameInterfaceControls.menuAction = ACTION_BROWSE_GAMES;
-}
-
-static void
 gameDialogWelcomeMultiHost()
 {
     actions_menu_set(ACTION_HOST_GAME);
@@ -84,41 +77,17 @@ gameDialogWelcomeMultiHost()
 }
 
 static void
-gameDialogWelcomeMultiHostLAN()
+gameDialogWelcomeMultiJoin()
 {
-    actions_menu_set(ACTION_HOST_LAN_GAME);
-    gameInterfaceControls.menuAction = ACTION_HOST_LAN_GAME;
-}
-
-static void
-gameDialogWelcomeMultiJoinLAN()
-{
-    actions_menu_set(ACTION_CONNECT_TO_LAN_GAME);
-    gameInterfaceControls.menuAction = ACTION_CONNECT_TO_LAN_GAME;
-}
-
-static void
-gameDialogWelcomeMultiInternet()
-{
-    gameInterfaceModalDialog("Find a game\nor Host\n(see help)", "Find", "Host",
-                             gameDialogWelcomeMultiDirectory, gameDialogWelcomeMultiHost);
-}
-
-static void
-gameDialogWelcomeMultiLan()
-{
-    gameInterfaceModalDialog("Join or host:", "Join", "Host",
-                             gameDialogWelcomeMultiJoinLAN, gameDialogWelcomeMultiHostLAN);
+    actions_menu_set(ACTION_CONNECT_TO_GAME);
+    gameInterfaceControls.menuAction = ACTION_CONNECT_TO_GAME;
 }
 
 static void
 gameDialogWelcomeMulti()
 {
-    /*
-    gameInterfaceModalDialog("Local/Internet:", "Local\nWI-FI", "Internet",
-                             gameDialogWelcomeMultiLan, gameDialogWelcomeMultiInternet);
-     */
-    gameDialogWelcomeMultiLan();
+    gameInterfaceModalDialog("Join or host:", "Join", "Host",
+                             gameDialogWelcomeMultiJoin, gameDialogWelcomeMultiHost);
 }
 
 static void
@@ -254,9 +223,11 @@ gameDialogConnectToGameYes()
 }
 
 static void
-gameDialogPortalToGame()
+gameDialogPortalToGame(const char* address)
 {
-    gameInterfaceModalDialog("Connect to this game?", "Yes", "No",
+    char str[255];
+    sprintf(str, "Connect to server %s?\n(Edit this in settings)", address);
+    gameInterfaceModalDialog(str, "Yes", "No",
                              gameDialogConnectToGameYes, gameDialogCancel);
 }
 
@@ -297,9 +268,6 @@ gameDialogStartNetworkGame2()
 }
 
 static void
-gameDialogStartNetworkGameBotAdded();
-
-static void
 gameDialogStartNetworkGameBotAdded()
 {
     gameDialogCounter++;
@@ -310,8 +278,9 @@ gameDialogStartNetworkGameBotAdded()
                             rand_in_range(1, gWorld->bound_z),
                             NULL);
     }
-    
-    gameInterfaceModalDialog("(Added)\nReady to start game, add a bot?", "Start", "+1",
+
+    // TODO: dialog to indicate local address
+    gameInterfaceModalDialog("(Added)\nReady to start game?", "Start", "+Bot",
                              gameDialogStartNetworkGame2, gameDialogStartNetworkGameBotAdded);
 }
 

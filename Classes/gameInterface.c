@@ -406,9 +406,10 @@ gameInterfaceEditDone()
     
     // re-init with new values
     gameNetwork_init(0, gameSettingsGameName, gameSettingsPlayerName, gameSettingsNetworkFrequency,
-                     gameSettingsDirectoryServerName,
                      gameSettingsPortNumber,
                      gameSettingsLocalIPOverride);
+    
+    gameInterfaceControls.textEditControl.text[0] = '\0';
 }
 
 void
@@ -536,9 +537,6 @@ gameInterfaceHandleTouchBegin(float x, float y)
                     case ACTION_SETTING_PORT_NUMBER:
                         gameInterfaceEditInt(&gameSettingsPortNumber);
                         break;
-                    case ACTION_SETTING_DIRECTORY_SERVER:
-                        gameInterfaceEditString(gameSettingsDirectoryServerName);
-                        break;
                     case ACTION_SETTING_LOCAL_IP_OVERRIDE:
                         gameInterfaceEditString(gameSettingsLocalIPOverride);
                         break;
@@ -552,7 +550,6 @@ gameInterfaceHandleTouchBegin(float x, float y)
                             gameDialogRating();
                             break;
                         }
-                            
                         
                         switch(model_my_ship)
                         {

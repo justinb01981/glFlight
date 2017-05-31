@@ -495,10 +495,10 @@ game_add_enemy(float x, float y, float z)
 }
 
 int
-game_add_enemy_ace(float x, float y, float z)
+game_add_enemy_bountyhunter(float x, float y, float z)
 {
     int obj_id = game_add_enemy_core(x, y, z, MODEL_SHIP3);
-    game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence + 2);
+    game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
     world_get_last_object()->texture_id = TEXTURE_ID_ENEMYSHIP_ACE;
     world_get_last_object()->stuff.u.enemy.fires_missles = 0;
     world_get_last_object()->durability *= 4;
@@ -1778,9 +1778,9 @@ game_run()
                                 
                                 if(rand_in_range(1, 4) == 4)
                                 {
-                                    game_add_enemy_ace(pCur->elem->physics.ptr->x,
-                                                       pCur->elem->physics.ptr->y,
-                                                       pCur->elem->physics.ptr->z);
+                                    game_add_enemy_bountyhunter(pCur->elem->physics.ptr->x,
+                                                                pCur->elem->physics.ptr->y,
+                                                                pCur->elem->physics.ptr->z);
                                     world_get_last_object()->stuff.u.enemy.intelligence =
                                     pCur->elem->stuff.u.spawnpoint.spawn_intelligence * 2;
                                 }
@@ -2290,81 +2290,41 @@ game_run()
                     console_write("map loaded:%s", maps_list_names[maps_list_idx]);
                     break;
                     
-                case ACTION_BROWSE_GAMES:
-                    /* BEGIN HACK */
-                    if(gameNetwork_connect(gameNetworkState.hostInfo.name, 1, 1) == GAME_NETWORK_ERR_NONE)
-                    {
-                    }
-                    gameNetwork_disconnect();
-                    /* END HACK */
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    gameMapSetMap(map_portal_lobby);
-                    gameNetwork_directoryList();
-                    gameDialogBrowseGames();
-                    console_write("browsing game directory...\n%s", gameNetworkState.gameDirectory.directory_name);
-                    gameStateSinglePlayer.started = 0;
-                    break;
-                    
                 case ACTION_CONNECT_TO_GAME:
-                    gameNetwork_disconnect();
-                    if(gameNetwork_connect(gameSettingsGameName, 0, 0) == GAME_NETWORK_ERR_NONE)
                     {
-                        gameInterfaceControls.mainMenu.visible = 0;
-                        actions_menu_reset();
-                        gameMapSetMap(gameNetworkState.server_map_data);
-                        gameStateSinglePlayer.started = 0;
+                        int lan_game = 0;
                         
-                        gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);
-                        gameDialogConnectToGameSuccessful();
-                    }
-                    else
-                    {
-                        console_write("Game %s not found\n(see help)\n", gameNetworkState.hostInfo.name);
-                        gameDialogConnectToGameFailed();
+                        if(strcmp(gameSettingsGameName, GAME_NETWORK_LAN_GAME_NAME) == 0) lan_game = 1;
+                        
+                        gameNetwork_disconnect();
+                        
+                        gameDialogPortalToGame(gameSettingsGameName);
+                    
+                        if(gameNetwork_connect(gameSettingsGameName, 0, 0) == GAME_NETWORK_ERR_NONE)
+                        {
+                            gameInterfaceControls.mainMenu.visible = 0;
+                            actions_menu_reset();
+                            gameMapSetMap(gameNetworkState.server_map_data);
+                            gameStateSinglePlayer.started = 0;
+                            
+                            gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);
+                            gameDialogConnectToGameSuccessful();
+                        }
+                        else
+                        {
+                            console_write("Game %s not found\n(see help)\n", gameNetworkState.hostInfo.name);
+                            gameDialogConnectToGameFailed();
+                        }
                     }
                     break;
                     
-                case ACTION_CONNECT_TO_LAN_GAME:
-                    gameNetwork_disconnect();
-                    if(gameNetwork_connect((char *) GAME_NETWORK_LAN_GAME_NAME, 0, 1) == GAME_NETWORK_ERR_NONE)
-                    {
-                        gameInterfaceControls.mainMenu.visible = 0;
-                        actions_menu_reset();
-                        gameMapSetMap(gameNetworkState.server_map_data);
-                        gameStateSinglePlayer.started = 0;
-                        
-                        gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);
-                        gameDialogConnectToGameSuccessful();
-                    }
-                    else
-                    {
-                        console_write("LAN Game not found\n(see help)\n");
-                        gameDialogConnectToGameFailed();
-                    }
-                    break;
-                    
-                case ACTION_HOST_LAN_GAME:
+                case ACTION_HOST_GAME:
                     gameInterfaceControls.mainMenu.visible = 0;
                     if(gameNetwork_connect((char *) GAME_NETWORK_LAN_GAME_NAME, 1, 1) == GAME_NETWORK_ERR_NONE)
                     {
                         actions_menu_reset();
                         gameStateSinglePlayer.started = 0;
                         save_map = 0;
-                        console_write("Hosting game: %s\nStart deathmatch when ready...",
-                                      gameNetworkState.hostInfo.name);
-                        if(!game_map_custom_loaded) gameMapSetMap(initial_map_deathmatch);
-                        gameDialogStartNetworkGame();
-                    }
-                    break;
-                    
-                case ACTION_HOST_GAME:
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    if(gameNetwork_connect(gameNetworkState.hostInfo.name, 1, 0) == GAME_NETWORK_ERR_NONE)
-                    {
-                        actions_menu_reset();
-                        gameStateSinglePlayer.started = 0;
-                        save_map = 0;
-                        
                         console_write("Hosting game: %s\nStart deathmatch when ready...",
                                       gameNetworkState.hostInfo.name);
                         if(!game_map_custom_loaded) gameMapSetMap(initial_map_deathmatch);
@@ -2515,6 +2475,10 @@ game_run()
                     
                 case ACTION_SETTING_RESET_SCORE:
                     gameDialogResetScores();
+                    break;
+                    
+                case ACTION_SETTING_RESET_DEFAULT:
+                    gameSettingsDefaults();
                     break;
                     
                 default:
@@ -2761,7 +2725,7 @@ firePoopedCube(WorldElem *elem)
                              elem->physics.ptr->y + qz.y*1,
                              elem->physics.ptr->z + qz.z*1,
                              elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
-                             0.15,
+                             0.5,
                              texture_id);
         world_get_last_object()->object_type = OBJ_POOPEDCUBE;
         world_get_last_object()->renderInfo.priority = 1;

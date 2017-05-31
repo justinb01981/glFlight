@@ -126,7 +126,7 @@ prepare_listen_socket(int stream, unsigned int port)
 	addr.sin_port = htons(port);
     
 	int bcast_enabled = 1;
-	int sigpipe_disabled = 1;
+	int so_arg = 1;
     int backlog = 10;
     if(!stream)
     {
@@ -141,8 +141,11 @@ prepare_listen_socket(int stream, unsigned int port)
     }
     
 #ifdef BSD_SOCKETS
-	setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &sigpipe_disabled, sizeof(sigpipe_disabled));
+	setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &so_arg, sizeof(so_arg));
 #endif
+    
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &so_arg, sizeof(so_arg));
+    setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &so_arg, sizeof(so_arg));
     
     /* bind */
     if(bind(sock, (struct sockaddr*) &addr, sizeof(addr)) < 0)
@@ -246,10 +249,11 @@ gameNetwork_initsockets()
 gameNetworkError
 gameNetwork_init(int broadcast_mode, const char* server_name,
                  const char* player_name, int update_ms,
-                 const char* directory_name,
                  unsigned short host_port,
                  const char* local_inet_addr)
 {
+    const char *directory_name = "d0gf1ght.domain17.net";
+    
     update_frequency_ms = update_ms;
     
     memset(&gameNetworkState, 0, sizeof(gameNetworkState));
@@ -310,7 +314,7 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
     char server_ip_resolved[64];
     int map_downloaded = 0;
     int lan_bcast_retries = 4, directory_search_retries = 3, search_retries = 0;
-    unsigned short server_port_resolved = htons(gameNetworkState.hostInfo.port);
+    unsigned short server_port_resolved = gameNetworkState.hostInfo.port;
     int retries_udp = 10;
     int delay_udp = 100;
     char download_cmd = '\n';
@@ -401,7 +405,7 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
                     struct sockaddr_in* beaconSockaddr = (struct sockaddr_in*) &gameAddress;
                     
                     strcpy(server_ip_resolved, inet_ntoa(beaconSockaddr->sin_addr));
-                    server_port_resolved = GAME_NETWORK_ADDRESS_PORT(&gameAddress);
+                    server_port_resolved = ntohs(GAME_NETWORK_ADDRESS_PORT(&gameAddress));
                     GAMENET_TRACE();
                     break;
                 }
@@ -442,7 +446,7 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
                         memset(server_ip_resolved, 0, sizeof(server_ip_resolved));
                         strncpy(server_ip_resolved, msgSearchResponse.params.c,
                                 sizeof(msgSearchResponse.params.c));
-                        server_port_resolved = htons(gameNetworkState.hostInfo.port);
+                        server_port_resolved = gameNetworkState.hostInfo.port;
                         break;
                     }
                     recv_retries--;
@@ -458,7 +462,7 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
 
         memset(&addr, 0, sizeof(addr));
         addr.sin_addr.s_addr = inet_addr(server_ip_resolved);
-        addr.sin_port = /* server_port_resolved */ htons(gameNetworkState.hostInfo.port);
+        addr.sin_port = htons(server_port_resolved);
         addr.sin_family = AF_INET;
 #ifdef BSD_SOCKETS
         addr.sin_len = sizeof(addr);
@@ -488,7 +492,7 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
                 {
                     if(gameNetwork_getPlayerInfo(netMsg.player_id, &playerInfo, 1) == GAME_NETWORK_ERR_NONE)
                     {
-                        console_write("connecting to game...");
+                        console_write("\rconnecting to game...");
                         
                         socket_set_blocking(download_sock, 0);
                         
@@ -543,12 +547,12 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
                                     
                                     r = recv(download_sock, read_dest, 1024, 0);
                                     
-                                    if(memcmp(read_dest, map_eom, strlen(map_eom)) == 0) break;
-                                    
                                     if(r > 0)
                                     {
                                         read_dest += r;
                                         map_data_bytes += r;
+                                        
+                                        if(strstr(map_data, map_eom) != NULL) break;
                                     }
                                 } while(r > 0 && !timed_out);
                                 
@@ -580,7 +584,7 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
         {
             console_write("connect failed\n");
             console_append("(server %s:%d)\n",
-                           server_ip_resolved,
+                           server_name,
                            server_port_resolved);
             gameNetwork_removePlayer(host_player_id);
             return GAME_NETWORK_ERR_FAIL;
@@ -621,6 +625,19 @@ gameNetwork_disconnect()
         gameNetwork_sendPlayersDisconnect();
         
         gameNetworkState.connected = 0;
+    }
+    
+    int* sock_set[] = {&gameNetworkState.hostInfo.socket.s,
+        &gameNetworkState.hostInfo.map_socket.s,
+        &gameNetworkState.hostInfo.stream_socket.s};
+    int s = 0;
+    for(s = 0; s < sizeof(sock_set)/sizeof(int*); s++)
+    {
+        if(*sock_set[s] != -1)
+        {
+            close(*sock_set[s]);
+            *sock_set[s] = -1;
+        }
     }
 }
 

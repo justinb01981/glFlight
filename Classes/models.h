@@ -341,7 +341,6 @@ static model_texcoord_t model_bullet_texcoords[] = {
 static int model_bullet_primitives[] =
 {
 };
-
 /********************************************************/
 static model_texcoord_t model_cube_texcoords_alt[] =
 {

@@ -65,9 +65,9 @@ extern int controls_simple;
 #define GYRO_DC_DEFAULT /*0.004*/ (0.002)
 #define GYRO_FEEDBACK_DEFAULT (0.01)
 #define PLATFORM_TICK_RATE 60
-#define PLATFORM_DRAW_ELEMS_MAX 500
+#define PLATFORM_DRAW_ELEMS_MAX 1000
 #define GYRO_SAMPLE_RATE (60)
-#define VISIBLE_DISTANCE_PLATFORM 75
+#define VISIBLE_DISTANCE_PLATFORM 100
 #else
 #define GAME_PLATFORM_IS_LANDSCAPE 0
 #define GYRO_FEEDBACK_COEFF (0.002)
@@ -84,7 +84,7 @@ extern int controls_simple;
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "0.9.27.0_core";
+const static char* GAME_VERSION_STR = "0.9.29.0_core";
 
 const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2.5);
 const static float SPEED_BOOST_FRAMES = 60 * 5;

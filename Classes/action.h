@@ -27,12 +27,11 @@ typedef enum
     ACTION_START_LOBBALL_GAME,
     ACTION_DISPLAY_SCORES,
     ACTION_HELP, /**/
-    ACTION_CONNECT_TO_LAN_GAME,
-    ACTION_HOST_LAN_GAME,
-    ACTION_BROWSE_GAMES,
+    
     ACTION_HOST_GAME,
     ACTION_CONNECT_TO_GAME,
     ACTION_START_DEATHMATCH_GAME,  /**/
+    
     ACTION_FIRE_BULLET,
     ACTION_FIRE_MISSLE,
     ACTION_DROP_TOW,  /**/
@@ -56,7 +55,6 @@ typedef enum
     ACTION_SETTING_PLAYER_NAME,
     ACTION_SETTING_GAME_NAME,
     ACTION_SETTING_UPDATE_FREQUENCY,
-    ACTION_SETTING_DIRECTORY_SERVER,
     ACTION_SETTING_LOCK_CAMERA,
     ACTION_SETTING_SHOW_DEBUG,
     ACTION_SETTING_TWEAK_PHYSICS,
@@ -64,25 +62,22 @@ typedef enum
     ACTION_SETTING_PORT_NUMBER,
     ACTION_SETTING_LOCAL_IP_OVERRIDE,
     ACTION_SETTING_RESET_SCORE,
+    ACTION_SETTING_RESET_DEFAULT,
     ACTION_LAST /* 46 */
 } action_t;
 
 static int actions_sub[][ACTION_LAST] =
 {
     // main
-    {1,0,1,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {1,0,1,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // net
-    //{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // game
-    //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // build
-    //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // settings
-    //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 };
 
 extern int *actions_enabled;
@@ -102,11 +97,8 @@ static const char* action_strings[ACTION_LAST] =
     "game: lob",
     "display scores",
     "help/about",
-    "join (LAN/WiFi local)",
-    "host (LAN/WiFi local)",
-    "search (Internet)",
-    "host (Internet)",
-    "join (Internet)",
+    "host game",
+    "join game (lan/internet)",
     "start game",
     "shoot",
     "shoot missle",
@@ -129,16 +121,16 @@ static const char* action_strings[ACTION_LAST] =
     "mute audio",
     "ship appearance",
     "player name",
-    "game name",
-    "net frequency ms",
-    "directory server",
+    "multiplayer server address",
+    "net update interval(ms)",
     "camera mode",
     "show debug",
     "friction level",
     "gyroscope drift correct",
-    "server port number",
-    "local IP detect/override",
-    "reset scores"
+    "port number",
+    "public IP override",
+    "reset scores",
+    "restore default"
 };
 
 extern int fireAction;

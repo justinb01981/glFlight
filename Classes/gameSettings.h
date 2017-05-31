@@ -43,7 +43,6 @@ extern char gameSettingsPlayerNameDefault[255];
 extern char gameSettingsMapName[255];
 extern char gameSettingsGameName[255];
 extern char gameSettingsGameNameDefault[255];
-extern char gameSettingsDirectoryServerName[255];
 extern int gameSettingsNetworkFrequency;
 extern int gameSettingsPortNumber;
 extern char gameSettingsLocalIPOverride[255];
@@ -83,8 +82,7 @@ gameSettingsDefaults()
     gameSettingsRatingGiven = 0;
     strcpy(gameSettingsPlayerName, gameSettingsPlayerNameDefault);
     strcpy(gameSettingsMapName, "MAP1");
-    strcpy(gameSettingsGameName, gameSettingsGameNameDefault);
-    strcpy(gameSettingsDirectoryServerName, "d0gf1ght.domain17.net");
+    strcpy(gameSettingsGameName, "d0gf1ght.domain17.net");
     strcpy(gameSettingsLocalIPOverride, "0.0.0.0");
     gameSettingsNetworkFrequency = 50;
     gameSettingsPortNumber = 52000;
@@ -120,7 +118,7 @@ gameSettingsWrite(const char *filename)
         fprintf(fp, "%s\n", gameSettingsPlayerName);
         fprintf(fp, "%s\n", gameSettingsMapName);
         fprintf(fp, "%s\n", gameSettingsGameName);
-        fprintf(fp, "%s\n", gameSettingsDirectoryServerName);
+        fprintf(fp, "%s\n", "d0gf1ght.domain17.net");
         fprintf(fp, "%s\n", gameSettingsLocalIPOverride);
         fprintf(fp, "%d\n", gameSettingsNetworkFrequency);
         fprintf(fp, "%d\n", gameSettingsPortNumber);
@@ -139,6 +137,7 @@ gameSettingsRead(const char *filename)
     int settings_ver;
     int err = 0;
     int ignored = 0;
+    char gameSettingsDirectoryServerNameREMOVED[255];
     
     while(fp)
     {
@@ -183,7 +182,7 @@ gameSettingsRead(const char *filename)
         if(fscanf(fp, "%s", gameSettingsPlayerName) < 1) break;
         if(fscanf(fp, "%s", gameSettingsMapName) < 1) break;
         if(fscanf(fp, "%s", gameSettingsGameName) < 1) break;
-        if(fscanf(fp, "%s", gameSettingsDirectoryServerName) < 1) break;
+        if(fscanf(fp, "%s", gameSettingsDirectoryServerNameREMOVED) < 1) break;
         if(fscanf(fp, "%s", gameSettingsLocalIPOverride) < 1) break;
         if(fscanf(fp, "%d", &gameSettingsNetworkFrequency) < 1) break;
         if(fscanf(fp, "%d", &gameSettingsPortNumber) < 1) break;

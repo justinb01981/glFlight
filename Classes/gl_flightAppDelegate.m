@@ -131,7 +131,7 @@ void glFlightInit(gl_flightViewController* viewController)
     gameMapFileName("temp");
     
     gameNetwork_init(0, gameSettingsGameName, gameSettingsPlayerName, gameSettingsNetworkFrequency,
-                     gameSettingsDirectoryServerName, gameSettingsPortNumber, gameSettingsLocalIPOverride);
+                     gameSettingsPortNumber, gameSettingsLocalIPOverride);
     
     if(game_terminated_gracefully) reset_map = 0;
     game_terminated_gracefully = 0;
