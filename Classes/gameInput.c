@@ -71,7 +71,7 @@ double minSpeed;
 double speedBoost = 0;
 double bulletVel;
 int needTrimLast;
-int needTrim;
+int needTrim = 1;
 int isLandscape;
 int controlsCalibrated = 0;
 quaternion_t b;
@@ -95,8 +95,6 @@ float gyroInputStableThresh = 0.01;
 const float tex_pass_initial_sample = 60;
 
 static double trim_dz[3];
-
-float trimWarnThresh = 0.05;
 
 struct
 {
@@ -259,7 +257,7 @@ gameInput()
     {
         if(!needTrim && trimCountLast == trimCount)
         {
-            if(gyroStableCount >= (GYRO_SAMPLE_RATE*2))
+            if(gyroStableCount == (GYRO_SAMPLE_RATE*2))
             {
                 console_clear();
                 console_write("calibrating...");
@@ -552,12 +550,6 @@ gameInput()
             quaternion_rotate_inplace(&b, &cam_pos.bz, s);
             //gameCamera_rollRadians(s);
             gameShip_roll(s);
-            
-            if(fabs(s) >= trimWarnThresh && !gameInterfaceControls.trim.blinking)
-            {
-                gameInterfaceSetInterfaceState(INTERFACE_STATE_TRIM_BLINKING);
-                trimWarnThresh *= 1.5;
-            }
         }
         //else
         {
@@ -576,12 +568,6 @@ gameInput()
             quaternion_rotate_inplace(&b, &cam_pos.bx, s);
             //gameCamera_pitchRadians(s);
             gameShip_pitch(s);
-            
-            if(fabs(s) >= trimWarnThresh && !gameInterfaceControls.trim.blinking)
-            {
-                gameInterfaceSetInterfaceState(INTERFACE_STATE_TRIM_BLINKING);
-                trimWarnThresh *= 1.5;
-            }
         }
         //else
         {
@@ -600,12 +586,6 @@ gameInput()
             quaternion_rotate_inplace(&b, &cam_pos.by, s);
             //gameCamera_yawRadians(s);
             gameShip_yaw(s);
-            
-            if(fabs(s) >= trimWarnThresh && !gameInterfaceControls.trim.blinking)
-            {
-                gameInterfaceSetInterfaceState(INTERFACE_STATE_TRIM_BLINKING);
-                trimWarnThresh *= 1.5;
-            }
         }
         //else
         {

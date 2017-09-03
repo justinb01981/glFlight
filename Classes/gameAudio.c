@@ -125,6 +125,43 @@ gameAudioPlaySoundAtLocationWithRate(const char* filename, float x, float y, flo
 }
 
 void
+gameAudioPlaySoundAtLocationWithDuration(const char* filename, float x, float y, float z, float duration_ms)
+{
+    if(gameAudioMuted) return;
+    
+    // TODO: audio panning
+    cocoaMessage msg;
+    float vol_distance = cam_distance(x, y, z);
+    float vol_distance_max = 25;
+    float v = (vol_distance / vol_distance_max);
+    float vol_c[] = {0.5, 0.3, 0.3, 0.2, 0.2, 0.1, 0}; //{1, 0.8, 0.5, 0.2, 0.1, 0, 0};
+    
+    if(v > 1.0) v = 1.0;
+    
+    if(vol_distance < vol_distance_max)
+    {
+        float r = (sizeof(vol_c)/sizeof(float));
+        float idx = round(v * r);
+        
+        float vol = vol_c[(int) idx];
+        
+        if(vol > 0 && vol < 1.0)
+        {
+            msg.f[0] = vol;
+            msg.f[1] = 0;
+            msg.f[2] = duration_ms;
+            strncpy(msg.str, filename, sizeof(msg.str)-1);
+            
+            gameAudioLock();
+            cocoaMessageListAdd(&msg, &cocoaMessageAudioList);
+            gameAudioUnlock();
+            
+            printf("Playing sound %s with vol:%f\n", msg.str, msg.f[0]);
+        }
+    }
+}
+
+void
 gameAudioPlaySoundAtLocation(const char* filename, float x, float y, float z)
 {
     gameAudioPlaySoundAtLocationWithRate(filename, x, y, z, 1.0);

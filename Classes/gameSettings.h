@@ -12,7 +12,7 @@
 #include "gamePlay.h"
 #include "gameInterface.h"
 #include "glFlight.h"
-#include "gameaudio.h"
+#include "gameAudio.h"
 #include "textures.h"
 #include "gamePlatform.h"
 #include "gameNetwork.h"

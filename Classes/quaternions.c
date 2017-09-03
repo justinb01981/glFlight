@@ -404,6 +404,40 @@ eulerHeading1(float arrowV[3], float eu[3])
     
 }
 
+extern float dot(float, float, float, float, float, float);
+
+void
+vector_relative_to_plane(quaternion_t *qA, quaternion_t *qU, quaternion_t *qV)
+{
+    quaternion_t svr;
+    
+    // if dot product < 1 reverse
+    // TODO: < 0?
+    float siU = dot(qA->x, qA->y, qA->z, qU->x, qU->y, qU->z) < 0.99 ? -1 : 1;
+    qU->w *= siU; qU->x *= siU; qU->y *= siU; qU->z *= siU;
+    
+    // s-lerp qA towards qU
+    slerp(qA->w, qA->x, qA->y, qA->z,
+          qU->w, qU->x, qU->y, qU->z,
+          0.99,
+          &svr.w, &svr.x, &svr.y, &svr.z);
+    
+    *qA = svr;
+    
+    // calculate dot product between result and qV
+    float siV = dot(qA->x, qA->y, qA->z, qV->x, qV->y, qV->z) < 0.99 ? -1 : 1;
+    
+    qV->w *= siV; qV->x *= siV; qV->y *= siV; qV->z *= siV;
+    
+    // s-lerp the result towards qV
+    slerp(qA->w, qA->x, qA->y, qA->z,
+          qV->w, qV->x, qV->y, qV->z,
+          0.99,
+          &svr.w, &svr.x, &svr.y, &svr.z);
+    
+    *qA = svr;
+}
+
 /*
 int main(int argc, char** argv)
 {

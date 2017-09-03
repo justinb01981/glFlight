@@ -30,10 +30,12 @@ typedef enum
     
     ACTION_HOST_GAME,
     ACTION_CONNECT_TO_GAME,
+    ACTION_CONNECT_TO_GAME_LAN,
     ACTION_START_DEATHMATCH_GAME,  /**/
     
     ACTION_FIRE_BULLET,
     ACTION_FIRE_MISSLE,
+    ACTION_GAME_PLACEHOLDER,
     ACTION_DROP_TOW,  /**/
     ACTION_PLACE_SHIP,
     ACTION_PLACE_TURRET,  /**/
@@ -45,17 +47,16 @@ typedef enum
     ACTION_SCALE_OBJECT,
     ACTION_REPLACE_OBJECT,
     ACTION_CLEAR_MAP,  /**/
+    ACTION_SETTING_PLAYER_NAME,
+    ACTION_SETTING_GAME_NAME,
     ACTION_SETTING_SHIP_MODEL,
-    ACTION_SETTING_CONTROL_TYPE,
+    ACTION_SETTING_LOCK_CAMERA,
     ACTION_SETTING_INPUT_SENSITIVITY,
-    ACTION_SETTING_NUMAIS,
+    ACTION_SETTING_CONTROL_MODE,
     ACTION_SETTING_BOTINTELLIGENCE,
     ACTION_SETTING_AUDIO,
     ACTION_SETTING_SHIP_TEXTURE,
-    ACTION_SETTING_PLAYER_NAME,
-    ACTION_SETTING_GAME_NAME,
     ACTION_SETTING_UPDATE_FREQUENCY,
-    ACTION_SETTING_LOCK_CAMERA,
     ACTION_SETTING_SHOW_DEBUG,
     ACTION_SETTING_TWEAK_PHYSICS,
     ACTION_SETTING_GYRO_FEEDBACK,
@@ -69,15 +70,15 @@ typedef enum
 static int actions_sub[][ACTION_LAST] =
 {
     // main
-    {1,0,1,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {1,0,1,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // net
-    {0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // game
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // build
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // settings
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 };
 
 extern int *actions_enabled;
@@ -98,10 +99,12 @@ static const char* action_strings[ACTION_LAST] =
     "display scores",
     "help/about",
     "host game",
-    "join game (lan/internet)",
+    "join game (internet)",
+    "join game (local WIFI)",
     "start game",
     "shoot",
     "shoot missle",
+    "<empty>",
     "drop tow",
     "deploy ally",
     "deploy turret",
@@ -113,17 +116,16 @@ static const char* action_strings[ACTION_LAST] =
     "edit: scale object",
     "edit: change object",
     "map: regenerate",
-    "ship type",
-    "control-type",
-    "input sensitivity",
-    "deathmatch num bots",
-    "deathmatch bot skill",
-    "mute audio",
-    "ship appearance",
     "player name",
     "multiplayer server address",
-    "net update interval(ms)",
+    "ship type",
     "camera mode",
+    "input sensitivity",
+    "control mode",
+    "deathmatch bot skill",
+    "mute audio",
+    "ship appearance(texture)",
+    "net update interval(ms)",
     "show debug",
     "friction level",
     "gyroscope drift correct",

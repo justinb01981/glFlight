@@ -164,6 +164,7 @@
 		D0B4C4D11A325F1500F125D4 /* texture84.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CE1A325F1500F125D4 /* texture84.bmp */; };
 		D0B4C4D21A325F1500F125D4 /* texture85.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CF1A325F1500F125D4 /* texture85.bmp */; };
 		D0B4C4D41A32616B00F125D4 /* texture86.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4D31A32616B00F125D4 /* texture86.bmp */; };
+		D0B918F01F5BC27B0073ECD6 /* engineloop.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0B918EF1F5BC27B0073ECD6 /* engineloop.wav */; };
 		D0BCBFB1175FE67F00003168 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */; };
 		D0C133C319F448A1003A6949 /* greenhex.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0C133C219F448A1003A6949 /* greenhex.bmp */; };
 		D0C133C519F448BF003A6949 /* Default2.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C133C419F448BF003A6949 /* Default2.png */; };
@@ -402,6 +403,7 @@
 		D0B4C4CE1A325F1500F125D4 /* texture84.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture84.bmp; sourceTree = "<group>"; };
 		D0B4C4CF1A325F1500F125D4 /* texture85.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture85.bmp; sourceTree = "<group>"; };
 		D0B4C4D31A32616B00F125D4 /* texture86.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture86.bmp; sourceTree = "<group>"; };
+		D0B918EF1F5BC27B0073ECD6 /* engineloop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engineloop.wav; sourceTree = "<group>"; };
 		D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		D0BCBFB3176136CF00003168 /* gameLock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameLock.h; sourceTree = "<group>"; };
 		D0C133C219F448A1003A6949 /* greenhex.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = greenhex.bmp; sourceTree = "<group>"; };
@@ -731,6 +733,7 @@
 				D02DAC1117D1478400035601 /* collect.wav */,
 				D02DAC0F17D145A000035601 /* bump.wav */,
 				D05A90B717A1E3F400F40807 /* engine.wav */,
+				D0B918EF1F5BC27B0073ECD6 /* engineloop.wav */,
 				D0A5039B1A43EF9400C4BBD1 /* enginefast.wav */,
 				D0A503991A43EF8C00C4BBD1 /* engineslow.wav */,
 				6D4F2F3F1618241A00286C16 /* boom.wav */,
@@ -909,6 +912,7 @@
 				D00D78D81A0AFA4800E701B9 /* app_icon_64x64.png in Resources */,
 				D00D78CC1A02BF8B00E701B9 /* texture76.bmp in Resources */,
 				6D53C4D9169407E1009D6C3C /* texture22.bmp in Resources */,
+				D0B918F01F5BC27B0073ECD6 /* engineloop.wav in Resources */,
 				6D53C4DB1696D30B009D6C3C /* dead.wav in Resources */,
 				D04EB4D71BDE145D0089D9F0 /* app_icon57x57.png in Resources */,
 				D02D0BFD1CC7DF050016A619 /* texture102.bmp in Resources */,

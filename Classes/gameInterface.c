@@ -568,7 +568,7 @@ gameInterfaceHandleTouchBegin(float x, float y)
                     }
                         break;
                         
-                    case ACTION_SETTING_CONTROL_TYPE:
+                    case ACTION_SETTING_CONTROL_MODE:
                         gameSettingsSimpleControls = !gameSettingsSimpleControls;
                         break;
                         

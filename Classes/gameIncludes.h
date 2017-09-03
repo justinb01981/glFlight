@@ -12,9 +12,9 @@
 #include "gamePlatform.h"
 
 #if GAME_PLATFORM_ANDROID
+#include <GLES/gl.h>
 #include <GLES/glext.h>
 #include <GLES/glplatform.h>
-#include "GLES/gl.h"
 #include "GLES/glext.h"
 #else /* iOS */
 #include <OpenGLES/ES1/gl.h>

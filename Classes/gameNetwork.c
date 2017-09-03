@@ -152,6 +152,7 @@ prepare_listen_socket(int stream, unsigned int port)
     {
         console_append("%s:%d %s\n", __func__, __LINE__, "socket failure (bind)");
         close(sock);
+        gameDialogError("bind failed (kill/restart app)");
         return -1;
     }
     
@@ -162,17 +163,12 @@ prepare_listen_socket(int stream, unsigned int port)
             console_append("%s:%d %s\n", __func__, __LINE__, "socket failure (listen)");
             // listen failed
             close(sock);
+            gameDialogError("listen() failed (kill/restart app)");
             return -1;
         }
     }
     
     return sock;
-}
-
-static void
-close_socket(int socket)
-{
-    close(socket);
 }
 
 static void
@@ -240,7 +236,9 @@ gameNetwork_initsockets()
     //if(gameNetworkState.hostInfo.map_socket.s != -1) close_socket(gameNetworkState.hostInfo.map_socket.s);
     if(gameNetworkState.hostInfo.map_socket.s == -1)
     gameNetworkState.hostInfo.map_socket.s = prepare_listen_socket(1, gameNetworkState.hostInfo.port);
-    
+
+    gameNetworkState.hostInfo.map_socket_sending.s = -1;
+
     //if(gameNetworkState.hostInfo.stream_socket.s != -1) close_socket(gameNetworkState.hostInfo.stream_socket.s);
     if(gameNetworkState.hostInfo.stream_socket.s == -1)
     gameNetworkState.hostInfo.stream_socket.s = prepare_listen_socket(1, gameNetworkState.hostInfo.port+1);
@@ -272,7 +270,7 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
     gameNetworkState.game_object_id_next = GAME_NETWORK_OBJECT_ID_MIN;
 
     GAME_NETWORK_ADDRESS_INADDR(&gameNetworkState.hostInfo.local_inet_addr).s_addr = INADDR_ANY;
-    if(inet_addr(local_inet_addr) != INADDR_NONE && inet_addr(local_inet_addr) != INADDR_ANY)
+    if(strlen(local_inet_addr) > 0 && inet_addr(local_inet_addr) != INADDR_NONE && inet_addr(local_inet_addr) != INADDR_ANY)
     {
         GAME_NETWORK_ADDRESS_INADDR(&gameNetworkState.hostInfo.local_inet_addr).s_addr =
             inet_addr(local_inet_addr);
@@ -626,17 +624,21 @@ gameNetwork_disconnect()
         
         gameNetworkState.connected = 0;
     }
-    
+
     int* sock_set[] = {&gameNetworkState.hostInfo.socket.s,
         &gameNetworkState.hostInfo.map_socket.s,
+        &gameNetworkState.hostInfo.map_socket_sending.s,
         &gameNetworkState.hostInfo.stream_socket.s};
     int s = 0;
     for(s = 0; s < sizeof(sock_set)/sizeof(int*); s++)
     {
-        if(*sock_set[s] != -1)
+        if(*(sock_set[s]) != -1)
         {
-            close(*sock_set[s]);
-            *sock_set[s] = -1;
+            int so_arg = 0;
+            setsockopt(*(sock_set[s]), SOL_SOCKET, SO_LINGER, &so_arg, sizeof(so_arg));
+
+            close(*(sock_set[s]));
+            *(sock_set[s]) = -1;
         }
     }
 }
@@ -884,11 +886,16 @@ gameNetwork_accept_map_download(gameNetworkAddress* src_addr, char* (*mapRenderC
             from_addr_len = sizeof(from_addr);
             
             int a = accept(s, &from_addr, &from_addr_len);
+
+            int so_arg = 0;
+            setsockopt(a, SOL_SOCKET, SO_LINGER, &so_arg, sizeof(so_arg));
             
             if(a > 0)
             {
                 int w;
                 char inbuf;
+
+                gameNetworkState.hostInfo.map_socket_sending.s = a;
                 
                 // wait for a newline to be received
                 while(1)
@@ -946,6 +953,9 @@ gameNetwork_accept_stream_connection(gameNetworkAddress* src_addr)
             from_addr_len = sizeof(from_addr);
             
             int a = accept(s, &from_addr, &from_addr_len);
+
+            int so_arg = 0;
+            setsockopt(a, SOL_SOCKET, SO_LINGER, &so_arg, sizeof(so_arg));
             
             if(a > 0)
             {
@@ -1157,8 +1167,6 @@ game_network_periodic_check()
     const game_timeval_t time_out_ms = 1000*30;
     gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
     game_timeval_t network_time_ms = get_time_ms();
-    
-    gameNetwork_initsockets();
     
     while(pInfo)
     {

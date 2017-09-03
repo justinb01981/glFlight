@@ -232,6 +232,15 @@ gameDialogPortalToGame(const char* address)
 }
 
 static void
+gameDialogError(const char* errorMessage)
+{
+    char str[255];
+    sprintf(str, "Error:\n%s\n", errorMessage);
+    gameInterfaceModalDialog(str, "Yes", "No",
+                             gameDialogCancel, gameDialogCancel);
+}
+
+static void
 gameDialogBrowseGames()
 {
     gameInterfaceModalDialog("Enter node to connect...", "OK", "", gameDialogCancel, gameDialogCancel);
@@ -240,7 +249,7 @@ gameDialogBrowseGames()
 static void
 gameDialogConnectToGameSuccessful()
 {
-    gameInterfaceModalDialog("Connect successful! Scoring begins...\n", "Ok", "",
+    gameInterfaceModalDialog("Connect successful!n", "Ok", "",
                              gameDialogCancel, gameDialogCancel);
 }
 

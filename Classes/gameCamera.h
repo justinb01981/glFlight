@@ -22,7 +22,6 @@
 #define gl_flight_gameCamera_h
 
 #include "quaternions.h"
-#include <math.h>
 
 #define RADIANS_TO_DEGREES(x) (((float)x*360.0)/(M_PI*2))
 

@@ -1811,7 +1811,7 @@ world_update(float tc)
                         {
                             const char *soundName = gameSoundNames[pCur->elem->stuff.sound.emit_sound_id];
                             
-                            game_timeval_t next_play = gameAudioSoundDuration(soundName) + pCur->elem->stuff.sound.time_last_emit;
+                            game_timeval_t next_play = pCur->elem->stuff.sound.emit_sound_duration + pCur->elem->stuff.sound.time_last_emit;
                             
                             if(time_ms >= next_play)
                             {

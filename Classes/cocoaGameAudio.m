@@ -56,6 +56,11 @@ int playSound = 1;
             audioPlayersPreloaded.name[i] = [[NSString alloc] initWithUTF8String:gameSoundNames[i]];
             
             [audioPlayersPreloaded.ap[i][j] enableRate];
+            
+            audioPlayersPreloaded.duration_ms[i] = 1000 * [audioPlayersPreloaded.ap[i][j] duration];
+            
+            printf("cocoaGameAudio.init: loaded sound %s with duration %f\n",
+                   [audioPlayersPreloaded.name[i] UTF8String], audioPlayersPreloaded.duration_ms[i]);
         }
         
         i++;
@@ -215,6 +220,23 @@ int playSound = 1;
 #endif
 }
 
+- (void) playSound: (NSString*)soundFileName withVolume:(float)volume andDuration:(float) duration_ms
+{
+    float rate = 1.0;
+    
+    int i = 0;
+    
+    while(i < GAME_SOUND_NAMES_MAX && audioPlayersPreloaded.ap[i][0] != NULL)
+    {
+        if([audioPlayersPreloaded.name[i] compare:soundFileName] == NSOrderedSame)
+        {
+            rate = audioPlayersPreloaded.duration_ms[i] / duration_ms;
+        }
+        i += 1;
+    }
+    [self playSound:soundFileName withVolume:volume andRate:rate];
+}
+
 - (void) processMessages: (int) maxMessagesProcessed
 {
     
@@ -242,7 +264,14 @@ int playSound = 1;
     {
         NSString* str = [[NSString alloc] initWithUTF8String:msgList[i].str];
         
-        [self playSound:str withVolume:msgList[i].f[0] andRate:msgList[i].f[1]];
+        if(msgList[i].f[1] != 0)
+        {
+            [self playSound:str withVolume:msgList[i].f[0] andRate:msgList[i].f[1]];
+        }
+        else
+        {
+            [self playSound:str withVolume:msgList[i].f[0] andDuration:msgList[i].f[2]];
+        }
         
         [str release];
     }

@@ -184,6 +184,7 @@ typedef struct
         gameNetworkSocket socket;
         gameNetworkSocket map_socket;
         gameNetworkSocket stream_socket;
+        gameNetworkSocket map_socket_sending;
         gameNetworkAddress addr;
         //gameNetworkMessage retransmitMsg;
         //int retransmitAcks;

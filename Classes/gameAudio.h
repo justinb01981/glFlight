@@ -36,18 +36,14 @@ extern cocoaMessage cocoaMessageAudioList;
 void
 gameAudioInit();
 
-static unsigned int
-gameAudioSoundDuration(const char* filename)
-{
-    /* HACK */
-    return 1000;
-}
-
 void
 gameAudioPlaySoundAtLocation(const char* filename, float x, float y, float z);
 
 void
 gameAudioPlaySoundAtLocationWithRate(const char* filename, float x, float y, float z, float rate);
+
+void
+gameAudioPlaySoundAtLocationWithDuration(const char* filename, float x, float y, float z, float duration_ms);
 
 void
 gameAudioLock();

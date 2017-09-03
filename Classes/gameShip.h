@@ -56,4 +56,7 @@ gameShip_getEuler(float* alpha, float* beta, float* gamma)
                                 alpha, beta, gamma);
 }
 
+float
+gameShip_calcRoll();
+
 #endif

@@ -123,6 +123,7 @@ struct WorldElem {
         struct
         {
             int emit_sound_id;
+            unsigned int emit_sound_duration;
             game_timeval_t time_last_emit;
         } sound;
         

@@ -214,17 +214,18 @@ glFlightFrameStage1()
     
     // play engine sound
     static game_timeval_t time_engine_sound_next = 0;
-    const float engine_sound_duration = 350;
+    const float engine_sound_duration = 4000;
     if(time_ms > time_engine_sound_next || time_engine_sound_next == 0)
     {
         float minSpeed = 0.1;
         
         if(speed/maxSpeed >= minSpeed)
         {
-            float rateRange[] = {0.75, 1.2};
+            float rateRange[] = {0.5, 2.0};
             float rate = rateRange[0] + (rateRange[1]-rateRange[0])*(speed/maxSpeed);
             
-            char* sndName = "engine2";
+            char* sndName = "engineloop";
+            /*
             if(speed/maxSpeed < 0.33)
             {
                 sndName = "engineslow";
@@ -233,10 +234,11 @@ glFlightFrameStage1()
             {
                 sndName = "enginefast";
             }
-            gameAudioPlaySoundAtLocationWithRate(sndName, my_ship_x, my_ship_y, my_ship_z,
-                                                 rate);
+             */
+            gameAudioPlaySoundAtLocationWithDuration(sndName, my_ship_x, my_ship_y, my_ship_z,
+                                                 engine_sound_duration * rate);
             
-            time_engine_sound_next = time_ms + (engine_sound_duration / rate);
+            time_engine_sound_next = time_ms + (engine_sound_duration * rate);
         }
     }
     
@@ -652,11 +654,10 @@ glFlightFrameStage1()
     
     // draw bounding lines
     drawLineBegin();
-    float lineBounds = 5;
+    float lineBounds = 10;
     if(my_ship_x <= lineBounds || my_ship_x >= gWorld->bound_x-lineBounds ||
        my_ship_y <= lineBounds || my_ship_y >= gWorld->bound_y-lineBounds ||
-       my_ship_z <= lineBounds || my_ship_z >= gWorld->bound_z-lineBounds ||
-       count_elems_last <= count_elems_grid)
+       my_ship_z <= lineBounds || my_ship_z >= gWorld->bound_z-lineBounds)
     {
         drawBoundingLineGrid();
     }

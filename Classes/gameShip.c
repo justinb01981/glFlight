@@ -7,8 +7,10 @@
 //
 
 #include <stdio.h>
+#include <math.h>
 #include "quaternions.h"
 #include "worldElem.h"
+#include "gameUtils.h"
 
 int my_ship_id = WORLD_ELEM_ID_INVALID;
 int my_ship_changed = 0;
@@ -168,3 +170,67 @@ gameShip_getEulerGamma() {
                                 &alpha, &beta, &gamma);
     return gamma;
 }
+
+float gameShip_calcRoll()
+{
+    float trimR;
+    
+    quaternion_t qA, qB, qC;
+    
+    {
+        qA = (quaternion_t) { 1.0, 0.00, 1.0, 0.00 };
+        
+        float vTmp[3];
+        
+        gameShip_getZVector(vTmp);
+        quaternion_t qBz = {1.0, vTmp[0], vTmp[1], vTmp[2]};
+        
+        gameShip_getXVector(vTmp);
+        quaternion_t qBx = {1.0, vTmp[0], vTmp[1], vTmp[2]};
+        
+        vector_relative_to_plane(&qA, &qBz, &qBx);
+    }
+    
+    {
+        qB = (quaternion_t) { 1.0, 1.0, 0.00, 0.00 };
+        
+        float vTmp[3];
+        
+        gameShip_getZVector(vTmp);
+        quaternion_t qBz = {1.0, vTmp[0], vTmp[1], vTmp[2]};
+        
+        gameShip_getYVector(vTmp);
+        quaternion_t qBy = {1.0, vTmp[0], vTmp[1], vTmp[2]};
+        
+        vector_relative_to_plane(&qB, &qBz, &qBy);
+    }
+    
+    {
+        qC = (quaternion_t) { 1.0, 0.00, 0.00, 1.0 };
+        
+        float vTmp[3];
+        
+        gameShip_getXVector(vTmp);
+        quaternion_t qBx = {1.0, vTmp[0], vTmp[1], vTmp[2]};
+        
+        gameShip_getYVector(vTmp);
+        quaternion_t qBy = {1.0, vTmp[0], vTmp[1], vTmp[2]};
+        
+        vector_relative_to_plane(&qC, &qBx, &qBy);
+    }
+    
+    // cross product of vectors representing body x/z plane
+    float zyCross[3];
+    {
+        float yv[] = { qA.x, qA.y, qA.z };
+        float zv[] = { qC.x, qC.y, qC.z };
+        vector_cross_product(yv, zv, zyCross);
+    }
+    
+    trimR = dot(qA.x, qA.y, qA.z, 0.0, 1.0, 0.0) * M_PI/2;
+    
+    if(qB.y > 0.0) trimR = -trimR + M_PI;
+    
+    return trimR;
+}
+

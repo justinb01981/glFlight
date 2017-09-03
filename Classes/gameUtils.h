@@ -71,6 +71,9 @@ void
 unit_vector_ab(float a[3], float b[3], float out[3]);
 
 void
+vector_cross_product(float a[3], float b[3], float result[3]);
+
+void
 console_write(char* fmt, ...);
 
 void

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #include "gameIncludes.h"
 
@@ -712,6 +713,13 @@ void drawControls()
         }
         else if(r.visible)
         {
+            game_timeval_t blink_d = time_ms - blink_time_last;
+            if(blink_d < 200 && controls[i]->blinking)
+            {
+                tex_id_controls = 0;
+            }
+            if(blink_d > 400) blink_time_last = time_ms;
+            
             if(controls[i] == &gameInterfaceControls.accelerator)
             {
                 //yphase = speed / maxSpeed;
@@ -721,6 +729,32 @@ void drawControls()
                 subElements[subElementsN].yw = 1;
                 subElements[subElementsN].tex_id = 21;
                 subElementsN++;
+            }
+            else if(controls[i] == &gameInterfaceControls.trim && tex_id_controls != 0)
+            {
+                float trimR;
+                
+                trimR = gameShip_calcRoll();
+                
+                float m[16] =
+                {
+                    sin(trimR), -cos(trimR), 1, 0, // landscape y-axis
+                    cos(trimR), sin(trimR), 1, 0,  // landscape x-axis
+                    0, 0, 1, 0,
+                    0, 0, 0, 1
+                };
+                
+                glMatrixMode(GL_TEXTURE);
+                
+                glPushMatrix();
+                glLoadIdentity();
+                
+                
+                glTranslatef(0.5, 0.5, 0);
+                
+                //glRotatef(RADIANS_TO_DEGREES(trimR), 0, 0, 1);
+                glMultMatrixf(m);
+                glTranslatef(-0.5, -0.5, 0);
             }
             else if(controls[i] == &gameInterfaceControls.radar)
             {
@@ -755,13 +789,6 @@ void drawControls()
                     gameInterfaceControls.dialogRect.visible = 0;
                 }
             }
-            
-            game_timeval_t blink_d = time_ms - blink_time_last;
-            if(blink_d < 200 && controls[i]->blinking)
-            {
-                tex_id_controls = 0;
-            }
-            if(blink_d > 400) blink_time_last = time_ms;
             
             // HACK: to flip instead of glRotatef
             r.y = screenHeight - r.y-r.yw;
@@ -847,6 +874,11 @@ void drawControls()
             strcpy(controls[i]->text, menuBuf);
         }
         
+        if(controls[i] == &gameInterfaceControls.trim)
+        {
+            glPopMatrix();
+        }
+        
         glDisable(GL_BLEND);
         setupGLTextureViewDone();
         setupGLModelViewDone();
@@ -854,34 +886,35 @@ void drawControls()
         if(controls[i]->visible &&
            (controls[i]->text[0] || controls[i] == &gameInterfaceControls.textEditControl))
         {
+            static char displayText[1024];
+            int td = 30;
+
+            strncpy(displayText, controls[i]->text, sizeof(displayText)-1);
+
             if(controls[i] == &gameInterfaceControls.textEditControl)
             {
-                char tmp[256];
-                int td = 30;
-                
-                strcpy(tmp, controls[i]->text);
-                
-                if((tex_pass % td) < (td/2) && strlen(tmp) > 0) tmp[strlen(tmp)-1] = ' ';
-                
+                if((tex_pass % td) < (td/2) && strlen(displayText) > 0) displayText[strlen(displayText)-1] = ' ';
+                strcat(displayText, "<");
+
                 drawText("Enter new value:",
                          controls[i]->x + controls[i]->xw*0.8,
                          controls[i]->y + controls[i]->yw*0.15);
-                drawText(tmp,
+                drawText(displayText,
                          controls[i]->x + controls[i]->xw*0.8 - screenWidth * 0.05,
                          controls[i]->y + controls[i]->yw*0.15);
             }
             else
             {
-                if(strchr(controls[i]->text, '\n') == NULL)
+                if(strchr(displayText, '\n') == NULL)
                 {
                     // one line
-                    drawText(controls[i]->text,
+                    drawText(displayText,
                              controls[i]->x + controls[i]->xw*0.5,
                              controls[i]->y + controls[i]->yw*0.2);
                 }
                 else
                 {
-                    drawText(controls[i]->text,
+                    drawText(displayText,
                              controls[i]->x + controls[i]->xw*0.8,
                              controls[i]->y + controls[i]->yw*0.15);
                 }

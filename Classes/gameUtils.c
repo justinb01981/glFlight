@@ -312,6 +312,7 @@ conv_3d_to_2d(float vec1[3], float vec2[3], float pt_unit_vec[3], float* v1dot, 
     *v2dot = vec2[0]*pt_unit_vec[0] + vec2[1]*pt_unit_vec[1] + vec2[2]*pt_unit_vec[2];
 }
 
+// unit-vector dot product: 0 = 90degrees, 1 = codirectional
 float dot(float v1x, float v1y, float v1z, float v2x, float v2y, float v2z)
 {
     return v1x*v2x + v1y*v2y + v1z*v2z;
@@ -330,6 +331,14 @@ void unit_vector_ab(float a[3], float b[3], float out[3])
     float d = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
     
     for(int i = 0; i < 3; i++) out[i] = v[i] / d;
+}
+
+void
+vector_cross_product(float a[3], float b[3], float result[3])
+{
+    result[0] = a[1]*b[2] - a[2]*b[1];
+    result[1] = a[2]*b[0] - a[0]*b[2];
+    result[2] = a[0]*b[1] - a[1]*b[0];
 }
 
 char consoleMessage[2048] = {0};

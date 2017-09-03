@@ -14,8 +14,13 @@
 #define GAME_SOUND_NAMES_MAX 32
 
 enum {
-    GAME_SOUND_ID_BULLET_FLYBY = 15,
-    GAME_SOUND_ID_MISSLE_FLYBY = 15,
+    GAME_SOUND_ID_BULLET_FLYBY = 16,
+    GAME_SOUND_ID_MISSLE_FLYBY = 16,
+};
+
+enum {
+    GAME_SOUND_DURATION_BULLET_FLYBY = 1000,
+    GAME_SOUND_DURATION_MISSLE_FLYBY = 1000,
 };
 
 static const char* gameSoundNames[] = {
@@ -27,6 +32,7 @@ static const char* gameSoundNames[] = {
     "dropoff",
     "collect",
     "dead",
+    "engineloop",
     "engine2",
     "victory",
     "warning",

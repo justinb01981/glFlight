@@ -2289,18 +2289,24 @@ game_run()
                     gameStateSinglePlayer.map_use_current = 1;
                     console_write("map loaded:%s", maps_list_names[maps_list_idx]);
                     break;
-                    
+
+                case ACTION_CONNECT_TO_GAME_LAN:
                 case ACTION_CONNECT_TO_GAME:
                     {
-                        int lan_game = 0;
+                        char* gameName = gameSettingsGameName;
+                        int lan_only = 0;
                         
-                        if(strcmp(gameSettingsGameName, GAME_NETWORK_LAN_GAME_NAME) == 0) lan_game = 1;
+                        if(gameInterfaceControls.menuAction == ACTION_CONNECT_TO_GAME_LAN)
+                        {
+                            lan_only = 1;
+                            gameName = GAME_NETWORK_LAN_GAME_NAME;
+                        }
                         
                         gameNetwork_disconnect();
                         
-                        gameDialogPortalToGame(gameSettingsGameName);
+                        gameDialogPortalToGame(gameName);
                     
-                        if(gameNetwork_connect(gameSettingsGameName, 0, 0) == GAME_NETWORK_ERR_NONE)
+                        if(gameNetwork_connect(gameName, 0, lan_only) == GAME_NETWORK_ERR_NONE)
                         {
                             gameInterfaceControls.mainMenu.visible = 0;
                             actions_menu_reset();
@@ -2480,6 +2486,7 @@ game_run()
                 case ACTION_SETTING_RESET_DEFAULT:
                     gameSettingsDefaults();
                     break;
+
                     
                 default:
                     break;
@@ -2573,6 +2580,7 @@ game_add_bullet(float pos[3], float euler[3], float vel, float leadV, int bullet
             if(affiliation != gameNetworkState.my_player_id)
             {
                 world_get_last_object()->stuff.sound.emit_sound_id = GAME_SOUND_ID_MISSLE_FLYBY;
+                world_get_last_object()->stuff.sound.emit_sound_duration = GAME_SOUND_DURATION_MISSLE_FLYBY;
             }
         }
         else
@@ -2582,6 +2590,7 @@ game_add_bullet(float pos[3], float euler[3], float vel, float leadV, int bullet
             if(affiliation != gameNetworkState.my_player_id)
             {
                 world_get_last_object()->stuff.sound.emit_sound_id = GAME_SOUND_ID_BULLET_FLYBY;
+                world_get_last_object()->stuff.sound.emit_sound_duration = GAME_SOUND_DURATION_BULLET_FLYBY;
             }
         }
     }

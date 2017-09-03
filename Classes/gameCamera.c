@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include "gameCamera.h"
+#include <math.h>
 
 
 camera_position_t cam_pos;

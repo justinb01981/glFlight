@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
@@ -62,6 +61,7 @@ glFlightGameResourceInfo_t glFlightGameResourceInfo;
 glFlightPrefs prefs;
 
 bool glFlightInited = false;
+int glFlightRenderIgnore = 0;
 
 static char settingsPath[255];
 
@@ -120,7 +120,7 @@ glFlightJNIInit()
 	initTextures(glFlightGameResourceInfo.pathPrefix);
 
 	gameNetwork_init(0, gameSettingsGameName, gameSettingsPlayerName,
-			gameSettingsNetworkFrequency, gameSettingsDirectoryServerName,
+			gameSettingsNetworkFrequency,
 			gameSettingsPortNumber, gameSettingsLocalIPOverride);
 
 	gameMapFilePrefix(glFlightGameResourceInfo.pathPrefix);
@@ -130,7 +130,9 @@ glFlightJNIInit()
 	gameInterfaceInit(viewWidth, viewHeight);
     gameInterfaceControls.trim.blinking = 1;
     
-    gameDialogCalibrate();    
+    gameDialogCalibrate();
+
+    gameDialogLoading();
 }
 
 static float xscale = 1;
@@ -177,6 +179,8 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 	{
 		DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
 
+		if(glFlightRenderIgnore > 0) { glFlightRenderIgnore--; return; }
+
 		glFlightJNIInit();
 
 		glFlightInited = true;
@@ -203,8 +207,33 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIE
     glFlightInited = false;
 }
 
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNIEnv *e, jobject o)
+{
+    glFlightRenderIgnore = 100;
+
+    gameNetwork_disconnect();
+    if(save_map)
+    {
+        world_lock();
+        gameMapWrite();
+        world_unlock();
+    }
+	gameSettingsWrite(glFlightSettingsPath());
+}
+
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JNIEnv *e, jobject o)
 {
+    DBPRINTF(("Java_com_domain17_glflight_GameRunnable_glFlightUninit called"));
+
+    glFlightInited = false;
+
+    gameNetwork_disconnect();
+    if(save_map)
+    {
+        world_lock();
+        gameMapWrite();
+        world_unlock();
+    }
 	gameSettingsWrite(glFlightSettingsPath());
 }
 
@@ -236,7 +265,7 @@ JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAu
 		gameAudioLock();
 		if(cocoaMessageAudioList.next)
 		{
-			strcpy(audioStr, cocoaMessageAudioList.next->str);
+			sprintf(audioStr, "%s:%f", cocoaMessageAudioList.next->str, cocoaMessageAudioList.next->f[0]);
 			cocoaMessageListPop(&cocoaMessageAudioList);
 			dbtrace((char*)"sound\n",0);
 		}

@@ -61,4 +61,7 @@ get_euler_from_body_vectors(quaternion_t* vecx, quaternion_t* vecy, quaternion_t
 void
 eulerHeading1(float arrowV[3], float eu[3]);
 
+void
+vector_relative_to_plane(quaternion_t *qA, quaternion_t *qU, quaternion_t *qV);
+
 #endif

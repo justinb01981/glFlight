@@ -19,6 +19,7 @@
         AVAudioPlayer *ap[GAME_SOUND_NAMES_MAX][GAME_SOUND_INSTANCES_MAX];
         NSString* name[GAME_SOUND_NAMES_MAX];
         int ap_inst[GAME_SOUND_NAMES_MAX];
+        float duration_ms[GAME_SOUND_NAMES_MAX];
         int clone;
         int available;
     } audioPlayersPreloaded;
@@ -27,6 +28,7 @@
 -(id)init;
 -(void)dealloc;
 -(void) playSound: (NSString*)soundFileName withVolume:(float)volume andRate:(float)rate;
+-(void) playSound: (NSString*)soundFileName withVolume:(float)volume andDuration:(float) duration_ms;
 -(void) processMessages: (int)maxMessagesProcessed;
 
 @end
