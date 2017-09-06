@@ -1373,7 +1373,7 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                 }
                 
                 world_remove_object(elemA->elem_id);
-                gameAudioPlaySoundAtLocationWithRate("filelost", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
+                gameAudioPlaySoundAtLocationWithRate("filelost", 1.0, gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
             }
             break;
             

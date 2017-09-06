@@ -311,6 +311,8 @@ gameInterfaceHandleTouchMove(float x, float y)
         float m = touchedControl->touch_rx;
         if(m <= 0.10) m = 0;
         targetSpeed = minSpeed + ((maxSpeed-minSpeed) * m);
+        
+        time_engine_sound_next = 0;
     }
     else if(touchedControl == &gameInterfaceControls.radar)
     {

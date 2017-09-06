@@ -197,7 +197,7 @@ int playSound = 1;
                 ac = a;
             }
             
-            if([ac isPlaying]) return;
+            //if([ac isPlaying]) return;
             
             [ac setDelegate:self];
             

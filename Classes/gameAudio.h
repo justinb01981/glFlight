@@ -40,10 +40,10 @@ void
 gameAudioPlaySoundAtLocation(const char* filename, float x, float y, float z);
 
 void
-gameAudioPlaySoundAtLocationWithRate(const char* filename, float x, float y, float z, float rate);
+gameAudioPlaySoundAtLocationWithRate(const char* filename, float volumescale, float x, float y, float z, float rate);
 
 void
-gameAudioPlaySoundAtLocationWithDuration(const char* filename, float x, float y, float z, float duration_ms);
+gameAudioPlaySoundAtLocationWithDuration(const char* filename, float volumescale, float x, float y, float z, float duration_ms);
 
 void
 gameAudioLock();

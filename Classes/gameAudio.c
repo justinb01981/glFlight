@@ -89,7 +89,7 @@ gameAudioUnlock()
 }
 
 void
-gameAudioPlaySoundAtLocationWithRate(const char* filename, float x, float y, float z, float rate)
+gameAudioPlaySoundAtLocationWithRate(const char* filename, float volumescale, float x, float y, float z, float rate)
 {
     if(gameAudioMuted) return;
     
@@ -111,7 +111,7 @@ gameAudioPlaySoundAtLocationWithRate(const char* filename, float x, float y, flo
         
         if(vol > 0 && vol < 1.0)
         {
-            msg.f[0] = vol;
+            msg.f[0] = vol * volumescale;
             msg.f[1] = rate;
             strncpy(msg.str, filename, sizeof(msg.str)-1);
             
@@ -119,13 +119,13 @@ gameAudioPlaySoundAtLocationWithRate(const char* filename, float x, float y, flo
             cocoaMessageListAdd(&msg, &cocoaMessageAudioList);
             gameAudioUnlock();
             
-            printf("Playing sound %s with vol:%f\n", msg.str, msg.f[0]);
+            printf("Playing sound %s with vol:%f and rate %f\n", msg.str, msg.f[0], msg.f[1]);
         }
     }
 }
 
 void
-gameAudioPlaySoundAtLocationWithDuration(const char* filename, float x, float y, float z, float duration_ms)
+gameAudioPlaySoundAtLocationWithDuration(const char* filename, float volumescale, float x, float y, float z, float duration_ms)
 {
     if(gameAudioMuted) return;
     
@@ -156,7 +156,7 @@ gameAudioPlaySoundAtLocationWithDuration(const char* filename, float x, float y,
             cocoaMessageListAdd(&msg, &cocoaMessageAudioList);
             gameAudioUnlock();
             
-            printf("Playing sound %s with vol:%f\n", msg.str, msg.f[0]);
+            printf("Playing sound %s with vol:%f and duration:%f\n", msg.str, msg.f[0], msg.f[2]);
         }
     }
 }
@@ -164,5 +164,5 @@ gameAudioPlaySoundAtLocationWithDuration(const char* filename, float x, float y,
 void
 gameAudioPlaySoundAtLocation(const char* filename, float x, float y, float z)
 {
-    gameAudioPlaySoundAtLocationWithRate(filename, x, y, z, 1.0);
+    gameAudioPlaySoundAtLocationWithRate(filename, 1.0, x, y, z, 1.0);
 }

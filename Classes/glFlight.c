@@ -56,6 +56,8 @@ float block_scale = 1;
 WorldElem targetingReticleElem;
 float reticleZDist = -10;
 
+game_timeval_t time_engine_sound_next = 0;
+
 unsigned int count_elems_last = 0, count_elems_grid = 100;
 
 struct
@@ -213,18 +215,17 @@ glFlightFrameStage1()
     do_world_collision_handling(tc);
     
     // play engine sound
-    static game_timeval_t time_engine_sound_next = 0;
-    const float engine_sound_duration = 4000;
-    if(time_ms > time_engine_sound_next || time_engine_sound_next == 0)
+    const float engine_sound_duration_engineloop = 3947;
+    const float engine_sound_duration_engineslow = 347;
+    if(time_ms >= time_engine_sound_next || time_engine_sound_next == 0)
     {
         float minSpeed = 0.1;
         
         if(speed/maxSpeed >= minSpeed)
         {
-            float rateRange[] = {0.5, 2.0};
-            float rate = rateRange[0] + (rateRange[1]-rateRange[0])*(speed/maxSpeed);
+            float rate = 0.25 + 2.0*(speed/maxSpeed);
             
-            char* sndName = "engineloop";
+            char* sndName = "engineslow";
             /*
             if(speed/maxSpeed < 0.33)
             {
@@ -235,10 +236,10 @@ glFlightFrameStage1()
                 sndName = "enginefast";
             }
              */
-            gameAudioPlaySoundAtLocationWithDuration(sndName, my_ship_x, my_ship_y, my_ship_z,
-                                                 engine_sound_duration * rate);
+            gameAudioPlaySoundAtLocationWithDuration(sndName, 0.75, my_ship_x, my_ship_y, my_ship_z,
+                                                 engine_sound_duration_engineslow / rate);
             
-            time_engine_sound_next = time_ms + (engine_sound_duration * rate);
+            time_engine_sound_next = time_ms + (engine_sound_duration_engineslow / rate);
         }
     }
     
@@ -359,7 +360,7 @@ glFlightFrameStage1()
         // bail this draw
         
         console_write(game_log_messages[GAME_LOG_TELEPORT]);
-        gameAudioPlaySoundAtLocationWithRate("teleport", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
+        gameAudioPlaySoundAtLocationWithRate("teleport", 1.0, gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
         return;
     }
     else

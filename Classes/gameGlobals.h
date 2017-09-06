@@ -84,7 +84,7 @@ extern int controls_simple;
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "0.9.29.0_core";
+const static char* GAME_VERSION_STR = "0.9.30.0_core";
 
 const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2.5);
 const static float SPEED_BOOST_FRAMES = 60 * 5;
@@ -108,5 +108,7 @@ const static float GAME_AI_UPDATE_INTERVAL_MS = 50;
 #define GAME_TICK_RATE PLATFORM_TICK_RATE
 
 extern int controlsCalibrated;
+
+extern game_timeval_t time_engine_sound_next;
 
 #endif
