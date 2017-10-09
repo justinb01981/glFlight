@@ -787,8 +787,9 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
-        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
-        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_POINTS;
+        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_LIFE;
+        //gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
+        //gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_POINTS;
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
         gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
