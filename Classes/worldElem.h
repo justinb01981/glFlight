@@ -15,7 +15,7 @@
 #include "simple_hash.h"
 #include "gameTimeval.h"
 
-#define MAX_ELEM 128
+#define MAX_ELEM 512
 
 #define IS_LINKED_ELEM(e) ((e)->head_elem != NULL)
 
@@ -51,13 +51,16 @@ struct ListNode_t
 typedef struct ListNode_t ListNode_t;
 
 struct WorldElem {
-	model_index_t indices[MAX_ELEM];
+    model_index_t *indices;
+	model_index_t indices_[MAX_ELEM];
 	GLint n_indices;
 	
-	model_coord_t coords[MAX_ELEM];
+    model_coord_t *coords;
+	model_coord_t coords_[MAX_ELEM];
 	GLint n_coords;
 	
-	model_texcoord_t texcoords[MAX_ELEM];
+    model_texcoord_t *texcoords;
+	model_texcoord_t texcoords_[MAX_ELEM];
 	GLint n_texcoords;
 	
 	struct {
@@ -217,6 +220,9 @@ world_elem_list_init(WorldElemListNode* pHeadNode)
 {
     memset(pHeadNode, 0, sizeof(*pHeadNode));
 }
+
+WorldElem*
+world_elem_alloc();
 
 WorldElem*
 world_elem_alloc();

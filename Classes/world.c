@@ -53,6 +53,8 @@ float visible_distance = VISIBLE_DISTANCE_PLATFORM;
 static struct mesh_t* world_pending_mesh = NULL;
 static float world_pending_mesh_info[3];
 
+models_shared_t models_shared;
+
 static int
 world_add_object_core(Model type,
                       float x, float y, float z,
@@ -315,6 +317,17 @@ world_add_object_core(Model type,
             model_primitives = model_icosahedron_primitives;
             break;
             
+        case MODEL_SPHERE:
+            model_coords = model_sphere_coords;
+            model_sizeof = sizeof(model_sphere_coords);
+            model_indices = model_sphere_indices;
+            model_indices_sizeof = sizeof(model_sphere_indices);
+            model_texcoords = model_sphere_texcoords;
+            model_texcoords_sizeof = sizeof(model_sphere_texcoords);
+            model_primitives_sizeof = sizeof(model_sphere_primitives);
+            model_primitives = model_sphere_primitives;
+            break;
+            
         default:
             break;
 	}
@@ -473,6 +486,9 @@ world_add_object_core(Model type,
                 pElemNext->linked_elem = elemSave.linked_elem;
                 pElemNext->head_elem = elemSave.head_elem;
                 pElemNext->listRefHead = elemSave.listRefHead;
+                pElemNext->coords = elemSave.coords;
+                pElemNext->texcoords = elemSave.texcoords;
+                pElemNext->indices = elemSave.indices;
                 memcpy(&pElemNext->stuff, &elemSave.stuff, sizeof(pElemNext->stuff));
                 
                 world_elem_replace_fix(pElemNext);
@@ -1150,6 +1166,8 @@ void world_init(float size_x, float size_y, float size_z)
     }
     
     //world_build_visibility_data();
+    
+    models_init();
 
 	return;
 }

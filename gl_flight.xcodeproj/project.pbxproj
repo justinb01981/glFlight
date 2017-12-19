@@ -361,6 +361,7 @@
 		D052FB9319E44DA000077F9C /* gamePlatform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gamePlatform.h; sourceTree = "<group>"; };
 		D05A90B517A1CF8100F40807 /* texture40.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture40.bmp; sourceTree = "<group>"; };
 		D05A90B717A1E3F400F40807 /* engine.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engine.wav; sourceTree = "<group>"; };
+		D05C28A71F9FEBC700BC2194 /* sphere_model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sphere_model.h; sourceTree = "<group>"; };
 		D062ED5816E0278F00CA4374 /* glFlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glFlight.h; sourceTree = "<group>"; };
 		D062ED5916E0279B00CA4374 /* glFlight.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glFlight.c; sourceTree = "<group>"; };
 		D062ED5B16E0294A00CA4374 /* gameGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameGraphics.h; sourceTree = "<group>"; };
@@ -480,6 +481,7 @@
 				D02B8F151964D67700830369 /* cocoaGameInput.h */,
 				D02B8F161964D67700830369 /* cocoaGameInput.m */,
 				6D512E1915EC21860064DF49 /* models.h */,
+				D05C28A71F9FEBC700BC2194 /* sphere_model.h */,
 				D0CF62B514A919D600E08151 /* object.h */,
 				D03ABA6414ADACF000C44538 /* world.h */,
 				6D91DE9F16697F0B00362864 /* world.c */,

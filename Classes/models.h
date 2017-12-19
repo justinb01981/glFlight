@@ -17,12 +17,15 @@
 
 #include "gameIncludes.h"
 
+
 typedef GLfloat model_coord_t;
 // keep these in-sync
 #define index_type_enum GL_UNSIGNED_INT
 typedef GLuint model_index_t;
 typedef GLfloat model_color_t;
 typedef GLfloat model_texcoord_t;
+
+#include "sphere_model.h"
 
 typedef enum {
     MODEL_FIRST = 0,
@@ -43,7 +46,8 @@ typedef enum {
     MODEL_SHIP3,
     MODEL_ICOSAHEDRON,
     MODEL_CUBE_INVERTED,
-    MODEL_LAST
+    MODEL_SPHERE,
+    MODEL_LAST,
 } Model;
 
 /********************************************************/
@@ -947,6 +951,76 @@ models_iterate()
     
 }
 /********************************************************/
+
+struct models_shared_t_
+{
+    struct
+    {
+        model_index_t indices[1024];
+        model_coord_t coords[3072];
+        model_texcoord_t texcoords[2048];
+        size_t indices_count;
+    } sphere;
+};
+typedef struct models_shared_t_ models_shared_t;
+extern models_shared_t models_shared;
+
+static inline void
+models_init()
+{
+    int i = 0;
+    
+    // vectors to step to next vertex
+    model_coord_t stepsC[][3] = {
+        {0.0, 0.0, 30.0},
+        {30.0, 0.0, 0.0},
+        {-30.0, 0.0, -30.0}
+    };
+    
+    // vectors to step to next texture-coordinate
+    model_texcoord_t stepsT[][2] = {
+        {1.0, 0.0},
+        {0.0, 1.0},
+        {-1.0, -1.0}
+    };
+    
+    models_shared.sphere.indices_count = 0;
+    
+    model_coord_t cur[3] = {100, 50, 100}; // model origin
+    model_texcoord_t tcur[2] = {0, 0}; // texture origin
+    
+    for(i = 0; i < 3; i++)
+    {
+        int j;
+        
+//        // push coordinate
+//        models_shared.sphere.coords[models_shared.sphere.indices_count][0] = cur[0];
+//        models_shared.sphere.coords[models_shared.sphere.indices_count][1] = cur[1];
+//        models_shared.sphere.coords[models_shared.sphere.indices_count][2] = cur[2];
+//
+//        // push texture-space coordinate
+//        models_shared.sphere.texcoords[models_shared.sphere.indices_count][0] = tcur[0];
+//        models_shared.sphere.texcoords[models_shared.sphere.indices_count][1] = tcur[1];
+//
+//        // push index
+//        models_shared.sphere.indices[models_shared.sphere.indices_count] = i;
+//        models_shared.sphere.indices_count++;
+        
+//        for(j = 0; j < 3; j++) cur[j] += stepsC[i][j];
+//        for(j = 0; j < 2; j++) tcur[j] += stepsT[i][j];
+    }
+    
+    unsigned int count = sizeof(model_sphere_indices) / sizeof(model_sphere_indices[0]);
+    
+    for(i = 0; i < count; i++) models_shared.sphere.indices[i] = model_sphere_indices[i];
+    models_shared.sphere.indices_count = count;
+    
+    count = sizeof(model_sphere_coords) / sizeof(model_sphere_coords[0]);
+    for(i = 0; i < count; i++) models_shared.sphere.coords[i] = (model_sphere_coords[i] * 10.0) + 30;
+    
+    count = sizeof(model_sphere_texcoords) / sizeof(model_sphere_texcoords[0]);
+    for(i = 0; i < count; i++) models_shared.sphere.texcoords[i] = model_sphere_texcoords[i];
+}
 
 /********************************************************/
 									   

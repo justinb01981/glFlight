@@ -40,6 +40,7 @@ extern double bulletVel;
 extern int needTrim;
 extern int trimReady;
 extern int my_ship_id;
+extern int shared_model_sphere_id;
 extern int my_ship_changed;
 extern float my_ship_x;
 extern float my_ship_y;

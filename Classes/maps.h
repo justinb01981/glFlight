@@ -37,10 +37,7 @@
 "register_params_update 0 0 8 0 0 0 0 0 0 0 0 0 0 0 0 0\n"  \
 "add_object 1 r r r 0 0 0 4 16\n"
 
-#define WORLD_SCALED_FRAME(x, tex, scale)                                \
-"register_params 400 100 400 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
-"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-"set_world_size r r r\n"                                                 \
+#define WORLD_CUBEGRID(x, tex, scale) \
 "mesh_manip_add 0 " "1" " 0" " 4 0 0" " 0 0 4" " wx0.25 wz0.25\n" \
 WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
 WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
@@ -58,6 +55,13 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
 WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
 "mesh_manip_round 0 1 0\n" \
 "mesh_manip_complete 1 "#tex" 1 "#scale"\n"
+
+#define WORLD_SCALED_FRAME(x, tex, scale)                                \
+"register_params 400 100 400 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
+"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
+"set_world_size r r r\n"\
+//WORLD_CUBEGRID(x, tex, scale) \
+"\n"
 
 #define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
 "register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
@@ -224,7 +228,7 @@ ADD_OBJ_END(4, 40) \
 "register_params_update 0 rnd_-4_4 4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
 "add_object r r r r 0 0 0 r r\n"
 
-#define BASE_MODEL_ID "10"
+#define BASE_MODEL_ID "17"
 #define BASE_TEXTURE_ID_FRIENDLY /*"106"*/ "106"
 #define BASE_TEXTURE_ID_ENEMY /*58*/ "89"
 
@@ -249,7 +253,7 @@ ADD_OBJ_END(4, 40) \
 
 #define MAP_TEXTURE_ID_ANIMATED_STATIC "18"
 #define BASE_GENERIC(x,y,z)                            \
-"register_params 15 "/*"rndx"*/#x" "#y" "/*"rndz"*/#z" 0 0 0 8 "/*"42"*//*"88"*/MAP_TEXTURE_ID_ANIMATED_STATIC" 0 0 0 0 0 0 0\n"                 \
+"register_params 17 "/*"rndx"*/#x" "#y" "/*"rndz"*/#z" 0 0 0 8 "/*"42"*//*"88"*/MAP_TEXTURE_ID_ANIMATED_STATIC" 0 0 0 0 0 0 0\n"                 \
 "add_object r r r r r r r r " "r" "\n" \
 "object_set_info 13\n"
 

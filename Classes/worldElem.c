@@ -23,6 +23,11 @@ world_elem_alloc()
 {
     WorldElem *pElem = malloc(sizeof(WorldElem));
     if(pElem) memset(pElem, 0, sizeof(WorldElem));
+    
+    pElem->coords = pElem->coords_;
+    pElem->texcoords = pElem->texcoords_;
+    pElem->indices = pElem->indices_;
+    
     return pElem;
 }
 
@@ -40,6 +45,10 @@ world_elem_clone(WorldElem* a)
         memset(&pNew->listRefHead, 0, sizeof(pNew->listRefHead));
         pNew->stuff.btree_node[0] = pNew->stuff.btree_node[1] = NULL;
         pNew->elem_id = WORLD_ELEM_ID_INVALID;
+        
+        pNew->coords = pNew->coords_;
+        pNew->texcoords = pNew->texcoords_;
+        pNew->indices = pNew->indices_;
     }
     return pNew;
 }

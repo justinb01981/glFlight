@@ -1005,6 +1005,9 @@ drawElemBatch()
 void
 drawElem(WorldElem* pElem)
 {
+    const int coord_size = 3;
+    const int texcoord_size = 2;
+    
     if(pElem->type == MODEL_SPRITE)
     {
         drawElemBatch();
@@ -1047,37 +1050,51 @@ drawElem(WorldElem* pElem)
         {
         }
         
-        if(drawElem_indicesBatchBuffer_count+drawElem_batchTotal[0]+pElem->n_indices < drawElem_BatchBuffer_max &&
-           drawElem_vertexBatchBuffer_count+drawElem_batchTotal[1]+pElem->n_coords < drawElem_BatchBuffer_max &&
-           drawElem_textCoordBatchBuffer_count+drawElem_batchTotal[2]+pElem->n_texcoords < drawElem_BatchBuffer_max)
+        model_coord_t* pElemCoords = pElem->coords;
+        model_texcoord_t* pElemTexCoords = pElem->texcoords;
+        model_index_t* pElemIndices = pElem->indices;
+        size_t pElemIndicesCount = pElem->n_indices;
+        
+        /*
+        if(pElem->type == MODEL_SHARED)
+        {
+            pElemCoords = models_shared.sphere.coords;
+            pElemTexCoords = models_shared.sphere.texcoords;
+            pElemIndices = models_shared.sphere.indices;
+            pElemIndicesCount = models_shared.sphere.indices_count;
+        }
+        */
+        
+        if(drawElem_indicesBatchBuffer_count+drawElem_batchTotal[0]+pElemIndicesCount < drawElem_BatchBuffer_max &&
+           drawElem_vertexBatchBuffer_count+drawElem_batchTotal[1]+/*pElem->n_coords*/(pElemIndicesCount*coord_size) < drawElem_BatchBuffer_max &&
+           drawElem_textCoordBatchBuffer_count+drawElem_batchTotal[2]+(pElemIndicesCount*texcoord_size) < drawElem_BatchBuffer_max)
         {
             int idx;
             
             unsigned long indicesBatchOffset = drawElem_indicesBatchBuffer_count;
             
             const int coord_inval = -1;
-            const int coord_size = 3;
-            const int texcoord_size = 2;
-            int coord_table[MAX_ELEM];
-            for(idx = 0; idx < MAX_ELEM; idx++) { coord_table[idx] = coord_inval; }
+
+            int coord_table[MAX_ELEM*4];
+            for(idx = 0; idx < MAX_ELEM*4; idx++) { coord_table[idx] = coord_inval; }
             
             idx = 0;
-            while(idx < pElem->n_indices)
+            while(idx < pElemIndicesCount)
             {
-                model_index_t index = pElem->indices[idx];
+                model_index_t index = pElemIndices[idx];
                 
                 if(coord_table[index] == coord_inval)
                 {
                     coord_table[index] = drawElem_vertexBatchBuffer_count / coord_size;
                     
                     // copy coordinates
-                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+0] = pElem->coords[index*coord_size+0];
-                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+1] = pElem->coords[index*coord_size+1];
-                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+2] = pElem->coords[index*coord_size+2];
+                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+0] = pElemCoords[index*coord_size+0];
+                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+1] = pElemCoords[index*coord_size+1];
+                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+2] = pElemCoords[index*coord_size+2];
                     
                     // copy texture coordinates
-                    drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+0] = pElem->texcoords[index*texcoord_size+0];
-                    drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+1] = pElem->texcoords[index*texcoord_size+1];
+                    drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+0] = pElemTexCoords[index*texcoord_size+0];
+                    drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+1] = pElemTexCoords[index*texcoord_size+1];
                     
                     drawElem_vertexBatchBuffer_count += coord_size;
                     drawElem_textCoordBatchBuffer_count += texcoord_size;

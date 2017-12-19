@@ -1,4 +1,4 @@
-//
+
 //  glFlight.c
 //  gl_flight
 //
@@ -779,6 +779,27 @@ glFlightFrameStage1()
         a[i] = 0;
     }
      */
+    
+    {
+        int li = 0;
+        
+        float lines[6][3] = {
+            {my_ship_x, my_ship_y, my_ship_z}, {my_ship_x + 10, my_ship_y, my_ship_z},
+            {my_ship_x, my_ship_y, my_ship_z}, {my_ship_x, my_ship_y+10, my_ship_z},
+            {my_ship_x, my_ship_y, my_ship_z}, {my_ship_x, my_ship_y, my_ship_z+10},
+        };
+        
+        float colors[3][3] = {
+            {1.0, 0.0, 0.0},
+            {0.0, 1.0, 0.0},
+            {0.0, 0.0, 1.0}
+        };
+        
+        for(li = 0; li < 6; li+= 2)
+        {
+            drawLineWithColorAndWidth(lines[li], lines[li+1], colors[li/2], 2);
+        }
+    }
     
     drawLineEnd();
     

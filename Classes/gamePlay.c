@@ -11,6 +11,9 @@
 // - defend-your-base-mode with progressively more aggressive enemies spawning
 // - hold onto capture-points (accruing points/spawning allies)
 // - capture the flag
+// - 10-9-2017 - remove enemy base, enemies should come in from map borders, and teleport out with data
+//   better indication of system distress state, based on number of enemies in system
+//   instead of saving floppies you have to expunge intruders (with new/bigger waves starting?)
 //
 
 #include <stdio.h>
@@ -2075,7 +2078,7 @@ game_run()
         
         int* arrow_objects[] = {
             &game_target_objective_id,
-            &game_target_enemy_near
+            //&game_target_enemy_near
         };
         
         for(int a = 0; a < sizeof(arrow_objects)/sizeof(int*); a++)
@@ -2154,7 +2157,7 @@ game_run()
             // add ball
             float ball_scale = 2.0;
             
-            world_add_object(MODEL_ICOSAHEDRON, pos[0], pos[1], pos[2], 0, 0, 0, ball_scale, TEXTURE_ID_BALL);
+            world_add_object(MODEL_SPHERE, pos[0], pos[1], pos[2], 0, 0, 0, ball_scale, TEXTURE_ID_BALL);
             if((pElemBallHeld = world_get_last_object()))
             {
                 update_object_velocity(pElemBallHeld->elem_id, 0, 0, 0, 0);
