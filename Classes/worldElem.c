@@ -18,26 +18,62 @@ static void hack_remove_elem_from_all(WorldElem* pElem);
 
 volatile WorldElemListNode* world_elem_list_remove_watch_elem = NULL;
 
-WorldElem*
-world_elem_alloc()
+void
+world_elem_adjust_geometry_pointers(WorldElem* pElem)
 {
-    WorldElem *pElem = malloc(sizeof(WorldElem));
-    if(pElem) memset(pElem, 0, sizeof(WorldElem));
+    if(pElem->size == sizeof(WorldElem))
+    {
+        pElem->coords = pElem->coords_;
+        pElem->texcoords = pElem->texcoords_;
+        pElem->indices = pElem->indices_;
+    }
+    else
+    {
+        pElem->coords = ((model_data_extension_t*) &pElem->model_data_extension_stub)->coords_;
+        pElem->texcoords = ((model_data_extension_t*) &pElem->model_data_extension_stub)->texcoords_;
+        pElem->indices = ((model_data_extension_t*) &pElem->model_data_extension_stub)->indices_;
+    }
+}
+
+WorldElem*
+world_elem_alloc_core(size_t size)
+{
+    WorldElem *pElem = malloc(size);
+    if(pElem) memset(pElem, 0, size);
     
-    pElem->coords = pElem->coords_;
-    pElem->texcoords = pElem->texcoords_;
-    pElem->indices = pElem->indices_;
+    pElem->size = size;
+    
+    world_elem_adjust_geometry_pointers(pElem);
     
     return pElem;
 }
 
 WorldElem*
+world_elem_alloc()
+{
+    return world_elem_alloc_core(sizeof(WorldElem));
+}
+
+WorldElem*
+world_elem_alloc_extended_model()
+{
+    WorldElem* e;
+    e = world_elem_alloc_core(sizeof(WorldElem) + sizeof(model_data_extension_t));
+    if(e)
+    {
+        world_elem_adjust_geometry_pointers(e);
+    }
+    return e;
+}
+
+WorldElem*
 world_elem_clone(WorldElem* a)
 {
-    WorldElem *pNew = world_elem_alloc();
+    WorldElem *pNew = world_elem_alloc_core(a->size);
     if(pNew)
     {
-        memcpy(pNew, a, sizeof(*pNew));
+        memcpy(pNew, a, a->size);
+        pNew->size = a->size;
         
         // HACK: copy everything, nulling some fields
         memset(&pNew->stuff, 0, sizeof(pNew->stuff));
@@ -46,9 +82,7 @@ world_elem_clone(WorldElem* a)
         pNew->stuff.btree_node[0] = pNew->stuff.btree_node[1] = NULL;
         pNew->elem_id = WORLD_ELEM_ID_INVALID;
         
-        pNew->coords = pNew->coords_;
-        pNew->texcoords = pNew->texcoords_;
-        pNew->indices = pNew->indices_;
+        world_elem_adjust_geometry_pointers(pNew);
     }
     return pNew;
 }

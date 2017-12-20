@@ -1075,8 +1075,13 @@ drawElem(WorldElem* pElem)
             
             const int coord_inval = -1;
 
-            int coord_table[MAX_ELEM*4];
-            for(idx = 0; idx < MAX_ELEM*4; idx++) { coord_table[idx] = coord_inval; }
+            int *coord_table = malloc(pElemIndicesCount * 4 * sizeof(int));
+            if(!coord_table) return;
+            
+            for(idx = 0; idx < pElemIndicesCount * 4; idx++)
+            {
+                coord_table[idx] = coord_inval;
+            }
             
             idx = 0;
             while(idx < pElemIndicesCount)
@@ -1109,6 +1114,9 @@ drawElem(WorldElem* pElem)
                 idx++;
             }
             drawElem_indicesBatchBuffer_count += idx;
+            
+            free(coord_table);
+            coord_table = NULL;
             
             //if(gl_vertex_ptr_last != drawElem_vertexBatchBuffer)
             //{

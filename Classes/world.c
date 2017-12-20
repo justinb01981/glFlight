@@ -103,7 +103,15 @@ world_add_object_core(Model type,
     }
     else
     {
-        pElem = world_elem_alloc();
+        if(type == MODEL_SPHERE)
+        {
+            pElem = world_elem_alloc_extended_model();
+        }
+        else
+        {
+            pElem = world_elem_alloc();
+        }
+
         if(!pElem) return WORLD_ELEM_ID_INVALID;
         
         world_elem_init(pElem, gWorld->elem_id_next);
@@ -130,7 +138,7 @@ world_add_object_core(Model type,
 	
 	switch (type)
 	{
-    case MODEL_CUBE_INVERTED:
+        case MODEL_CUBE_INVERTED:
             model_coords = model_cube;
             model_sizeof = sizeof(model_cube);
             model_indices = model_cube_indices_inverted;
@@ -141,7 +149,7 @@ world_add_object_core(Model type,
             model_primitives = model_cube_primitives;
             break;
             
-	case MODEL_CUBE:
+        case MODEL_CUBE:
             model_coords = model_cube;
             model_sizeof = sizeof(model_cube);
             model_indices = model_cube_indices;
@@ -163,7 +171,7 @@ world_add_object_core(Model type,
             model_primitives = model_cube_primitives;
             break;
 			
-	case MODEL_SQUARE:
+        case MODEL_SQUARE:
             model_coords = model_square;
             model_sizeof = sizeof(model_square);
             model_indices = model_square_indices;
@@ -174,7 +182,7 @@ world_add_object_core(Model type,
             model_primitives = model_square_primatives;
             break;
             
-    case MODEL_PYRAMID:
+        case MODEL_PYRAMID:
             model_coords = model_pyramid;
             model_sizeof = sizeof(model_pyramid);
             model_indices = model_pyramid_indices;
@@ -480,7 +488,7 @@ world_add_object_core(Model type,
                 memcpy(&elemSave, pElemNext, sizeof(elemSave));
                 
                 // TODO: probably only necessary to update coords...
-                memcpy(pElemNext, pElem, sizeof(*pElem));
+                memcpy(pElemNext, pElem, pElem->size);
                 
                 pElemNext->elem_id = elemSave.elem_id;
                 pElemNext->linked_elem = elemSave.linked_elem;
@@ -492,6 +500,7 @@ world_add_object_core(Model type,
                 memcpy(&pElemNext->stuff, &elemSave.stuff, sizeof(pElemNext->stuff));
                 
                 world_elem_replace_fix(pElemNext);
+                world_elem_adjust_geometry_pointers(pElemNext);
             }
             else
             {

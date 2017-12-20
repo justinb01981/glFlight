@@ -15,7 +15,8 @@
 #include "simple_hash.h"
 #include "gameTimeval.h"
 
-#define MAX_ELEM 512
+#define MAX_ELEM 128
+#define MODEL_EXTENSION_MAX 1024
 
 #define IS_LINKED_ELEM(e) ((e)->head_elem != NULL)
 
@@ -51,6 +52,8 @@ struct ListNode_t
 typedef struct ListNode_t ListNode_t;
 
 struct WorldElem {
+    size_t size;
+    
     model_index_t *indices;
 	model_index_t indices_[MAX_ELEM];
 	GLint n_indices;
@@ -193,7 +196,20 @@ struct WorldElem {
     void* pVoid;
     
     struct ListNode_t listRefHead;
+    
+    struct {
+        model_index_t indices_[1];
+        model_coord_t coords_[1];
+        model_texcoord_t texcoords_[1];
+    } model_data_extension_stub;
+    
 };
+
+typedef struct {
+    model_index_t indices_[MODEL_EXTENSION_MAX];
+    model_coord_t coords_[MODEL_EXTENSION_MAX];
+    model_texcoord_t texcoords_[MODEL_EXTENSION_MAX];
+} model_data_extension_t;
 
 typedef struct WorldElem WorldElem;
 
@@ -225,7 +241,10 @@ WorldElem*
 world_elem_alloc();
 
 WorldElem*
-world_elem_alloc();
+world_elem_alloc_extended_model();
+
+void
+world_elem_adjust_geometry_pointers(WorldElem* pElem);
 
 WorldElem*
 world_elem_clone(WorldElem*);

@@ -228,7 +228,7 @@ ADD_OBJ_END(4, 40) \
 "register_params_update 0 rnd_-4_4 4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
 "add_object r r r r 0 0 0 r r\n"
 
-#define BASE_MODEL_ID "17"
+#define BASE_MODEL_ID "11"
 #define BASE_TEXTURE_ID_FRIENDLY /*"106"*/ "106"
 #define BASE_TEXTURE_ID_ENEMY /*58*/ "89"
 
