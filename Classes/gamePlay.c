@@ -344,10 +344,6 @@ game_add_powerup(float x, float y, float z, int type, int lifetime)
             tex_id = TEXTURE_ID_POWERUP_LIFE;
             break;
             
-        case GAME_SUBTYPE_SHIP:
-            tex_id = TEXTURE_ID_POWERUP_SHIP;
-            break;
-            
         case GAME_SUBTYPE_TURRET:
             tex_id = TEXTURE_ID_POWERUP_TURRET;
             break;
@@ -601,20 +597,20 @@ game_move_spawnpoint(WorldElem* pElem)
     {
         pElem->stuff.u.spawnpoint.time_last_move = time_ms;
         
+        float V[] = {
+            my_ship_x - pElem->physics.ptr->x,
+            my_ship_y - pElem->physics.ptr->y,
+            my_ship_z - pElem->physics.ptr->z
+        };
         float v[] = {
-            pElem->physics.ptr->x+rand_in_range(-2, 2),
-            pElem->physics.ptr->y+rand_in_range(-2, 2),
-            pElem->physics.ptr->z+rand_in_range(-2, 2)
+            V[0]/fabs(V[0]),
+            V[1]/fabs(V[1]),
+            V[2]/fabs(V[2])
         };
         
-        if(v[0] < gWorld->bound_x &&
-           v[1] > 1 && v[1] < gWorld->bound_y &&
-           v[2] > 1 && v[2] < gWorld->bound_z)
+        if(pElem->physics.ptr->velocity < GAME_VARIABLE("ENEMY_SPAWNPOINT_MAXSPEED"))
         {
-            world_move_elem(pElem, v[0], v[1], v[2], 0);
-            /*
-            game_relocate_elem(pElem);
-             */
+            update_object_velocity(pElem->elem_id, v[0], v[1], v[2], 1);
         }
     }
 }
@@ -647,7 +643,7 @@ game_init_objects()
         {
             case OBJ_SPAWNPOINT_ENEMY:
                 pCur->elem->stuff.u.spawnpoint.time_spawn_interval = (1000 * gameStateSinglePlayer.enemy_spawnpoint_interval) / gameStateSinglePlayer.difficulty;
-                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000 * 2;
+                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000/2;
                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence = 3 + gameStateSinglePlayer.difficulty;
                 break;
                 
@@ -766,7 +762,6 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
-        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
         
         collision_actions_set_grab_powerup();
         
@@ -831,8 +826,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
-        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
-        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_ALLY;
+        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_ALLY;
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.enemy_durability = 3;
         
@@ -863,8 +857,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
-        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
-        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_ALLY;
+        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_ALLY;
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.enemy_durability = 3;
         
@@ -891,8 +884,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
-        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
-        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_ALLY;
+        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_ALLY;
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.enemy_durability = 3;
         
@@ -915,8 +907,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
-        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
-        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_ALLY;
+        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_ALLY;
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.enemy_durability = 3;
         
@@ -945,8 +936,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
-        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_SHIP;
-        gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_ALLY;
+        gameStateSinglePlayer.powerup_drop_chance[8] = GAME_SUBTYPE_ALLY;
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.enemy_durability = 3;
         
@@ -1137,19 +1127,6 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
                 elemA->durability = DURABILITY_PLAYER;
                 world_remove_object(elemB->elem_id);
                 collect_sound = 1;
-            }
-            break;
-            
-        case GAME_SUBTYPE_SHIP:
-            {
-                int models_list[] = {MODEL_SHIP1, MODEL_SHIP2, MODEL_SHIP3};
-                int mi = rand_in_range(0, 2);
-                if(elemA == myShipListNode->elem)
-                {
-                    model_my_ship = models_list[mi];
-                    world_remove_object(elemA->elem_id);
-                    my_ship_changed = 1;
-                }
             }
             break;
             
@@ -1443,12 +1420,6 @@ game_handle_destruction(WorldElem* elem)
                     myShipListNode->elem->durability = DURABILITY_PLAYER;
                     break;
                     
-                case GAME_SUBTYPE_SHIP:
-                    myShipListNode->elem->stuff.flags.mask |= STUFF_FLAGS_SHIP;
-                    fireAction = ACTION_PLACE_SHIP;
-                    gameInterfaceControls.menuControl.visible = 1;
-                    break;
-                    
                 case GAME_SUBTYPE_TURRET:
                     myShipListNode->elem->stuff.flags.mask |= STUFF_FLAGS_TURRET;
                     fireAction = ACTION_PLACE_TURRET;
@@ -1463,15 +1434,6 @@ game_handle_destruction(WorldElem* elem)
                 console_write(game_log_messages[GAME_LOG_GAMEOVER_KILLED]);
                 game_over();
                 gameInterfaceControls.dialogRect.tex_id = TEXTURE_ID_DIALOG_GAMEOVER;
-            }
-        
-            if(elem->stuff.flags.mask &= STUFF_FLAGS_SHIP)
-            {
-                world_add_object(MODEL_CUBE2, elem->physics.ptr->x, elem->physics.ptr->y, elem->physics.ptr->z,
-                                 0, 0, 0, 1, TEXTURE_ID_POWERUP);
-                world_get_last_object()->object_type = OBJ_POWERUP_GENERIC;
-                world_get_last_object()->stuff.subtype = GAME_SUBTYPE_SHIP;
-                world_get_last_object()->durability = 0;
             }
             
             if(elem->stuff.flags.mask &= STUFF_FLAGS_TURRET)
@@ -2295,6 +2257,9 @@ game_run()
                     break;
 
                 case ACTION_CONNECT_TO_GAME_LAN:
+                    {
+                        if(gameDialogLanSearching()) break;
+                    }
                 case ACTION_CONNECT_TO_GAME:
                     {
                         char* gameName = gameSettingsGameName;
@@ -2306,7 +2271,7 @@ game_run()
                             gameName = GAME_NETWORK_LAN_GAME_NAME;
                         }
                         
-                        gameNetwork_disconnect();
+                        if(gameNetworkState.connected) gameNetwork_disconnect();
                         
                         gameDialogPortalToGame(gameName);
                     
@@ -2328,9 +2293,12 @@ game_run()
                     }
                     break;
                     
+                case ACTION_HOST_GAME_LAN:
                 case ACTION_HOST_GAME:
+                    gameNetwork_disconnect();
+                    
                     gameInterfaceControls.mainMenu.visible = 0;
-                    if(gameNetwork_connect((char *) GAME_NETWORK_LAN_GAME_NAME, 1, 1) == GAME_NETWORK_ERR_NONE)
+                    if(gameNetwork_connect((char *) GAME_NETWORK_LAN_GAME_NAME, 1, gameInterfaceControls.menuAction == ACTION_HOST_GAME_LAN) == GAME_NETWORK_ERR_NONE)
                     {
                         actions_menu_reset();
                         gameStateSinglePlayer.started = 0;
@@ -2448,17 +2416,6 @@ game_run()
                          */
                         
                         game_add_turret(newBlock[0], newBlock[1], newBlock[2]);
-                        world_get_last_object()->stuff.affiliation = pMyShipNode->elem->stuff.affiliation;
-                    }
-                    break;
-                    
-                case ACTION_PLACE_SHIP:
-                    if(pMyShipNode->elem->stuff.flags.mask &= STUFF_FLAGS_SHIP)
-                    {
-                        pMyShipNode->elem->stuff.flags.mask ^= STUFF_FLAGS_SHIP;
-                     
-                        game_add_enemy(newBlock[0], newBlock[1], newBlock[2]);
-                        world_get_last_object()->texture_id = TEXTURE_ID_ALLYSHIP;
                         world_get_last_object()->stuff.affiliation = pMyShipNode->elem->stuff.affiliation;
                     }
                     break;

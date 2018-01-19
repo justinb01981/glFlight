@@ -55,7 +55,7 @@ int playSound = 1;
             
             audioPlayersPreloaded.name[i] = [[NSString alloc] initWithUTF8String:gameSoundNames[i]];
             
-            [audioPlayersPreloaded.ap[i][j] enableRate];
+            audioPlayersPreloaded.ap[i][j].enableRate = YES;
             
             audioPlayersPreloaded.duration_ms[i] = 1000 * [audioPlayersPreloaded.ap[i][j] duration];
             
@@ -204,8 +204,7 @@ int playSound = 1;
             [ac stop];
             
             [ac setVolume:volume];
-            [ac enableRate];
-            [ac setRate:rate];
+            ac.rate = rate;
             [ac play];
         }
         

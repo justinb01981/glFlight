@@ -10,6 +10,7 @@
 #import "gameGlobals.h"
 #import "world.h"
 #import "gameNetwork.h"
+#import "GameNetworkBonjourManager.h"
 
 @implementation cocoaNetworkThread
 
@@ -28,8 +29,10 @@
     while(1)
     {
         world_lock();
+        
         //do_game_network_read();
         do_game_network_write();
+        
         world_unlock();
         usleep(2000);
     }

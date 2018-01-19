@@ -393,7 +393,7 @@ console_log_search(char *key, unsigned idx)
 void
 console_append(char* fmt, ...)
 {
-    size_t i = strlen(consoleMessage);
+    size_t i = 0;
     int newlines = 0;
     int newlinesMax = 5;
     

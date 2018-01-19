@@ -128,6 +128,9 @@
 		D05A90B817A1E3F400F40807 /* engine.wav in Resources */ = {isa = PBXBuildFile; fileRef = D05A90B717A1E3F400F40807 /* engine.wav */; };
 		D062ED5A16E0279B00CA4374 /* glFlight.c in Sources */ = {isa = PBXBuildFile; fileRef = D062ED5916E0279B00CA4374 /* glFlight.c */; };
 		D062ED5D16E0295500CA4374 /* gameGraphics.c in Sources */ = {isa = PBXBuildFile; fileRef = D062ED5C16E0295500CA4374 /* gameGraphics.c */; };
+		D062FE161FEADFDF00ABE435 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D062FE151FEADFDF00ABE435 /* Media.xcassets */; };
+		D062FE181FEAF7DC00ABE435 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D062FE171FEAF7DC00ABE435 /* LaunchScreen.xib */; };
+		D062FE1F1FEB702C00ABE435 /* GameNetworkBonjourManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D062FE1E1FEB702C00ABE435 /* GameNetworkBonjourManager.m */; };
 		D065B0FF1888412E002C1980 /* highscore.wav in Resources */ = {isa = PBXBuildFile; fileRef = D065B0FE1888412E002C1980 /* highscore.wav */; };
 		D077557E152588C800DF2E0B /* quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = D077557C152588C800DF2E0B /* quaternions.c */; };
 		D077BA4B1DB435DB00B4C701 /* texture110.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D077BA4A1DB435DB00B4C701 /* texture110.bmp */; };
@@ -366,6 +369,10 @@
 		D062ED5916E0279B00CA4374 /* glFlight.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glFlight.c; sourceTree = "<group>"; };
 		D062ED5B16E0294A00CA4374 /* gameGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameGraphics.h; sourceTree = "<group>"; };
 		D062ED5C16E0295500CA4374 /* gameGraphics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gameGraphics.c; sourceTree = "<group>"; };
+		D062FE151FEADFDF00ABE435 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
+		D062FE171FEAF7DC00ABE435 /* LaunchScreen.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		D062FE1D1FEB702C00ABE435 /* GameNetworkBonjourManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameNetworkBonjourManager.h; sourceTree = "<group>"; };
+		D062FE1E1FEB702C00ABE435 /* GameNetworkBonjourManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameNetworkBonjourManager.m; sourceTree = "<group>"; };
 		D065B0FE1888412E002C1980 /* highscore.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = highscore.wav; sourceTree = "<group>"; };
 		D077557C152588C800DF2E0B /* quaternions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternions.c; sourceTree = "<group>"; };
 		D077557D152588C800DF2E0B /* quaternions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quaternions.h; sourceTree = "<group>"; };
@@ -513,6 +520,8 @@
 				6D595F5E164C80FE00C21926 /* world_file.c */,
 				6D595F77165CD33800C21926 /* gameNetwork.h */,
 				6D595F78165CD34500C21926 /* gameNetwork.c */,
+				D062FE1D1FEB702C00ABE435 /* GameNetworkBonjourManager.h */,
+				D062FE1E1FEB702C00ABE435 /* GameNetworkBonjourManager.m */,
 				6D91DEA1166C0DB200362864 /* cocoaGameAudio.h */,
 				6D91DEA2166C0DB300362864 /* cocoaGameAudio.m */,
 				6D595F641652CB0D00C21926 /* maps.h */,
@@ -625,9 +634,9 @@
 				D02071721BF282D4000AC2BA /* texture88.bmp */,
 				D0F33ADD1BBF453C00215953 /* texture87.bmp */,
 				D0B4C4D31A32616B00F125D4 /* texture86.bmp */,
-				D0B4C4CD1A325F1500F125D4 /* texture83.bmp */,
-				D0B4C4CE1A325F1500F125D4 /* texture84.bmp */,
 				D0B4C4CF1A325F1500F125D4 /* texture85.bmp */,
+				D0B4C4CE1A325F1500F125D4 /* texture84.bmp */,
+				D0B4C4CD1A325F1500F125D4 /* texture83.bmp */,
 				D034416B1A1E7B9200C89475 /* texture82.bmp */,
 				D03441691A1E7B8A00C89475 /* texture81.bmp */,
 				D00D78D01A09525100E701B9 /* texture80.bmp */,
@@ -747,8 +756,10 @@
 				D00D78C919FB18EC00E701B9 /* flyby.wav */,
 				28EC4C5811D54ECE0027AA9F /* gl_flightViewController.xib */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
+				D062FE171FEAF7DC00ABE435 /* LaunchScreen.xib */,
 				8D1107310486CEB800E47090 /* gl_flight-Info.plist */,
 				6D413C031688150500A37ADF /* Settings.bundle */,
+				D062FE151FEADFDF00ABE435 /* Media.xcassets */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -900,6 +911,7 @@
 				D02B8F051954A91000830369 /* texture70.bmp in Resources */,
 				6D595F74165B896800C21926 /* texture17.bmp in Resources */,
 				D00D78CA19FB18EC00E701B9 /* flyby.wav in Resources */,
+				D062FE181FEAF7DC00ABE435 /* LaunchScreen.xib in Resources */,
 				6D91DEA7166C73FD00362864 /* texture18.bmp in Resources */,
 				D04256671DA75CFB00E9C17B /* texture106.bmp in Resources */,
 				D065B0FF1888412E002C1980 /* highscore.wav in Resources */,
@@ -961,6 +973,7 @@
 				D08AC6C21DAAE3DA00E367B7 /* texture108.bmp in Resources */,
 				D02D0BFC1CC7DF050016A619 /* texture101.bmp in Resources */,
 				D0CB80E51BFD9F0100E52F43 /* texture91.bmp in Resources */,
+				D062FE161FEADFDF00ABE435 /* Media.xcassets in Resources */,
 				D02DAC1017D145A100035601 /* bump.wav in Resources */,
 				D02DAC1217D1478500035601 /* collect.wav in Resources */,
 				D02DAC1417D147E600035601 /* dropoff.wav in Resources */,
@@ -1028,6 +1041,7 @@
 				6D595F5F164C80FE00C21926 /* world_file.c in Sources */,
 				6D595F79165CD34500C21926 /* gameNetwork.c in Sources */,
 				6D91DEA016697F0B00362864 /* world.c in Sources */,
+				D062FE1F1FEB702C00ABE435 /* GameNetworkBonjourManager.m in Sources */,
 				6D91DEA3166C0DB300362864 /* cocoaGameAudio.m in Sources */,
 				6D91DEA5166C0EF100362864 /* gameAudio.c in Sources */,
 				6D91DEAC1675556300362864 /* gameBounding.c in Sources */,
@@ -1049,6 +1063,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = shipicon;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1075,6 +1090,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = shipicon;
 				COPY_PHASE_STRIP = YES;
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (

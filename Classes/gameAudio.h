@@ -10,7 +10,7 @@
 #define __GAME_AUDIO_H__
 
 #define MAX_CONCURRENT_SOUNDS 16
-#define GAME_AUDIO_QUEUE_READ_INTERVAL_MS 50
+#define GAME_AUDIO_QUEUE_READ_INTERVAL_MS 20
 
 struct cocoaMessage
 {

@@ -246,10 +246,31 @@ gameDialogBrowseGames()
     gameInterfaceModalDialog("Enter node to connect...", "OK", "", gameDialogCancel, gameDialogCancel);
 }
 
+static void gameDialogLanConnect()
+{
+    gameDialogCancel();
+    gameInterfaceControls.menuAction = ACTION_CONNECT_TO_GAME_LAN;
+}
+
+static int gameDialogLanSearching()
+{
+    char* message = "Scanning for local game hosts...";
+    extern int GameNetworkBonjourManagerBrowseBegin();
+    
+    if(!gameInterfaceControls.dialogRect.visible && strcmp(gameInterfaceControls.dialogRect.text, message) != 0)
+    {
+        gameInterfaceModalDialog(message, "OK", "", gameDialogLanConnect, gameDialogCancel);
+        GameNetworkBonjourManagerBrowseBegin();
+
+        return 1; // must retry
+    }
+    return 0;
+}
+
 static void
 gameDialogConnectToGameSuccessful()
 {
-    gameInterfaceModalDialog("Connect successful!n", "Ok", "",
+    gameInterfaceModalDialog("Connect successful!", "Ok", "",
                              gameDialogCancel, gameDialogCancel);
 }
 

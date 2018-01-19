@@ -11,6 +11,7 @@
 #import "cocoaGameInput.h"
 #import "cocoaNetworkThread.h"
 #import "cocoaAudioThread.h"
+#import "GameNetworkBonjourManager.h"
 
 #include "glFlight.h"
 #include "world.h"

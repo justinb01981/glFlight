@@ -149,7 +149,6 @@ glFlightFrameStage1()
     float ship_z_vec_prev[3];
     gameShip_getZVector(ship_z_vec_prev);
     
-    gameNetwork_lock();
     world_lock();
     
     if(!world_inited && world_data)
@@ -215,17 +214,19 @@ glFlightFrameStage1()
     do_world_collision_handling(tc);
     
     // play engine sound
-    const float engine_sound_duration_engineloop = 3947;
-    const float engine_sound_duration_engineslow = 347;
+    const char* engine_sounds[] = {"engine", "engineslow"};
+    const float engine_sounds_duration[] = {1250, 347};
     if(time_ms >= time_engine_sound_next || time_engine_sound_next == 0)
     {
         float minSpeed = 0.1;
         
         if(speed/maxSpeed >= minSpeed)
         {
+            int sound_idx = 0;
             float rate = 0.25 + 2.0*(speed/maxSpeed);
             
-            char* sndName = "engineslow";
+            char* sndName = engine_sounds[sound_idx];
+            
             /*
             if(speed/maxSpeed < 0.33)
             {
@@ -236,10 +237,10 @@ glFlightFrameStage1()
                 sndName = "enginefast";
             }
              */
-            gameAudioPlaySoundAtLocationWithDuration(sndName, 0.75, my_ship_x, my_ship_y, my_ship_z,
-                                                 engine_sound_duration_engineslow / rate);
             
-            time_engine_sound_next = time_ms + (engine_sound_duration_engineslow / rate);
+            gameAudioPlaySoundAtLocationWithRate(sndName, 0.75, my_ship_x, my_ship_y, my_ship_z, rate);
+            
+            time_engine_sound_next = time_ms + (engine_sounds_duration[sound_idx] * (1.0/rate));
         }
     }
     
@@ -254,6 +255,9 @@ glFlightFrameStage1()
     
     // TODO: this is being called at most once every 1/60th of a second (16ms)
     do_game_network_world_update();
+    
+    gameNetworkState.msgQueue.cleanupWaiting = 1;
+    while(gameNetworkState.msgQueue.cleanup) { int i; i++; }
     
     gameNetworkMessageQueued* pNetworkMsg = gameNetworkState.msgQueue.head.next;
     while(pNetworkMsg && gameNetworkState.msgQueue.cleanup == 0)
@@ -780,27 +784,6 @@ glFlightFrameStage1()
     }
      */
     
-    {
-        int li = 0;
-        
-        float lines[6][3] = {
-            {my_ship_x, my_ship_y, my_ship_z}, {my_ship_x + 10, my_ship_y, my_ship_z},
-            {my_ship_x, my_ship_y, my_ship_z}, {my_ship_x, my_ship_y+10, my_ship_z},
-            {my_ship_x, my_ship_y, my_ship_z}, {my_ship_x, my_ship_y, my_ship_z+10},
-        };
-        
-        float colors[3][3] = {
-            {1.0, 0.0, 0.0},
-            {0.0, 1.0, 0.0},
-            {0.0, 0.0, 1.0}
-        };
-        
-        for(li = 0; li < 6; li+= 2)
-        {
-            drawLineWithColorAndWidth(lines[li], lines[li+1], colors[li/2], 2);
-        }
-    }
-    
     drawLineEnd();
     
     drawRadar();
@@ -859,7 +842,6 @@ glFlightFrameStage2()
     
     // done
     world_unlock();
-    gameNetwork_unlock();
     return;
 }
 

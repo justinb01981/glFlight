@@ -13,16 +13,19 @@
 
 #define GAME_NETWORK_MAX_PLAYERS 64
 #define GAME_NETWORK_MAX_STRING_LEN 32
+#define GAME_NETWORK_MAX_MAP_STRING_LEN 256
 #define GAME_NETWORK_PORT 52000
+#define GAME_NETWORK_PORT_BONJOUR 52010
 #define GAME_NETWORK_PORT_STR "52000"
 #define GAME_NETWORK_PLAYER_ID_HOST 16000
 #define GAME_NETWORK_PLAYER_ID_MAX (GAME_NETWORK_PLAYER_ID_HOST-1)
 #define GAME_NETWORK_OBJECT_ID_MIN (GAME_NETWORK_PLAYER_ID_HOST+1)
 #define GAME_NETWORK_STRING_FMT_KILLED "killed: %s -> %s"
-#define GAME_NETWORK_ADDRESS_FAMILY(x) (((struct sockaddr_in*) (x)->storage)->sin_family)
-#define GAME_NETWORK_ADDRESS_INADDR(x) (((struct sockaddr_in*) (x)->storage)->sin_addr)
-#define GAME_NETWORK_ADDRESS_PORT(x) (((struct sockaddr_in*) (x)->storage)->sin_port)
-#define GAME_NETWORK_ADDRESS_LEN_CORRECT(x) ((x)->len == sizeof(struct sockaddr_in))
+#define GAME_NETWORK_ADDRESS_FAMILY(x) (((struct sockaddr_in6*) (x)->storage)->sin6_family)
+#define GAME_NETWORK_ADDRESS_INADDR(x) (((struct sockaddr_in6*) (x)->storage)->sin6_addr)
+#define GAME_NETWORK_ADDRESS_PORT(x) (((struct sockaddr_in6*) (x)->storage)->sin6_port)
+#define GAME_NETWORK_ADDRESS_LEN_CORRECT(x) ((x)->len == sizeof(struct sockaddr_in6))
+#define GAME_NETWORK_BONJOUR_ADDRFAMILY_HACK 0x09
 
 const static char *GAME_NETWORK_LAN_GAME_NAME = "d0gf1ght_lan";
 
@@ -42,6 +45,9 @@ typedef enum
     GAME_NETWORK_MSG_CONNECT,
     GAME_NETWORK_MSG_DISCONNECT,
     GAME_NETWORK_MSG_GET_MAP,
+    GAME_NETWORK_MSG_GET_MAP_BEGIN,
+    GAME_NETWORK_MSG_GET_MAP_SOME,
+    GAME_NETWORK_MSG_GET_MAP_END,
     GAME_NETWORK_MSG_PLAYER_INFO,
     GAME_NETWORK_MSG_ADD_OBJECT,
     GAME_NETWORK_MSG_FIRE_BULLET,
@@ -70,9 +76,15 @@ typedef enum
 
 typedef struct
 {
-    unsigned char storage[32];
+    unsigned char storage[128];
     int len;
 } gameNetworkAddress;
+
+struct bonjour_addr_stuffed_in_sockaddr_in {
+    uint8_t len;
+    uint8_t sa_family;
+    uint32_t peer_id;
+};
 
 typedef struct
 {
@@ -97,6 +109,10 @@ typedef struct
             char c[GAME_NETWORK_MAX_STRING_LEN];
             gameNetworkAddress addr;
         } directoryInfo;
+        
+        struct {
+            char s[GAME_NETWORK_MAX_MAP_STRING_LEN];
+        } mapData;
         
         struct {
             int is_towing;
@@ -180,6 +196,7 @@ typedef struct
     {
         int hosting;
         int lan_only;
+        int bonjour_lan;
         char name[GAME_NETWORK_MAX_STRING_LEN];
         gameNetworkSocket socket;
         gameNetworkSocket map_socket;
@@ -221,7 +238,7 @@ typedef struct
     struct
     {
         gameNetworkMessageQueued head;
-        volatile int cleanup;
+        volatile int cleanup, cleanupWaiting;
     } msgQueue;
     
     game_timeval_t time_last_periodic_check;
@@ -232,6 +249,8 @@ typedef struct
     unsigned int msg_seq_next;
     
     unsigned int msg_seq_acked_last;
+    
+    int (*gameNetworkHookOnMessage)(gameNetworkMessage*, gameNetworkAddress*);
     
 } gameNetworkState_t;
 
@@ -317,12 +336,6 @@ gameNetwork_handle_destruction(WorldElem* elem);
 
 void
 gameNetwork_action_handle(int action);
-
-void
-gameNetwork_lock();
-
-void
-gameNetwork_unlock();
 
 void
 do_game_network_handle_msg(gameNetworkMessage *msg, gameNetworkAddress *srcAddr);

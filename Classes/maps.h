@@ -9,10 +9,36 @@
 #ifndef gl_flight_maps_h
 #define gl_flight_maps_h
 
+/*
+ * textures
+ */
 #define CUBE_TEXTURE_1 19
 #define CUBE_TEXTURE_2 28
 #define CUBE_TEXTURE_3 52
 #define CUBE_TEXTURE_4 57
+
+
+/*
+ * models
+ */
+#define MAPMODEL_SHIP1 "0"
+#define MAPMODEL_CUBE "1"
+#define MAPMODEL_CUBE2 "2"
+#define MAPMODEL_PYRAMID "3"
+#define MAPMODEL_SQUARE "4"
+#define MAPMODEL_BULLET "5"
+#define MAPMODEL_SURFACE "6"
+#define MAPMODEL_VERTICAL_PILLAR "7"
+#define MAPMODEL_MESH "8"
+#define MAPMODEL_TELEPORTER "9"
+#define MAPMODEL_SPRITE "10"
+#define MAPMODEL_TURRET "11"
+#define MAPMODEL_SHIP2 "12"
+#define MAPMODEL_MISSLE "13"
+#define MAPMODEL_SHIP3 "14"
+#define MAPMODEL_ICOSAHEDRON "15"
+#define MAPMODEL_CUBE_INVERTED "16"
+#define MAPMODEL_SPHERE "17"
 
 /*
  (Model type, float x, float y, float z, float yaw, float pitch, float roll, float scale, int texture_id)
@@ -60,7 +86,6 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
 "register_params 400 100 400 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
 "set_world_size r r r\n"\
-//WORLD_CUBEGRID(x, tex, scale) \
 "\n"
 
 #define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
@@ -70,22 +95,9 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.93) \
 "mesh_manip_add 0 " "0" " 0" " 4 0 0" " 0 0 4" " wx0.25 wz0.25\n" \
 "mesh_manip_gltriangles_complete "#tex"\n"
 
+#define WORLD_SCALED_FRAME_TERRAIN(tex, scale) \
+WORLD_CUBEGRID(x, tex, scale)
 
-#define MESH_CUBES_2(tex, scale)                                    \
-"mesh_manip_add wx0.1 " "-4" " wz0.1" " 4 0 0" " 0 0 4" " 40 40\n"  \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"               \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"               \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"               \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"              \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"              \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"              \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"               \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"               \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_50 0"" 0.95\n"               \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"              \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"              \
-"mesh_manip_pull rnd_50 rnd_50"" 0 rnd_-10 0"" 0.95\n"              \
-"mesh_manip_complete "/*"2"*/"1"" "/*"57"*/#tex" 1 "#scale"\n"
 
 #define MESH_CUBES_80x80(tex, scale)                                \
 "mesh_manip_add wx0.1 " "-4" " wz0.1" " 2 0 0" " 0 0 2" " 80 80\n"  \
@@ -228,7 +240,7 @@ ADD_OBJ_END(4, 40) \
 "register_params_update 0 rnd_-4_4 4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
 "add_object r r r r 0 0 0 r r\n"
 
-#define BASE_MODEL_ID "11"
+#define BASE_MODEL_ID MAPMODEL_SPRITE
 #define BASE_TEXTURE_ID_FRIENDLY /*"106"*/ "106"
 #define BASE_TEXTURE_ID_ENEMY /*58*/ "89"
 
@@ -243,7 +255,7 @@ ADD_OBJ_END(4, 40) \
 "object_set_info 8\n"
 
 #define BASE_ENEMY_1                           \
-"add_object "BASE_MODEL_ID" rndx 50 rndz 0 0 0 8 "BASE_TEXTURE_ID_ENEMY"\n"       \
+"add_object "MAPMODEL_SPHERE" rndx 50 rndz 0 0 0 8 "BASE_TEXTURE_ID_ENEMY"\n"       \
 "object_set_info 15\n"
 
 #define BASE_TURRET_1                        \
@@ -252,6 +264,7 @@ ADD_OBJ_END(4, 40) \
 "object_set_info 8\n"
 
 #define MAP_TEXTURE_ID_ANIMATED_STATIC "18"
+
 #define BASE_GENERIC(x,y,z)                            \
 "register_params 17 "/*"rndx"*/#x" "#y" "/*"rndz"*/#z" 0 0 0 8 "/*"42"*//*"88"*/MAP_TEXTURE_ID_ANIMATED_STATIC" 0 0 0 0 0 0 0\n"                 \
 "add_object r r r r r r r r " "r" "\n" \
@@ -530,8 +543,9 @@ const static char initial_map_collection[] = ""
 
 BACKGROUND_TEX_RANDOM
 
-//MESH_CUBES_2(28, 4)
+
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
+WORLD_SCALED_FRAME_TERRAIN(28, 4)
 //WORLD_SCALED_FRAME_GL_TERRAIN(1, 83, 4)
 
 // else
@@ -560,7 +574,7 @@ BUILDING_1(rndx, 0, rndz)
 
 // drifting asteroid example
 /*
-"add_object 2 100 20 100 0 0 0 11 56\n"
+"add_object "MAPMODEL_CUBE2" 100 20 100 0 0 0 11 56\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
  */
@@ -710,7 +724,7 @@ BUILDING_1(rndx, 8, rndz)
 
 // drifting asteroid example
 /*
- "add_object 2 100 20 100 0 0 0 11 56\n"
+ "add_object "MAPMODEL_CUBE2" 100 20 100 0 0 0 11 56\n"
  "object_set_info 4\n" // moving block
  "object_set_velocity 0 0.5 0\n"
  */
@@ -1106,14 +1120,14 @@ BASE_FRIENDLY_1(rndx, rndy, rndz)
 
 // drifting asteroid example
 /*
- "add_object 2 100 20 100 0 0 0 11 56\n"
+ "add_object "MAPMODEL_CUBE2" 100 20 100 0 0 0 11 56\n"
  "object_set_info 4\n" // moving block
  "object_set_velocity 0 0.5 0\n"
  */
 
 // add test tower
 // add base
-"add_object 2 rndx 50 rndz 0 0 0 8 " "42" "\n"
+"add_object "MAPMODEL_CUBE2" rndx 50 rndz 0 0 0 8 " "42" "\n"
 "object_set_info 8\n"
 
 BASE_ENEMY_1

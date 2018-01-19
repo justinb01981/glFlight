@@ -22,6 +22,7 @@
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <errno.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,12 +42,12 @@ extern "C" {
 #include "gameIncludes.h"
 #include "gameLock.h"
 #include "collision.h"
+#include "sounds.h"
     
 //#define GAMENET_TRACE() {console_append("%s:%d",__func__,__LINE__);}
 #define GAMENET_TRACE()
 
 gameNetworkState_t gameNetworkState;
-game_lock_t networkLock;
 
 static unsigned long update_frequency_ms = 20;
 static unsigned long update_time_last = 0;
@@ -60,6 +61,14 @@ static char *gameKillVerbs[] = {"slaughtered", "evicerated", "de-rezzed", "shot-
 
 static int
 gameNetwork_directoryListOffset(int offset);
+
+extern int GameNetworkBonjourManagerHost(const char* name, int* sock_out);
+extern int GameNetworkBonjourManagerBrowseBegin();
+extern int GameNetworkBonjourManagerBrowseEnd(gameNetworkAddress* address_returned);
+extern int GameNetworkBonjourManagerDisconnect();
+void GameNetworkBonjourManagerSendMessageToPeer(uint8_t* msg_, int peer_id);
+extern int gameNetwork_onBonjourConnecting1(gameNetworkMessage*, gameNetworkAddress*);
+static char* do_game_map_render();
 
 
 ////////////////////////////////
@@ -107,12 +116,13 @@ socket_read_ready(int sock, unsigned int timeout_ms)
 }
 
 static int
-prepare_listen_socket(int stream, unsigned int port)
+prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
 {
     int sock;
-    struct sockaddr_in addr;
+    struct sockaddr_in6 addr;
+    struct sockaddr_in6* addr6 = (void*) &addr;
     
-    sock = socket(AF_INET, (stream? SOCK_STREAM: SOCK_DGRAM), 0);
+    sock = socket(AF_INET6, (stream? SOCK_STREAM: SOCK_DGRAM), 0);
     if(sock < 0)
     {
         console_append("%s:%d %s\n", __func__, __LINE__, "socket failure");
@@ -121,9 +131,10 @@ prepare_listen_socket(int stream, unsigned int port)
     
     memset(&addr, 0, sizeof(addr));
     
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	addr.sin_port = htons(port);
+    addr6->sin6_len = sizeof(struct sockaddr_in6);
+    addr6->sin6_family = AF_INET6;
+    addr6->sin6_addr = in6addr_any;
+	addr6->sin6_port = htons(port);
     
 	int bcast_enabled = 1;
 	int so_arg = 1;
@@ -135,9 +146,9 @@ prepare_listen_socket(int stream, unsigned int port)
     else
     {
         /*
-         int blocking = 0;
-         setsockopt(sock, SOL_SOCKET, O_NONBLOCK, &blocking, sizeof(blocking));
-         */
+        int blocking = 0;
+        setsockopt(sock, SOL_SOCKET, O_NONBLOCK, &blocking, sizeof(blocking));
+        */
     }
     
 #ifdef BSD_SOCKETS
@@ -148,6 +159,7 @@ prepare_listen_socket(int stream, unsigned int port)
     setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &so_arg, sizeof(so_arg));
     
     /* bind */
+    if(do_bind)
     if(bind(sock, (struct sockaddr*) &addr, sizeof(addr)) < 0)
     {
         console_append("%s:%d %s\n", __func__, __LINE__, "socket failure (bind)");
@@ -174,31 +186,40 @@ prepare_listen_socket(int stream, unsigned int port)
 static void
 send_lan_broadcast(gameNetworkMessage* msg)
 {
-    struct sockaddr_in sa_bc;
-    int r;
+    struct sockaddr_in6 sa_bc6;
+    long r;
     
-    memset(&sa_bc, 0, sizeof(sa_bc));
-    sa_bc.sin_family = AF_INET;
+    memset(&sa_bc6, 0, sizeof(sa_bc6));
+    
+    // resend with ipv6 link-local
+    
+    sa_bc6.sin6_family = AF_INET6;
 #ifdef BSD_SOCKETS
-    sa_bc.sin_len = sizeof(sa_bc);
+    sa_bc6.sin6_len = sizeof(sa_bc6);
 #endif
-    sa_bc.sin_port = htons(gameNetworkState.hostInfo.port);
-    sa_bc.sin_addr.s_addr = inet_addr("255.255.255.255");
+    sa_bc6.sin6_port = htons(gameNetworkState.hostInfo.port);
+    sa_bc6.sin6_addr = in6addr_linklocal_allnodes;
     
     r = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg),
-               0, (struct sockaddr*) &sa_bc, sizeof(sa_bc));
+               0, (struct sockaddr*) &sa_bc6, sizeof(sa_bc6));
 }
 
 static void
 send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
 {
-    struct sockaddr_in sa;
-    int r;
+    struct sockaddr_storage sa;
+    long r;
     
     memcpy(&sa, address->storage, address->len);
     
+    if(gameNetworkState.hostInfo.bonjour_lan)
+    {
+        GameNetworkBonjourManagerSendMessageToPeer((void*) msg, ((struct bonjour_addr_stuffed_in_sockaddr_in *) address->storage)->peer_id);
+        return;
+    }
+    
     r = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg),
-               0, (struct sockaddr*) &sa, sizeof(sa));
+               0, (struct sockaddr*) &sa, address->len);
 }
 
 static int
@@ -231,17 +252,17 @@ gameNetwork_initsockets()
 {
     //if(gameNetworkState.hostInfo.socket.s != -1) close_socket(gameNetworkState.hostInfo.socket.s);
     if(gameNetworkState.hostInfo.socket.s == -1)
-    gameNetworkState.hostInfo.socket.s = prepare_listen_socket(0, gameNetworkState.hostInfo.port);
+    gameNetworkState.hostInfo.socket.s = prepare_listen_socket(0, gameNetworkState.hostInfo.port, 1);
     
     //if(gameNetworkState.hostInfo.map_socket.s != -1) close_socket(gameNetworkState.hostInfo.map_socket.s);
     if(gameNetworkState.hostInfo.map_socket.s == -1)
-    gameNetworkState.hostInfo.map_socket.s = prepare_listen_socket(1, gameNetworkState.hostInfo.port);
+    gameNetworkState.hostInfo.map_socket.s = prepare_listen_socket(1, gameNetworkState.hostInfo.port+1, gameNetworkState.hostInfo.hosting);
 
     gameNetworkState.hostInfo.map_socket_sending.s = -1;
 
     //if(gameNetworkState.hostInfo.stream_socket.s != -1) close_socket(gameNetworkState.hostInfo.stream_socket.s);
     if(gameNetworkState.hostInfo.stream_socket.s == -1)
-    gameNetworkState.hostInfo.stream_socket.s = prepare_listen_socket(1, gameNetworkState.hostInfo.port+1);
+    gameNetworkState.hostInfo.stream_socket.s = prepare_listen_socket(1, gameNetworkState.hostInfo.port+2, gameNetworkState.hostInfo.hosting);
 }
 
 gameNetworkError
@@ -256,8 +277,6 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
     
     memset(&gameNetworkState, 0, sizeof(gameNetworkState));
     
-    game_lock_init(&networkLock);
-    
     strcpy(gameNetworkState.hostInfo.name, server_name);
     gameNetworkState.hostInfo.port = host_port;
     
@@ -269,11 +288,10 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
  
     gameNetworkState.game_object_id_next = GAME_NETWORK_OBJECT_ID_MIN;
 
-    GAME_NETWORK_ADDRESS_INADDR(&gameNetworkState.hostInfo.local_inet_addr).s_addr = INADDR_ANY;
+    GAME_NETWORK_ADDRESS_INADDR(&gameNetworkState.hostInfo.local_inet_addr) = in6addr_any;
     if(strlen(local_inet_addr) > 0 && inet_addr(local_inet_addr) != INADDR_NONE && inet_addr(local_inet_addr) != INADDR_ANY)
     {
-        GAME_NETWORK_ADDRESS_INADDR(&gameNetworkState.hostInfo.local_inet_addr).s_addr =
-            inet_addr(local_inet_addr);
+        inet_pton(AF_INET6, local_inet_addr, &(GAME_NETWORK_ADDRESS_INADDR(&gameNetworkState.hostInfo.local_inet_addr)));
     }
     
     if(!gameNetwork_inited)
@@ -283,6 +301,7 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
         gameNetworkState.hostInfo.socket.s = -1;
         gameNetworkState.hostInfo.map_socket.s = -1;
         gameNetworkState.hostInfo.stream_socket.s = -1;
+        gameNetworkState.hostInfo.map_socket_sending.s = -1;
     }
     
     gameNetworkState.inited = 1;
@@ -304,22 +323,29 @@ int
 gameNetwork_connect(char* server_name, int host, int lan_only)
 {
     int retries = 0;
-    struct sockaddr_in addr;
-    gameNetworkMessage connectMsg, netMsg;
+    //struct sockaddr_storage addr;
     gameNetworkAddress gameAddress;
+    struct sockaddr_in6* addr6 = (struct sockaddr_in6*) gameAddress.storage;
+    struct sockaddr* sockaddr_p = (struct sockaddr*) gameAddress.storage;
+    gameNetworkMessage connectMsg, netMsg, msgBeacon;
     gameNetworkPlayerInfo* playerInfo = NULL;
     int host_player_id = GAME_NETWORK_PLAYER_ID_HOST;
     char server_ip_resolved[64];
-    int map_downloaded = 0;
-    int lan_bcast_retries = 4, directory_search_retries = 3, search_retries = 0;
+    int lan_bcast_retries = 0, directory_search_retries = 3, bonjour_search_retries = 8, search_retries = 0;
     unsigned short server_port_resolved = gameNetworkState.hostInfo.port;
     int retries_udp = 10;
     int delay_udp = 100;
-    char download_cmd = '\n';
+    
+    gameAddress.len = sizeof(struct sockaddr_in);
+    memset(&gameAddress, 0, sizeof(gameAddress));
+    
+    assert(sizeof(gameAddress.storage) >= sizeof(struct sockaddr_storage));
     
     gameNetworkState.hostInfo.lan_only = lan_only;
     
     gameNetworkState.connected = 0;
+    
+    gameNetworkState.hostInfo.hosting = host;
     
     gameNetwork_initsockets();
     
@@ -335,7 +361,7 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
     // if starts with a number, server name is ip address
     if(server_name[0] >= '0' && server_name[0] <= '9')
     {
-        directory_search_retries = lan_bcast_retries = 0;
+        directory_search_retries = lan_bcast_retries = bonjour_search_retries = 0;
         strcpy(server_ip_resolved, server_name);
     }
     else
@@ -358,10 +384,11 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
     if(host)
     {
         // register game with directory server
-        gameNetworkState.hostInfo.hosting = 1;
-        
         gameNetworkState.my_player_id = GAME_NETWORK_PLAYER_ID_HOST;
-        if(server_name != gameNetworkState.hostInfo.name) strcpy(gameNetworkState.hostInfo.name, server_name);
+        if(server_name != gameNetworkState.hostInfo.name)
+        {
+            strcpy(gameNetworkState.hostInfo.name, server_name);
+        }
         
         console_clear();
         console_write("Hosting game %s\non port %d\n",
@@ -370,6 +397,11 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
         
         gameNetwork_getPlayerInfo(gameNetworkState.my_player_id, &playerInfo, 1);
         strcpy(playerInfo->name, gameNetworkState.my_player_name);
+        
+        if(lan_only)
+        {
+            GameNetworkBonjourManagerHost(GAME_NETWORK_LAN_GAME_NAME, &gameNetworkState.hostInfo.socket.s);
+        }
     }
     else
     {
@@ -377,39 +409,77 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
         
         // moving to gameNetwork_init
         if(gameNetworkState.my_player_id == 0 || gameNetworkState.my_player_id == GAME_NETWORK_PLAYER_ID_HOST)
-        {
+        { 
             gameNetworkState.my_player_id = rand_in_range(1, GAME_NETWORK_PLAYER_ID_HOST-1);
         }
         
-        // attempt to find on lan
-        search_retries = lan_bcast_retries;
+        // attempt to find via apple "bonjour" (bluetooth + wifi)
+        search_retries = lan_only ? bonjour_search_retries: 0;
+        gameAddress.len = sizeof(struct sockaddr_in6);
+        
         while(search_retries > 0)
         {
-            gameNetworkMessage msgBeacon;
+            memset(&gameAddress, 0, sizeof(gameAddress));
+            gameAddress.len = sizeof(struct sockaddr_in6);
             
-            memset(&msgBeacon, 0, sizeof(msgBeacon));
-            msgBeacon.cmd = GAME_NETWORK_MSG_BEACON;
-            strcpy(msgBeacon.params.c, GAME_NETWORK_LAN_GAME_NAME);
-            msgBeacon.player_id = gameNetworkState.my_player_id;
-            
-            send_lan_broadcast(&msgBeacon);
-            
-            if(gameNetwork_receive(&msgBeacon, &gameAddress, 1000) == GAME_NETWORK_ERR_NONE)
+            if(GameNetworkBonjourManagerBrowseEnd(&gameAddress) != 0)
             {
-                GAMENET_TRACE();
+                gameNetworkState.hostInfo.bonjour_lan = 1;
                 
-                if(msgBeacon.cmd == GAME_NETWORK_MSG_BEACON_RESP)
+                memset(&msgBeacon, 0, sizeof(msgBeacon));
+                msgBeacon.cmd = GAME_NETWORK_MSG_BEACON;
+                strcpy(msgBeacon.params.c, GAME_NETWORK_LAN_GAME_NAME);
+                msgBeacon.player_id = gameNetworkState.my_player_id;
+                
+                if(sockaddr_p->sa_family != GAME_NETWORK_BONJOUR_ADDRFAMILY_HACK)
                 {
-                    struct sockaddr_in* beaconSockaddr = (struct sockaddr_in*) &gameAddress;
-                    
-                    strcpy(server_ip_resolved, inet_ntoa(beaconSockaddr->sin_addr));
-                    server_port_resolved = ntohs(GAME_NETWORK_ADDRESS_PORT(&gameAddress));
-                    GAMENET_TRACE();
-                    break;
+                    return GAME_NETWORK_ERR_FAIL;
                 }
-                else continue;
+                
+                gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting1;
+
+                send_to_address_udp(&msgBeacon, &gameAddress);
+                gameNetworkState.connected = 1;
+                return GAME_NETWORK_ERR_NONE;
             }
+            
             search_retries--;
+        }
+        
+        // attempt to find on lan
+        if(search_retries == 0)
+        {
+            search_retries = lan_bcast_retries;
+            while(search_retries > 0)
+            {
+                gameNetworkMessage msgBeacon;
+                
+                memset(&msgBeacon, 0, sizeof(msgBeacon));
+                msgBeacon.cmd = GAME_NETWORK_MSG_BEACON;
+                strcpy(msgBeacon.params.c, GAME_NETWORK_LAN_GAME_NAME);
+                msgBeacon.player_id = gameNetworkState.my_player_id;
+                
+                send_lan_broadcast(&msgBeacon);
+                
+                if(gameNetwork_receive(&msgBeacon, &gameAddress, 1000) == GAME_NETWORK_ERR_NONE)
+                {
+                    GAMENET_TRACE();
+                    
+                    if(msgBeacon.cmd == GAME_NETWORK_MSG_BEACON_RESP)
+                    {
+                        struct sockaddr_in6* pBeaconAddr6 = (struct sockaddr_in6*) gameAddress.storage;
+                        struct sockaddr_in* pBeaconAddr4 = (struct sockaddr_in*) gameAddress.storage;
+                        
+                        if(gameAddress.len == sizeof(*pBeaconAddr6)) inet_ntop(AF_INET6, &pBeaconAddr6->sin6_addr, server_ip_resolved, sizeof(server_ip_resolved));
+                        if(gameAddress.len == sizeof(*pBeaconAddr4)) inet_ntop(AF_INET, &pBeaconAddr4->sin_addr, server_ip_resolved, sizeof(server_ip_resolved));
+                        server_port_resolved = ntohs(GAME_NETWORK_ADDRESS_PORT(&gameAddress));
+                        GAMENET_TRACE();
+                        break;
+                    }
+                    else continue;
+                }
+                search_retries--;
+            }
         }
     
         if(search_retries == 0) // failed
@@ -454,17 +524,36 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
             }
         }
         
-        if(search_retries == 0) strcpy(server_ip_resolved, gameNetworkState.hostInfo.name);
+        if(search_retries == 0)
+        {
+            // attempt to treat "hostname" as an ipv4 address
+            sprintf(server_ip_resolved, "::FFFF:%s", gameNetworkState.hostInfo.name);
+            gameAddress.len = sizeof(struct sockaddr_in6);
+        }
         
         GAMENET_TRACE();
 
-        memset(&addr, 0, sizeof(addr));
-        addr.sin_addr.s_addr = inet_addr(server_ip_resolved);
-        addr.sin_port = htons(server_port_resolved);
-        addr.sin_family = AF_INET;
+        if(gameAddress.len == sizeof(struct sockaddr_in6))
+        {
+            memset(gameAddress.storage, 0, sizeof(gameAddress.storage));
+            
+            if(inet_pton(AF_INET6, server_ip_resolved, &(addr6->sin6_addr)) != 1)
+            {
+                console_write("inet_pton(%s) failed",server_ip_resolved);
+            }
+            addr6->sin6_port = htons(server_port_resolved);
+            addr6->sin6_family = AF_INET6;
+            
 #ifdef BSD_SOCKETS
-        addr.sin_len = sizeof(addr);
+            addr6->sin6_len = gameAddress.len;
 #endif
+        }
+
+        memset(&msgBeacon, 0, sizeof(msgBeacon));
+        msgBeacon.cmd = GAME_NETWORK_MSG_BEACON;
+        strcpy(msgBeacon.params.c, GAME_NETWORK_LAN_GAME_NAME);
+        msgBeacon.player_id = gameNetworkState.my_player_id;
+        send_to_address_udp(&msgBeacon, &gameAddress);
         
         memset(&connectMsg, 0, sizeof(connectMsg));
         connectMsg.cmd = GAME_NETWORK_MSG_CONNECT;
@@ -472,113 +561,34 @@ gameNetwork_connect(char* server_name, int host, int lan_only)
         
         if(gameNetwork_getPlayerInfo(host_player_id, &playerInfo, 1) == GAME_NETWORK_ERR_NONE)
         {
-            int download_sock;
-            
             strcpy(playerInfo->name, "host");
             
-            download_sock = socket(AF_INET, SOCK_STREAM, 0);
-            
-            memcpy(&playerInfo->address, &addr, sizeof(addr));
-            playerInfo->address.len = sizeof(addr);
+            if(playerInfo->address.len == 0)
+            {
+                memcpy(&playerInfo->address, &gameAddress, sizeof(gameAddress));
+            }
         
             retries = retries_udp;
             while(retries > 0)
             {
                 gameNetwork_send(&connectMsg);
                 
-                if(gameNetwork_receive(&netMsg, &gameAddress, delay_udp) == GAME_NETWORK_ERR_NONE)
+                if(gameNetwork_receive(&netMsg, &gameAddress, 100) == GAME_NETWORK_ERR_NONE)
                 {
                     if(gameNetwork_getPlayerInfo(netMsg.player_id, &playerInfo, 1) == GAME_NETWORK_ERR_NONE)
                     {
                         console_write("\rconnecting to game...");
                         
-                        socket_set_blocking(download_sock, 0);
-                        
-                        // TODO: make connect non-blocking/timing-out here
-                        if(!map_downloaded && connect(download_sock, (struct sockaddr*) &addr, sizeof(addr)) == 0)
-                        {
-                            console_write("downloading map...");
-                            
-                            socket_set_blocking(download_sock, 1);
-                            
-                            // send '\n'
-                            send(download_sock, &download_cmd, sizeof(download_cmd), 0);
-                            
-                            // download map
-                            size_t map_data_size = 1024*1024;
-                            char* map_data = malloc(map_data_size);
-                            char* read_dest = map_data;
-                            size_t map_data_bytes = 0;
-                            
-                            if(map_data)
-                            {
-                                int r = 0;
-                                int timed_out = 0;
-                                do
-                                {
-                                    int read_len = read_dest - map_data;
-                                    
-                                    if(read_len + 1024 >= map_data_size)
-                                    {
-                                        map_data_size = map_data_size*2;
-                                        char* tmp = malloc(map_data_size);
-                                        
-                                        if(tmp)
-                                        {
-                                            memcpy(tmp, map_data, read_len);
-                                            free(map_data);
-                                            
-                                            map_data = tmp;
-                                            read_dest = map_data + read_len;
-                                        }
-                                        else
-                                        {
-                                            break;
-                                        }
-                                    }
-                                    
-                                    if(!socket_read_ready(download_sock, 3000))
-                                    {
-                                        timed_out = 1;
-                                        break;
-                                    }
-                                    
-                                    r = recv(download_sock, read_dest, 1024, 0);
-                                    
-                                    if(r > 0)
-                                    {
-                                        read_dest += r;
-                                        map_data_bytes += r;
-                                        
-                                        if(strstr(map_data, map_eom) != NULL) break;
-                                    }
-                                } while(r > 0 && !timed_out);
-                                
-                                if(!timed_out && map_data_bytes > 0)
-                                {
-                                    if(gameNetworkState.server_map_data) free(gameNetworkState.server_map_data);
-                                    
-                                    gameNetworkState.server_map_data = map_data;
-                                    map_downloaded = 1;
-                                    save_map = 0;
-                                }
-                                else
-                                {
-                                    free(map_data);
-                                }
-                            }
-                            
-                            break;
-                        }
+                        gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting1;
+                        break;
                     }
                 }
+                
                 retries--;
             }
-            
-            close(download_sock);
         }
         
-        if(retries <= 0 || !map_downloaded)
+        if(retries <= 0)
         {
             console_write("connect failed\n");
             console_append("(server %s:%d)\n",
@@ -641,6 +651,8 @@ gameNetwork_disconnect()
             *(sock_set[s]) = -1;
         }
     }
+    
+    GameNetworkBonjourManagerDisconnect();
 }
 
 int
@@ -669,18 +681,11 @@ gameNetwork_startGame(unsigned int sec)
         pInfo = pInfo->next;
     }
 }
-
+    
 gameNetworkError
-gameNetwork_send_player(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerInfoTarget)
+gameNetwork_send_player_core(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerInfoTarget)
 {
-    struct sockaddr sa;
-    int s;
-
-    msg->player_id = gameNetworkState.my_player_id;
-    
-    msg->needs_stream = 0;
-    
-    msg->timestamp = get_time_ms();
+    long s;
     
     gameNetworkPlayerInfo* playerInfo = gameNetworkState.player_list_head.next;
     while(playerInfo)
@@ -692,7 +697,7 @@ gameNetwork_send_player(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerIn
             {
                 if(msg->needs_stream)
                 {
-                    int r = send(playerInfo->stream_socket.s, msg, sizeof(*msg), 0);
+                    long r = send(playerInfo->stream_socket.s, msg, sizeof(*msg), 0);
                     
                     if(r <= 0)
                     {
@@ -701,10 +706,16 @@ gameNetwork_send_player(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerIn
                 }
                 else
                 {
-                    memcpy(&sa, &playerInfo->address, playerInfo->address.len);
-                    
-                    s = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg), 0,
-                               (struct sockaddr*) &sa, sizeof(sa));
+                    if(gameNetworkState.hostInfo.bonjour_lan)
+                    {
+                        GameNetworkBonjourManagerSendMessageToPeer((uint8_t*)msg, ((struct bonjour_addr_stuffed_in_sockaddr_in *) playerInfo->address.storage)->peer_id);
+                        s = sizeof(*msg);
+                    }
+                    else
+                    {
+                        s = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg), 0,
+                                   (struct sockaddr*) (playerInfo->address.storage), playerInfo->address.len);
+                    }
                 }
                 
                 // only host has to send to everyone, since host will re-bcast packets
@@ -716,6 +727,24 @@ gameNetwork_send_player(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerIn
     
     return s > 0? GAME_NETWORK_ERR_NONE: GAME_NETWORK_ERR_FAIL;
 }
+    
+gameNetworkError
+gameNetwork_forward_to_player(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerInfoTarget)
+{
+    return gameNetwork_send_player_core(msg, playerInfoTarget);
+}
+    
+gameNetworkError
+gameNetwork_send_player(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerInfoTarget)
+{
+    msg->player_id = gameNetworkState.my_player_id;
+    
+    msg->needs_stream = 0;
+    
+    msg->timestamp = get_time_ms();
+    
+    return gameNetwork_send_player_core(msg, playerInfoTarget);
+}
 
 gameNetworkError
 gameNetwork_send(gameNetworkMessage* msg)
@@ -726,13 +755,11 @@ gameNetwork_send(gameNetworkMessage* msg)
 gameNetworkError
 gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsigned int timeout_ms)
 {
-    int r;
-    struct sockaddr from_addr;
+    long r;
+    struct sockaddr_storage from_addr;
     socklen_t from_addr_len;
     struct timeval block_time;
     fd_set rd_set;
-    struct sockaddr sa;
-    int s;
     int *pSock;
     int found = 0;
     int sock_max;
@@ -750,8 +777,8 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
     {
         FD_ZERO(&rd_set);
         
-        sock_max = gameNetworkState.hostInfo.socket.s;
         FD_SET(gameNetworkState.hostInfo.socket.s, &rd_set);
+        sock_max = gameNetworkState.hostInfo.socket.s;
         
         gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
         while(pInfo)
@@ -792,8 +819,10 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
             }
         }
         
+        memset(msg, 0, sizeof(*msg));
+        
         from_addr_len = sizeof(from_addr);
-        r = recvfrom(*pSock,
+        r = (int) recvfrom(*pSock,
                      (void*) msg, sizeof(*msg),
                      0, (struct sockaddr*) &from_addr, &from_addr_len);
         if(r <= 0)
@@ -805,6 +834,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
         // ignore packets from ourself
         if(msg->player_id == gameNetworkState.my_player_id) continue;
         
+        memset(src_addr, 0, sizeof(*src_addr));
         memcpy(src_addr->storage, &from_addr, from_addr_len);
         src_addr->len = from_addr_len;
         
@@ -840,14 +870,11 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
                         int* rb_sock = msg->needs_stream? &playerInfo->stream_socket.s:
                                       &gameNetworkState.hostInfo.socket.s;
                         
-                        memcpy(&sa, &playerInfo->address, playerInfo->address.len);
-                        
-                        s = sendto(*rb_sock, msg, sizeof(*msg), 0,
-                                   (struct sockaddr*) &sa, sizeof(sa));
-                        if(s < 0)
+                        if(gameNetwork_forward_to_player(msg, playerInfo) == GAME_NETWORK_ERR_FAIL)
                         {
                             *rb_sock = -1;
                         }
+                           
                     }
                     playerInfo = playerInfo->next;
                 }
@@ -865,7 +892,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
 gameNetworkError
 gameNetwork_accept_map_download(gameNetworkAddress* src_addr, char* (*mapRenderCallback)())
 {
-    struct sockaddr from_addr;
+    struct sockaddr_storage from_addr;
     socklen_t from_addr_len;
     struct timeval block_time;
     fd_set rd_set;
@@ -885,14 +912,14 @@ gameNetwork_accept_map_download(gameNetworkAddress* src_addr, char* (*mapRenderC
         {
             from_addr_len = sizeof(from_addr);
             
-            int a = accept(s, &from_addr, &from_addr_len);
+            int a = accept(s, (struct sockaddr*) &from_addr, &from_addr_len);
 
             int so_arg = 0;
             setsockopt(a, SOL_SOCKET, SO_LINGER, &so_arg, sizeof(so_arg));
             
             if(a > 0)
             {
-                int w;
+                long w;
                 char inbuf;
 
                 gameNetworkState.hostInfo.map_socket_sending.s = a;
@@ -908,7 +935,7 @@ gameNetwork_accept_map_download(gameNetworkAddress* src_addr, char* (*mapRenderC
                     {
                         do
                         {
-                            int send_len = 128;
+                            long send_len = 128;
                             if(strlen(map_data) < send_len) send_len = strlen(map_data);
                             w = send(a, map_data, send_len, 0);
                             map_data += w;
@@ -962,7 +989,7 @@ gameNetwork_accept_stream_connection(gameNetworkAddress* src_addr)
                 // receive player-id
                 // TODO: timeout
                 gameNetworkMessage connectMsg;
-                int r = recv(a, &connectMsg, sizeof(connectMsg), 0);
+                long r = recv(a, &connectMsg, sizeof(connectMsg), 0);
                 
                 if(r == sizeof(connectMsg))
                 {
@@ -992,10 +1019,10 @@ gameNetwork_addPlayerInfo(int player_id)
         pInfo = pInfo->next;
     }
     
-    pInfo->next = (gameNetworkPlayerInfo*) malloc(sizeof(*pInfo));
+    pInfo->next = (gameNetworkPlayerInfo*) malloc(sizeof(gameNetworkPlayerInfo));
     if(!pInfo->next) return GAME_NETWORK_ERR_FAIL;
     
-    memset(pInfo->next, 0, sizeof(*pInfo->next));
+    memset(pInfo->next, 0, sizeof(gameNetworkPlayerInfo));
     pInfo->next->time_last_update = get_time_ms();
     pInfo->next->elem_id = WORLD_ELEM_ID_INVALID;
     
@@ -1024,7 +1051,9 @@ gameNetwork_getPlayerInfo(int player_id, gameNetworkPlayerInfo** info_out, int a
     {
         if(gameNetwork_addPlayerInfo(player_id) == GAME_NETWORK_ERR_NONE)
         {
-            return gameNetwork_getPlayerInfo(player_id, info_out, 0);
+            int r = gameNetwork_getPlayerInfo(player_id, info_out, 0);
+            
+            return r;
         }
     }
     
@@ -1090,10 +1119,12 @@ gameNetwork_updatePlayerObject(gameNetworkPlayerInfo* playerInfo,
                              x, y, z,
                              alpha, beta, gamma,
                              pElem->scale, pElem->texture_id);
+        if(obj_id != WORLD_ELEM_ID_INVALID)
+        {
+            pElem->object_type = OBJ_PLAYER;
         
-        pElem->object_type = OBJ_PLAYER;
-        
-        update_object_velocity(pElem->elem_id, velx, vely, velz, 0);
+            update_object_velocity(pElem->elem_id, velx, vely, velz, 0);
+        }
         
         return GAME_NETWORK_ERR_NONE;
     }
@@ -1300,9 +1331,9 @@ do_game_network_write()
         // send along INADDR_ANY:PORT, indicating to use the detected srcAddr
         GAME_NETWORK_ADDRESS_FAMILY(&directoryRegisterMsg.params.directoryInfo.addr) = AF_INET;
         GAME_NETWORK_ADDRESS_PORT(&directoryRegisterMsg.params.directoryInfo.addr) = htons(gameNetworkState.hostInfo.port);
-        GAME_NETWORK_ADDRESS_INADDR(&directoryRegisterMsg.params.directoryInfo.addr).s_addr =
-            GAME_NETWORK_ADDRESS_INADDR(&gameNetworkState.hostInfo.local_inet_addr).s_addr;
-        directoryRegisterMsg.params.directoryInfo.addr.len = sizeof(struct sockaddr_in);
+        GAME_NETWORK_ADDRESS_INADDR(&directoryRegisterMsg.params.directoryInfo.addr) =
+            GAME_NETWORK_ADDRESS_INADDR(&gameNetworkState.hostInfo.local_inet_addr);
+        directoryRegisterMsg.params.directoryInfo.addr.len = sizeof(struct sockaddr_in6);
         
         send_to_address_udp(&directoryRegisterMsg, &gameNetworkState.gameDirectory.directory_address);
     }
@@ -1609,6 +1640,7 @@ do_game_network_handle_directory_msg(gameNetworkMessage *msg, gameNetworkAddress
 {
     gameNetworkPlayerInfo* pInfo;
     char game_name[128];
+    char msgBuf[128];
     int offset, offset_o;
     
     pInfo = &gameNetworkState.gameDirectory.head;
@@ -1663,10 +1695,10 @@ do_game_network_handle_directory_msg(gameNetworkMessage *msg, gameNetworkAddress
                             if(GAME_NETWORK_ADDRESS_LEN_CORRECT(&msg->params.directoryInfo.addr))
                             {
                                 // if IP is zero, use ip from srcAddr
-                                if(GAME_NETWORK_ADDRESS_INADDR(&msg->params.directoryInfo.addr).s_addr != INADDR_ANY)
+                                if(IN6_ARE_ADDR_EQUAL(&in6addr_any, &(GAME_NETWORK_ADDRESS_INADDR(&msg->params.directoryInfo.addr))))
                                 {
-                                    GAME_NETWORK_ADDRESS_INADDR(&pInfoNew->address).s_addr =
-                                        GAME_NETWORK_ADDRESS_INADDR(&msg->params.directoryInfo.addr).s_addr;
+                                    GAME_NETWORK_ADDRESS_INADDR(&pInfoNew->address) =
+                                        GAME_NETWORK_ADDRESS_INADDR(&msg->params.directoryInfo.addr);
                                 }
                                 
                                 // if msg port is non-zero, use that port
@@ -1683,7 +1715,7 @@ do_game_network_handle_directory_msg(gameNetworkMessage *msg, gameNetworkAddress
                         if(pInfoNew)
                         {
                             console_write("Registered game:%s/%s:%d", pInfoNew->name,
-                                          inet_ntoa(GAME_NETWORK_ADDRESS_INADDR(&pInfoNew->address)),
+                                          inet_ntop(AF_INET6, &(GAME_NETWORK_ADDRESS_INADDR(&pInfoNew->address)), msgBuf, sizeof(msgBuf)),
                                           ntohs(GAME_NETWORK_ADDRESS_PORT(&pInfoNew->address)));
                         }
                         break;
@@ -1746,7 +1778,7 @@ do_game_network_handle_directory_msg(gameNetworkMessage *msg, gameNetworkAddress
                         {
                             console_write("QUERY: found game %s at\n%s\noffset:%d(srcAddr=%s)",
                                           pInfo->name, inet_ntoa(sin_ptr->sin_addr), offset_o,
-                                          inet_ntoa(GAME_NETWORK_ADDRESS_INADDR(srcAddr)));
+                                          inet_ntop(AF_INET6, &(GAME_NETWORK_ADDRESS_INADDR(srcAddr)), msgBuf, sizeof(msgBuf)));
                             /*
                             strcpy(queryResponseMsg.params.c, inet_ntoa(sin_ptr->sin_addr));
                              */
@@ -1813,6 +1845,14 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
     int interp_velo = 1;
     game_timeval_t network_time_ms = get_time_ms();
     
+    if(gameNetworkState.gameNetworkHookOnMessage != NULL)
+    {
+        if(gameNetworkState.gameNetworkHookOnMessage(msg, srcAddr))
+        {
+            return;
+        }
+    }
+    
     if(msg->is_ack && msg->msg_seq == gameNetworkState.msgUnacked.msg_seq)
     {
         memset(&gameNetworkState.msgUnacked, 0, sizeof(gameNetworkState.msgUnacked));
@@ -1834,6 +1874,18 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
         if(msg->msg_seq == gameNetworkState.msg_seq_acked_last) return;
         
         gameNetworkState.msg_seq_acked_last = msg->msg_seq;
+    }
+    
+    if(msg->cmd == GAME_NETWORK_MSG_BEACON && gameNetworkState.hostInfo.hosting)
+    {
+        if(strncmp(msg->params.c, gameNetworkState.hostInfo.name, sizeof(msg->params.c)) == 0)
+        {
+            msg->cmd = GAME_NETWORK_MSG_BEACON_RESP;
+            msg->player_id = gameNetworkState.my_player_id;
+            //send_lan_broadcast(&msg);
+            send_to_address_udp(msg, srcAddr);
+        }
+        return;
     }
     
     // find player info
@@ -1874,6 +1926,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
             // send back message with our player-name
             memset(&msgOut, 0, sizeof(msgOut));
             msgOut.cmd = GAME_NETWORK_MSG_CONNECT;
+            msgOut.player_id = gameNetworkState.my_player_id;
             strncpy(msgOut.params.c, gameNetworkState.my_player_name, GAME_NETWORK_MAX_STRING_LEN);
             gameNetwork_send(&msgOut);
         }
@@ -2124,6 +2177,9 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                 if(msg->params.f[0] == MODEL_BULLET)
                 {
                     gameAudioPlaySoundAtLocation("shoot", msg->params.f[1], msg->params.f[2], msg->params.f[3]);
+                    
+                    world_get_last_object()->stuff.sound.emit_sound_id = GAME_SOUND_ID_BULLET_FLYBY;
+                    world_get_last_object()->stuff.sound.emit_sound_duration = GAME_SOUND_DURATION_BULLET_FLYBY;
                 }
                 
                 if(msg->cmd == GAME_NETWORK_MSG_KILLED)
@@ -2334,6 +2390,39 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                 }
                 break;
                 
+            case GAME_NETWORK_MSG_GET_MAP:
+                {
+                    gameNetworkMessage msgOut;
+                    read_in_render_thread = 1;
+                    char* map_data = do_game_map_render();
+                    read_in_render_thread = 0;
+                    
+                    memset(&msgOut, 0, sizeof(msgOut));
+                    msgOut.cmd = GAME_NETWORK_MSG_GET_MAP_BEGIN;
+                    msgOut.player_id = gameNetworkState.my_player_id;
+                    send_to_address_udp(&msgOut, srcAddr);
+                    
+                    if(map_data)
+                    {
+                        char* ptr = map_data;
+                        char* ptr_end = map_data + strlen(map_data);
+                        
+                        do
+                        {
+                            msgOut.cmd = GAME_NETWORK_MSG_GET_MAP_SOME;
+                            msgOut.player_id = gameNetworkState.my_player_id;
+                            memset(msgOut.params.mapData.s, 0, sizeof(msgOut.params.mapData.s));
+                            strncpy(msgOut.params.mapData.s, ptr, GAME_NETWORK_MAX_MAP_STRING_LEN);
+                            send_to_address_udp(&msgOut, srcAddr);
+                            ptr += GAME_NETWORK_MAX_MAP_STRING_LEN;
+                        } while(ptr < ptr_end && strlen(ptr) > 0);
+                    }
+                    
+                    msgOut.cmd = GAME_NETWORK_MSG_GET_MAP_END;
+                    send_to_address_udp(&msgOut, srcAddr);
+                }
+                break;
+                
             default:
                 break;
         }
@@ -2347,7 +2436,6 @@ do_game_map_render()
 {
     if(!read_in_render_thread)
     {
-        game_lock_lock(&networkLock);
         world_lock();
     }
     
@@ -2356,23 +2444,28 @@ do_game_map_render()
     if(!read_in_render_thread)
     {
         world_unlock();
-        game_lock_unlock(&networkLock);
     }
     
     return map;
 }
-
+    
 void
-do_game_network_read()
+do_game_network_read_core()
 {
     gameNetworkMessage msg;
     gameNetworkAddress srcAddr;
     int receive_block_ms = 1;
     int retries = 100;
     
-    if(!gameNetworkState.connected || !world_inited)
+    if(!gameNetworkState.connected /*|| !world_inited*/)
     {
         return;
+    }
+    
+    if(gameNetworkState.hostInfo.bonjour_lan)
+    {
+        retries = 1;
+        goto do_game_network_read_queue;
     }
     
     if(!read_in_render_thread)
@@ -2411,7 +2504,6 @@ do_game_network_read()
         {
             if(!read_in_render_thread)
             {
-                game_lock_lock(&networkLock);
                 world_lock();
             }
             
@@ -2420,15 +2512,20 @@ do_game_network_read()
             if(!read_in_render_thread)
             {
                 world_unlock();
-                game_lock_unlock(&networkLock);
             }
             
             retries--;
             continue;
         }
         
+    do_game_network_read_queue:
         // clean up processed messages
         gameNetworkState.msgQueue.cleanup = 1;
+        if(!read_in_render_thread)
+        {
+            while(!gameNetworkState.msgQueue.cleanupWaiting) { int i; i++; }
+        }
+        
         gameNetworkMessageQueued* pMsgCur = &gameNetworkState.msgQueue.head;
         gameNetworkMessageQueued* pMsgProcessed = NULL;
         while(pMsgCur->next && pMsgCur->next->processed)
@@ -2443,7 +2540,6 @@ do_game_network_read()
             pMsgFree->next = NULL;
             free(pMsgFree);
         }
-        gameNetworkState.msgQueue.cleanup = 0;
         
         // add to queue
         gameNetworkMessageQueued* pMsg =
@@ -2459,13 +2555,35 @@ do_game_network_read()
             while(pTail->next) pTail = pTail->next;
             pTail->next = pMsg;
         }
+        gameNetworkState.msgQueue.cleanup = 0;
+        gameNetworkState.msgQueue.cleanupWaiting = 0;
         
         retries--;
     }
     
     if(retries <= 0)
     {
-        printf("Warning: network thread lagging\n");
+        //printf("Warning: network thread lagging\n");
+    }
+}
+    
+void
+do_game_network_read()
+{
+    if(!gameNetworkState.hostInfo.bonjour_lan)
+    {
+        read_in_render_thread = 0;
+        do_game_network_read_core();
+    }
+}
+
+void
+do_game_network_read_bonjour()
+{
+    if(gameNetworkState.hostInfo.bonjour_lan)
+    {
+        read_in_render_thread = 1;
+        do_game_network_read_core();
     }
 }
 
@@ -2731,16 +2849,85 @@ gameNetwork_action_handle(int action)
     }
 }
     
-void
-gameNetwork_lock()
+// mark -- callbacks used during connection negotiating
+int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
 {
-    game_lock_lock(&networkLock);
-}
+    if(msg->cmd == GAME_NETWORK_MSG_GET_MAP_BEGIN)
+    {
+        if(gameNetworkState.server_map_data)
+        {
+            free(gameNetworkState.server_map_data);
+        }
+        
+        gameNetworkState.server_map_data = malloc(1024);
+        memset(gameNetworkState.server_map_data, 0, 1024);
+        
+        return 1;
+    }
+    else if(msg->cmd == GAME_NETWORK_MSG_GET_MAP_END && gameNetworkState.server_map_data)
+    {
+        gameNetworkState.gameNetworkHookOnMessage = NULL;
+        
+        gameMapSetMap(gameNetworkState.server_map_data);
+        
+        return 1;
+    }
+    else if(msg->cmd == GAME_NETWORK_MSG_GET_MAP_SOME && gameNetworkState.server_map_data)
+    {
+        char* catbuf = malloc(strlen(gameNetworkState.server_map_data) + GAME_NETWORK_MAX_MAP_STRING_LEN + 1);
+        strcpy(catbuf, gameNetworkState.server_map_data);
+        strncat(catbuf, msg->params.mapData.s, GAME_NETWORK_MAX_MAP_STRING_LEN);
+        free(gameNetworkState.server_map_data);
+        gameNetworkState.server_map_data = catbuf;
+        return 1;
+    }
 
-void
-gameNetwork_unlock()
+    return 0;
+}
+    
+int gameNetwork_onBonjourConnecting2(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
 {
-    game_lock_unlock(&networkLock);
+    gameNetworkMessage downloadMsg;
+    gameNetworkPlayerInfo *playerInfo;
+    
+    if(msg->cmd == GAME_NETWORK_MSG_CONNECT)
+    {
+        gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting3;
+        
+        memset(&downloadMsg, 0, sizeof(downloadMsg));
+        downloadMsg.cmd = GAME_NETWORK_MSG_GET_MAP;
+        downloadMsg.player_id = gameNetworkState.my_player_id;
+        send_to_address_udp(&downloadMsg, srcAddr);
+        
+        if(gameNetwork_getPlayerInfo(msg->player_id, &playerInfo, 1) == GAME_NETWORK_ERR_NONE)
+        {
+            memcpy(&playerInfo->address, srcAddr, sizeof(gameNetworkAddress));
+            return 1;
+        }
+        
+        return 1;
+    }
+    
+    return 0;
+}
+    
+int gameNetwork_onBonjourConnecting1(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
+{
+    gameNetworkMessage connectMsg;
+    
+    if(msg->cmd == GAME_NETWORK_MSG_BEACON_RESP)
+    {
+        gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting2;
+        
+        memset(&connectMsg, 0, sizeof(connectMsg));
+        connectMsg.cmd = GAME_NETWORK_MSG_CONNECT;
+        connectMsg.player_id = gameNetworkState.my_player_id;
+        strncpy(connectMsg.params.c, gameNetworkState.my_player_name, sizeof(connectMsg.params.c));
+        send_to_address_udp(&connectMsg, srcAddr);
+        
+        return 1;
+    }
+    return 0;
 }
     
 #ifdef __cplusplus

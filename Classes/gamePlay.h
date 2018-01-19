@@ -22,7 +22,6 @@
 
 enum
 {
-    STUFF_FLAGS_SHIP = 0x01,
     STUFF_FLAGS_TURRET = 0x02,
     STUFF_FLAGS_COLLECT = 0x04,
 };
@@ -59,7 +58,6 @@ enum
     GAME_SUBTYPE_COLLECT,
     GAME_SUBTYPE_ASTEROID,
     GAME_SUBTYPE_LIFE,
-    GAME_SUBTYPE_SHIP,
     GAME_SUBTYPE_TURRET,
     GAME_SUBTYPE_ALLY,
     GAME_SUBTYPE_POINTS,
@@ -104,6 +102,7 @@ const static char *game_variables_name[] = {
     "ENEMY1_JUKE_PCT",
     "ENEMY1_COLLECT_DURABILITY",
     "ENEMY_RUN_DISTANCE",
+    "ENEMY_SPAWNPOINT_MAXSPEED",
     NULL
 };
 
@@ -175,7 +174,8 @@ const static float game_variables_default[] = {
     /*25*/10,    // ENEMY1_JUKE_PCT
     2,           // ENEMY1_COLLECT_DURABILITY
     20,          // ENEMY_RUN_DISTANCE
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    MAX_SPEED/2,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,
     0            // END
 };
 
@@ -444,6 +444,8 @@ inline static void
 game_elem_setup_spawnpoint_enemy(WorldElem* elem)
 {
     elem->renderInfo.priority = 1;
+    elem->bounding_remain = 1;
+    elem->physics.ptr->friction = 1;
 }
 
 inline static void
