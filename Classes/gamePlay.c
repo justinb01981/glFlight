@@ -45,7 +45,6 @@
 static int game_setup_needed = 0;
 static int game_reset_needed = 0;
 int game_collision_last_bullet_affiliation = 0;
-int maps_list_idx = 0;
 int save_map = 0;
 int game_target_missle_id = -1;
 int game_target_objective_id = -1;
@@ -60,9 +59,9 @@ int game_delay_frames = 0;
 int invuln_count = 0;
 unsigned int score_last_checked = 0;
 //float collects_count_gameover = 10;
-int collects_obj_type_score = OBJ_PLAYER;
 char game_status_string_[255] = {0};
 char *game_status_string = game_status_string_;
+const float randH = 100000;
 
 game_timeval_t firedLast = 0, firedLastMissle = 0;
 float blr_last = 1;
@@ -191,8 +190,7 @@ score_display()
             /* ,*high_score_session */
             );
     
-    gameInterfaceControls.dialogRect.tex_id = TEXTURE_ID_DIALOG_GAMEOVER;
-    gameDialogDisplayString("");
+    gameDialogGraphic(TEXTURE_ID_DIALOG_GAMEOVER);
     gameInterfaceControls.dialogRect.tex_id = TEXTURE_ID_CONTROLS_DIALOG_BOX;
     gameDialogDisplayString(scoreStr);
     
@@ -470,7 +468,6 @@ game_add_enemy_core(float x, float y, float z, int model)
     world_get_last_object()->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
     world_get_last_object()->durability = gameStateSinglePlayer.enemy_durability;
     world_get_last_object()->stuff.intelligent = 1;
-    world_get_last_object()->stuff.u.enemy.appearance = rand() % TEXTURE_ID_LAST;
     world_get_last_object()->physics.ptr->friction = 1;
     game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
     update_object_velocity(obj_id, 1, 1, 1, 0);
@@ -549,7 +546,6 @@ game_add_turret(float x, float y, float z)
     world_get_last_object()->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
     world_get_last_object()->durability = DURABILITY_TURRET;
     world_get_last_object()->object_type = OBJ_TURRET;
-    world_get_last_object()->stuff.u.enemy.appearance = rand() % TEXTURE_ID_LAST;
     world_get_last_object()->stuff.intelligent = 1;
     game_elem_setup_turret(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
     update_object_velocity(obj_id, 0, 0, 0, 0);
@@ -684,7 +680,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.stats.score_last = 0;
         gameStateSinglePlayer.stats.score = 0;
         gameStateSinglePlayer.stats.level_last = 0;
-        texture_id_background = TEXTURE_ID_BACKGROUND;
+        texture_id_background = BACKGROUND_TEXTURE;
     }
     else
     {
@@ -730,8 +726,6 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.enemy1_ignore_player_pct = 0;
     gameStateSinglePlayer.score_pop_threshold = 10;
     gameStateSinglePlayer.enemy_spawnpoint_interval = 1;
-    gameStateSinglePlayer.base_spawn_collect_pct_rate_increase = 0;
-    gameStateSinglePlayer.base_spawn_collect_initial = 0;
     
     gameStateSinglePlayer.collect_system_integrity = 100;
     
@@ -791,9 +785,8 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
         gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
-        gameStateSinglePlayer.base_spawn_collect_pct = 10;
-        //gameStateSinglePlayer.base_spawn_collect_pct_rate_increase = 0.2;
-        gameStateSinglePlayer.base_spawn_collect_initial = 2;
+        gameStateSinglePlayer.base_spawn_collect_p = 0.8;
+        gameStateSinglePlayer.base_spawn_collect_m = 1.1;
         gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/20;
@@ -942,9 +935,7 @@ game_start(float difficulty, int type)
         
         gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
         gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
-        gameStateSinglePlayer.base_spawn_collect_pct = 10;
-        //gameStateSinglePlayer.base_spawn_collect_pct_rate_increase = 0.2;
-        gameStateSinglePlayer.base_spawn_collect_initial = 2;
+        gameStateSinglePlayer.base_spawn_collect_p = 0.5;
         gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/10;
@@ -1139,7 +1130,7 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
             break;
             
         case GAME_SUBTYPE_COLLECT:
-            if(elemA->object_type == collects_obj_type_score)
+            if(elemA->object_type == OBJ_PLAYER)
             {
                 world_remove_object(elemB->elem_id);
                 gameStateSinglePlayer.stats.data_collected++;
@@ -1331,9 +1322,10 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
         case OBJ_SPAWNPOINT_ENEMY:
             if(elemA->object_type == OBJ_POWERUP_GENERIC)
             {
-                gameStateSinglePlayer.collect_system_integrity -= 10;
+                gameStateSinglePlayer.collect_system_integrity -= 20;
                 
                 console_write(game_log_messages[GAME_LOG_FILELOST]);
+                gameDialogMessagePopup(game_log_messages[GAME_LOG_FILELOST]);
                 
                 // add an explosion
                 {
@@ -1514,12 +1506,11 @@ game_run()
 {
     WorldElemListNode* pMyShipNode;
     float ship_z_vec[3];
-    char alertmsg[256];
     static game_timeval_t game_run_last;
     float p[3] = {my_ship_x, my_ship_y, my_ship_z};
     float v[3], r[3];
     int target_types[] = {OBJ_SHIP, OBJ_PLAYER, OBJ_TURRET, OBJ_UNKNOWN};
-    static int game_map_custom_loaded = 0;
+    
     static game_timeval_t logSoundTimeLast = 0;
     static int game_target_enemy_near = WORLD_ELEM_ID_INVALID;
     WorldElem* pElemBallHeld = NULL;
@@ -1702,6 +1693,8 @@ game_run()
         {
             gameStateSinglePlayer.last_run = time_ms;
             
+            gameStateSinglePlayer.base_spawn_collect_m += rand_in_range(-randH/10, randH/5);
+            
             game_target_objective_id = gameStateSinglePlayer.elem_id_spawnpoint;
             
             if(strncmp(gameSettingsPlayerName, "god", 3) == 0) pMyShipNode->elem->durability = 9999;
@@ -1739,8 +1732,6 @@ game_run()
                                 // spawn faster
                                 pCur->elem->stuff.u.spawnpoint.time_spawn_interval *= 0.9;
                                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence *= 1.1;
-                            
-                                console_append(game_log_messages[GAME_LOG_SPAWNFASTER]);
                                 
                                 if(rand_in_range(1, 4) == 4)
                                 {
@@ -1885,10 +1876,9 @@ game_run()
                 
                 if(obj_id_base != WORLD_ELEM_ID_INVALID)
                 {
-                    if(rand_in_range(1, 100) <= gameStateSinglePlayer.base_spawn_collect_pct ||
-                       gameStateSinglePlayer.base_spawn_collect_initial > 0)
+                    if(gameStateSinglePlayer.base_spawn_collect_m >= gameStateSinglePlayer.base_spawn_collect_p*randH)
                     {
-                        gameStateSinglePlayer.base_spawn_collect_initial--;
+                        gameStateSinglePlayer.base_spawn_collect_m *= 0.2;
                         
                         // spawn a random collect powerup
                         WorldElemListNode* pElemNodeSpawn = world_elem_list_find(obj_id_base, &gWorld->elements_list);
@@ -1923,13 +1913,9 @@ game_run()
                                       gameStateSinglePlayer.collect_system_integrity);
                     }
                     
-                    gameStateSinglePlayer.base_spawn_collect_pct +=
-                        gameStateSinglePlayer.base_spawn_collect_pct_rate_increase;
-                    
                     if(gameStateSinglePlayer.collect_system_integrity <= 0)
                     {
                         game_over();
-                        gameInterfaceControls.graphicDialog.tex_id = TEXTURE_ID_DIALOG_GAMEOVER;
                     }
                 }
                 
@@ -2176,7 +2162,7 @@ game_run()
         console_write(game_log_messages[GAME_LOG_SHOTFIRED]);
     }
     
-    if(gameInterfaceControls.fireRectMissle.touched && time_ms - firedLastMissle > 200)
+    if(gameInterfaceControls.fireRectMissle.touched && time_ms - firedLastMissle > 1000)
     {
         firedLastMissle = time_ms;
         fireBullet(ACTION_FIRE_MISSLE);
@@ -2198,12 +2184,10 @@ game_run()
         gameInterfaceSetInterfaceState(INTERFACE_STATE_TOWING_NONE);
     }
     
-    if(gameInterfaceControls.menuAction >= ACTION_FIRST && gameInterfaceControls.menuAction < ACTION_LAST)
+    if(fireAction >= ACTION_FIRST && fireAction < ACTION_LAST)
     {
         int obj_id;
         int newBlock[3];
-        int game_start_difficulty = 1;
-        int game_start_score = 0;
         
         block_scale = 1;
         
@@ -2213,184 +2197,11 @@ game_run()
         newBlock[1] = round((my_ship_y + ship_z_vec[1]*2)/block_scale) * block_scale;
         newBlock[2] = round((my_ship_z + ship_z_vec[2]*2)/block_scale) * block_scale;
         
-        if(actions_enabled[gameInterfaceControls.menuAction])
+        if(actions_enabled[fireAction])
         {
-            char *mapBuffer = NULL;
             
-            /* single-player games disconnect from network */
-            if((gameInterfaceControls.menuAction >= ACTION_START_TURRET_GAME &&
-                gameInterfaceControls.menuAction <= ACTION_START_SPEEDRUN_GAME) ||
-               gameInterfaceControls.menuAction == ACTION_MAP_EDIT)
+            switch(fireAction)
             {
-                gameNetwork_disconnect();
-            }
-            
-            switch(gameInterfaceControls.menuAction)
-            {
-                case ACTION_MAP_EDIT:
-                    game_map_custom_loaded = 1;
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    gameMapFileName("custom");
-                    mapBuffer = gameMapRead();
-                    gameMapSetMap(mapBuffer);
-                    //save_map = 1; // save map when done
-                    gameStateSinglePlayer.map_use_current = 1;
-                    console_write("custom map loaded\nchanges will be saved");
-                    break;
-                    
-                case ACTION_MAP_SAVE:
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    gameMapFileName("custom");
-                    gameMapWrite();
-                    gameStateSinglePlayer.map_use_current = 1;
-                    console_write("custom map saved\n");
-                    break;
-                    
-                case ACTION_CLEAR_MAP:
-                    gameMapFileName("custom");
-                    maps_list_idx++;
-                    if(maps_list[maps_list_idx] == NULL) maps_list_idx = 0;
-                    gameMapSetMap(maps_list[maps_list_idx]);
-                    gameMapWrite();
-                    gameStateSinglePlayer.map_use_current = 1;
-                    console_write("map loaded:%s", maps_list_names[maps_list_idx]);
-                    break;
-
-                case ACTION_CONNECT_TO_GAME_LAN:
-                    {
-                        if(gameDialogLanSearching()) break;
-                    }
-                case ACTION_CONNECT_TO_GAME:
-                    {
-                        char* gameName = gameSettingsGameName;
-                        int lan_only = 0;
-                        
-                        if(gameInterfaceControls.menuAction == ACTION_CONNECT_TO_GAME_LAN)
-                        {
-                            lan_only = 1;
-                            gameName = GAME_NETWORK_LAN_GAME_NAME;
-                        }
-                        
-                        if(gameNetworkState.connected) gameNetwork_disconnect();
-                        
-                        gameDialogPortalToGame(gameName);
-                    
-                        if(gameNetwork_connect(gameName, 0, lan_only) == GAME_NETWORK_ERR_NONE)
-                        {
-                            gameInterfaceControls.mainMenu.visible = 0;
-                            actions_menu_reset();
-                            gameMapSetMap(gameNetworkState.server_map_data);
-                            gameStateSinglePlayer.started = 0;
-                            
-                            gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);
-                            gameDialogConnectToGameSuccessful();
-                        }
-                        else
-                        {
-                            console_write("Game %s not found\n(see help)\n", gameNetworkState.hostInfo.name);
-                            gameDialogConnectToGameFailed();
-                        }
-                    }
-                    break;
-                    
-                case ACTION_HOST_GAME_LAN:
-                case ACTION_HOST_GAME:
-                    gameNetwork_disconnect();
-                    
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    if(gameNetwork_connect((char *) GAME_NETWORK_LAN_GAME_NAME, 1, gameInterfaceControls.menuAction == ACTION_HOST_GAME_LAN) == GAME_NETWORK_ERR_NONE)
-                    {
-                        actions_menu_reset();
-                        gameStateSinglePlayer.started = 0;
-                        save_map = 0;
-                        console_write("Hosting game: %s\nStart deathmatch when ready...",
-                                      gameNetworkState.hostInfo.name);
-                        if(!game_map_custom_loaded) gameMapSetMap(initial_map_deathmatch);
-                        gameDialogStartNetworkGame();
-                    }
-                    break;
-                    
-                case ACTION_DISPLAY_SCORES:
-                    gameDialogScores();
-                    break;
-                    
-                case ACTION_HELP:
-                    gameInterfaceControls.graphicDialog.visible = !gameInterfaceControls.graphicDialog.visible;
-                    break;
-                    
-                case ACTION_RESUME_GAME:
-                    game_start_difficulty = gameStateSinglePlayer.last_game.difficulty;
-                    game_start_score = gameStateSinglePlayer.last_game.score;
-                    
-                case ACTION_START_GAME:
-                    actions_menu_reset();
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    game_start(game_start_difficulty, GAME_TYPE_COLLECT);
-                    gameStateSinglePlayer.stats.score = game_start_score;
-                    gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
-                    save_map = 0;
-                    break;
-                    
-                case ACTION_START_DEATHMATCH_GAME:
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    sprintf(alertmsg, "5m deathmatch started!\nNetworked:%s",
-                            gameNetworkState.hostInfo.hosting? "YES": "NO");
-                    gameNetwork_alert(alertmsg);
-                    gameNetwork_startGame(300);
-                    game_start(1, GAME_TYPE_DEATHMATCH);
-                    gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
-                    save_map = 0;
-                    break;
-                    
-                case ACTION_START_SURVIVAL_GAME:
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    sprintf(alertmsg, "survival started!\n");
-                    gameStateSinglePlayer.started = 1;
-                    game_start(1, GAME_TYPE_SURVIVAL);
-                    gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
-                    save_map = 0;
-                    break;
-                
-                case ACTION_START_SPEEDRUN_GAME:
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    sprintf(alertmsg, "survival started!\n");
-                    gameStateSinglePlayer.started = 1;
-                    game_start(1, GAME_TYPE_SPEEDRUN);
-                    gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
-                    save_map = 0;
-                    break;
-                
-                case ACTION_START_LOBBALL_GAME:
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    sprintf(alertmsg, "lob started!\n");
-                    gameStateSinglePlayer.started = 1;
-                    game_start(1, GAME_TYPE_LOBBALL);
-                    gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
-                    save_map = 0;
-                    break;
-                    
-                case ACTION_START_DEFEND_GAME:
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    sprintf(alertmsg, "defend started!\n");
-                    gameStateSinglePlayer.started = 1;
-                    game_start(1, GAME_TYPE_DEFEND);
-                    gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
-                    save_map = 0;
-                    break;
-                    
-                case ACTION_START_TURRET_GAME:
-                    gameInterfaceControls.mainMenu.visible = 0;
-                    sprintf(alertmsg, "turret started!\n");
-                    gameStateSinglePlayer.started = 1;
-                    game_start(1, GAME_TYPE_TURRET);
-                    gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
-                    save_map = 0;
-                    break;
-                    
-                case ACTION_NETWORK_MULTIPLAYER_MENU:
-                    action_sub_next();
-                    break;
-                    
                 case ACTION_DROP_BLOCK:
                     camera_locked_frames = 120;
                     
@@ -2440,21 +2251,10 @@ game_run()
                     fireBullet(ACTION_BLOCK_TEXTURE);
                     break;
                     
-                case ACTION_SETTING_RESET_SCORE:
-                    gameDialogResetScores();
-                    break;
-                    
-                case ACTION_SETTING_RESET_DEFAULT:
-                    gameSettingsDefaults();
-                    break;
-
-                    
                 default:
                     break;
             }
         }
-        
-        gameInterfaceControls.menuAction = ACTION_INVALID;
     }
     
     /*

@@ -34,6 +34,8 @@ float drawDistanceFar = 200;
 
 const int console_write_append_thresh_ms = 1000;
 
+int console_lines_max = 5;
+
 float 
 distance(float x1, float y1, float z1, float x2, float y2, float z2)
 {
@@ -395,14 +397,13 @@ console_append(char* fmt, ...)
 {
     size_t i = 0;
     int newlines = 0;
-    int newlinesMax = 5;
     
     while(consoleMessage[i])
     {
         if(consoleMessage[i] == '\n') newlines++;
         i++;
     }
-    if(newlines > newlinesMax) i = 0;
+    if(newlines > console_lines_max) i = 0;
     
     //if(i > 0) consoleMessage[i++] = '\n';
     consoleMessage[i] = '\0';

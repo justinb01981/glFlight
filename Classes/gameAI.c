@@ -25,10 +25,10 @@ float diff_m = 0.1;
 float scan_dist_increase = 60;
 float game_ai_fire_rate_ms = 800.0;
 float patrol_area_reached = 2.0;
-float tow_v_scale = /*0.5*/ 0.9;
+float tow_v_scale = /*0.5*/ 1.5;
 float min_patrol_distance = 20;
 float collect_deploy_distance = -2.5;
-float change_target_frequency = 5000;
+float change_target_frequency = 10000;
 float enemy_turn_rate_dampc = 0.9;
 
 float juke_distance = 20.0, juke_distance_patrol = 50.0;
@@ -568,7 +568,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     }
     
     // rate at which enemy rotates
-    //float turn_r = elem->stuff.u.enemy.max_turn * tc;
     float turn_r = (elem->stuff.u.enemy.max_turn / 4) * tc;
     
     // rate at which object accelerates
@@ -593,6 +592,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         fireBullet = 1;
         dist = 0;
         zdot = zdot_ikillyou;
+        vdesired = 1.0;
     }
     
     if(do_pitch)
@@ -691,18 +691,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         {
             game_add_bullet(bulletPos, bulletEuler, bulletVel, bv, 0, -1, elem->stuff.affiliation);
         }
-    }
-    
-    if(elem->stuff.u.enemy.deploys_collect && time_ms - elem->stuff.u.enemy.time_last_deploy > 1000)
-    {
-        elem->stuff.u.enemy.time_last_deploy = time_ms;
-     
-        float bv = collect_deploy_distance * elem->scale;
-        
-        game_add_powerup(elem->physics.ptr->x - zq.x*bv,
-                         elem->physics.ptr->y - zq.y*bv,
-                         elem->physics.ptr->z - zq.z*bv,
-                         GAME_SUBTYPE_COLLECT, 0);
     }
     
     // leave trail
@@ -810,8 +798,8 @@ pursuit_speed_for_object(WorldElem* elem, float* accel)
     {
         case OBJ_MISSLE:
             v = elem->stuff.u.enemy.max_speed;
-            s = 1.0;
-            *accel = 4;
+            s = 2.0;
+            *accel = 3;
             break;
             
         default:

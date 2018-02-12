@@ -32,50 +32,6 @@
 @synthesize window;
 @synthesize viewController;
 
-void readPrefs(glFlightPrefs* prefs)
-{
-    NSUserDefaults* defaults = [[NSUserDefaults alloc] init];
-
-    NSString *defaultPlayerName = [NSString stringWithFormat:@"player_%@",
-                                   [[[UIDevice currentDevice] name] componentsSeparatedByString:@" "][0]];
-    NSString *defaultServerName = [NSString stringWithFormat:@"game_%@",
-                                   [[[UIDevice currentDevice] name] componentsSeparatedByString:@" "][0]];
-    
-    memset(prefs, 0, sizeof(*prefs));
-    
-    NSString *key_map = @"map_name";
-    NSString *key_server = @"host_preference";
-    NSString *key_name = @"name_preference";
-    NSString *key_update_frequency = @"update_frequency_ms_preference";
-    NSString *key_directory_name = @"game_directory_preference";
-    NSString *key_host_port = @"game_host_port";
-    NSString *key_hidden_cfg = @"game_extra_cfg";
-    NSString *key_local_inet_addr_cfg = @"local_inet_addr_preference";
-    
-    // set default values
-    if(![defaults stringForKey:key_map]) [defaults setValue:@"map1" forKey:key_map];
-    if(![defaults stringForKey:key_server]) [defaults setValue:defaultServerName forKey:key_server];
-    if(![defaults stringForKey:key_name]) [defaults setValue:defaultPlayerName forKey:key_name];
-    if(![defaults integerForKey:key_update_frequency]) [defaults setInteger:50 forKey:key_update_frequency];
-    if(![defaults stringForKey:key_directory_name]) [defaults setValue:@"d0gfight.domain17.net" forKey:key_directory_name];
-    if(![defaults stringForKey:key_host_port]) [defaults setValue:@GAME_NETWORK_PORT_STR forKey:key_host_port];
-    if(![defaults stringForKey:key_hidden_cfg]) [defaults setValue:@"" forKey:key_hidden_cfg];
-    if(![defaults stringForKey:key_local_inet_addr_cfg]) [defaults setValue:@"0.0.0.0" forKey:key_local_inet_addr_cfg];
-    
-    strcpy(prefs->map_name, [[defaults stringForKey:key_map] UTF8String]);
-    strcpy(prefs->server_name, [[defaults stringForKey:key_server] UTF8String]);
-    strcpy(prefs->player_name, [[defaults stringForKey:key_name] UTF8String]);
-    strcpy(prefs->directory_hostname, [[defaults stringForKey:key_directory_name] UTF8String]);
-    strcpy(prefs->hidden_config, [[defaults stringForKey:key_hidden_cfg] UTF8String]);
-    strcpy(prefs->local_inet_addr, [[defaults stringForKey:key_local_inet_addr_cfg] UTF8String]);
-    prefs->host_port = [defaults integerForKey:key_host_port];
-    
-    prefs->net_update_frequency = [defaults integerForKey:key_update_frequency];
-    prefs->hosting = 0;
-    
-    [defaults release];
-}
-
 void appWriteSettings()
 {
     gameSettingsWrite([[NSString stringWithFormat:@"%@/settings.txt", get_docs_prefix()] UTF8String]);
@@ -90,7 +46,6 @@ NSString* get_docs_prefix()
 void glFlightInit(gl_flightViewController* viewController)
 {
     int reset_map = 1;
-    glFlightPrefs prefs;
     
     NSString *docsPrefix = get_docs_prefix();
     
@@ -120,8 +75,6 @@ void glFlightInit(gl_flightViewController* viewController)
     gameAudioInit();
     world_lock_init();
     
-    readPrefs(&prefs);
-    
     game_ai_init();
     
     gameInputInit();
@@ -131,7 +84,7 @@ void glFlightInit(gl_flightViewController* viewController)
     gameMapFilePrefix((char*) [docsPrefix UTF8String]);
     gameMapFileName("temp");
     
-    gameNetwork_init(0, gameSettingsGameName, gameSettingsPlayerName, gameSettingsNetworkFrequency,
+    gameNetwork_init(0, gameSettingGameTitle, gameSettingsPlayerName, gameSettingsNetworkFrequency,
                      gameSettingsPortNumber, gameSettingsLocalIPOverride);
     
     if(game_terminated_gracefully) reset_map = 0;
@@ -140,7 +93,6 @@ void glFlightInit(gl_flightViewController* viewController)
     
     if(!reset_map)
     {
-        //gameMapSetMapData(gameNetworkState.server_map_data);
         gameMapSetMap(maps_list[0]);
     }
     else
@@ -161,10 +113,6 @@ void glFlightInit(gl_flightViewController* viewController)
 
 void glFlightResume(time_t time_last_suspend)
 {
-    glFlightPrefs prefs;
-    
-    readPrefs(&prefs);
-    
     if(time(NULL) - time_last_suspend > 30)
     {
     }

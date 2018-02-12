@@ -1553,7 +1553,6 @@ world_update(float tc)
 {
     // TODO: for meshes test collision by checking if object is < plane-normal vector
     int do_check_collisions = 1;
-    int do_check_boundaries = 1;
     int do_oob_gravity_sound = 1;
     int do_sound_checks = 1;
     int allow_oob_moving_objects = 0;
@@ -1608,7 +1607,7 @@ world_update(float tc)
                 // TODO: get rid of this it's expensive
                 pCur->elem->physics.ptr->velocity = sqrt(vm[0]*vm[0] + vm[1]*vm[1] + vm[2]*vm[2]);
                 
-                if(do_check_boundaries)
+                if(pCur->elem->object_type != OBJ_DISPLAYONLY)
                 {
                     // only doing complex bounding test for some objects (players)
                     if(pCur->elem->bounding_remain)
@@ -1625,7 +1624,6 @@ world_update(float tc)
                                                               v_oob))
                         {
                             out_of_bounds_remove = 0;
-                            
                             
                             if(!pCur->elem->bounding_wrap)
                             {
@@ -1658,7 +1656,7 @@ world_update(float tc)
                         if(my_ship_oob && !sound_played)
                         {
                             sound_played = 1;
-                            gameAudioPlaySoundAtLocation("bump_boundary",
+                            gameAudioPlaySoundAtLocation("bump",
                                                          pCur->elem->physics.ptr->x,
                                                          pCur->elem->physics.ptr->y,
                                                          pCur->elem->physics.ptr->z);

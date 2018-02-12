@@ -26,12 +26,20 @@
 #include "gameSettings.h"
 #include "gameDialogs.h"
 
+extern void appWriteSettings();
+
 int texture_id_block = TEXTURE_ID_BLOCK;
 
 const char *charMap = "abcdefghijklmnopqrstuvwxyz0123456789. _-@!$%^&*";
 
 static float x_last = -1;
 static float y_last = -1;
+
+// variables scoped for fireAction menu handling
+unsigned int maps_list_idx = 0;
+static int game_map_custom_loaded = 0;
+int game_start_difficulty = 1;
+int game_start_score = 0;
 
 void
 gameInterfaceInit(double screenWidth, double screenHeight)
@@ -127,20 +135,13 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.textMenuControl.tex_id = TEXTURE_ID_CONTROLS_TEXTMENU;
     gameInterfaceControls.textMenuControl.visible = 0;
     
-
-    gameInterfaceControls.textEditControl.xw = screenWidth * 0.3;
-    gameInterfaceControls.textEditControl.yw = screenHeight * 0.4;
-    gameInterfaceControls.textEditControl.x = (screenWidth - gameInterfaceControls.textEditControl.xw)/2;
-    gameInterfaceControls.textEditControl.y = (screenHeight - gameInterfaceControls.textEditControl.yw)/2;
-    gameInterfaceControls.textEditControl = gameInterfaceControls.textMenuControl;
-    
     float helpWidth = 0.8;
     float helpHeight = 0.8;
-    gameInterfaceControls.graphicDialog.x = screenWidth/2 - (helpWidth*gameInterfaceControls.interfaceWidth)/2;
-    gameInterfaceControls.graphicDialog.y = screenHeight/2 - (helpHeight*gameInterfaceControls.interfaceHeight)/2;
-    gameInterfaceControls.graphicDialog.xw = helpWidth*gameInterfaceControls.interfaceWidth;
-    gameInterfaceControls.graphicDialog.yw = helpHeight*gameInterfaceControls.interfaceHeight;
-    gameInterfaceControls.graphicDialog.tex_id = TEXTURE_ID_CONTROLS_HELP;
+    gameInterfaceControls.graphicDialog.x = ((1.0-helpWidth)/2) * screenWidth;
+    gameInterfaceControls.graphicDialog.y = ((1.0-helpHeight)/2) * screenHeight;
+    gameInterfaceControls.graphicDialog.xw = helpWidth*screenWidth;
+    gameInterfaceControls.graphicDialog.yw = helpHeight*screenHeight;
+    gameInterfaceControls.graphicDialog.tex_id = TEXTURE_ID_DIALOG_GAMEOVER;
     gameInterfaceControls.graphicDialog.visible = 0;
     
     float dialogWidth = /*0.48*/ 0.60;
@@ -152,6 +153,13 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.dialogRectDefault.tex_id = TEXTURE_ID_CONTROLS_DIALOG_BOX;
     gameInterfaceControls.dialogRectDefault.visible = 0;
     gameInterfaceControls.dialogRect = gameInterfaceControls.dialogRectDefault;
+    
+    gameInterfaceControls.keyboardEntry.xw = screenWidth * 0.6;
+    gameInterfaceControls.keyboardEntry.yw = screenHeight * 0.5;
+    gameInterfaceControls.keyboardEntry.x = screenWidth*0.1;
+    gameInterfaceControls.keyboardEntry.y = (screenHeight - gameInterfaceControls.keyboardEntry.yw)/2;
+    gameInterfaceControls.keyboardEntry.tex_id = /*29*/ 108;
+    gameInterfaceControls.keyboardEntry.visible = 0;
     
     float reticlem = 0.2;
     gameInterfaceControls.reticleRect.x = ((screenWidth)/2 - (reticlem*screenWidth)/2) - screenWidth*0.025;
@@ -183,7 +191,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.fireRectBoost.visible = 0;
     
     gameInterfaceControls.consoleTextRect.x = screenWidth * 0.95;
-    gameInterfaceControls.consoleTextRect.y = screenHeight * 0.1;
+    gameInterfaceControls.consoleTextRect.y = screenHeight * 0.15;
     gameInterfaceControls.consoleTextRect.visible = 1;
     gameInterfaceControls.consoleTextRect.tex_id = -1;
     
@@ -212,12 +220,12 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.reticleRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.textMenuControl;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.fireRectMissle;
-    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.graphicDialog;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.dialogRect;
+    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.graphicDialog;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.consoleTextRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.statsTextRect;
-    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.textEditControl;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.altControl;
+    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.keyboardEntry;
     gameInterfaceControls.controlArray[i++] = NULL;
     
     i = 0;
@@ -229,10 +237,8 @@ gameInterfaceInit(double screenWidth, double screenHeight)
         i++;
     }
     
-    gameInterfaceControls.textHeight = (screenWidth/320) * 12;
-    gameInterfaceControls.textWidth = (screenHeight/568) * 8;
-    
-    gameInterfaceControls.menuAction = ACTION_INVALID;
+    gameInterfaceControls.textHeight = (screenWidth/320) * 8;
+    gameInterfaceControls.textWidth = (screenHeight/568) * 6;
     
     gameInterfaceControls.menuControl.visible = 0;
     
@@ -244,8 +250,6 @@ gameInterfaceInit(double screenWidth, double screenHeight)
 void
 gameInterfaceReset()
 {
-    gameInterfaceControls.menuAction = ACTION_INVALID;
-    
     gameInterfaceControls.menuControl.visible = 0;
     
     gameInterfaceControls.consoleHidden = 0;
@@ -304,7 +308,7 @@ gameInterfaceHandleTouchMove(float x, float y)
         touchedControl->touch_ry = (y - touchedControl->y) / touchedControl->yw;
     }
     
-    gameInterfaceControls.graphicDialog.visible = 0;
+    gameDialogGraphicCancel();
     
     if(touchedControl == &gameInterfaceControls.accelerator)
     {
@@ -370,7 +374,7 @@ gameInterfaceEditString(char *ptr)
     gameInterfaceControls.textMenuControl.visible = 0;
     
     char *p = ptr;
-    char *pd = gameInterfaceControls.textEditControl.text;
+    char *pd = gameInterfaceControls.keyboardEntry.text;
     while(*p)
     {
         int i = 0;
@@ -381,11 +385,12 @@ gameInterfaceEditString(char *ptr)
             *pd = charMap[i];
             pd++;
         }
+
         p++;
     }
     *pd = '\0';
-    gameInterfaceControls.textEditControl.textDest = ptr;
-    gameInterfaceControls.textEditControl.visible = 1;
+    gameInterfaceControls.keyboardEntry.textDest = ptr;
+    gameInterfaceControls.keyboardEntry.visible = 1;
 }
 
 void
@@ -393,32 +398,37 @@ gameInterfaceEditInt(int *ptr)
 {
     gameInterfaceControls.textMenuControl.visible = 0;
     
-    char *pd = gameInterfaceControls.textEditControl.text;
+    char *pd = gameInterfaceControls.keyboardEntry.text;
     sprintf(pd, "%d", *ptr);
-    gameInterfaceControls.textEditControl.textDestInt = ptr;
-    gameInterfaceControls.textEditControl.visible = 1;
+    gameInterfaceControls.keyboardEntry.textDestInt = ptr;
+    gameInterfaceControls.keyboardEntry.visible = 1;
 }
 
 void
 gameInterfaceEditDone()
 {
-    gameInterfaceControls.textMenuControl.visible = 1;
+    gameInterfaceControls.keyboardEntry.visible = 0;
     
     // re-init with new values
-    gameNetwork_init(0, gameSettingsGameName, gameSettingsPlayerName, gameSettingsNetworkFrequency,
+    gameNetwork_init(0, gameSettingGameTitle, gameSettingsPlayerName, gameSettingsNetworkFrequency,
                      gameSettingsPortNumber,
                      gameSettingsLocalIPOverride);
     
-    gameInterfaceControls.textEditControl.text[0] = '\0';
+    gameInterfaceControls.keyboardEntry.text[0] = '\0';
     
-    extern void appWriteSettings();
+    fireAction = fireActionQueued;
+    fireActionQueued = ACTION_INVALID;
+    gameInterfaceProcessAction();
+    
     appWriteSettings();
 }
 
 void
 gameInterfaceHandleTouchBegin(float x, float y)
 {
+    int rgnv = 0;
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
+    
     if(touchedControl)
     {
         touchedControl->touched = 1;
@@ -427,51 +437,59 @@ gameInterfaceHandleTouchBegin(float x, float y)
     
     if(touchedControl == &gameInterfaceControls.textMenuControl ||
        touchedControl == &gameInterfaceControls.fireRect2 ||
-       touchedControl == &gameInterfaceControls.textEditControl)
+       touchedControl == &gameInterfaceControls.keyboardEntry)
     {
-        int a[3][3] =
-        {
-            {0, 1, 0},
-            {2, 0, 3},
-            {5, 4, 0}
+        float touchRegionsXY2048[][3] = {
+            {650,1446, 1}, // up
+            {650,1844, 4}, // down
+            {460,1652, 3}, // left
+            {844,1654, 2}, // right
+            {1320,1654, 5} // enter
         };
+        float touchRadius = 200;
+        float RMin = touchRadius;
         
-        int rx = ((float) (1 - touchedControl->touch_rx) * 3.0); // inverted
-        int ry = ((float) (1 - touchedControl->touch_ry) * 3.0); // inverted
-        int rgnv = a[rx][ry];
-        
-        if(touchedControl == &gameInterfaceControls.fireRect2)
+        if(touchedControl == &gameInterfaceControls.textMenuControl)
         {
-            touchedControl = &gameInterfaceControls.textMenuControl;
-            rgnv = 5;
-        }
-        
-        if(touchedControl == &gameInterfaceControls.textEditControl)
-        {
-            char *p = &(touchedControl->text[strlen(touchedControl->text)-1]);
-            
-            int i = 0;
-            while(charMap[i] != *p) i++;
-            
-            switch(rgnv)
+            int r;
+            for(r = 0; r < sizeof(touchRegionsXY2048)/(sizeof(float)*2); r++)
             {
-                case 1:
-                    i++;
-                    break;
-                case 4:
-                    i--;
-                    break;
-                case 2:
-                    *(p+1) = *p;
-                    break;
-                case 3:
-                    *p = '\0';
-                    break;
-                case 5:
+                float dx = ((touchedControl->touch_ry * 2048) - touchRegionsXY2048[r][0]);
+                float dy = (((1-touchedControl->touch_rx) * 2048) - touchRegionsXY2048[r][1]);
+                float R = sqrt(dx*dx + dy*dy);
+                if(R < RMin)
+                {
+                    RMin = R;
+                    rgnv = touchRegionsXY2048[r][2];
+                }
+            }
+        }
+        else if(touchedControl == &gameInterfaceControls.keyboardEntry)
+        {
+            int col = (int) floor((float) (touchedControl->touch_ry) * 10); // inverted
+            int row = (int) floor((float) (1 - touchedControl->touch_rx) * 5); // inverted
+            if(row < 5 && col < 10)
+            {
+                char KB[5][10] = {
+                    {'1','2','3','4','5','6','7','8','9','0'},
+                    {'q','w','e','r','t','y','u','i','o','p'},
+                    {'a','s','d','f','g','h','j','k','l','@'},
+                    {':','z','x','c','v','b','n','m',',','.'},
+                    {'D',' ',' ',' ',' ',' ',' ',' ',' ','\n'}
+                };
+                
+                char key = KB[(int)roundf(row)][(int)roundf(col)];
+                size_t l = strlen(touchedControl->text);
+                char *p = &(touchedControl->text[l]);
+                
+                if(key == '\n')
+                {
                     /* save */
+                    *p = '\0';
+                    
                     if(touchedControl->textDestInt)
                     {
-                        char*p = touchedControl->text;
+                        char* p = touchedControl->text;
                         int invalid = 0;
                         while(*p)
                         {
@@ -488,195 +506,54 @@ gameInterfaceHandleTouchBegin(float x, float y)
                     {
                         strcpy(touchedControl->textDest, touchedControl->text);
                     }
+
                     touchedControl->textDestInt = NULL;
                     touchedControl->textDest = NULL;
                     touchedControl->visible = 0;
                     gameInterfaceEditDone();
-                    break;
-            default:
-                    gameAudioPlaySoundAtLocation("bump", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
-                    console_write("use menu arrows/ok");
-                break;
-            }
-            
-            if(*p)
-            {
-                if(i < 0) i = strlen(charMap)-1;
-                if(i >= strlen(charMap)) i = 0;
-                *p = charMap[i];
-            }
-            
-        }
-        else
-        {
-            switch(rgnv)
-            {
-                case 0:
-                    break;
-                case 1:
-                    action_prev();
-                    break;
-                case 2:
-                    action_sub_next();
-                    break;
-                case 3:
-                    action_sub_prev();
-                    break;
-                case 4:
-                    action_next();
-                    break;
-                case 5:
-                    switch(fireAction)
-                {
-                    case ACTION_SETTING_PLAYER_NAME:
-                        gameInterfaceEditString(gameSettingsPlayerName);
-                        break;
-                    case ACTION_SETTING_GAME_NAME:
-                        gameInterfaceEditString(gameSettingsGameName);
-                        break;
-                    case ACTION_SETTING_UPDATE_FREQUENCY:
-                        gameInterfaceEditInt(&gameSettingsNetworkFrequency);
-                        break;
-                    case ACTION_SETTING_PORT_NUMBER:
-                        gameInterfaceEditInt(&gameSettingsPortNumber);
-                        break;
-                    case ACTION_SETTING_LOCAL_IP_OVERRIDE:
-                        gameInterfaceEditString(gameSettingsLocalIPOverride);
-                        break;
-                        
-                    case ACTION_SETTING_SHIP_MODEL:
+                    
+                    if(fireAction == ACTION_CONNECT_TO_GAME ||
+                       fireAction == ACTION_HOST_GAME)
                     {
-                        int model_new = MODEL_SHIP1;
-                        
-                        if(!gameSettingsRatingGiven)
-                        {
-                            gameDialogRating();
-                            break;
-                        }
-                        
-                        switch(model_my_ship)
-                        {
-                            case MODEL_SHIP1:
-                                model_new = MODEL_SHIP2;
-                                break;
-                            case MODEL_SHIP2:
-                                model_new = MODEL_SHIP3;
-                                break;
-                            default:
-                                model_new = MODEL_SHIP1;
-                                break;
-                        }
-                        model_my_ship = model_new;
-                        console_write("model %d (on next respawn)", model_my_ship);
+                        // re-perform the action that brought up the keyvboard
+                        rgnv = 5;
                     }
-                        break;
-                        
-                    case ACTION_SETTING_CONTROL_MODE:
-                        gameSettingsSimpleControls = !gameSettingsSimpleControls;
-                        break;
-                        
-                    case ACTION_SETTING_LOCK_CAMERA:
-                        if(camera_chase_frames >= GAME_CAMERA_CHASE_LAG_FRAMES_MAX)
-                        {
-                            camera_chase_frames = 0;
-                            camera_locked_frames = 60 * 30;
-                        }
-                        else if(camera_chase_frames == 0)
-                        {
-                            camera_chase_frames = 1;
-                            camera_locked_frames = 0;
-                        }
-                        else camera_chase_frames *= 2;
-                        
-                        console_write("camera chase:%d locked:%d",
-                                      camera_chase_frames,
-                                      camera_locked_frames? 1: 0);
-                        break;
-                        
-                    case ACTION_SETTING_SHOW_DEBUG:
-                        console_write("enemy_intelligence:%f,myPlayerId:%d\nbuild date/time:%s - %s\n",
-                                      gameStateSinglePlayer.enemy_intelligence,
-                                      gameNetworkState.my_player_id, __DATE__, __TIME__);
-                        break;
-                        
-                    case ACTION_SETTING_TWEAK_PHYSICS:
-                        C_FRICTION *= 1.5;
-                        if(C_FRICTION >= 0.5) C_FRICTION = 0.005;
-                        console_write("C_FRICTION:%f", C_FRICTION);
-                        break;
-                        
-                    case ACTION_SETTING_GYRO_FEEDBACK:
-                        if(GYRO_FEEDBACK == 0.0) GYRO_FEEDBACK = 0.0005;
-                        GYRO_FEEDBACK *= 2;
-                        if(GYRO_FEEDBACK >= 0.2) GYRO_FEEDBACK = GYRO_FEEDBACK_DEFAULT;
-                        console_write("GYRO_FEEDBACK:%f", GYRO_FEEDBACK);
-                        break;
-                        
-                    case ACTION_SETTING_SHIP_TEXTURE:
-                        switch(texture_id_playership)
-                    {
-                        case TEXTURE_ID_SHIP1:
-                            texture_id_playership = TEXTURE_ID_SHIP2;
-                            break;
-                        case TEXTURE_ID_SHIP2:
-                            texture_id_playership = TEXTURE_ID_SHIP3;
-                            break;
-                        case TEXTURE_ID_SHIP3:
-                            texture_id_playership = TEXTURE_ID_SHIP4;
-                            break;
-                        case TEXTURE_ID_SHIP4:
-                            texture_id_playership = TEXTURE_ID_SHIP5;
-                            break;
-                        case TEXTURE_ID_SHIP5:
-                            texture_id_playership = TEXTURE_ID_SHIP6;
-                            break;
-                        case TEXTURE_ID_SHIP6:
-                            texture_id_playership = TEXTURE_ID_SHIP7;
-                            break;
-                        case TEXTURE_ID_SHIP7:
-                            texture_id_playership = TEXTURE_ID_SHIP8;
-                            break;
-                        default:
-                            texture_id_playership = TEXTURE_ID_SHIP1;
-                            break;
-                    }
-                        
-                        WorldElemListNode* pShip = world_elem_list_find(my_ship_id, &gWorld->elements_list);
-                        if(pShip)
-                        {
-                            pShip->elem->texture_id = texture_id_playership;
-                        }
-                        
-                        console_write("texture:%d\r", texture_id_playership);
-                        gameInterfaceControls.textMenuControl.hide_frames = 120;
-                        break;
-                        
-                    case ACTION_SETTING_INPUT_SENSITIVITY:
-                        GYRO_DC += 0.001;
-                        if(GYRO_DC >= 0.01) GYRO_DC = 0.001;
-                        console_write("Input sensitivity: %f\n", GYRO_DC);
-                        break;
-                        
-                    case ACTION_SETTING_BOTINTELLIGENCE:
-                        gameStateSinglePlayer.setting_bot_intelligence++;
-                        if(gameStateSinglePlayer.setting_bot_intelligence > 10)
-                            gameStateSinglePlayer.setting_bot_intelligence = 1;
-                        console_write("Bot skill:%d\n", gameStateSinglePlayer.setting_bot_intelligence);
-                        break;
-                        
-                    case ACTION_SETTING_AUDIO:
-                        gameAudioMuted = !gameAudioMuted;
-                        console_write("Audio muted:%d\n", gameAudioMuted);
-                        break;
-                        
-                    default:
-                        gameInterfaceControls.menuAction = fireAction;
-                        break;
                 }
-                    break;
-                default:
-                    break;
+                else if(key == 'D')
+                {
+                    // delete
+                    if(l > 0) *(p-1) = '\0';
+                }
+                else
+                {
+                    *p = key;
+                    *(p+1) = '\0';
+                }
             }
+        }
+
+        switch(rgnv)
+        {
+            case 0:
+                break;
+            case 1:
+                action_prev();
+                break;
+            case 2:
+                action_sub_next();
+                break;
+            case 3:
+                action_sub_prev();
+                break;
+            case 4:
+                action_next();
+                break;
+            case 5:
+                gameInterfaceProcessAction();
+                break;
+                
+            default:
+                break;
         }
     }
     
@@ -719,6 +596,366 @@ gameInterfaceHandleTouchBegin(float x, float y)
     gameInterfaceControls.touchCount++;
     
     if(touchedControl != &gameInterfaceControls.trim) game_paused = 0;
+}
+
+void gameInterfaceProcessAction()
+{
+    char *mapBuffer = NULL;
+    const char* pGameConnectName = gameSettingGameTitle;
+    char strTmp[256];
+        
+    /* single-player games disconnect from network */
+    if((fireAction >= ACTION_START_TURRET_GAME &&
+        fireAction <= ACTION_START_SPEEDRUN_GAME) ||
+       fireAction == ACTION_MAP_EDIT)
+    {
+        gameNetwork_disconnect();
+    }
+    
+    switch(fireAction)
+    {
+        case ACTION_MAP_EDIT:
+            game_map_custom_loaded = 1;
+            gameInterfaceControls.mainMenu.visible = 0;
+            gameMapFileName("custom");
+            mapBuffer = gameMapRead();
+            gameMapSetMap(mapBuffer);
+            //save_map = 1; // save map when done
+            gameStateSinglePlayer.map_use_current = 1;
+            console_write("custom map loaded\nchanges will be saved");
+            break;
+            
+        case ACTION_MAP_SAVE:
+            gameInterfaceControls.mainMenu.visible = 0;
+            gameMapFileName("custom");
+            gameMapWrite();
+            gameStateSinglePlayer.map_use_current = 1;
+            console_write("custom map saved\n");
+            break;
+            
+        case ACTION_CLEAR_MAP:
+            gameMapFileName("custom");
+            maps_list_idx++;
+            if(maps_list[maps_list_idx] == NULL) maps_list_idx = 0;
+            gameMapSetMap(maps_list[maps_list_idx]);
+            gameMapWrite();
+            gameStateSinglePlayer.map_use_current = 1;
+            console_write("map loaded:%s", maps_list_names[maps_list_idx]);
+            break;
+            
+        case ACTION_CONNECT_TO_GAME_LAN:
+            goto connect_to_game_name_set;
+        case ACTION_CONNECT_TO_GAME:
+        {
+            char* gameName = gameSettingGameTitle;
+            
+            if(!gameDialogState.networkGameNameEntered)
+            {
+                gameDialogState.networkGameNameEntered = 1;
+                fireActionQueued = fireAction;
+                console_clear();
+                console_write("Enter the host game-ID:");
+                console_append("(or IP address)");
+                goto fire_action_setting_game_name;
+            }
+            
+        connect_to_game_name_set:
+            
+            if(fireAction == ACTION_CONNECT_TO_GAME_LAN &&
+               !gameDialogSearchingForGame())
+            {
+                break;
+            }
+            
+            if(fireAction == ACTION_CONNECT_TO_GAME_LAN)
+            {
+                gameName = (char*) GAME_NETWORK_LAN_GAME_NAME;
+            }
+            
+            if(gameNetworkState.connected) gameNetwork_disconnect();
+            
+            if(gameNetwork_connect(gameName, 0) == GAME_NETWORK_ERR_NONE)
+            {
+                gameStateSinglePlayer.started = 0;
+            }
+            else
+            {
+                console_write("Connection failed to %s", gameName);
+            }
+        }
+            break;
+            
+        case ACTION_HOST_GAME_LAN:
+            pGameConnectName = GAME_NETWORK_LAN_GAME_NAME;
+        case ACTION_HOST_GAME:
+            
+            if(!gameDialogState.networkGameNameEntered && fireAction != ACTION_HOST_GAME_LAN)
+            {
+                gameDialogState.networkGameNameEntered = 1;
+                fireActionQueued = fireAction;
+                console_clear();
+                console_write("Enter a host game-ID:\n(share this with guests)");
+                goto fire_action_setting_game_name;
+            }
+            
+            gameInterfaceControls.mainMenu.visible = 0;
+            gameNetwork_disconnect();
+            if(gameNetwork_connect((char *) pGameConnectName, 1) == GAME_NETWORK_ERR_NONE)
+            {
+                actions_menu_reset();
+                gameStateSinglePlayer.started = 0;
+                save_map = 0;
+                console_write("Hosting game: %s\nWaiting for guests...",
+                              gameNetworkState.hostInfo.name);
+                if(!game_map_custom_loaded) gameMapSetMap(initial_map_deathmatch);
+            }
+            break;
+            
+        case ACTION_DISPLAY_SCORES:
+            gameDialogScores();
+            break;
+            
+        case ACTION_HELP:
+            gameDialogGraphic(TEXTURE_ID_CONTROLS_HELP);
+            break;
+            
+        case ACTION_RESUME_GAME:
+            game_start_difficulty = gameStateSinglePlayer.last_game.difficulty;
+            game_start_score = gameStateSinglePlayer.last_game.score;
+            
+        case ACTION_START_GAME:
+            actions_menu_reset();
+            gameInterfaceControls.mainMenu.visible = 0;
+            game_start(game_start_difficulty, GAME_TYPE_COLLECT);
+            gameStateSinglePlayer.stats.score = game_start_score;
+            gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
+            save_map = 0;
+            break;
+            
+        case ACTION_START_DEATHMATCH_GAME:
+            gameInterfaceControls.mainMenu.visible = 0;
+            sprintf(strTmp, "5m deathmatch started!\nNetworked:%s",
+                    gameNetworkState.hostInfo.hosting? "YES": "NO");
+            gameNetwork_alert(strTmp);
+            gameNetwork_startGame(300);
+            game_start(1, GAME_TYPE_DEATHMATCH);
+            gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
+            save_map = 0;
+            break;
+            
+        case ACTION_START_SURVIVAL_GAME:
+            gameInterfaceControls.mainMenu.visible = 0;
+            sprintf(strTmp, "survival started!\n");
+            gameStateSinglePlayer.started = 1;
+            game_start(1, GAME_TYPE_SURVIVAL);
+            gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
+            save_map = 0;
+            break;
+            
+        case ACTION_START_SPEEDRUN_GAME:
+            gameInterfaceControls.mainMenu.visible = 0;
+            sprintf(strTmp, "survival started!\n");
+            gameStateSinglePlayer.started = 1;
+            game_start(1, GAME_TYPE_SPEEDRUN);
+            gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
+            save_map = 0;
+            break;
+            
+        case ACTION_START_LOBBALL_GAME:
+            gameInterfaceControls.mainMenu.visible = 0;
+            sprintf(strTmp, "lob started!\n");
+            gameStateSinglePlayer.started = 1;
+            game_start(1, GAME_TYPE_LOBBALL);
+            gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
+            save_map = 0;
+            break;
+            
+        case ACTION_START_DEFEND_GAME:
+            gameInterfaceControls.mainMenu.visible = 0;
+            sprintf(strTmp, "defend started!\n");
+            gameStateSinglePlayer.started = 1;
+            game_start(1, GAME_TYPE_DEFEND);
+            gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
+            save_map = 0;
+            break;
+            
+        case ACTION_START_TURRET_GAME:
+            gameInterfaceControls.mainMenu.visible = 0;
+            sprintf(strTmp, "turret started!\n");
+            gameStateSinglePlayer.started = 1;
+            game_start(1, GAME_TYPE_TURRET);
+            gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
+            save_map = 0;
+            break;
+            
+        case ACTION_NETWORK_MULTIPLAYER_MENU:
+            action_sub_next();
+            break;
+            
+        case ACTION_SETTING_PLAYER_NAME:
+            gameInterfaceEditString(gameSettingsPlayerName);
+            break;
+            
+        case ACTION_SETTING_GAME_NAME:
+        fire_action_setting_game_name:
+            gameInterfaceEditString(gameSettingGameTitle);
+            break;
+        case ACTION_SETTING_UPDATE_FREQUENCY:
+            gameInterfaceEditInt(&gameSettingsNetworkFrequency);
+            break;
+        case ACTION_SETTING_PORT_NUMBER:
+            gameInterfaceEditInt(&gameSettingsPortNumber);
+            break;
+        case ACTION_SETTING_LOCAL_IP_OVERRIDE:
+            gameInterfaceEditString(gameSettingsLocalIPOverride);
+            break;
+            
+        case ACTION_SETTING_SHIP_MODEL:
+        {
+            int model_new = MODEL_SHIP1;
+            
+            if(!gameSettingsRatingGiven)
+            {
+                gameDialogRating();
+                break;
+            }
+            
+            switch(model_my_ship)
+            {
+                case MODEL_SHIP1:
+                    model_new = MODEL_SHIP2;
+                    break;
+                case MODEL_SHIP2:
+                    model_new = MODEL_SHIP3;
+                    break;
+                default:
+                    model_new = MODEL_SHIP1;
+                    break;
+            }
+            model_my_ship = model_new;
+            console_write("model %d (on next respawn)", model_my_ship);
+            
+            appWriteSettings();
+        }
+            break;
+            
+        case ACTION_SETTING_CONTROL_MODE:
+            gameSettingsSimpleControls = !gameSettingsSimpleControls;
+            appWriteSettings();
+            break;
+            
+        case ACTION_SETTING_LOCK_CAMERA:
+            if(camera_chase_frames >= GAME_CAMERA_CHASE_LAG_FRAMES_MAX)
+            {
+                camera_chase_frames = 0;
+                camera_locked_frames = 60 * 30;
+            }
+            else if(camera_chase_frames == 0)
+            {
+                camera_chase_frames = 1;
+                camera_locked_frames = 0;
+            }
+            else camera_chase_frames *= 2;
+            
+            console_write("camera chase:%d locked:%d",
+                          camera_chase_frames,
+                          camera_locked_frames? 1: 0);
+            appWriteSettings();
+            break;
+            
+        case ACTION_SETTING_SHOW_DEBUG:
+            console_write("enemy_intelligence:%f,myPlayerId:%d\nbuild date/time:%s - %s\n",
+                          gameStateSinglePlayer.enemy_intelligence,
+                          gameNetworkState.my_player_id, __DATE__, __TIME__);
+            break;
+            
+        case ACTION_SETTING_TWEAK_PHYSICS:
+            C_FRICTION *= 1.5;
+            if(C_FRICTION >= 0.5) C_FRICTION = 0.005;
+            console_write("C_FRICTION:%f", C_FRICTION);
+            appWriteSettings();
+            break;
+            
+        case ACTION_SETTING_GYRO_FEEDBACK:
+            if(GYRO_FEEDBACK == 0.0) GYRO_FEEDBACK = 0.0005;
+            GYRO_FEEDBACK *= 2;
+            if(GYRO_FEEDBACK >= 0.2) GYRO_FEEDBACK = GYRO_FEEDBACK_DEFAULT;
+            console_write("GYRO_FEEDBACK:%f", GYRO_FEEDBACK);
+            appWriteSettings();
+            break;
+            
+        case ACTION_SETTING_SHIP_TEXTURE:
+            switch(texture_id_playership)
+        {
+            case TEXTURE_ID_SHIP1:
+                texture_id_playership = TEXTURE_ID_SHIP2;
+                break;
+            case TEXTURE_ID_SHIP2:
+                texture_id_playership = TEXTURE_ID_SHIP3;
+                break;
+            case TEXTURE_ID_SHIP3:
+                texture_id_playership = TEXTURE_ID_SHIP4;
+                break;
+            case TEXTURE_ID_SHIP4:
+                texture_id_playership = TEXTURE_ID_SHIP5;
+                break;
+            case TEXTURE_ID_SHIP5:
+                texture_id_playership = TEXTURE_ID_SHIP6;
+                break;
+            case TEXTURE_ID_SHIP6:
+                texture_id_playership = TEXTURE_ID_SHIP7;
+                break;
+            case TEXTURE_ID_SHIP7:
+                texture_id_playership = TEXTURE_ID_SHIP8;
+                break;
+            default:
+                texture_id_playership = TEXTURE_ID_SHIP1;
+                break;
+        }
+            
+            WorldElemListNode* pShip = world_elem_list_find(my_ship_id, &gWorld->elements_list);
+            if(pShip)
+            {
+                pShip->elem->texture_id = texture_id_playership;
+            }
+            
+            console_write("texture:%d\r", texture_id_playership);
+            gameInterfaceControls.textMenuControl.hide_frames = 120;
+            appWriteSettings();
+            break;
+            
+        case ACTION_SETTING_INPUT_SENSITIVITY:
+            GYRO_DC += GYRO_DC_DEFAULT/2;
+            if(GYRO_DC >= GYRO_DC_DEFAULT*2) GYRO_DC = GYRO_DC_DEFAULT/2;
+            console_write("Input sensitivity: %f\n", GYRO_DC);
+            appWriteSettings();
+            break;
+            
+        case ACTION_SETTING_BOTINTELLIGENCE:
+            gameStateSinglePlayer.setting_bot_intelligence++;
+            if(gameStateSinglePlayer.setting_bot_intelligence > 10)
+                gameStateSinglePlayer.setting_bot_intelligence = 1;
+            console_write("Bot skill:%d\n", gameStateSinglePlayer.setting_bot_intelligence);
+            appWriteSettings();
+            break;
+            
+        case ACTION_SETTING_AUDIO:
+            gameAudioMuted = !gameAudioMuted;
+            console_write("Audio muted:%d\n", gameAudioMuted);
+            appWriteSettings();
+            break;
+            
+        case ACTION_SETTING_RESET_SCORE:
+            gameDialogResetScores();
+            break;
+            
+        case ACTION_SETTING_RESET_DEFAULT:
+            gameSettingsDefaults();
+            break;
+            
+        default:
+            break;
+    }
 }
 
 void

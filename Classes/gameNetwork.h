@@ -12,7 +12,7 @@
 #include "gameUtils.h"
 
 #define GAME_NETWORK_MAX_PLAYERS 64
-#define GAME_NETWORK_MAX_STRING_LEN 32
+#define GAME_NETWORK_MAX_STRING_LEN 128
 #define GAME_NETWORK_MAX_MAP_STRING_LEN 256
 #define GAME_NETWORK_PORT 52000
 #define GAME_NETWORK_PORT_BONJOUR 52010
@@ -26,6 +26,7 @@
 #define GAME_NETWORK_ADDRESS_PORT(x) (((struct sockaddr_in6*) (x)->storage)->sin6_port)
 #define GAME_NETWORK_ADDRESS_LEN_CORRECT(x) ((x)->len == sizeof(struct sockaddr_in6))
 #define GAME_NETWORK_BONJOUR_ADDRFAMILY_HACK 0x09
+#define GAME_NETWORK_MAP_REQUEST_BLOCK_LEN (GAME_NETWORK_MAX_STRING_LEN * 32)
 
 const static char *GAME_NETWORK_LAN_GAME_NAME = "d0gf1ght_lan";
 
@@ -44,7 +45,7 @@ typedef enum
     GAME_NETWORK_MSG_PONG,
     GAME_NETWORK_MSG_CONNECT,
     GAME_NETWORK_MSG_DISCONNECT,
-    GAME_NETWORK_MSG_GET_MAP,
+    GAME_NETWORK_MSG_GET_MAP_REQUEST,
     GAME_NETWORK_MSG_GET_MAP_BEGIN,
     GAME_NETWORK_MSG_GET_MAP_SOME,
     GAME_NETWORK_MSG_GET_MAP_END,
@@ -58,13 +59,14 @@ typedef enum
     GAME_NETWORK_MSG_REMOVE_SERVER_OBJECT_WITH_ID,
     GAME_NETWORK_MSG_ALERT_BEGIN,
     GAME_NETWORK_MSG_ALERT_CONTINUE,
+    GAME_NETWORK_MSG_ALERT_END,
     GAME_NETWORK_MSG_KILLEDME,
     GAME_NETWORK_MSG_MYINFO,
     GAME_NETWORK_MSG_TOW_DROP,
     GAME_NETWORK_MSG_PLAYER_STATUS,
     GAME_NETWORK_MSG_HITME,
     
-    GAME_NETWORK_MSG_DIRECTORY_ADD,
+    GAME_NETWORK_MSG_DIRECTORY_ADD, /* 29 */
     GAME_NETWORK_MSG_DIRECTORY_REMOVE,
     GAME_NETWORK_MSG_DIRECTORY_QUERY,
     GAME_NETWORK_MSG_DIRECTORY_QUERY_RANDOM,
@@ -111,6 +113,8 @@ typedef struct
         } directoryInfo;
         
         struct {
+            unsigned long offset;
+            unsigned short block_len;
             char s[GAME_NETWORK_MAX_MAP_STRING_LEN];
         } mapData;
         
@@ -151,6 +155,7 @@ struct gameNetworkPlayerInfo
     game_timeval_t time_status_last;
     game_timeval_t time_cube_pooped_last;
     game_timeval_t euler_last_interp;
+    char* map_data, *map_data_ptr;
     
     struct
     {
@@ -214,7 +219,8 @@ typedef struct
     
     gameNetworkSocket server_socket;
     
-    char *server_map_data;
+    char *server_map_data, *server_map_data_end;
+    unsigned long map_request_offset;
     
     int inited;
     int connected;
@@ -268,7 +274,7 @@ gameNetworkError
 gameNetwork_resume();
 
 int
-gameNetwork_connect(char* server_name, int host, int lan_only);
+gameNetwork_connect(char* server_name, int host);
 
 void
 gameNetwork_worldInit();

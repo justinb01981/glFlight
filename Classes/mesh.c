@@ -300,3 +300,101 @@ free_mesh_opengl(struct mesh_opengl_t* ogl_mesh)
     
     free(ogl_mesh);
 }
+
+
+/**
+ // possiblw "triangle-fan" like solution
+ 8-----7-----6
+ | \   |   / |
+ |  \  |  /  |
+ |   \ | /   |
+ |    \|/    |
+ 0-----1-----5
+ |    /|\    |
+ |   / | \   |
+ |  /  |  \  |
+ | /   |   \ |
+ 2-----3-----4
+ 0,2,1
+ 2,3,1
+ 3,4,1
+ 4,5,1
+ 5,6,1
+ 6,7,1
+ 7,8,1
+ 8,0,1 <-- end-step
+ 
+ // possible triangle-strip solution
+ 0-----1-----4-----6
+ |    /|    /|
+ |   / |   / |
+ |  /  |  /  |
+ | /   | /   |
+ 2-----3-----5
+1,0,2
+3,1,2  m=1 // (next, read prev left-right, skip m)
+4,1,3  m=2 // (next, read prev right-left, skip m)
+5,4,3  m=1
+6,4,5  m=2
+7,6,5  m=1
+8,6,7  m=2
+ **/
+TESS_BEGIN_FUNCTION
+{
+    S->Icur = S->Is;
+    S->Mcur = S->Ms;
+    S->Tcur = S->Ts;
+    
+    // store next set of vertices
+    *(S->Icur) = 1; S->Icur++;
+    *(S->Icur) = 0; S->Icur++;
+    S->Inext = 2;
+    
+    *S->Mcur = A[0]; S->Mcur++; *S->Mcur = A[1]; S->Mcur++; *S->Mcur = A[2]; S->Mcur++;
+    *S->Mcur = B[0]; S->Mcur++; *S->Mcur = B[1]; S->Mcur++; *S->Mcur = B[2]; S->Mcur++;
+    
+    *S->Tcur = u[0]; S->Tcur++; *S->Tcur = u[1]; S->Tcur++;
+    *S->Tcur = v[0]; S->Tcur++; *S->Tcur = v[1]; S->Tcur++;
+}
+
+TESS_STEP_FUNCTION
+{
+    unsigned int* Ist = S->Icur - 3;
+    
+    *S->Mcur = A[0]; S->Mcur++; *S->Mcur = A[1]; S->Mcur++; *S->Mcur = A[2]; S->Mcur++;
+    
+    *S->Tcur = u[0]; S->Tcur++; *S->Tcur = u[1]; S->Tcur++;
+
+    if(S->Inext == 2)
+    {
+        // complete first triangle
+        *(S->Icur) = S->Inext; S->Icur++;
+    }
+    else
+    if(S->Inext % 2 == 1)
+    {
+        *(S->Icur) = S->Inext; S->Icur++;
+        *(S->Icur) = *(Ist); S->Icur++;
+        *(S->Icur) = *(Ist+2); S->Icur++;
+    }
+    else
+    {
+        *(S->Icur) = S->Inext; S->Icur++;
+        *(S->Icur) = *(Ist+1); S->Icur++;
+        *(S->Icur) = *(Ist); S->Icur++;
+    }
+    
+    printf("TESS_STEP[1]: %d %d %d\n", *(S->Icur-3), *(S->Icur-2), *(S->Icur-1));
+    
+    S->Inext++;
+}
+
+TESS_END_FUNCTION
+{
+}
+
+TESS_WALK_FUNCTION
+{
+    cb(S->Ms, S->Ts, S->Is, S->Icur - S->Is);
+}
+

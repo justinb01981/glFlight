@@ -156,11 +156,11 @@ const int PEER_ID_INITIAL = 1001;
     if(inputStream && outputStream)
     {
         [inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-        if([[[self service] type] containsString:@"tcp"]) [inputStream close];
+        [inputStream close];
         inputStream = nil;
 
         [outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-        if([[[self service] type] containsString:@"tcp"]) [outputStream close];
+        [outputStream close];
         outputStream = nil;
     }
     else
@@ -226,7 +226,7 @@ static GameNetworkBonjourManager* instance;
 {
     self = [super init];
     if (self) {
-        browsers = nil;
+        browsers = [[NSMutableArray alloc] init];
         
         foundDomains = [[NSMutableArray alloc] init];
         
@@ -316,12 +316,22 @@ static GameNetworkBonjourManager* instance;
     [browsers enumerateObjectsUsingBlock:^(NSNetServiceBrowser * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj stop];
     }];
-    browsers = [[NSMutableArray alloc] initWithObjects: [[NSNetServiceBrowser alloc] init], nil];
     
-    [browsers[0] searchForBrowsableDomains];
+    [browsers removeAllObjects];
+    
+    [browsers addObject:[[NSNetServiceBrowser alloc] init]];
     
     browsers[0].includesPeerToPeer = YES;
     [browsers[0] setDelegate:self];
+    
+    [foundDomains removeAllObjects];
+    [browsers[0] searchForBrowsableDomains];
+    
+    [browsedServices removeAllObjects];
+    
+    [servicesResolving removeAllObjects];
+    
+    clientService = nil;
     
     return 1;
 }
@@ -329,10 +339,11 @@ static GameNetworkBonjourManager* instance;
 - (void) sendPeer:(gameNetworkMessage*) msg peer:(int)peer_id
 {
     NSMutableArray<GameNetworkPeer*>* peers = (void*) self.peers;
+    __block gameNetworkMessage* msg_ = msg;
     [peers enumerateObjectsUsingBlock:^(GameNetworkPeer * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if(obj.peerId == peer_id)
         {
-            [obj sendMsg:msg];
+            [obj sendMsg:msg_];
             *stop = YES;
         }
     }];
@@ -357,6 +368,8 @@ static GameNetworkBonjourManager* instance;
     }];
     
     [peers removeAllObjects];
+    
+    clientService = nil;
 }
 
 // NSNetServiceDelegate delegate
@@ -516,20 +529,14 @@ static GameNetworkBonjourManager* instance;
 {
     [foundDomains addObject:domainString];
     
-    if(!moreComing) {
-        [browser stop];
-        
-        if(foundDomains.count == 0) return;
-        
-        NSNetServiceBrowser* newBrowser = [[NSNetServiceBrowser alloc] init];
-        [browsers addObject:newBrowser];
-        
-        [foundDomains enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [newBrowser setDelegate:self];
-            newBrowser.includesPeerToPeer = TRUE;
-            [newBrowser searchForServicesOfType:type inDomain:obj];
-        }];
-    }
+    NSNetServiceBrowser* newBrowser = [[NSNetServiceBrowser alloc] init];
+    [browsers addObject:newBrowser];
+    
+    [foundDomains enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [newBrowser setDelegate:self];
+        newBrowser.includesPeerToPeer = TRUE;
+        [newBrowser searchForServicesOfType:type inDomain:obj];
+    }];
 }
 
 - (void) netServiceDidResolveAddress:(NSNetService *)sender
@@ -571,15 +578,14 @@ static GameNetworkBonjourManager* instance;
     
     [service scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [service resolveWithTimeout:2.0];
-    
-    if(!moreComing) {
-        [browser stop];
-    }
 }
 
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser didNotSearch:(NSDictionary *)errorDict
 {
     NSLog(@"netServiceBrowser did not search: %@", [errorDict description]);
+    [browser stop];
+    
+    [browsers removeObject:browser];
 }
 
 @end
@@ -603,7 +609,7 @@ void GameNetworkBonjourManagerSendMessageToPeer(uint8_t* msg_, int peer_id)
 
 int GameNetworkBonjourManagerBrowseBegin()
 {
-    GameNetworkBonjourManager.instance = nil;
+    //GameNetworkBonjourManager.instance = nil;
     [GameNetworkBonjourManager.instance browse];
     return 1;
 }

@@ -59,6 +59,8 @@ extern float block_scale;
 extern int radar_mode;
 extern int save_map;
 extern int controls_simple;
+extern int fireAction;
+extern int fireActionQueued;
 
 #if GAME_PLATFORM_ANDROID
 #define GAME_PLATFORM_IS_LANDSCAPE 0

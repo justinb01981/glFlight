@@ -14,6 +14,8 @@ extern int game_paused;
 extern int game_terminated_gracefully;
 extern char* world_data;
 
+extern void (*glFlightDrawframeHook)(void);
+
 void
 glFlightFrameStage1();
 

@@ -20,6 +20,9 @@ struct gameDialogStateStruct
 {
     int ratingDesired;
     int controlsResuming;
+    char gameDialogPortalToGameLast[255];
+    int lanGameScanning;
+    int networkGameNameEntered;
 };
 
 extern struct gameDialogStateStruct gameDialogState;
@@ -29,6 +32,18 @@ extern int gameDialogCounter;
 static void
 gameDialogCancel(void)
 {
+}
+
+static void
+gameDialogClose(void)
+{
+    gameInterfaceControls.dialogRect.visible = 0;
+}
+
+static int
+gameDialogVisible()
+{
+    return gameInterfaceControls.dialogRect.visible;
 }
 
 static void
@@ -44,43 +59,24 @@ gameDialogResetScores()
 }
 
 static void
-gameDialogWelcomeSingleNew()
-{
-    gameInterfaceControls.menuAction = ACTION_START_GAME;
-}
-
-static void
-gameDialogWelcomeSingleResume()
-{
-    gameInterfaceControls.menuAction = ACTION_RESUME_GAME;
-}
-
-static void
 gameDialogWelcomeSingle()
 {
-    if(/*gameStateSinglePlayer.last_game.difficulty > 1*/ 0)
-    {
-        gameInterfaceModalDialog("Resume last game?", "Resume", "New",
-                                 gameDialogWelcomeSingleResume, gameDialogWelcomeSingleNew);
-    }
-    else
-    {
-        gameInterfaceControls.menuAction = ACTION_START_GAME;
-    }
+    fireAction = ACTION_START_GAME;
+    gameInterfaceControls.textMenuControl.visible = 1;
 }
 
 static void
 gameDialogWelcomeMultiHost()
 {
     actions_menu_set(ACTION_HOST_GAME);
-    gameInterfaceControls.menuAction = ACTION_HOST_GAME;
+    fireAction = ACTION_HOST_GAME;
 }
 
 static void
 gameDialogWelcomeMultiJoin()
 {
     actions_menu_set(ACTION_CONNECT_TO_GAME);
-    gameInterfaceControls.menuAction = ACTION_CONNECT_TO_GAME;
+    fireAction = ACTION_CONNECT_TO_GAME;
 }
 
 static void
@@ -137,11 +133,23 @@ gameDialogWelcomeNoRating()
 "^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D\n"
 
 static void
+gameDialogMenuCountdown()
+{
+    static int passes = 60;
+    passes--;
+    
+    if(passes > 0) return;
+    
+    gameDialogWelcomeMenu();
+    glFlightDrawframeHook = NULL;
+}
+
+static void
 gameDialogWelcome()
 {
     gameInterfaceControls.mainMenu.visible = 1;
     
-    if(gameSettingsLaunchCount % 2 == 1 && !gameSettingsRatingGiven)
+    if(/*gameSettingsLaunchCount % 2 == 1 && !gameSettingsRatingGiven*/ 0)
     {
         gameInterfaceModalDialog(WELCOMESTR
                                  "Please rate d0gf1ght\n"
@@ -151,9 +159,13 @@ gameDialogWelcome()
     }
     else
     {
-        gameInterfaceModalDialog(WELCOMESTR, "Quick Game", "Menu",
-                                 /*gameDialogWelcomeQuick*/ gameDialogWelcomeSingle, gameDialogWelcomeMenu);
+        //gameInterfaceModalDialog(WELCOMESTR, "Quick Game", "Menu",
+        //                         /*gameDialogWelcomeQuick*/ gameDialogWelcomeSingle, gameDialogWelcomeMenu);
+        
+        glFlightDrawframeHook = gameDialogMenuCountdown;
     }
+    
+    gameDialogClose();
 }
 
 static void
@@ -219,16 +231,24 @@ static void
 gameDialogConnectToGameYes()
 {
     actions_menu_set(ACTION_CONNECT_TO_GAME);
-    gameInterfaceControls.menuAction = ACTION_CONNECT_TO_GAME;
+    fireAction = ACTION_CONNECT_TO_GAME;
+}
+
+static char*
+gameDialogPortalToGameLast()
+{
+    gameDialogClose();
+    return gameDialogState.gameDialogPortalToGameLast;
 }
 
 static void
 gameDialogPortalToGame(const char* address)
 {
     char str[255];
-    sprintf(str, "Connect to server %s?\n(Edit this in settings)", address);
+    sprintf(str, "Click to join\n \"%s\"", address);
     gameInterfaceModalDialog(str, "Yes", "No",
                              gameDialogConnectToGameYes, gameDialogCancel);
+    strcpy(gameDialogState.gameDialogPortalToGameLast, address);
 }
 
 static void
@@ -249,43 +269,51 @@ gameDialogBrowseGames()
 static void gameDialogLanConnect()
 {
     gameDialogCancel();
-    gameInterfaceControls.menuAction = ACTION_CONNECT_TO_GAME_LAN;
+    fireAction = ACTION_CONNECT_TO_GAME_LAN;
+    gameInterfaceProcessAction();
 }
 
-static int gameDialogLanSearching()
+static int
+gameDialogSearchingForGame()
 {
-    char* message = "Scanning for local game hosts...";
     extern int GameNetworkBonjourManagerBrowseBegin();
     
-    if(!gameInterfaceControls.dialogRect.visible && strcmp(gameInterfaceControls.dialogRect.text, message) != 0)
+    if(gameDialogState.lanGameScanning)
     {
-        gameInterfaceModalDialog(message, "OK", "", gameDialogLanConnect, gameDialogCancel);
-        GameNetworkBonjourManagerBrowseBegin();
-
-        return 1; // must retry
+        gameDialogState.lanGameScanning = 0;
+        return 1;
     }
-    return 0;
+    else
+    {
+        GameNetworkBonjourManagerBrowseBegin();
+        gameInterfaceModalDialog("Searching for game...", "", "",
+                                 gameDialogLanConnect, gameDialogCancel);
+        gameDialogState.lanGameScanning = 1;
+        return 0;
+    }
 }
 
 static void
 gameDialogConnectToGameSuccessful()
 {
-    gameInterfaceModalDialog("Connect successful!", "Ok", "",
+    gameInterfaceModalDialog("Connecting...\nDownloading...", "Ok", "",
                              gameDialogCancel, gameDialogCancel);
 }
 
 static void
-gameDialogConnectToGameFailed()
+gameDialogConnectToGameSuccessful2()
 {
-    gameInterfaceModalDialog("Connect failed retry?\n", "Yes", "No",
-                             gameDialogConnectToGameYes, gameDialogCancel);
+    gameDialogClose();
+    
+    gameInterfaceControls.mainMenu.visible = 0;
+    actions_menu_reset();
+    gameStateSinglePlayer.started = 0;
+    gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);
 }
 
 static void
 gameDialogStartNetworkGame2()
 {
- 
-    //gameNetwork_disconnectPlayers();
     gameNetwork_sendPlayersDisconnect();
     
     game_start(1, GAME_TYPE_DEATHMATCH);
@@ -317,7 +345,7 @@ gameDialogStartNetworkGameBotAdded()
 static void
 gameDialogStartNetworkGameAddBots()
 {
-    gameInterfaceModalDialog("Everyone here?\nReady to start game/scoring?\n(or add a bot)?", "Start", "+1",
+    gameInterfaceModalDialog("Round started!", "Start", "+1",
                              gameDialogStartNetworkGame2, gameDialogStartNetworkGameBotAdded);
 }
 
@@ -326,7 +354,7 @@ static void gameDialogStartNetworkGame();
 static void
 gameDialogStartNetworkGameNewMap()
 {
-    extern int maps_list_idx;
+    extern unsigned int maps_list_idx;
     
     maps_list_idx++;
     if(maps_list[maps_list_idx] == NULL) maps_list_idx = 0;
@@ -345,7 +373,7 @@ gameDialogStartNetworkGame()
 {
     gameDialogCounter = 0;
     gameStateSinglePlayer.map_use_current = 1;
-    gameInterfaceModalDialog("Gathering players...\nWait...\nStart when ready\n", "Start", "Change\nmap", gameDialogStartNetworkGameAddBots, gameDialogStartNetworkGameNewMap);
+    gameInterfaceModalDialog("Ready to start?\nWait for more?\n", "Start", "Wait", gameDialogStartNetworkGameAddBots, gameDialogCancel);
 }
 
 static char gameDialogDisplayStringStr[16][1024];
@@ -425,6 +453,41 @@ gameDialogScorePopup(char *scoreStr)
     gameInterfaceModalDialogWithRect(scoreStr, "", "", gameDialogCancelString, gameDialogCancelString, &r, GAME_FRAME_RATE * 2.0);
     r.tex_id = TEXTURE_ID_CONTROLS_POPUPOVER_DIALOG_BOX;
     gameInterfaceControls.dialogRect.modal = 0;
+}
+
+static void
+gameDialogMessagePopup(char *str)
+{
+    controlRect r;
+    r = gameInterfaceControls.dialogRectDefault;
+    
+    r.x -= gameInterfaceControls.interfaceWidth / 3;
+    
+    float scale = 3;
+    r.x += r.xw/scale;
+    r.y += r.yw/scale;
+    r.xw /= scale;
+    r.yw /= scale;
+    r.xm = -1;
+    r.ym = 0;
+    r.tex_id = 4;
+    
+    gameInterfaceModalDialogWithRect(str, "", "", gameDialogCancelString, gameDialogCancelString, &r, GAME_FRAME_RATE * 2.0);
+    r.tex_id = TEXTURE_ID_CONTROLS_POPUPOVER_DIALOG_BOX;
+    gameInterfaceControls.dialogRect.modal = 0;
+}
+
+static void
+gameDialogGraphicCancel()
+{
+    gameInterfaceControls.graphicDialog.visible = 0;
+}
+
+static void
+gameDialogGraphic(int tex_id)
+{
+    gameInterfaceControls.graphicDialog.visible = 1;
+    gameInterfaceControls.graphicDialog.tex_id = tex_id;
 }
 
 #endif

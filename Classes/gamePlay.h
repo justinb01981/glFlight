@@ -107,12 +107,12 @@ const static char *game_variables_name[] = {
 };
 
 static char *game_log_messages[] = {
-    /*"^D: firewalled :-)\n"*/ "^D saved - system integrity restored\n",
-    "detected: virus\n",
-    "detected: bounty hunter\n",
-    "virus deleted ^D :-(\n",
+    /*"^D: firewalled :-)\n"*/ "^D secured\n",
+    "HIDDEN: detected: virus\n",
+    "HIDDEN: detected: bounty hunter\n",
+    "virus deleted ^D\n",
     "detected: ally AI\n",
-    "warning: virus capturing ^D\n",
+    "HIDDEN: warning: virus capturing ^D\n",
     "killed: virus\n",
     "killed: bounty-hunter\n",
     "killed: turret\n",
@@ -122,10 +122,10 @@ static char *game_log_messages[] = {
     "^K^K^KSYSTEM_COMPROMISED (GAME_OVER)^K^K^K\n",
     "HIDDEN: points collected\n",
     "HIDDEN: detected: ^D vulnerable\n",
-    "enemies spawning faster!\n",
-    "vulnerable ^D:%d system integrity:%.0f%% \045\n",
+    "HIDDEN: enemies spawning faster!\n",
+    "HIDDEN: vulnerable ^D:%d system integrity:%.0f%% \045\n",
     "HIDDEN: connection successful",
-    "detected: new turret",
+    "HIDDEN: detected: new turret",
     NULL
 };
 
@@ -204,9 +204,8 @@ struct
     float powerup_drop_chance[GAME_POWERUP_DROP_TABLE_LEN];
     int one_collect_at_a_time;
     
-    float base_spawn_collect_pct;
-    float base_spawn_collect_pct_rate_increase;
-    float base_spawn_collect_initial;
+    float base_spawn_collect_p;
+    float base_spawn_collect_m;
     
     float log_event_camwatch[GAME_LOG_LAST];
     

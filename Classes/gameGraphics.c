@@ -26,9 +26,9 @@
 #include "gameNetwork.h"
 #include "mesh.h"
 
-#define BACKGROUND_MODEL model_cube
-#define BACKGROUND_MODEL_TEXCOORDS /*model_cube_texcoords_alt*/ model_cube_texcoords
-#define BACKGROUND_MODEL_INDICES model_cube_indices
+#define BACKGROUND_MODEL model_background
+#define BACKGROUND_MODEL_TEXCOORDS /*model_cube_texcoords_alt*/ model_background_texcoords
+#define BACKGROUND_MODEL_INDICES1 model_background_indices1
 
 extern int isLandscape;
 
@@ -40,9 +40,10 @@ float viewHeight;
 DrawBackgroundData* bgData = NULL;
 
 gameGraphics_drawState2d drawState_2d;
+gameGraphics_drawState2d drawControls_ds;
 
 int texture_id_playership;
-int texture_id_background = TEXTURE_ID_BACKGROUND;
+int texture_id_background = BACKGROUND_TEXTURE;
 
 /*
 model_coord_t overlay_coords[12];
@@ -173,13 +174,13 @@ bindTexture(unsigned int tex_id)
 
 static gameGraphics_drawState2d drawText_ds;
 
-void drawText(char *str, float x, float y)
+void drawText(char *str, float x, float y, float scale)
 {
     float screenWidth = viewWidth;
     float screenHeight = viewHeight;
-    unsigned int len = strlen(str);
-    float fscreenwidth = /*8*/ gameInterfaceControls.textWidth;
-    float fscreenheight = /*12*/ gameInterfaceControls.textHeight;
+    unsigned long len = strlen(str);
+    float fscreenwidth = /*8*/ gameInterfaceControls.textWidth * scale;
+    float fscreenheight = /*12*/ gameInterfaceControls.textHeight * scale;
     float fmapwidth = 512; // width of the font bitmap
     float fmapheight = 512; // height of the font bitmap
     float rows = 6;
@@ -556,7 +557,7 @@ int drawRadar()
             
             if(textLabel && zdot > 0)
             {
-                drawText(textLabel, er.x+20, viewHeight - er.y);
+                drawText(textLabel, er.x+20, viewHeight - er.y, 1);
             }
         }
 
@@ -665,8 +666,6 @@ int drawControlsRadar(drawSubElement subElemRadarList[], int max)
     return subElementsN;
 }
 
-static gameGraphics_drawState2d drawControls_ds;
-
 void drawControls()
 {
     float screenWidth = viewWidth;
@@ -748,7 +747,6 @@ void drawControls()
                 
                 glPushMatrix();
                 glLoadIdentity();
-                
                 
                 glTranslatef(0.5, 0.5, 0);
                 
@@ -884,24 +882,27 @@ void drawControls()
         setupGLModelViewDone();
         
         if(controls[i]->visible &&
-           (controls[i]->text[0] || controls[i] == &gameInterfaceControls.textEditControl))
+           (controls[i]->text[0] || controls[i] == &gameInterfaceControls.keyboardEntry))
         {
             static char displayText[1024];
-            int td = 30;
+            int td = 30; 
 
             strncpy(displayText, controls[i]->text, sizeof(displayText)-1);
 
-            if(controls[i] == &gameInterfaceControls.textEditControl)
+            if(controls[i] == &gameInterfaceControls.keyboardEntry)
             {
-                if((tex_pass % td) < (td/2) && strlen(displayText) > 0) displayText[strlen(displayText)-1] = ' ';
-                strcat(displayText, "<");
+                long dl = strlen(displayText);
+                if((tex_pass % td) < (td/2))
+                {
+                    displayText[dl] = '^';
+                    displayText[dl+1] = '@';
+                    displayText[dl+2] = '\0';
+                }
 
-                drawText("Enter new value:",
-                         controls[i]->x + controls[i]->xw*0.8,
-                         controls[i]->y + controls[i]->yw*0.15);
+                float scale = 2.0;
                 drawText(displayText,
-                         controls[i]->x + controls[i]->xw*0.8 - screenWidth * 0.05,
-                         controls[i]->y + controls[i]->yw*0.15);
+                         controls[i]->x + controls[i]->xw+16+gameInterfaceControls.textWidth*2,
+                         controls[i]->y + controls[i]->yw*0.5 - (gameInterfaceControls.textWidth * scale * (dl/2)), scale);
             }
             else
             {
@@ -910,29 +911,47 @@ void drawControls()
                     // one line
                     drawText(displayText,
                              controls[i]->x + controls[i]->xw*0.5,
-                             controls[i]->y + controls[i]->yw*0.2);
+                             controls[i]->y + controls[i]->yw*0.2, 1);
                 }
                 else
                 {
                     drawText(displayText,
                              controls[i]->x + controls[i]->xw*0.8,
-                             controls[i]->y + controls[i]->yw*0.15);
+                             controls[i]->y + controls[i]->yw*0.15, 1);
                 }
             }
             
-            if(controls[i]->textLeft[0])
-            {
-                drawText(controls[i]->textLeft,
-                         controls[i]->x + controls[i]->xw*0.15,
-                         controls[i]->y + controls[i]->yw*0.2);
-            }
+            /*
+            float yOff = controls[i]->yw/2;
+            char *btnStrings[2];
+            btnStrings[0] = controls[i]->textLeft;
+            btnStrings[1] = controls[i]->textRight;
             
-            if(controls[i]->textRight[0])
+            for(btn = 0; btn < 2 && btnStrings[btn] != NULL && strlen(btnStrings[btn]) > 0; btn++)
             {
-                 drawText(controls[i]->textRight,
-                          controls[i]->x + controls[i]->xw*0.15,
-                          controls[i]->y + controls[i]->yw/2 + controls[i]->yw*0.2);
+                char textBuf[256] = {0};
+                int c = 0;
+                
+                strcat(textBuf, "*----------------*\n*");
+                while(c*2 + strlen(btnStrings[btn]) < 16)
+                {
+                    strcat(textBuf, " ");
+                    c++;
+                }
+                strcat(textBuf, btnStrings[btn]);
+                while(c > 0)
+                {
+                    strcat(textBuf, " ");
+                    c--;
+                }
+                strcat(textBuf, "*\n*----------------*\n");
+                
+                drawText(textBuf,
+                         controls[i]->x + controls[i]->xw*0.15,
+                         controls[i]->y + yOff, 1);
+                yOff -= yOff;
             }
+            */
         }
         
         i++;
@@ -1054,16 +1073,6 @@ drawElem(WorldElem* pElem)
         model_texcoord_t* pElemTexCoords = pElem->texcoords;
         model_index_t* pElemIndices = pElem->indices;
         size_t pElemIndicesCount = pElem->n_indices;
-        
-        /*
-        if(pElem->type == MODEL_SHARED)
-        {
-            pElemCoords = models_shared.sphere.coords;
-            pElemTexCoords = models_shared.sphere.texcoords;
-            pElemIndices = models_shared.sphere.indices;
-            pElemIndicesCount = models_shared.sphere.indices_count;
-        }
-        */
         
         if(drawElem_indicesBatchBuffer_count+drawElem_batchTotal[0]+pElemIndicesCount < drawElem_BatchBuffer_max &&
            drawElem_vertexBatchBuffer_count+drawElem_batchTotal[1]+/*pElem->n_coords*/(pElemIndicesCount*coord_size) < drawElem_BatchBuffer_max &&
@@ -1201,7 +1210,9 @@ visible_list_remove(WorldElem* elem, unsigned int* n_visible, WorldElemListNode*
 static void
 drawBackgroundInit(int tex_id,
                    float alpha, float beta, float gamma,
-                   float scale)
+                   float scale,
+                   model_index_t* indices,
+                   size_t indices_n)
 {
     int i;
     
@@ -1217,14 +1228,14 @@ drawBackgroundInit(int tex_id,
             
             bgData->coords = malloc(sizeof(BACKGROUND_MODEL));
             bgData->texcoords = malloc(sizeof(BACKGROUND_MODEL_TEXCOORDS));
-            bgData->indices = malloc(sizeof(BACKGROUND_MODEL_INDICES));
+            bgData->indices = malloc(sizeof(model_index_t) * indices_n);
             
             // swap triangle indices
-            for(i = 0; i < sizeof(BACKGROUND_MODEL_INDICES)/sizeof(model_index_t); i += 3)
+            for(i = 0; i < indices_n; i += 3)
             {
-                bgData->indices[i] = BACKGROUND_MODEL_INDICES[i+2];
-                bgData->indices[i+1] = BACKGROUND_MODEL_INDICES[i+1];
-                bgData->indices[i+2] = BACKGROUND_MODEL_INDICES[i];
+                bgData->indices[i] = indices[i+2];
+                bgData->indices[i+1] = indices[i+1];
+                bgData->indices[i+2] = indices[i];
                 bgData->n_indices += 3;
             }
             
@@ -1269,6 +1280,57 @@ drawBackgroundInit(int tex_id,
                 bgData->coords[i+1] =  pt.y;
                 bgData->coords[i+2] =  pt.z;
             }
+            
+            // tesselate - init
+#if TESSELATE_TERRAIN
+            bgData->tess.S = &bgData->tess.S_;
+            bgData->tess.S->Icur = bgData->tess.S->Is = bgData->tess.indices;
+            bgData->tess.S->Mcur = bgData->tess.S->Ms = bgData->tess.coords;
+            bgData->tess.S->Tcur = bgData->tess.S->Ts = bgData->tess.texcoords;
+            
+            float A[] = {
+                0, 0, 0
+            };
+            float B[] = {
+                100, 0, 0
+            };
+            float U[] = {
+                0.0, 0.0
+            };
+            float V[] = {
+                0.5, 0.0
+            };
+            
+            tess_begin(A, B, U, V, bgData->tess.S);
+            
+            B[2] = 100;
+            B[0] = 0;
+            V[0] = 0;
+            V[1] = 1.0;
+            tess_step(B, V, bgData->tess.S);
+            
+            B[0] = 100;
+            B[2] = 100;
+            V[0] = 1.0;
+            V[1] = 1.0;
+            tess_step(B, V, bgData->tess.S);
+            
+            B[0] = 200;
+            B[2] = 0;
+            V[0] = 0;
+            V[1] = 2.0;
+            tess_step(B, V, bgData->tess.S);
+            
+            B[0] = 200;
+            B[2] = 100;
+            V[0] = 0;
+            V[1] = 2.0;
+            V[0] = 2.0;
+            tess_step(B, V, bgData->tess.S);
+            
+            tess_end(bgData->tess.S);
+            // tesselate - done
+#endif
         }
     }
 }
@@ -1287,7 +1349,16 @@ drawBackgroundUninit()
 }
 
 void
-drawBackground()
+drawBackground_tess(float* modelC, float* textureC, unsigned int* indicesC, unsigned long indicesN)
+{
+    glVertexPointer(3, GL_FLOAT, 0, modelC);
+    glTexCoordPointer(2, GL_FLOAT, 0, textureC);
+    bindTexture(TEXTURE_ID_ASTEROID);
+    glDrawElements(GL_TRIANGLES, (int) indicesN, index_type_enum, indicesC);
+}
+
+void
+drawBackgroundCore()
 {
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
@@ -1322,6 +1393,17 @@ drawBackground()
     
     glMatrixMode(GL_TEXTURE);
     glPopMatrix();
+    
+#if TESSELATE_TERRAIN
+    tess_walk(bgData->tess.S, drawBackground_tess);
+#endif
+}
+
+void drawBackground()
+{
+    drawBackgroundUninit();
+    drawBackgroundInit(texture_id_background, 0, 0, 0, 100, BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
+    drawBackgroundCore();
 }
 
 struct
@@ -1646,7 +1728,6 @@ drawTriangleMesh(struct mesh_opengl_t* glmesh, int tex_id)
 void
 gameGraphicsInit()
 {
-    drawBackgroundInit(texture_id_background, 0, 0, 0, 100);
 }
 
 void

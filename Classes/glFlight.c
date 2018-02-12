@@ -42,7 +42,8 @@ extern int isLandscape;
 int world_inited = 0;
 int game_terminated_gracefully = 0;
 char *world_data = NULL;
-int game_paused = 0;
+int game_paused = 1;
+void (*glFlightDrawframeHook)(void) = NULL;
 
 unsigned int visibleElementsLen = 0;
 
@@ -136,6 +137,9 @@ glFlightFrameStage1()
     int ship_durability = DURABILITY_PLAYER;
     float tc = 0;
     float spawn[6];
+    float lineA[3];
+    float lineB[3];
+    static int gameDialogCalibrateDone = 0;
     
     glEnableClientState(GL_VERTEX_ARRAY);
     
@@ -173,8 +177,9 @@ glFlightFrameStage1()
         goto draw_bail;
     }
     
-    if(n_textures > TEXTURE_ID_PRELOAD && n_textures <= TEXTURE_ID_LAST)
+    if(!gameDialogCalibrateDone && n_textures < TEXTURE_ID_PRELOAD+1)
     {
+        gameDialogCalibrateDone = 1;
         gameDialogCalibrate();
     }
 
@@ -186,13 +191,14 @@ glFlightFrameStage1()
     time_ms = time_ms_wall;
 #endif
     
-    if(gameInterfaceControls.textMenuControl.visible && !gameNetworkState.connected && gameInterfaceControls.menuAction == ACTION_INVALID)
+    if(gameInterfaceControls.textMenuControl.visible ||
+       gameInterfaceControls.keyboardEntry.visible)
     {
         game_paused = 1;
     }
     else game_paused = 0;
     
-    if(game_paused)
+    if(game_paused && !gameNetworkState.connected)
     {
         world_update_time_last = get_time_ms();
         goto paused_bail;
@@ -220,7 +226,7 @@ glFlightFrameStage1()
     {
         float minSpeed = 0.1;
         
-        if(speed/maxSpeed >= minSpeed)
+        if(targetSpeed/maxSpeed >= minSpeed)
         {
             int sound_idx = 0;
             float rate = 0.25 + 2.0*(speed/maxSpeed);
@@ -258,6 +264,7 @@ glFlightFrameStage1()
     
     gameNetworkState.msgQueue.cleanupWaiting = 1;
     while(gameNetworkState.msgQueue.cleanup) { int i; i++; }
+    gameNetworkState.msgQueue.cleanupWaiting = 0;
     
     gameNetworkMessageQueued* pNetworkMsg = gameNetworkState.msgQueue.head.next;
     while(pNetworkMsg && gameNetworkState.msgQueue.cleanup == 0)
@@ -274,6 +281,8 @@ glFlightFrameStage1()
     do_game_network_write();
     
     paused_bail:
+    
+    if(glFlightDrawframeHook) glFlightDrawframeHook();
     
     pListNode = world_elem_list_find(my_ship_id, &gWorld->elements_list);
     if(pListNode) pWorldElemMyShip = pListNode->elem;
@@ -420,6 +429,45 @@ glFlightFrameStage1()
                 gameCamera_MoveZ(-camera_z_trail);
                 gameCamera_MoveY(1);
             }
+            
+            // updating targeting reticle
+            targetingReticleElem.physics.ptr = &targetingReticleElem.physics.data;
+            targetingReticleElem.physics.ptr->x = pWorldElemMyShip->physics.ptr->x + ship_z_vec[0] * reticleZDist;
+            targetingReticleElem.physics.ptr->y = pWorldElemMyShip->physics.ptr->y + ship_z_vec[1] * reticleZDist;
+            targetingReticleElem.physics.ptr->z = pWorldElemMyShip->physics.ptr->z + ship_z_vec[2] * reticleZDist;
+            targetingReticleElem.texture_id = TEXTURE_ID_CONTROLS_FIRE;
+            targetingReticleElem.scale = 2;
+            
+            // update elems used in drawLines
+            if(pWorldElemMyShip->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID)
+            {
+                WorldElemListNode *pNodeTowed = world_elem_list_find(pWorldElemMyShip->stuff.towed_elem_id, &gWorld->elements_moving);
+                if(pNodeTowed)
+                {
+                    int idx = 0;
+                    lineA[idx++] = my_ship_x;
+                    lineA[idx++] = my_ship_y;
+                    lineA[idx++] = my_ship_z;
+                    idx = 0;
+                    lineB[idx++] = pNodeTowed->elem->physics.ptr->x;
+                    lineB[idx++] = pNodeTowed->elem->physics.ptr->y;
+                    lineB[idx++] = pNodeTowed->elem->physics.ptr->z;
+                }
+            }
+            
+            sprintf(statsMessage, "^C:%.0f ^B:%.0f ^A:%.0f "
+                    //"CP:%d/%d Trt:%d Ally:%d "
+                    "Score:%d Time:%d %s",
+                    (pWorldElemMyShip->durability / (float) DURABILITY_PLAYER) * 100.0,
+                    (game_ammo_bullets / game_ammo_bullets_max) * 100,
+                    game_ammo_missles,
+                    //gameStateSinglePlayer.caps_owned, gameStateSinglePlayer.caps_found,
+                    //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_TURRET? 1: 0,
+                    //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_SHIP? 1: 0,
+                    gameStateSinglePlayer.stats.score,
+                    game_time_elapsed(),
+                    game_status_string);
+            strcpy(gameInterfaceControls.statsTextRect.text, statsMessage);
 
             respawned = 0;
         }
@@ -572,6 +620,9 @@ glFlightFrameStage1()
                                                   pElem->physics.ptr->y,
                                                   pElem->physics.ptr->z);
             
+            // approx dist to boundaries of the model poly
+            pElem->renderInfo.distance -= pElem->scale * 1.0;
+            
             int visible = element_visible(btreeVisibleTest->elem, visible_distance, visible_dot);
             
             if(visible)
@@ -687,48 +738,15 @@ glFlightFrameStage1()
     drawElemEnd();
     count_elems_last = visibleBtreeDrawn;
     
-    if(pWorldElemMyShip)
-    {
-        targetingReticleElem.physics.ptr = &targetingReticleElem.physics.data;
-        targetingReticleElem.physics.ptr->x = pWorldElemMyShip->physics.ptr->x + ship_z_vec[0] * reticleZDist;
-        targetingReticleElem.physics.ptr->y = pWorldElemMyShip->physics.ptr->y + ship_z_vec[1] * reticleZDist;
-        targetingReticleElem.physics.ptr->z = pWorldElemMyShip->physics.ptr->z + ship_z_vec[2] * reticleZDist;
-        targetingReticleElem.texture_id = TEXTURE_ID_CONTROLS_FIRE;
-        targetingReticleElem.scale = 2;
-        drawBillboard(&targetingReticleElem);
-        
-        sprintf(statsMessage, "^C:%.0f ^B:%.0f ^A:%.0f "
-                //"CP:%d/%d Trt:%d Ally:%d "
-                "Score:%d Time:%d %s",
-                (pWorldElemMyShip->durability / (float) DURABILITY_PLAYER) * 100.0,
-                (game_ammo_bullets / game_ammo_bullets_max) * 100,
-                game_ammo_missles,
-                //gameStateSinglePlayer.caps_owned, gameStateSinglePlayer.caps_found,
-                //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_TURRET? 1: 0,
-                //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_SHIP? 1: 0,
-                gameStateSinglePlayer.stats.score,
-                game_time_elapsed(),
-                game_status_string);
-        strcpy(gameInterfaceControls.statsTextRect.text, statsMessage);
-    }
+    drawBillboard(&targetingReticleElem);
     
     drawLineBegin();
-    if(pWorldElemMyShip && pWorldElemMyShip->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID)
+    
+    if((lineA[0] - lineB[0]) + (lineA[1] - lineB[1]) - (lineA[2] - lineB[2]) != 0)
     {
-        WorldElemListNode *pNodeTowed = world_elem_list_find(pWorldElemMyShip->stuff.towed_elem_id,
-                                                             &gWorld->elements_moving);
-        if(pNodeTowed)
-        {
-            float lineA[] = {my_ship_x, my_ship_y, my_ship_z};
-            float lineB[] =
-            {
-                pNodeTowed->elem->physics.ptr->x,
-                pNodeTowed->elem->physics.ptr->y,
-                pNodeTowed->elem->physics.ptr->z
-            };
-            float lineColor[] = {1.0, 0.5, 0.0};
-            drawLineWithColorAndWidth(lineA, lineB, lineColor, 2.0);
-        }
+        float lineColor[] = {1.0, 0.5, 0.0};
+        
+        drawLineWithColorAndWidth(lineA, lineB, lineColor, 2.0);
     }
     
     // draw world-defined lines

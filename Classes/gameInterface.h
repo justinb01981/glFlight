@@ -52,7 +52,7 @@ typedef struct {
     controlRect dialogRect;
     controlRect consoleTextRect;
     controlRect statsTextRect;
-    controlRect textEditControl;
+    controlRect keyboardEntry;
     
     controlRect dialogRectDefault;
     
@@ -60,7 +60,7 @@ typedef struct {
     
     unsigned long dialogLifeFrames;
     
-    int menuAction;
+    //int menuAction;
     
     float textWidth;
     float textHeight;
@@ -140,5 +140,8 @@ gameInterfaceSetInterfaceState(InterfaceMiscState state);
 
 void
 gameInterfaceEditString(char *ptr);
+
+void
+gameInterfaceProcessAction();
 
 #endif

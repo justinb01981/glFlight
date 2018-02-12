@@ -54,6 +54,14 @@ struct mesh_opengl_t
     unsigned int u;
 };
 
+struct tess_storage_t
+{
+    unsigned int *Is, *Icur;
+    float *Ms, *Mcur;
+    float *Ts, *Tcur;
+    unsigned int Inext, Ia, Ib;
+};
+
 struct mesh_t* 
 build_mesh(float x, float y, float z,
            float dx_r, float dy_r, float dz_r,
@@ -82,5 +90,29 @@ free_mesh_opengl(struct mesh_opengl_t* ogl_mesh);
 
 void
 free_mesh(struct mesh_t* mesh);
+
+#define TESS_BEGIN_FUNCTION \
+void \
+tess_begin(float A[3], float B[3], float u[2], float v[2], \
+           struct tess_storage_t* S)
+TESS_BEGIN_FUNCTION;
+
+#define TESS_STEP_FUNCTION \
+void \
+tess_step(float A[3], float u[2], \
+          struct tess_storage_t* S)
+TESS_STEP_FUNCTION;
+
+#define TESS_END_FUNCTION \
+void \
+tess_end(struct tess_storage_t* S)
+TESS_END_FUNCTION;
+
+#define TESS_WALK_FUNCTION \
+void \
+tess_walk(struct tess_storage_t* S, \
+          void (*cb)(float*, float*, unsigned int*, unsigned long))
+TESS_WALK_FUNCTION;
+
 
 #endif

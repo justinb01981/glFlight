@@ -21,6 +21,7 @@ extern unsigned long n_elements_out_of_order;
 extern int do_visibility_test;
 extern int nearest_first;
 extern game_timeval_t console_write_time;
+extern int console_lines_max;
 
 struct console_entry
 {

@@ -10,6 +10,7 @@
 #define gl_flight_action_h
 
 #include <string.h>
+#include "gameGlobals.h"
 #include "action.h"
 
 #define ACTIONS_CURSOR_STR "->"
@@ -48,6 +49,7 @@ typedef enum
     ACTION_SCALE_OBJECT,
     ACTION_REPLACE_OBJECT,
     ACTION_CLEAR_MAP,  /**/
+    
     ACTION_SETTING_PLAYER_NAME,
     ACTION_SETTING_GAME_NAME,
     ACTION_SETTING_SHIP_MODEL,
@@ -119,7 +121,7 @@ static const char* action_strings[ACTION_LAST] =
     "edit: change object",
     "map: regenerate",
     "player name",
-    "multiplayer server address",
+    "game server name",
     "ship type",
     "camera mode",
     "input sensitivity",
@@ -132,12 +134,10 @@ static const char* action_strings[ACTION_LAST] =
     "friction level",
     "gyroscope drift correct",
     "port number",
-    "public IP override",
+    "Directory IP addr override",
     "reset scores",
     "restore default"
 };
-
-extern int fireAction;
 
 static void action_next()
 {

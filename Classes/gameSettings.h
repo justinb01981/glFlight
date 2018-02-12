@@ -31,7 +31,7 @@ typedef struct
 } glFlightPrefs;
 
 // TODO:bump this every time settings change
-const static int settings_version = 34;
+const static int settings_version = 35;
 
 // HACK: externs built in .m files
 extern double dz_roll, dz_pitch, dz_yaw;
@@ -41,7 +41,7 @@ extern int gameSettingsRatingGiven;
 extern char gameSettingsPlayerName[255];
 extern char gameSettingsPlayerNameDefault[255];
 extern char gameSettingsMapName[255];
-extern char gameSettingsGameName[255];
+extern char gameSettingGameTitle[255];
 extern char gameSettingsGameNameDefault[255];
 extern int gameSettingsNetworkFrequency;
 extern int gameSettingsPortNumber;
@@ -60,7 +60,7 @@ static void
 gameSettingsPlatformInit(const char *playerName, const char* serverName)
 {
     strcpy(gameSettingsPlayerNameDefault, playerName);
-    strcpy(gameSettingsGameNameDefault, serverName);
+    strcpy(gameSettingsGameNameDefault, "serverName");
 }
 
 static void
@@ -82,7 +82,7 @@ gameSettingsDefaults()
     gameSettingsRatingGiven = 0;
     strcpy(gameSettingsPlayerName, gameSettingsPlayerNameDefault);
     strcpy(gameSettingsMapName, "MAP1");
-    strcpy(gameSettingsGameName, "d0gf1ght.domain17.net");
+    strcpy(gameSettingGameTitle, "dogfight1");
     strcpy(gameSettingsLocalIPOverride, "0.0.0.0");
     gameSettingsNetworkFrequency = 50;
     gameSettingsPortNumber = 52000;
@@ -117,7 +117,7 @@ gameSettingsWrite(const char *filename)
         fprintf(fp, "%d\n", gameSettingsRatingGiven);
         fprintf(fp, "%s\n", gameSettingsPlayerName);
         fprintf(fp, "%s\n", gameSettingsMapName);
-        fprintf(fp, "%s\n", gameSettingsGameName);
+        fprintf(fp, "%s\n", gameSettingGameTitle);
         fprintf(fp, "%s\n", "d0gf1ght.domain17.net");
         fprintf(fp, "%s\n", gameSettingsLocalIPOverride);
         fprintf(fp, "%d\n", gameSettingsNetworkFrequency);
@@ -181,7 +181,7 @@ gameSettingsRead(const char *filename)
         if(fscanf(fp, "%d", &gameSettingsRatingGiven) < 1) break;
         if(fscanf(fp, "%s", gameSettingsPlayerName) < 1) break;
         if(fscanf(fp, "%s", gameSettingsMapName) < 1) break;
-        if(fscanf(fp, "%s", gameSettingsGameName) < 1) break;
+        if(fscanf(fp, "%s", gameSettingGameTitle) < 1) break;
         if(fscanf(fp, "%s", gameSettingsDirectoryServerNameREMOVED) < 1) break;
         if(fscanf(fp, "%s", gameSettingsLocalIPOverride) < 1) break;
         if(fscanf(fp, "%d", &gameSettingsNetworkFrequency) < 1) break;

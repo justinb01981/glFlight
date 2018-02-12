@@ -933,6 +933,130 @@ static model_texcoord_t model_icosahedron_texcoords[] =
 
 /********************************************************/
 
+/*
+  ___\
+ X   /
+ 
+
+ 
+ 
+       0      1              / \
+           F                  |
+       3      2               z+
+
+8     9      12    14    16   / \
+    F    F     F     F         |
+11    10     13    15    17    Y
+ 
+       5      6                z-
+           F                   |
+       4      7               \ /
+ */
+static model_texcoord_t model_background_texcoords[] =
+{
+    //0
+    0.33, 0.0,
+    //1
+    0.66, 0.0,
+    //2
+    0.66, 0.33,
+    //3
+    0.33, 0.33,
+    //4
+    0.33, 1.0,
+    //5
+    0.33, 0.66,
+    //6
+    0.66, 0.66,
+    //7
+    0.66, 1.0,
+    //8
+    0.0, 0.33,
+    //9
+    0.25, 0.33,
+    //10
+    0.25, 0.66,
+    //11
+    0.0, 0.66,
+    //12
+    0.5, 0.33,
+    //13
+    0.5, 0.66,
+    //14
+    0.66, 0.33,
+    //15
+    0.66, 0.66,
+    //16
+    1.0, 0.33,
+    //17
+    1.0, 0.66
+};
+
+static model_coord_t model_background[] =
+{
+
+    //0
+    -1, -1, -1,
+    //1
+    1.0, -1, -1,
+    //2
+    1.0, -1, 1.0,
+    //3
+    -1, -1, 1.0,
+    //4
+    -1, 1.0, -1,
+    //5
+    -1, 1.0, 1.0,
+    //6
+    1.0, 1.0, 1.0,
+    //7
+    1.0, 1.0, -1,
+    //8
+    -1, -1, -1,
+    //9
+    -1, -1, 1.0,
+    //10
+    -1, 1.0, 1.0,
+    //11
+    -1, 1.0, -1,
+    //12
+    1.0, -1, 1.0,
+    //13
+    1.0, 1.0, 1.0,
+    //14
+    1.0, -1, -1,
+    //15
+    1.0, 1.0, -1,
+    //16
+    -1, -1, -1,
+    //17
+    -1, 1.0, -1
+};
+
+static model_index_t model_background_indices1[] =
+{
+    // ordering: counter-clockwise for each face (2 triangles) looking inwards to cube
+    0, 1, 3, 3, 1, 2,
+    5, 6, 7, 7, 4, 5,
+    
+    8, 9, 11, 11, 9, 10,
+    9, 12, 10, 10, 12, 13,
+    12, 14, 13, 13, 14, 15,
+    15, 14, 16, 15, 16, 17
+    /*
+    0,3,7, 7,4,0,
+    
+    3,2,6, 6,7,3,
+    
+    2,1,5, 5,6,2,
+    
+    1,0,4, 4,5,1,
+    
+    11,8,9, 10,11,9, // bottom
+     */
+};
+
+/********************************************************/
 
 static inline void
 models_iterate()
@@ -968,58 +1092,7 @@ extern models_shared_t models_shared;
 static inline void
 models_init()
 {
-    int i = 0;
-    
-    // vectors to step to next vertex
-    model_coord_t stepsC[][3] = {
-        {0.0, 0.0, 30.0},
-        {30.0, 0.0, 0.0},
-        {-30.0, 0.0, -30.0}
-    };
-    
-    // vectors to step to next texture-coordinate
-    model_texcoord_t stepsT[][2] = {
-        {1.0, 0.0},
-        {0.0, 1.0},
-        {-1.0, -1.0}
-    };
-    
-    models_shared.sphere.indices_count = 0;
-    
-    model_coord_t cur[3] = {100, 50, 100}; // model origin
-    model_texcoord_t tcur[2] = {0, 0}; // texture origin
-    
-    for(i = 0; i < 3; i++)
-    {
-        int j;
-        
-//        // push coordinate
-//        models_shared.sphere.coords[models_shared.sphere.indices_count][0] = cur[0];
-//        models_shared.sphere.coords[models_shared.sphere.indices_count][1] = cur[1];
-//        models_shared.sphere.coords[models_shared.sphere.indices_count][2] = cur[2];
-//
-//        // push texture-space coordinate
-//        models_shared.sphere.texcoords[models_shared.sphere.indices_count][0] = tcur[0];
-//        models_shared.sphere.texcoords[models_shared.sphere.indices_count][1] = tcur[1];
-//
-//        // push index
-//        models_shared.sphere.indices[models_shared.sphere.indices_count] = i;
-//        models_shared.sphere.indices_count++;
-        
-//        for(j = 0; j < 3; j++) cur[j] += stepsC[i][j];
-//        for(j = 0; j < 2; j++) tcur[j] += stepsT[i][j];
-    }
-    
-    unsigned int count = sizeof(model_sphere_indices) / sizeof(model_sphere_indices[0]);
-    
-    for(i = 0; i < count; i++) models_shared.sphere.indices[i] = model_sphere_indices[i];
-    models_shared.sphere.indices_count = count;
-    
-    count = sizeof(model_sphere_coords) / sizeof(model_sphere_coords[0]);
-    for(i = 0; i < count; i++) models_shared.sphere.coords[i] = (model_sphere_coords[i] * 10.0) + 30;
-    
-    count = sizeof(model_sphere_texcoords) / sizeof(model_sphere_texcoords[0]);
-    for(i = 0; i < count; i++) models_shared.sphere.texcoords[i] = model_sphere_texcoords[i];
+    return;
 }
 
 /********************************************************/

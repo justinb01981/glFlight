@@ -25,6 +25,14 @@ typedef struct
     model_index_t *indices;
     int n_indices;
     int tex_id;
+    
+    struct {
+        struct tess_storage_t* S;
+        struct tess_storage_t S_;
+        model_color_t coords[96];
+        model_texcoord_t texcoords[64];
+        model_index_t indices[288];
+    } tess;
 } DrawBackgroundData;
 
 typedef struct
@@ -45,7 +53,7 @@ void
 drawState2dDraw();
 
 void
-drawText(char* text , float x, float y);
+drawText(char* text , float x, float y, float scale);
 
 void
 drawControls();
