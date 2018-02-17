@@ -157,6 +157,10 @@ glFlightFrameStage1()
     
     if(!world_inited && world_data)
     {
+        bindTexture(TEXTURE_ID_FONTMAP2);
+        bindTexture(TEXTURE_ID_FONTMAP);
+        if(controlsCalibrated) needTrimLock = 1;
+        
         gameGraphicsUninit();
         gameMapReRender();
         gameNetwork_worldInit();

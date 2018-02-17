@@ -60,6 +60,7 @@ struct tess_storage_t
     float *Ms, *Mcur;
     float *Ts, *Tcur;
     unsigned int Inext, Ia, Ib;
+    int Id;
 };
 
 struct mesh_t* 
@@ -102,6 +103,11 @@ void \
 tess_step(float A[3], float u[2], \
           struct tess_storage_t* S)
 TESS_STEP_FUNCTION;
+
+#define TESS_STEP_ROW_FUNCTION \
+void \
+tess_step_row(float A[3], float u[2], \
+              struct tess_storage_t* S)
 
 #define TESS_END_FUNCTION \
 void \

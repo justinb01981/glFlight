@@ -118,4 +118,7 @@ gameGraphicsInit();
 void
 gameGraphicsUninit();
 
+int
+bindTexture(unsigned int tex_id);
+
 #endif

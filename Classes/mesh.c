@@ -325,19 +325,27 @@ free_mesh_opengl(struct mesh_opengl_t* ogl_mesh)
  8,0,1 <-- end-step
  
  // possible triangle-strip solution
- 0-----1-----4-----6
+ 0-----1-----4
  |    /|    /|
  |   / |   / |
  |  /  |  /  |
  | /   | /   |
  2-----3-----5
+       |\    |
+       | \   |
+       |  \  |
+       |   \ |
+       7-----6
+ 
 1,0,2
 3,1,2  m=1 // (next, read prev left-right, skip m)
 4,1,3  m=2 // (next, read prev right-left, skip m)
 5,4,3  m=1
-6,4,5  m=2
-7,6,5  m=1
-8,6,7  m=2
+            // (end row, move backwards)
+6,5,3  m=2
+7,6,3  m=1
+8,7,3  m=2
+
  **/
 TESS_BEGIN_FUNCTION
 {
@@ -370,23 +378,45 @@ TESS_STEP_FUNCTION
         // complete first triangle
         *(S->Icur) = S->Inext; S->Icur++;
     }
-    else
-    if(S->Inext % 2 == 1)
+    else if(S->Id > 0)
     {
-        *(S->Icur) = S->Inext; S->Icur++;
-        *(S->Icur) = *(Ist); S->Icur++;
-        *(S->Icur) = *(Ist+2); S->Icur++;
+        if(S->Inext % 2 == 1)
+        {
+            *(S->Icur) = S->Inext; S->Icur++;
+            *(S->Icur) = *(Ist); S->Icur++;
+            *(S->Icur) = *(Ist+2); S->Icur++;
+        }
+        else
+        {
+            *(S->Icur) = S->Inext; S->Icur++;
+            *(S->Icur) = *(Ist+1); S->Icur++;
+            *(S->Icur) = *(Ist); S->Icur++;
+        }
     }
-    else
+    else if(S->Id < 0)
     {
-        *(S->Icur) = S->Inext; S->Icur++;
-        *(S->Icur) = *(Ist+1); S->Icur++;
-        *(S->Icur) = *(Ist); S->Icur++;
+        if(S->Inext % 2 == 1)
+        {
+            *(S->Icur) = S->Inext; S->Icur++;
+            *(S->Icur) = *(Ist); S->Icur++;
+            *(S->Icur) = *(Ist+2); S->Icur++;
+        }
+        else
+        {
+            *(S->Icur) = S->Inext; S->Icur++;
+            *(S->Icur) = *(Ist); S->Icur++;
+            *(S->Icur) = *(Ist+2); S->Icur++;
+        }
     }
     
     printf("TESS_STEP[1]: %d %d %d\n", *(S->Icur-3), *(S->Icur-2), *(S->Icur-1));
     
     S->Inext++;
+}
+
+TESS_STEP_ROW_FUNCTION
+{
+    S->Id = -S->Id;
 }
 
 TESS_END_FUNCTION
@@ -397,4 +427,3 @@ TESS_WALK_FUNCTION
 {
     cb(S->Ms, S->Ts, S->Is, S->Icur - S->Is);
 }
-

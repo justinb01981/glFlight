@@ -15,14 +15,15 @@
 #include "gamePlay.h"
 #include "maps.h"
 #include "world_file.h"
+#include "gameInput.h"
 
 struct gameDialogStateStruct
 {
     int ratingDesired;
-    int controlsResuming;
     char gameDialogPortalToGameLast[255];
     int lanGameScanning;
     int networkGameNameEntered;
+    int hideNetworkStatus;
 };
 
 extern struct gameDialogStateStruct gameDialogState;
@@ -32,6 +33,12 @@ extern int gameDialogCounter;
 static void
 gameDialogCancel(void)
 {
+}
+
+static void
+gameDialogStopGameStatusMessages(void)
+{
+    gameDialogState.hideNetworkStatus = 1;
 }
 
 static void
@@ -197,12 +204,12 @@ gameDialogCalibrate()
 {
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
-                             "^C Calibrating controls:       ^C\n"
-                             "^C 1. Turn left/right          ^C\n"
-                             "^C 2. Center controls          ^C\n"
-                             "^C 3. Hold still               ^C\n"
-                             "^C Use flashing trim button    ^C\n"
-                             "^C to calibrate later          ^C\n"
+                             "^C                             ^C\n"
+                             "^C                             ^C\n"
+                             "^C Calibrating controls        ^C\n"
+                             "^C                             ^C\n"
+                             "^C                             ^C\n"
+                             "^C                             ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
                              "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
 }
@@ -210,7 +217,7 @@ gameDialogCalibrate()
 static void
 gameDialogResumePaused()
 {
-    gameDialogState.controlsResuming = 1;
+    needTrimLock = 1;
 }
 
 static void
@@ -286,7 +293,7 @@ gameDialogSearchingForGame()
     else
     {
         GameNetworkBonjourManagerBrowseBegin();
-        gameInterfaceModalDialog("Searching for game...", "", "",
+        gameInterfaceModalDialog("Searching for game...\nConnect?", "", "",
                                  gameDialogLanConnect, gameDialogCancel);
         gameDialogState.lanGameScanning = 1;
         return 0;
@@ -314,7 +321,10 @@ gameDialogConnectToGameSuccessful2()
 static void
 gameDialogStartNetworkGame2()
 {
-    gameNetwork_sendPlayersDisconnect();
+    if(gameStateSinglePlayer.game_type == GAME_TYPE_DEATHMATCH && gameStateSinglePlayer.started)
+    {
+        return;
+    }
     
     game_start(1, GAME_TYPE_DEATHMATCH);
     gameNetwork_startGame(300);
@@ -368,12 +378,31 @@ gameDialogStartNetworkGameNewMap()
     console_append("MAP: %s\n", maps_list_names[maps_list_idx]);
 }
 
+//static void
+//gameDialogStartNetworkGame()
+//{
+//    gameDialogCounter = 0;
+//    gameStateSinglePlayer.map_use_current = 1;
+//    gameInterfaceModalDialog("Ready to start?\nWait for more?\n", "Start", "Wait", gameDialogStartNetworkGameAddBots, gameDialogCancel);
+//}
+
 static void
-gameDialogStartNetworkGame()
+gameDialogNetworkGameStatus()
 {
-    gameDialogCounter = 0;
-    gameStateSinglePlayer.map_use_current = 1;
-    gameInterfaceModalDialog("Ready to start?\nWait for more?\n", "Start", "Wait", gameDialogStartNetworkGameAddBots, gameDialogCancel);
+    void (*okFunc)(void) = gameDialogCancel;
+    
+    if(gameDialogState.hideNetworkStatus) return;
+    
+    if(gameNetworkState.hostInfo.hosting)
+    {
+        okFunc = gameDialogStartNetworkGame2;
+    }
+    else
+    {
+        okFunc = gameDialogClose;
+    }
+    
+    gameInterfaceModalDialog(gameNetworkState.gameStatsMessage, "OK", "OK", okFunc, gameDialogStopGameStatusMessages);
 }
 
 static char gameDialogDisplayStringStr[16][1024];

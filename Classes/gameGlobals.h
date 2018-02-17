@@ -82,6 +82,8 @@ extern int fireActionQueued;
 #define VISIBLE_DISTANCE_PLATFORM 100
 #endif
 
+#define TESSELATE_TERRAIN 1
+
 /* reducing friction influences this... should be MAX_THRUST really */
 #define MAX_SPEED /*(15)*/ (10)
 

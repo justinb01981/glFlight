@@ -72,6 +72,7 @@ double speedBoost = 0;
 double bulletVel;
 int needTrimLast;
 int needTrim = 1;
+int needTrimLock = 0;
 int isLandscape;
 int controlsCalibrated = 0;
 quaternion_t b;
@@ -314,9 +315,9 @@ gameInput()
      }
      */
     
-    if(gameDialogState.controlsResuming)
+    if(needTrimLock)
     {
-        gameDialogState.controlsResuming = 0;
+        needTrimLock = 0;
         
         needTrim = 0;
         needTrimLast = 1;

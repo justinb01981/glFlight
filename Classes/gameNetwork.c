@@ -210,7 +210,6 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
 {
     struct sockaddr_in6 sa;
     long r;
-    char buf[128];
     
     memcpy(&sa, address->storage, address->len);
     
@@ -222,8 +221,6 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
     
     r = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg),
                0, (struct sockaddr*) &sa, address->len);
-    
-    printf("send_to_address: cmd:%d addr:%s:%u (%lu)\n", msg->cmd, inet_ntop(AF_INET6, &sa.sin6_addr, buf, sizeof(buf)), ntohs(sa.sin6_port), r);
 }
     
 static unsigned long strcksum(const char* str)
@@ -270,6 +267,32 @@ send_connect(gameNetworkAddress *addr)
     msg.player_id = gameNetworkState.my_player_id;
     
     send_to_address_udp(&msg, addr);
+}
+    
+void
+send_startgame()
+{
+    gameNetworkMessage msg;
+    
+    memset(&msg, 0, sizeof(msg));
+    msg.cmd = GAME_NETWORK_MSG_STARTGAME;
+    strncpy(msg.params.c, gameNetworkState.my_player_name, sizeof(msg.params.c));
+    msg.player_id = gameNetworkState.my_player_id;
+    
+    gameNetwork_send(&msg);
+}
+    
+void
+send_endgame()
+{
+    gameNetworkMessage msg;
+    
+    memset(&msg, 0, sizeof(msg));
+    msg.cmd = GAME_NETWORK_MSG_ENDGAME;
+    strncpy(msg.params.c, gameNetworkState.my_player_name, sizeof(msg.params.c));
+    msg.player_id = gameNetworkState.my_player_id;
+    
+    gameNetwork_send(&msg);
 }
     
 void
@@ -524,8 +547,7 @@ gameNetwork_connect(char* server_name, int host)
                 gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting1;
 
                 send_beacon(&gameAddress, GAME_NETWORK_LAN_GAME_NAME);
-                gameNetworkState.connected = 1;
-                return GAME_NETWORK_ERR_NONE;
+                goto gameNetwork_connect_done;
             }
             else
             {
@@ -687,6 +709,8 @@ gameNetwork_startGame(unsigned int sec)
         
         pInfo = pInfo->next;
     }
+    
+    send_startgame();
 }
     
 gameNetworkError
@@ -1936,8 +1960,6 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
             
             console_write("player %s joined", playerInfo->name);
             
-            gameDialogStartNetworkGame();
-            
             memcpy(&playerInfo->address, srcAddr, sizeof(*srcAddr));
             playerInfo->elem_id = WORLD_ELEM_ID_INVALID;
             
@@ -2335,19 +2357,24 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                 break;
                 
             case GAME_NETWORK_MSG_ALERT_BEGIN:
-                console_clear();
-                console_lines_max = 24;
                 msg->params.c[sizeof(msg->params.c)-1] = '\0';
-                console_write("%s:\n%s", playerInfo->name, msg->params.c);
+                gameNetworkState.gameStatsMessage[0] = '\0';
+                sprintf(gameNetworkState.gameStatsMessage, "%s:\n%s", playerInfo->name, msg->params.c);
                 break;
                 
             case GAME_NETWORK_MSG_ALERT_CONTINUE:
-                msg->params.c[sizeof(msg->params.c)-1] = '\0';
-                console_append(msg->params.c);
+                {
+                    char* p = msg->params.c;
+                    p[sizeof(msg->params.c)-1] = '\0';
+                    if(strlen(gameNetworkState.gameStatsMessage) + strlen(p) < sizeof(gameNetworkState.gameStatsMessage))
+                    {
+                        strcat(gameNetworkState.gameStatsMessage, p);
+                    }
+                }
                 break;
                 
             case GAME_NETWORK_MSG_ALERT_END:
-                console_lines_max = 2;
+                gameDialogNetworkGameStatus();
                 break;
                 
             case GAME_NETWORK_MSG_HITME:
@@ -2407,6 +2434,24 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                         }
                     }
                 }
+                break;
+                
+            case GAME_NETWORK_MSG_STARTGAME:
+                console_write("netgame started!");
+                if(my_ship_id != WORLD_ELEM_ID_INVALID)
+                {
+                    WorldElemListNode* pMyShipNode = world_elem_list_find(my_ship_id, &gWorld->elements_moving);
+                    
+                    if(pMyShipNode)
+                    {
+                        world_remove_object(my_ship_id);
+                        my_ship_id = WORLD_ELEM_ID_INVALID;
+                    }
+                }
+                break;
+                
+            case GAME_NETWORK_MSG_ENDGAME:
+                console_write("netgame ended!");
                 break;
                 
             case GAME_NETWORK_MSG_GET_MAP_REQUEST:
@@ -2673,45 +2718,89 @@ gameNetwork_sendStatsAlert()
     static int time_remaining_last = 1;
     int clear_stats = 0;
     const char* decor = "^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L\n";
+    char *rows[] = {"NAME ", "K^N   ", "D^M   ", "SHOTS", "PTS  ", "PING "};
+    char *cSep = "|";
+    char *pRowTop = NULL;
     
     if(game_time_remaining() <= 0 && time_remaining_last > 0)
     {
         clear_stats = 1;
+        send_endgame();
     }
     time_remaining_last = game_time_remaining();
     
-    sprintf(str, "Game stats:\n"
-            "%s"
-            "Time Remaining:%.0f\n"
-            "NAME            : KILL^N:   DEATH^M:   SHOTS:   PING:   POINTS:  \n", decor, game_time_remaining());
+    str[0] = '\0';
+    strcat(str, "ALERT:\n");
     
-    pInfo = gameNetworkState.player_list_head.next;
-    while(pInfo && strlen(str) < sizeof(str)-64)
+    strcat(str, decor);
+    sprintf(tmp, "remaining time: %f\n", game_time_remaining());
+    strcat(str, tmp);
+    strcat(str, decor);
+    
+    int row = 0;
+    while(row < sizeof(rows)/sizeof(char*))
     {
-        char *statsPrefix = clear_stats? "ALERT:": "";
-        if(clear_stats) statsPrefix = "***FINAL SCORE***\n";
+        pInfo = gameNetworkState.player_list_head.next;
         
-        strncpy(nameBuf, pInfo->name, 16);
-        while(strlen(nameBuf) < 16) strcat(nameBuf, " ");
+        if(!pRowTop) pRowTop = str + strlen(str);
         
-        sprintf(tmp, "%s%s: %02d       %02d        %04d     %02.0f      %02d\n",
-                statsPrefix,
-                nameBuf,
-                pInfo->stats.killer,
-                pInfo->stats.killed,
-                pInfo->stats.shots_fired,
-                pInfo->network_latency,
-                pInfo->stats.points);
-        strcat(str, tmp);
+        char* pLastSep = pRowTop;
         
-        if(clear_stats)
+        strcat(str, rows[row]);
+        
+        while(pInfo && strlen(str) < sizeof(str)-64)
         {
-            pInfo->stats.killed = pInfo->stats.killer = pInfo->stats.shots_fired =
-            pInfo->stats.points = pInfo->stats.score_calculated = 0;
+            while(row > 0 && *pLastSep && *pLastSep != cSep[0])
+            {
+                strcat(str, " ");
+                pLastSep++;
+            }
+            pLastSep++;
+            
+            switch(row)
+            {
+                case 0:
+                    strcat(str, cSep);
+                    strcat(str, pInfo->name);
+                    break;
+                    
+                case 1:
+                    sprintf(tmp, "%d", pInfo->stats.killer);
+                    strcat(str, tmp);
+                    if(clear_stats) pInfo->stats.killer = 0;
+                    break;
+                    
+                case 2:
+                    sprintf(tmp, "%d", pInfo->stats.killed);
+                    strcat(str, tmp);
+                    if(clear_stats) pInfo->stats.killed = 0;
+                    break;
+                    
+                case 3:
+                    sprintf(tmp, "%d", pInfo->stats.shots_fired);
+                    strcat(str, tmp);
+                    if(clear_stats) pInfo->stats.shots_fired = 0;
+                    break;
+                    
+                case 4:
+                    sprintf(tmp, "%d", pInfo->stats.points);
+                    strcat(str, tmp);
+                    if(clear_stats) pInfo->stats.points = 0;
+                    break;
+                    
+                case 5:
+                    sprintf(tmp, "%.0f", pInfo->network_latency);
+                    strcat(str, tmp);
+                    if(clear_stats) pInfo->stats.score_calculated = 0;
+                    break;
+            }
+            
+            pInfo = pInfo->next;
         }
-        
-        pInfo = pInfo->next;
+        strcat(str, "\n");
+        row++;
     }
+    
     strcat(str, decor);
     
     gameNetwork_alert(str);

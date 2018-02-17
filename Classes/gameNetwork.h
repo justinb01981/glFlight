@@ -73,6 +73,8 @@ typedef enum
     GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET,
     GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET_RESPONSE,
     GAME_NETWORK_MSG_DIRECTORY_RESPONSE,
+    GAME_NETWORK_MSG_STARTGAME,
+    GAME_NETWORK_MSG_ENDGAME,
     GAME_NETWORK_MSG_LAST
 } gameNetworkMsgType;
 
@@ -257,6 +259,8 @@ typedef struct
     unsigned int msg_seq_acked_last;
     
     int (*gameNetworkHookOnMessage)(gameNetworkMessage*, gameNetworkAddress*);
+    
+    char gameStatsMessage[1024];
     
 } gameNetworkState_t;
 

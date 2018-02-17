@@ -9,12 +9,15 @@
 #ifndef gl_flight_gameInput_h
 #define gl_flight_gameInput_h
 
+#include "quaternions.h"
+
 extern double yaw;
 extern double pitch;
 extern double roll;
 extern float qw, qx, qy, qz;
 extern double speed, maxSpeed, targetSpeed;
 extern int needTrim;
+extern int needTrimLock;
 extern int isLandscape;
 extern double bulletVel;
 extern quaternion_t bx, by, bz, b;

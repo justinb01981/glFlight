@@ -77,6 +77,8 @@ enum {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
+    
     EAGLContext *aContext = [[EAGLContext alloc] initWithAPI:/*kEAGLRenderingAPIOpenGLES2*/ kEAGLRenderingAPIOpenGLES1];
     
     if (!aContext)
@@ -92,9 +94,26 @@ enum {
 	self.context = aContext;
 	[aContext release];
 	
-    [(EAGLView *)self.view setContext:context];
-    [(EAGLView *)self.view setFramebuffer];
-    [(EAGLView *)self.view setMultipleTouchEnabled:true];
+    EAGLView* glView = (EAGLView*) self.view;
+    
+    // shrink inside of safe-area insets (iphone x)
+    if (@available(iOS 11.0, *))
+    {
+        UIEdgeInsets insets = [glView safeAreaInsets];
+        
+        CGRect childRect = [glView frame];
+        
+        childRect.size.width -= insets.left + insets.right;
+        childRect.origin.x += insets.left;
+        
+        [glView setFrame: childRect];
+    
+        [[glView superview] setBackgroundColor:[UIColor blackColor]];
+    }
+    
+    [glView setContext:context];
+    [glView setFramebuffer];
+    [glView setMultipleTouchEnabled:true];
     
     if ([context API] == kEAGLRenderingAPIOpenGLES2)
     {

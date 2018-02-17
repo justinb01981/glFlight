@@ -594,8 +594,6 @@ gameInterfaceHandleTouchBegin(float x, float y)
     gameInterfaceControls.fireRectMissle.visible = !gameInterfaceControls.fireRect2.visible;
     
     gameInterfaceControls.touchCount++;
-    
-    if(touchedControl != &gameInterfaceControls.trim) game_paused = 0;
 }
 
 void gameInterfaceProcessAction()
@@ -603,18 +601,11 @@ void gameInterfaceProcessAction()
     char *mapBuffer = NULL;
     const char* pGameConnectName = gameSettingGameTitle;
     char strTmp[256];
-        
-    /* single-player games disconnect from network */
-    if((fireAction >= ACTION_START_TURRET_GAME &&
-        fireAction <= ACTION_START_SPEEDRUN_GAME) ||
-       fireAction == ACTION_MAP_EDIT)
-    {
-        gameNetwork_disconnect();
-    }
-    
+
     switch(fireAction)
     {
         case ACTION_MAP_EDIT:
+            gameNetwork_disconnect();
             game_map_custom_loaded = 1;
             gameInterfaceControls.mainMenu.visible = 0;
             gameMapFileName("custom");
@@ -651,6 +642,7 @@ void gameInterfaceProcessAction()
             
             if(!gameDialogState.networkGameNameEntered)
             {
+                gameNetwork_disconnect();
                 gameDialogState.networkGameNameEntered = 1;
                 fireActionQueued = fireAction;
                 console_clear();
@@ -664,6 +656,7 @@ void gameInterfaceProcessAction()
             if(fireAction == ACTION_CONNECT_TO_GAME_LAN &&
                !gameDialogSearchingForGame())
             {
+                gameNetwork_disconnect();
                 break;
             }
             
@@ -671,8 +664,6 @@ void gameInterfaceProcessAction()
             {
                 gameName = (char*) GAME_NETWORK_LAN_GAME_NAME;
             }
-            
-            if(gameNetworkState.connected) gameNetwork_disconnect();
             
             if(gameNetwork_connect(gameName, 0) == GAME_NETWORK_ERR_NONE)
             {
@@ -724,6 +715,7 @@ void gameInterfaceProcessAction()
             game_start_score = gameStateSinglePlayer.last_game.score;
             
         case ACTION_START_GAME:
+            gameNetwork_disconnect();
             actions_menu_reset();
             gameInterfaceControls.mainMenu.visible = 0;
             game_start(game_start_difficulty, GAME_TYPE_COLLECT);
@@ -743,7 +735,13 @@ void gameInterfaceProcessAction()
             save_map = 0;
             break;
             
+        case ACTION_NETWORK_GAME_SCORE:
+            gameDialogState.hideNetworkStatus = 0;
+            gameDialogNetworkGameStatus();
+            break;
+            
         case ACTION_START_SURVIVAL_GAME:
+            gameNetwork_disconnect();
             gameInterfaceControls.mainMenu.visible = 0;
             sprintf(strTmp, "survival started!\n");
             gameStateSinglePlayer.started = 1;
@@ -753,6 +751,7 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_START_SPEEDRUN_GAME:
+            gameNetwork_disconnect();
             gameInterfaceControls.mainMenu.visible = 0;
             sprintf(strTmp, "survival started!\n");
             gameStateSinglePlayer.started = 1;
@@ -762,6 +761,7 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_START_LOBBALL_GAME:
+            gameNetwork_disconnect();
             gameInterfaceControls.mainMenu.visible = 0;
             sprintf(strTmp, "lob started!\n");
             gameStateSinglePlayer.started = 1;
@@ -771,6 +771,7 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_START_DEFEND_GAME:
+            gameNetwork_disconnect();
             gameInterfaceControls.mainMenu.visible = 0;
             sprintf(strTmp, "defend started!\n");
             gameStateSinglePlayer.started = 1;
@@ -780,6 +781,7 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_START_TURRET_GAME:
+            gameNetwork_disconnect();
             gameInterfaceControls.mainMenu.visible = 0;
             sprintf(strTmp, "turret started!\n");
             gameStateSinglePlayer.started = 1;
@@ -811,32 +813,32 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_SETTING_SHIP_MODEL:
-        {
-            int model_new = MODEL_SHIP1;
-            
-            if(!gameSettingsRatingGiven)
             {
-                gameDialogRating();
-                break;
+                int model_new = MODEL_SHIP1;
+                
+                if(!gameSettingsRatingGiven)
+                {
+                    gameDialogRating();
+                    break;
+                }
+                
+                switch(model_my_ship)
+                {
+                    case MODEL_SHIP1:
+                        model_new = MODEL_SHIP2;
+                        break;
+                    case MODEL_SHIP2:
+                        model_new = MODEL_SHIP3;
+                        break;
+                    default:
+                        model_new = MODEL_SHIP1;
+                        break;
+                }
+                model_my_ship = model_new;
+                console_write("model %d (on next respawn)", model_my_ship);
+                
+                appWriteSettings();
             }
-            
-            switch(model_my_ship)
-            {
-                case MODEL_SHIP1:
-                    model_new = MODEL_SHIP2;
-                    break;
-                case MODEL_SHIP2:
-                    model_new = MODEL_SHIP3;
-                    break;
-                default:
-                    model_new = MODEL_SHIP1;
-                    break;
-            }
-            model_my_ship = model_new;
-            console_write("model %d (on next respawn)", model_my_ship);
-            
-            appWriteSettings();
-        }
             break;
             
         case ACTION_SETTING_CONTROL_MODE:

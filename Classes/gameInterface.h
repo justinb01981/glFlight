@@ -24,7 +24,7 @@ typedef struct
     int blinking;
     double touch_rx, touch_ry;
     game_timeval_t touch_end_last;
-    char text[512], textLeft[64], textRight[64];
+    char text[1024], textLeft[64], textRight[64];
     char *textDest;
     int *textDestInt;
     int modal:1;

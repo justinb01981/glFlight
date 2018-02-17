@@ -32,7 +32,7 @@ typedef collision_action_t collision_action_table_t[OBJ_LAST][OBJ_LAST];
 const static collision_action_t
 collision_actions_default[OBJ_LAST][OBJ_LAST] =
 {
-    {0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 2, 0, 0}, // unknown
+    {0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0,       2, 0, 0, 0, 0, 0, 2, 0, 0}, // unknown
     {2, 2, 2, 0, 2, 2, 0, 0, 0, 0, 0,       3, 1, 0, 0, 0, 0, 1, 0, 0}, // ship
     {2, 2, 2, 3, 2, 2, 0, 4, 3, 0, 0, /*3*/ 1, 1, 0, 0, 0, 0, 0, 0, 0}, // player
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // turret
