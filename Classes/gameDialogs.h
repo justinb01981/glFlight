@@ -145,7 +145,11 @@ gameDialogMenuCountdown()
     static int passes = 60;
     passes--;
     
-    if(passes > 0) return;
+    if(passes > 0)
+    {
+        gameInterfaceControls.graphicDialogHelp.visible = 1;
+        return;
+    }
     
     gameDialogWelcomeMenu();
     glFlightDrawframeHook = NULL;
@@ -518,6 +522,7 @@ static void
 gameDialogGraphicCancel()
 {
     gameInterfaceControls.graphicDialog.visible = 0;
+    gameInterfaceControls.graphicDialogHelp.visible = 0;
 }
 
 static void

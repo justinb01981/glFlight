@@ -145,6 +145,13 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.graphicDialog.tex_id = TEXTURE_ID_DIALOG_GAMEOVER;
     gameInterfaceControls.graphicDialog.visible = 0;
     
+    gameInterfaceControls.graphicDialogHelp.x = 0;
+    gameInterfaceControls.graphicDialogHelp.y = 0;
+    gameInterfaceControls.graphicDialogHelp.xw = screenWidth;
+    gameInterfaceControls.graphicDialogHelp.yw = screenHeight;
+    gameInterfaceControls.graphicDialogHelp.tex_id = TEXTURE_ID_HELPOVERLAY;
+    gameInterfaceControls.graphicDialogHelp.visible = 0;
+    
     float dialogWidth = /*0.48*/ 0.60;
     float dialogHeight = 0.512;
     gameInterfaceControls.dialogRectDefault.x = gameInterfaceControls.interfaceWidth/2 - (dialogWidth*gameInterfaceControls.interfaceWidth)/2;
@@ -229,6 +236,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.fireRectMissle;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.dialogRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.graphicDialog;
+    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.graphicDialogHelp;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.consoleTextRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.statsTextRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.altControl;

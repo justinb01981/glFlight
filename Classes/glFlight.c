@@ -364,6 +364,7 @@ calibrate_bail:
         speed = 6;
         update_object_velocity(my_ship_id, ship_z_vec[0]*speed, ship_z_vec[1]*speed, ship_z_vec[2]*speed, 0);
         world_get_last_object()->bounding_remain = 1;
+        world_get_last_object()->renderInfo.fade_in_count = 300;
         world_get_last_object()->durability = ship_durability;
         
         gameCamera_init(my_ship_x, my_ship_y, my_ship_z,

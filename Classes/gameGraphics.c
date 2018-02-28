@@ -42,6 +42,9 @@ DrawBackgroundData* bgData = NULL;
 gameGraphics_drawState2d drawState_2d;
 gameGraphics_drawState2d drawControls_ds;
 
+void* gl_vertex_ptr_last = 0;
+void* gl_texcoord_ptr_last = 0;
+
 int texture_id_playership;
 int texture_id_background = BACKGROUND_TEXTURE;
 
@@ -941,46 +944,11 @@ void drawControls()
                          // characters drawn along y
                          Oy , 1);
             }
-            
-            /*
-            float yOff = controls[i]->yw/2;
-            char *btnStrings[2];
-            btnStrings[0] = controls[i]->textLeft;
-            btnStrings[1] = controls[i]->textRight;
-            
-            for(btn = 0; btn < 2 && btnStrings[btn] != NULL && strlen(btnStrings[btn]) > 0; btn++)
-            {
-                char textBuf[256] = {0};
-                int c = 0;
-                
-                strcat(textBuf, "*----------------*\n*");
-                while(c*2 + strlen(btnStrings[btn]) < 16)
-                {
-                    strcat(textBuf, " ");
-                    c++;
-                }
-                strcat(textBuf, btnStrings[btn]);
-                while(c > 0)
-                {
-                    strcat(textBuf, " ");
-                    c--;
-                }
-                strcat(textBuf, "*\n*----------------*\n");
-                
-                drawText(textBuf,
-                         controls[i]->x + controls[i]->xw*0.15,
-                         controls[i]->y + yOff, 1);
-                yOff -= yOff;
-            }
-            */
         }
         
         i++;
     }
 }
-
-void* gl_vertex_ptr_last = 0;
-void* gl_texcoord_ptr_last = 0;
 
 void
 drawElem_newFrame()
@@ -1077,6 +1045,12 @@ drawElem(WorldElem* pElem)
         }
         
         int texture_id = pElem->texture_id;
+        
+        if(pElem->renderInfo.fade_in_count)
+        {
+            texture_id = pElem->renderInfo.fade_in_count % 3 == 0 ? 0 : texture_id;
+            pElem->renderInfo.fade_in_count--;
+        }
         
         int texture_id_animated = texture_animated(texture_id, drawElemAnimationIdx);
         

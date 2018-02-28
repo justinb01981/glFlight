@@ -65,12 +65,17 @@ enum {
 
 @synthesize animating, context, displayLink;
 
--(NSUInteger)supportedInterfaceOrientations
+-(UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
     return UIInterfaceOrientationMaskLandscapeRight;
 }
 
 -(BOOL)shouldAutorotate
+{
+    return true;
+}
+
+-(BOOL)prefersHomeIndicatorAutoHidden
 {
     return true;
 }

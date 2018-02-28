@@ -105,9 +105,7 @@ void glFlightInit(gl_flightViewController* viewController)
                   [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]UTF8String]);
     
     gameInterfaceInit(viewWidth, viewHeight);
-    gameInterfaceControls.trim.blinking = 1;
-    
-    
+        
     gameDialogLoading();
 }
 
