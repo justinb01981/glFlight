@@ -22,7 +22,6 @@ typedef GLfloat model_coord_t;
 // keep these in-sync
 #define index_type_enum GL_UNSIGNED_INT
 typedef GLuint model_index_t;
-typedef GLfloat model_color_t;
 typedef GLfloat model_texcoord_t;
 
 #include "sphere_model.h"

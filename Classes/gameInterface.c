@@ -49,6 +49,9 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.interfaceHeight = screenHeight;
     gameInterfaceControls.interfaceWidth = screenWidth;
     
+    gameInterfaceControls.textWidth = screenWidth / 148;
+    gameInterfaceControls.textHeight = gameInterfaceControls.textWidth * 2.2 * (screenWidth/screenHeight);
+    
     // origin (in non-landscape mode) is upper left
     controlRect accelRect = {0, 0, screenWidth-(screenWidth*0.15), (screenHeight * 0.4507)/4};
     gameInterfaceControls.accelerator = accelRect;
@@ -126,12 +129,10 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.mainMenu.tex_id = /*29*/ TEXTURE_ID_MAINMENU;
     gameInterfaceControls.mainMenu.visible = 1;
     
-    float menuHeight = gameInterfaceControls.interfaceHeight * 0.7;
-    float menuWidth = gameInterfaceControls.interfaceWidth * 0.7;
-    gameInterfaceControls.textMenuControl.x = screenWidth/2 - menuWidth/2;
-    gameInterfaceControls.textMenuControl.y = screenHeight/2 - menuHeight/2;
-    gameInterfaceControls.textMenuControl.xw = menuWidth;
-    gameInterfaceControls.textMenuControl.yw = menuHeight;
+    gameInterfaceControls.textMenuControl.x = screenWidth*0.2;
+    gameInterfaceControls.textMenuControl.y = screenHeight*0.2;
+    gameInterfaceControls.textMenuControl.xw = screenWidth*0.6;
+    gameInterfaceControls.textMenuControl.yw = screenHeight*0.6;
     gameInterfaceControls.textMenuControl.tex_id = TEXTURE_ID_CONTROLS_TEXTMENU;
     gameInterfaceControls.textMenuControl.visible = 0;
     
@@ -190,15 +191,21 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.fireRectBoost.tex_id = TEXTURE_ID_CONTROLS_BOOST;
     gameInterfaceControls.fireRectBoost.visible = 0;
     
-    gameInterfaceControls.consoleTextRect.x = screenWidth * 0.95;
+    gameInterfaceControls.consoleTextRect.x = screenWidth - gameInterfaceControls.textHeight*console_lines_max;
     gameInterfaceControls.consoleTextRect.y = screenHeight * 0.15;
+    gameInterfaceControls.consoleTextRect.xw = 0.1*screenWidth;
+    gameInterfaceControls.consoleTextRect.yw = 0.5*screenHeight;
     gameInterfaceControls.consoleTextRect.visible = 1;
     gameInterfaceControls.consoleTextRect.tex_id = -1;
+    gameInterfaceControls.consoleTextRect.text_align_topleft = 1;
     
-    gameInterfaceControls.statsTextRect.x = screenWidth * 0.0;
-    gameInterfaceControls.statsTextRect.y = screenHeight * 0.1;
+    gameInterfaceControls.statsTextRect.x = screenWidth * 0.00;
+    gameInterfaceControls.statsTextRect.y = screenHeight * 0.15;
+    gameInterfaceControls.statsTextRect.xw = 0.05*screenWidth;
+    gameInterfaceControls.statsTextRect.yw = screenHeight/3;
     gameInterfaceControls.statsTextRect.visible = 1;
     gameInterfaceControls.statsTextRect.tex_id = -1;
+    gameInterfaceControls.statsTextRect.text_align_topleft = 1;
     
     gameInterfaceControls.altControl = gameInterfaceControls.fireRectBoost;
     gameInterfaceControls.altControl.tex_id = TEXTURE_ID_CONTROLS_ROLL;
@@ -236,9 +243,6 @@ gameInterfaceInit(double screenWidth, double screenHeight)
         gameInterfaceControls.controlArray[i]->textRight[0] = '\0';
         i++;
     }
-    
-    gameInterfaceControls.textHeight = (screenWidth/320) * 8;
-    gameInterfaceControls.textWidth = (screenHeight/568) * 6;
     
     gameInterfaceControls.menuControl.visible = 0;
     
@@ -293,6 +297,31 @@ gameInterfaceHandleTouchMove(float x, float y)
 {
     const float move_thresh = 10;
     
+    controlRect* touchedControl = gameInterfaceFindControl(x, y);
+    if(touchedControl)
+    {
+        touchedControl->touch_rx = (x - touchedControl->x) / touchedControl->xw;
+        touchedControl->touch_ry = (y - touchedControl->y) / touchedControl->yw;
+    }
+    
+    if(touchedControl == &gameInterfaceControls.accelerator)
+    {
+        float m = touchedControl->touch_rx;
+        if(m <= 0.10) m = 0;
+        targetSpeed = minSpeed + ((maxSpeed-minSpeed) * m);
+    }
+    else if(touchedControl == &gameInterfaceControls.fire)
+    {
+        //fireAction = ACTION_FIRE_BULLET;
+    }
+    else
+    {
+        gameInterfaceControls.touchUnmappedX = x;
+        gameInterfaceControls.touchUnmappedY = y;
+        gameInterfaceControls.touchUnmapped = 1;
+    }
+    
+    // controls after this ignore move events
     if(fabs(x-x_last) < move_thresh &&
        fabs(y-y_last) < move_thresh)
     {
@@ -301,22 +330,9 @@ gameInterfaceHandleTouchMove(float x, float y)
     x_last = x;
     y_last = y;
     
-    controlRect* touchedControl = gameInterfaceFindControl(x, y);
-    if(touchedControl)
-    {
-        touchedControl->touch_rx = (x - touchedControl->x) / touchedControl->xw;
-        touchedControl->touch_ry = (y - touchedControl->y) / touchedControl->yw;
-    }
-    
     gameDialogGraphicCancel();
     
-    if(touchedControl == &gameInterfaceControls.accelerator)
-    {
-        float m = touchedControl->touch_rx;
-        if(m <= 0.10) m = 0;
-        targetSpeed = minSpeed + ((maxSpeed-minSpeed) * m);
-    }
-    else if(touchedControl == &gameInterfaceControls.radar)
+    if(touchedControl == &gameInterfaceControls.radar)
     {
         radar_mode = !radar_mode;
         gameInterfaceControls.radar.tex_id = radar_mode? 4: 20;
@@ -334,10 +350,6 @@ gameInterfaceHandleTouchMove(float x, float y)
          viewRotationDegrees += 90;
          if(viewRotationDegrees >= 360) viewRotationDegrees = 0;
          */
-    }
-    else if(touchedControl == &gameInterfaceControls.fire)
-    {
-        //fireAction = ACTION_FIRE_BULLET;
     }
     else if(touchedControl == &gameInterfaceControls.fireRectMissle)
     {
@@ -359,12 +371,6 @@ gameInterfaceHandleTouchMove(float x, float y)
     }
     else if(touchedControl == &gameInterfaceControls.fireRectMisc)
     {
-    }
-    else
-    {
-        gameInterfaceControls.touchUnmappedX = x;
-        gameInterfaceControls.touchUnmappedY = y;
-        gameInterfaceControls.touchUnmapped = 1;
     }
 }
 

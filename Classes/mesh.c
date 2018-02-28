@@ -352,71 +352,122 @@ TESS_BEGIN_FUNCTION
     S->Icur = S->Is;
     S->Mcur = S->Ms;
     S->Tcur = S->Ts;
+    S->Imir = S->Icur;
+    
+    S->Ist = NULL;
+    
+    // current direction = U+
+    S->Id = 1;
+    S->Idc = 0;
     
     // store next set of vertices
-    *(S->Icur) = 1; S->Icur++;
-    *(S->Icur) = 0; S->Icur++;
-    S->Inext = 2;
+    *(S->Icur) = 0; S->Icur += 3;
+    S->Inext = 1;
     
-    *S->Mcur = A[0]; S->Mcur++; *S->Mcur = A[1]; S->Mcur++; *S->Mcur = A[2]; S->Mcur++;
-    *S->Mcur = B[0]; S->Mcur++; *S->Mcur = B[1]; S->Mcur++; *S->Mcur = B[2]; S->Mcur++;
+    // store model (x,y,z) origin
+    *S->Mcur = Mo[0]; S->Mcur++; *S->Mcur = Mo[1]; S->Mcur++; *S->Mcur = Mo[2]; S->Mcur++;
     
-    *S->Tcur = u[0]; S->Tcur++; *S->Tcur = u[1]; S->Tcur++;
-    *S->Tcur = v[0]; S->Tcur++; *S->Tcur = v[1]; S->Tcur++;
+    // store texture (u,v) origin
+    *S->Tcur = To[0]; S->Tcur++; *S->Tcur = To[1]; S->Tcur++;
 }
 
-TESS_STEP_FUNCTION
+TESS_STEPU_FUNCTION
 {
-    unsigned int* Ist = S->Icur - 3;
+    *S->Mcur = Mu[0]; S->Mcur++; *S->Mcur = Mu[1]; S->Mcur++; *S->Mcur = Mu[2]; S->Mcur++;
     
-    *S->Mcur = A[0]; S->Mcur++; *S->Mcur = A[1]; S->Mcur++; *S->Mcur = A[2]; S->Mcur++;
+    *S->Tcur = Tu[0]; S->Tcur++; *S->Tcur = Tu[1]; S->Tcur++;
     
-    *S->Tcur = u[0]; S->Tcur++; *S->Tcur = u[1]; S->Tcur++;
-
-    if(S->Inext == 2)
+    if(S->Idc)
     {
-        // complete first triangle
-        *(S->Icur) = S->Inext; S->Icur++;
+        // store triangles
+        *(S->Icur) = S->Inext;
+        *(S->Icur+1) = S->Imir;
+        *(S->Icur+2) = S->Inext-1;
+        
+        if(S->Id < 0)
+        {
+            unsigned int tmp = *(S->Icur+1);
+            *(S->Icur+1) = *(S->Icur+2);
+            *(S->Icur+2) = tmp;
+        }
+        S->Icur += 3;
+        //printf("TESS_STEPU[0]: %d %d %d\n", *(S->Icur-3), *(S->Icur-2), *(S->Icur-1));
+        
+         S->Inext += 1;
+        
+        *(S->Icur) = S->Inext;
+        *(S->Icur+1) = S->Imir;
+        *(S->Icur+2) = S->Inext-1;
+        
+        if(S->Id < 0)
+        {
+            unsigned int tmp = *(S->Icur+1);
+            *(S->Icur+1) = *(S->Icur+2);
+            *(S->Icur+2) = tmp;
+        }
+        S->Icur += 3;
+        
+        S->Inext += 1;
+        
+        //printf("TESS_STEPU[1]: %d %d %d\n", *(S->Icur-3), *(S->Icur-2), *(S->Icur-1));
     }
-    else if(S->Id > 0)
+    else
     {
-        if(S->Inext % 2 == 1)
+        // store triangles
+        *(S->Icur) = S->Inext;
+        *(S->Icur+1) = S->Inext-1;
+        *(S->Icur+2) = S->Imir+1;
+        
+        if(S->Id > 0)
         {
-            *(S->Icur) = S->Inext; S->Icur++;
-            *(S->Icur) = *(Ist); S->Icur++;
-            *(S->Icur) = *(Ist+2); S->Icur++;
+            unsigned int tmp = *(S->Icur+1);
+            *(S->Icur+1) = *(S->Icur+2);
+            *(S->Icur+2) = tmp;
         }
-        else
+        S->Icur += 3;
+        //printf("TESS_STEPU[0]: %d %d %d\n", *(S->Icur-3), *(S->Icur-2), *(S->Icur-1));
+        
+        *(S->Icur) = S->Inext;
+        *(S->Icur+1) = S->Imir;
+        *(S->Icur+2) = S->Imir+1;
+        
+        if(S->Id < 0)
         {
-            *(S->Icur) = S->Inext; S->Icur++;
-            *(S->Icur) = *(Ist+1); S->Icur++;
-            *(S->Icur) = *(Ist); S->Icur++;
+            unsigned int tmp = *(S->Icur+1);
+            *(S->Icur+1) = *(S->Icur+2);
+            *(S->Icur+2) = tmp;
         }
-    }
-    else if(S->Id < 0)
-    {
-        if(S->Inext % 2 == 1)
-        {
-            *(S->Icur) = S->Inext; S->Icur++;
-            *(S->Icur) = *(Ist); S->Icur++;
-            *(S->Icur) = *(Ist+2); S->Icur++;
-        }
-        else
-        {
-            *(S->Icur) = S->Inext; S->Icur++;
-            *(S->Icur) = *(Ist); S->Icur++;
-            *(S->Icur) = *(Ist+2); S->Icur++;
-        }
+        S->Icur += 3;
+        
+        //printf("TESS_STEPU[1]: %d %d %d\n", *(S->Icur-3), *(S->Icur-2), *(S->Icur-1));
+        
+        S->Inext += 1;
     }
     
-    printf("TESS_STEP[1]: %d %d %d\n", *(S->Icur-3), *(S->Icur-2), *(S->Icur-1));
-    
-    S->Inext++;
+    S->Imir -= 1;
+    S->Idc = 0;
 }
 
-TESS_STEP_ROW_FUNCTION
+TESS_STEPV_FUNCTION
 {
+    //printf("TESS_STEPV[0]: %d %d %d\n", *(S->Icur-3), *(S->Icur-2), *(S->Icur-1));
+    *S->Mcur = Mu[0]; S->Mcur++; *S->Mcur = Mu[1]; S->Mcur++; *S->Mcur = Mu[2]; S->Mcur++;
+    
+    *S->Tcur = Tu[0]; S->Tcur++; *S->Tcur = Tu[1]; S->Tcur++;
+    
+    S->Imir = S->Inext-2;
+    //S->Inext++;
+    
+    //S->Icur += 3;
+    
+    // move to next row
+    if(!S->Ist)
+    {
+        S->Ist = S->Icur;
+    }
     S->Id = -S->Id;
+    S->Idc = 1;
+    //printf("TESS_STEPV[1]: %d %d %d\n", *(S->Icur-3), *(S->Icur-2), *(S->Icur-1));
 }
 
 TESS_END_FUNCTION
@@ -425,5 +476,5 @@ TESS_END_FUNCTION
 
 TESS_WALK_FUNCTION
 {
-    cb(S->Ms, S->Ts, S->Is, S->Icur - S->Is);
+    cb(S->Ms, S->Ts, S->Ist, S->Icur - S->Ist);
 }

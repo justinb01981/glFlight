@@ -75,7 +75,6 @@ int needTrim = 1;
 int needTrimLock = 0;
 int isLandscape;
 int controlsCalibrated = 0;
-quaternion_t b;
 float rspin = 1;
 double yaw = 0;
 double pitch = 0;
@@ -111,8 +110,6 @@ int gameInputStatsInited = 0;
 void
 gameInputInit()
 {
-    initialized = 0;
-    
     // TODO: move these to some gameGlobals file
     // how large is our control "dead zone"
     //dz_roll = /*0.005*/ 0.1;
@@ -129,6 +126,8 @@ gameInputInit()
     isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
     
     gameInputStatsCollectStart();
+    
+    initialized = 1;
 }
 
 void
@@ -208,7 +207,6 @@ gyro_calibrate_log(float pct)
 void
 gameInput()
 {
-	double pi = M_PI;
     static float deviceLast[3];
     static unsigned long gyroInputCountLast = 0;
     
@@ -227,11 +225,17 @@ gameInput()
     deviceYaw = motionYaw;
     deviceRoll = motionRoll;
     
-    //float dz_m[3] = {0.5, 0.5, 0.5}; // deadzone-multiplier
-    float dz_m[3] = {0.0, 0.0, 0.0};
+    float dz_m[3] = {0.0, 0.0, 0.0}; // deadzone-multiplier
 #endif
     
     float s[3] = {deviceRoll, devicePitch, deviceYaw};
+    
+    
+    if(!initialized)
+    {
+        return;
+    }
+    
     gameInputStatsAppend(s);
     
     if(gyroStableCount > 0 &&
@@ -292,13 +296,6 @@ gameInput()
     
     if(gyroInputCount == gyroInputCountLast) return;
     gyroInputCountLast = gyroInputCount;
-	
-	if(!initialized)
-	{
-        euler_to_quaternion(pi, 0.1, 0.1, &b.w, &b.x, &b.y, &b.z);
-		
-		initialized = 1;
-	}
     
     static double trimStart[3];
     static int trimStartTime;
@@ -535,7 +532,7 @@ gameInput()
             if(!gameInterfaceControls.altControl.touched)
             {
                 roll_m = deviceRoll;
-                input_roll = 0.0;
+                input_roll = 0;
                 fcr += 0;
             }
         }
@@ -548,7 +545,6 @@ gameInput()
             
             if(fabs(s) > cap) s = cap * (s/fabs(s));
             
-            quaternion_rotate_inplace(&b, &cam_pos.bz, s);
             //gameCamera_rollRadians(s);
             gameShip_roll(s);
         }
@@ -566,7 +562,6 @@ gameInput()
             
             if(fabs(s) > cap) s = cap * (s/fabs(s));
             
-            quaternion_rotate_inplace(&b, &cam_pos.bx, s);
             //gameCamera_pitchRadians(s);
             gameShip_pitch(s);
         }
@@ -584,7 +579,6 @@ gameInput()
             
             if(fabs(s) > cap) s = cap * (s/fabs(s));
             
-            quaternion_rotate_inplace(&b, &cam_pos.by, s);
             //gameCamera_yawRadians(s);
             gameShip_yaw(s);
         }

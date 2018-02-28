@@ -202,16 +202,32 @@ gameDialogLoading()
 static void
 gameDialogCalibrate()
 {
+    gameInputInit();
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
                              "^C                             ^C\n"
                              "^C                             ^C\n"
-                             "^C Calibrating controls        ^C\n"
+                             "^C   Calibrating controls..    ^C\n"
                              "^C                             ^C\n"
                              "^C                             ^C\n"
                              "^C                             ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
                              "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
+}
+
+static void
+gameDialogCalibrateBegin()
+{
+    gameInterfaceModalDialog(
+                             "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
+                             "^C                             ^C\n"
+                             "^C    Hold your device still   ^C\n"
+                             "^C  while calibrating controls ^C\n"
+                             "^C                             ^C\n"
+                             "^C       (Tap to begin)        ^C\n"
+                             "^C                             ^C\n"
+                             "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
+                             "", "cancel", gameDialogCalibrate, gameDialogCalibrate);
 }
 
 static void
@@ -437,19 +453,11 @@ gameDialogCancelString()
     }
 }
 
-static char gameDialogScoresString[1024];
-
-static void
-gameDialogScoresDone()
-{
-    gameStateSinglePlayer.stats.score = 0;
-    
-    gameDialogWelcome();
-}
-
 static void
 gameDialogScores()
 {
+    static char gameDialogScoresString[1024];
+    
     sprintf(gameDialogScoresString, "firewall:%d\nSurvival:%d\nDefend:%d\nDeathmatch:%d\nTurret:%d\n",
             gameStateSinglePlayer.high_score[GAME_TYPE_COLLECT],
             gameStateSinglePlayer.high_score[GAME_TYPE_SURVIVAL],
@@ -459,7 +467,7 @@ gameDialogScores()
     
     gameInterfaceModalDialog(gameDialogScoresString,
                              "OK", "OK",
-                             gameDialogScoresDone, gameDialogScoresDone);
+                             gameDialogCancel, gameDialogCancel);
 }
 
 static void
@@ -487,16 +495,16 @@ gameDialogScorePopup(char *scoreStr)
 static void
 gameDialogMessagePopup(char *str)
 {
+    const float xscale = 2.0, yscale = 3.0;
     controlRect r;
     r = gameInterfaceControls.dialogRectDefault;
     
-    r.x -= gameInterfaceControls.interfaceWidth / 3;
+    r.x -= gameInterfaceControls.interfaceWidth / xscale;
     
-    float scale = 3;
-    r.x += r.xw/scale;
-    r.y += r.yw/scale;
-    r.xw /= scale;
-    r.yw /= scale;
+    r.x += r.xw/xscale;
+    r.y += r.yw/yscale;
+    r.xw /= xscale;
+    r.yw /= yscale;
     r.xm = -1;
     r.ym = 0;
     r.tex_id = 4;

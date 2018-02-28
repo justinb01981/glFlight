@@ -1602,6 +1602,29 @@ world_update(float tc)
                 
                 remove_element_from_region(pCur->elem);
                 
+                /*
+                 // hard bounding... presents lots of problems with collision detection
+                if(pCur->elem->bounding_remain && pCur->elem->object_type != OBJ_DISPLAYONLY)
+                {
+                    int i;
+                    for(i = 0; i < gWorld->boundingRegion->nVectorsInited; i++)
+                    {
+                        int d;
+                        for(d = 0; d < 3; d++)
+                        {
+                            float U[] = {vm[0]*tc, vm[1]*tc, vm[2]*tc};
+                            float V[] = {gWorld->boundingRegion->v[i].f[3], gWorld->boundingRegion->v[i].f[4], gWorld->boundingRegion->v[i].f[5]};
+                            float P[] = {gWorld->boundingRegion->v[i].f[0] - pCur->elem->physics.ptr->x, gWorld->boundingRegion->v[i].f[1] - pCur->elem->physics.ptr->y, gWorld->boundingRegion->v[i].f[2] - pCur->elem->physics.ptr->z};
+                            
+                            if((V[d] > 0 && P[d]-U[d] >= 0) || (V[d] < 0 && P[d]-U[d] <= 0))
+                            {
+                                vm[d] = -vm[d];
+                            }
+                        }
+                    }
+                }
+                */
+                
                 move_elem_relative(pCur->elem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
                 
                 // TODO: get rid of this it's expensive
@@ -1618,10 +1641,10 @@ world_update(float tc)
                         
                         // HACK: janky while loop but avoids having to return magnitude of oob-vector
                         while(!boundingRegionCheckPointInside(gWorld->boundingRegion,
-                                                              pCur->elem->physics.ptr->x,
-                                                              pCur->elem->physics.ptr->y,
-                                                              pCur->elem->physics.ptr->z,
-                                                              v_oob))
+                                pCur->elem->physics.ptr->x,
+                                pCur->elem->physics.ptr->y,
+                                pCur->elem->physics.ptr->z,
+                                v_oob))
                         {
                             out_of_bounds_remove = 0;
                             

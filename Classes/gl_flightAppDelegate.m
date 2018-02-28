@@ -77,7 +77,7 @@ void glFlightInit(gl_flightViewController* viewController)
     
     game_ai_init();
     
-    gameInputInit();
+    //gameInputInit();
     
     console_init();
     

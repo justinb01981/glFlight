@@ -345,11 +345,13 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
             
             map_cmd->params[map_cmd->n_params++] = f;
         }
-        
+    
         success = 1;
         
         strtok_r(NULL, " ", &line);
     }
+    
+    
     
     free(line1);
     

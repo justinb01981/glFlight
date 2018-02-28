@@ -138,10 +138,13 @@ WORLD_CUBEGRID(y, tex, scale)
 "object_set_sub_info 9\n"
 
 #define ADD_OBJ_BEGIN(model, x, y, z) \
-"register_params "#model" "#x" "#y" "#z" 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"register_params "#model" "#x" "#y" "#z" 0 0 0 0 0 0 0 0 0 0 0 0\n"
+
+#define ADD_OBJ_BEGIN_RANDOM_XZ(model, y) \
+"register_params "#model" rndx "#y" rndz 0 0 0 0 0 0 0 0 0 0 0 0\n"
 
 #define ADD_OBJ_MOVE(x, y, z) \
-"register_params_update 0 "#x" "#y" "#z" 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"register_params_update 0 "#x" "#y" "#z" 0 0 0 0 0 0 0 0 0 0 0 0\n"
 
 #define ADD_OBJ_END(scale, tex) \
 "add_object r r r r 0 0 0 "#scale" "#tex"\n"
@@ -181,8 +184,8 @@ ADD_OBJ_END(4, 40) \
 "add_object r r r r 0 0 0 r 31\n"
 
 #define RANDOM_DECORATION_1                                                \
-"register_params 2 rndx 0 rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"                 \
-"register_params_update 0 rnd_-4_4 4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
+"register_params 2 rndx 2 rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"                 \
+"register_params_update 0 rnd_-4_4 0 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
 "add_object r r r r 0 0 0 r r\n"                                           \
 "register_params_update 0 rnd_-4_4 4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
 "add_object r r r r 0 0 0 r r\n"                                           \
@@ -259,14 +262,77 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 
 #define BUILDING_1(x, y, z)                         \
 "set_vector "#x" "#y" "#z" 0 1 0\n"                 \
+"add_object 1 vecx_0 vecy_0 vecz_0 0 0 0 4 16\n"    \
 "add_object 1 vecx_0 vecy_4 vecz_0 0 0 0 4 16\n"    \
-"add_object 1 vecx_0 vecy_8 vecz_0 0 0 0 4 16\n"    \
+"add_object 1 vecx_0 vecy_8 vecz_0 0 0 0 4 16\n"   \
 "add_object 1 vecx_0 vecy_12 vecz_0 0 0 0 4 16\n"   \
 "add_object 1 vecx_0 vecy_16 vecz_0 0 0 0 4 16\n"   \
 "add_object 1 vecx_0 vecy_20 vecz_0 0 0 0 4 16\n"   \
 "add_object 1 vecx_0 vecy_24 vecz_0 0 0 0 4 16\n"   \
-"add_object 1 vecx_0 vecy_28 vecz_0 0 0 0 4 16\n"   \
-"add_object 1 vecx_0 vecy_32 vecz_0 0 0 0 4 16\n"
+"add_object 1 vecx_0 vecy_28 vecz_0 0 0 0 4 16\n"
+
+#define BUILDING_PYRAMID(x, y, z)                   \
+ADD_OBJ_BEGIN(2, x, y, z) \
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(4, 0, 0)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(4, 0, 0)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(4, 0, 0)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(4, 0, 0)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(0, 0, 4)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(0, 0, 4)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(0, 0, 4)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(0, 0, 4)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(-4, 0, 0)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(-4, 0, 0)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(-4, 0, 0)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(-4, 0, 0)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(0, 0, -4)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(0, 0, -4)\
+ADD_OBJ_END(4, 31)\
+ADD_OBJ_MOVE(0, 0, -4)\
+ADD_OBJ_END(4, 31) \
+ADD_OBJ_BEGIN(2, x, y, z) \
+ADD_OBJ_MOVE(4, 4, 4)\
+ADD_OBJ_END(4, 16) \
+ADD_OBJ_MOVE(4, 0, 0) \
+ADD_OBJ_END(4, 16) \
+ADD_OBJ_MOVE(4, 0, 0) \
+ADD_OBJ_END(4, 16) \
+ADD_OBJ_MOVE(0, 0, 4) \
+ADD_OBJ_END(4, 16) \
+ADD_OBJ_MOVE(0, 0, 4) \
+ADD_OBJ_END(4, 16) \
+ADD_OBJ_MOVE(-4, 0, 0) \
+ADD_OBJ_END(4, 16) \
+ADD_OBJ_MOVE(-4, 0, 0) \
+ADD_OBJ_END(4, 16) \
+ADD_OBJ_MOVE(0, 0, -4) \
+ADD_OBJ_END(4, 16) \
+ADD_OBJ_MOVE(4, 4, 0) \
+ADD_OBJ_END(4, 31) \
+
+#define WORLD_SCALED_FRAME_TURRET(x, tex, scale)                         \
+"register_params 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
+"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
+"set_world_size r r r\n"                                                 \
+"mesh_manip_add wx0.2 " "wy0.2" " wz0.1" " 4 0 0" " 0 0 4" " wx0.2 wz0.2\n" \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
+WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
+"mesh_manip_round 0 4 0\n" \
+"mesh_manip_complete 2 "#tex" 1 "#scale"\n"
 
 ///////////////////////////////////////////////////////
 const static char initial_map_200x100x200[] = ""
@@ -504,20 +570,25 @@ const static char initial_map_collection[] = ""
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
 
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
-WORLD_SCALED_FRAME_TERRAIN(-10, 28, 4)
+//WORLD_SCALED_FRAME_TERRAIN(-10, 28, 4)
 
 // else
-GREEN_TENDRILS_1
+//GREEN_TENDRILS_1
 
 /////////////
 
 // buildings
-BUILDING_1(rndx, 0, rndz)
-BUILDING_1(rndx, 0, rndz)
-BUILDING_1(rndx, 0, rndz)
-BUILDING_1(rndx, 0, rndz)
-BUILDING_1(rndx, 0, rndz)
-BUILDING_1(rndx, 0, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+
+BUILDING_PYRAMID(100, 2, 100)
+BUILDING_PYRAMID(300, 2, 100)
+BUILDING_PYRAMID(100, 2, 300)
+BUILDING_PYRAMID(300, 2, 300)
 
 // drifting asteroid example
 //"add_object "MAPMODEL_CUBE2" 100 20 100 0 0 0 11 56\n"
@@ -529,34 +600,6 @@ BASE_ENEMY_1
 
 // "core" that spits out data
 BASE_GENERIC(200, 50, 200)
-
-// air platform
-"register_params 2 rndx 20 rndy 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"register_params_update 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 6 31\n"
-"register_params_update 0 -20 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 6 31\n"
-"register_params_update 0 10 0 10 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 6 31\n"
-"register_params_update 0 0 0 -20 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 6 31\n"
-
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
 
 /*
 "register_params 1 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0\n"
@@ -619,16 +662,6 @@ RANDOM_DECORATION_1
 
  */
 ;
-
-#define WORLD_SCALED_FRAME_TURRET(x, tex, scale)                         \
-"register_params 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
-"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-"set_world_size r r r\n"                                                 \
-"mesh_manip_add wx0.2 " "wy0.2" " wz0.1" " 4 0 0" " 0 0 4" " wx0.2 wz0.2\n" \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
-"mesh_manip_round 0 4 0\n" \
-"mesh_manip_complete 2 "#tex" 1 "#scale"\n"
 
 const static char initial_map_turret[] = ""
 
@@ -784,171 +817,19 @@ const static char initial_map_deathmatch[] = ""
 ///WORLD_SCALED_FRAME_TERRAIN(-10, 28, 4)
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
 
-
 // stuff
-"register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-
-"register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-
-"register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-
-"register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-
-"register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-
-"register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-
-"register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-
-"register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-
-"register_params 2 rndx rndy rndz 0 0 0 4 29 0 0 0 0 0 0 0\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 rnd_-4_4 rnd_-4_4 rnd_-4_4 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
+RANDOM_DECORATION_1
+RANDOM_DECORATION_1
+RANDOM_DECORATION_1
+RANDOM_DECORATION_1
+RANDOM_DECORATION_1
+RANDOM_DECORATION_1
+RANDOM_DECORATION_1
+RANDOM_DECORATION_1
+RANDOM_DECORATION_1
 
 // asteroid
+/*
 ASTEROID_FIELD_5
 ASTEROID_FIELD_5
 ASTEROID_FIELD_5
@@ -976,6 +857,17 @@ ASTEROID_FIELD_5
 ASTEROID_FIELD_5
 ASTEROID_FIELD_5
 ASTEROID_FIELD_5
+ */
+ASTEROID_FIELD_PLANE(30)
+ASTEROID_FIELD_PLANE(35)
+ASTEROID_FIELD_PLANE(40)
+ASTEROID_FIELD_PLANE(45)
+ASTEROID_FIELD_PLANE(50)
+ASTEROID_FIELD_PLANE(55)
+ASTEROID_FIELD_PLANE(60)
+ASTEROID_FIELD_PLANE(65)
+ASTEROID_FIELD_PLANE(70)
+ASTEROID_FIELD_PLANE(80)
 ;
 
 const static char initial_map_survival[] = ""

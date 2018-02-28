@@ -29,9 +29,9 @@ typedef struct
     struct {
         struct tess_storage_t* S;
         struct tess_storage_t S_;
-        model_color_t coords[96];
-        model_texcoord_t texcoords[64];
-        model_index_t indices[288];
+        model_coord_t coords[6000];
+        model_texcoord_t texcoords[3000];
+        model_index_t indices[6000];
     } tess;
 } DrawBackgroundData;
 

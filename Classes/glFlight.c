@@ -184,12 +184,13 @@ glFlightFrameStage1()
     if(!gameDialogCalibrateDone && n_textures < TEXTURE_ID_PRELOAD+1)
     {
         gameDialogCalibrateDone = 1;
-        gameDialogCalibrate();
+        gameDialogCalibrateBegin();
     }
 
     extern void update_time_ms_frame_tick();
     update_time_ms_frame_tick();
     
+calibrate_bail:
     get_time_ms();
 #if GAME_PLATFORM_ANDROID
     time_ms = time_ms_wall;

@@ -885,8 +885,28 @@ void drawControls()
            (controls[i]->text[0] || controls[i] == &gameInterfaceControls.keyboardEntry))
         {
             static char displayText[1024];
-            int td = 30; 
-
+            int td = 30;
+            float textLineW = 0, textLineN = 0;
+            
+            strncpy(displayText, controls[i]->text, sizeof(displayText)-1);
+            char *pCur = strtok(displayText, "\n");
+            
+            do
+            {
+                if(!pCur) pCur = displayText;
+                textLineN++;
+                char *p = pCur;
+                unsigned long l = 0;
+                while(*p)
+                {
+                    if(*p != '^') l++;
+                    p++;
+                }
+                if(l > textLineW) textLineW = l;
+                
+                pCur = strtok(NULL, "\n");
+            } while(pCur);
+                
             strncpy(displayText, controls[i]->text, sizeof(displayText)-1);
 
             if(controls[i] == &gameInterfaceControls.keyboardEntry)
@@ -906,19 +926,20 @@ void drawControls()
             }
             else
             {
-                if(strchr(displayText, '\n') == NULL)
+                float Tw = gameInterfaceControls.textWidth * textLineW;
+                float Th = gameInterfaceControls.textHeight * textLineN;
+                float Ox = controls[i]->x + controls[i]->xw - (controls[i]->xw-Th)/2;
+                float Oy = (controls[i]->y + (controls[i]->yw/2)) - (Tw/2);
+                if(controls[i]->text_align_topleft)
                 {
-                    // one line
-                    drawText(displayText,
-                             controls[i]->x + controls[i]->xw*0.5,
-                             controls[i]->y + controls[i]->yw*0.2, 1);
+                    Ox = controls[i]->x + controls[i]->xw - gameInterfaceControls.textHeight;
+                    Oy = controls[i]->y;
                 }
-                else
-                {
-                    drawText(displayText,
-                             controls[i]->x + controls[i]->xw*0.8,
-                             controls[i]->y + controls[i]->yw*0.15, 1);
-                }
+                drawText(displayText,
+                         // lines drawn along x
+                         Ox,
+                         // characters drawn along y
+                         Oy , 1);
             }
             
             /*
@@ -1208,6 +1229,58 @@ visible_list_remove(WorldElem* elem, unsigned int* n_visible, WorldElemListNode*
 }
 
 static void
+drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
+{
+    // tesselate - init
+    bgData->tess.S = &bgData->tess.S_;
+    bgData->tess.S->Icur = bgData->tess.S->Is = bgData->tess.indices;
+    bgData->tess.S->Mcur = bgData->tess.S->Ms = bgData->tess.coords;
+    bgData->tess.S->Tcur = bgData->tess.S->Ts = bgData->tess.texcoords;
+    
+    float Mk = 25; // model - step size
+    float Tk = 8; // texture - step-size multiplier
+    
+    float Ub = 0;
+    float Vb = 0;
+    float Ue = gWorld->bound_x;
+    float Ve = gWorld->bound_z;
+    float Vi = Vb;
+    float Ui = Ub;
+    
+    float M[] = {Ui, 0, Vi};
+    float T[] = {0, 0};
+    
+    tess_begin(M, T, bgData->tess.S);
+    
+    while(Vi <= Ve)
+    {
+        while(Ui+Mk >= Ub && Ui+Mk <= Ue)
+        {
+            Ui += Mk;
+            M[0] = Ui;
+            M[2] = Vi;
+            T[0] = Ui/Ue * Tk;
+            T[1] = Vi/Ve * Tk;
+            
+            tess_step(M, T, bgData->tess.S);
+        }
+        
+        Vi += fabs(Mk);
+        M[0] = Ui;
+        M[2] = Vi;
+        T[0] = Ui/Ue * Tk;
+        T[1] = Vi/Ve * Tk;
+
+        tess_step_row(M, T, bgData->tess.S);
+        Mk *= -1;
+    }
+    
+    tess_end(bgData->tess.S);
+    
+    // tesselate - done
+}
+
+static void
 drawBackgroundInit(int tex_id,
                    float alpha, float beta, float gamma,
                    float scale,
@@ -1281,56 +1354,7 @@ drawBackgroundInit(int tex_id,
                 bgData->coords[i+2] =  pt.z;
             }
             
-            // tesselate - init
-#if TESSELATE_TERRAIN
-            bgData->tess.S = &bgData->tess.S_;
-            bgData->tess.S->Icur = bgData->tess.S->Is = bgData->tess.indices;
-            bgData->tess.S->Mcur = bgData->tess.S->Ms = bgData->tess.coords;
-            bgData->tess.S->Tcur = bgData->tess.S->Ts = bgData->tess.texcoords;
-            
-            float A[] = {
-                0, 0, 0
-            };
-            float B[] = {
-                100, 0, 0
-            };
-            float U[] = {
-                0.0, 0.0
-            };
-            float V[] = {
-                0.5, 0.0
-            };
-            
-            tess_begin(A, B, U, V, bgData->tess.S);
-            
-            B[2] = 100;
-            B[0] = 0;
-            V[0] = 0;
-            V[1] = 1.0;
-            tess_step(B, V, bgData->tess.S);
-            
-            B[0] = 100;
-            B[2] = 100;
-            V[0] = 1.0;
-            V[1] = 1.0;
-            tess_step(B, V, bgData->tess.S);
-            
-            B[0] = 200;
-            B[2] = 0;
-            V[0] = 0;
-            V[1] = 2.0;
-            tess_step(B, V, bgData->tess.S);
-            
-            B[0] = 200;
-            B[2] = 100;
-            V[0] = 0;
-            V[1] = 2.0;
-            V[0] = 2.0;
-            tess_step(B, V, bgData->tess.S);
-            
-            tess_end(bgData->tess.S);
-            // tesselate - done
-#endif
+            drawBackgroundBuildTerrain(bgData);
         }
     }
 }
@@ -1353,7 +1377,7 @@ drawBackground_tess(float* modelC, float* textureC, unsigned int* indicesC, unsi
 {
     glVertexPointer(3, GL_FLOAT, 0, modelC);
     glTexCoordPointer(2, GL_FLOAT, 0, textureC);
-    bindTexture(TEXTURE_ID_ASTEROID);
+    bindTexture(TEXTURE_ID_TERRAIN);
     glDrawElements(GL_TRIANGLES, (int) indicesN, index_type_enum, indicesC);
 }
 
@@ -1394,9 +1418,7 @@ drawBackgroundCore()
     glMatrixMode(GL_TEXTURE);
     glPopMatrix();
     
-#if TESSELATE_TERRAIN
     tess_walk(bgData->tess.S, drawBackground_tess);
-#endif
 }
 
 void drawBackground()
@@ -1708,7 +1730,7 @@ drawBoundingLineGrid()
     lstart[0] = 0; lstart[1] = 0; lstart[2] = 0;
     u[0] = linter; u[1] = 0; u[2] = 0;
     v[0] = 0; v[1] = 0; v[2] = linter;
-    drawLineGrid(lstart, u, v, gWorld->bound_x / linter, gWorld->bound_z / linter);
+    //drawLineGrid(lstart, u, v, gWorld->bound_x / linter, gWorld->bound_z / linter);
     lstart[1] = gWorld->bound_y;
     drawLineGrid(lstart, u, v, gWorld->bound_z / linter, gWorld->bound_z / linter);
 }

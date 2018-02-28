@@ -56,11 +56,12 @@ struct mesh_opengl_t
 
 struct tess_storage_t
 {
-    unsigned int *Is, *Icur;
+    unsigned int *Is, *Icur, *Ist;
     float *Ms, *Mcur;
     float *Ts, *Tcur;
-    unsigned int Inext, Ia, Ib;
+    unsigned int Inext, Imir;
     int Id;
+    int Idc;
 };
 
 struct mesh_t* 
@@ -94,20 +95,22 @@ free_mesh(struct mesh_t* mesh);
 
 #define TESS_BEGIN_FUNCTION \
 void \
-tess_begin(float A[3], float B[3], float u[2], float v[2], \
+tess_begin(float Mo[3], float To[2], \
            struct tess_storage_t* S)
-TESS_BEGIN_FUNCTION;
 
-#define TESS_STEP_FUNCTION \
+extern TESS_BEGIN_FUNCTION;
+
+#define TESS_STEPU_FUNCTION \
 void \
-tess_step(float A[3], float u[2], \
+tess_step(float Mu[3], float Tu[2], \
           struct tess_storage_t* S)
-TESS_STEP_FUNCTION;
+TESS_STEPU_FUNCTION;
 
-#define TESS_STEP_ROW_FUNCTION \
+#define TESS_STEPV_FUNCTION \
 void \
-tess_step_row(float A[3], float u[2], \
-              struct tess_storage_t* S)
+tess_step_row(float Mu[3], float Tu[2], \
+struct tess_storage_t* S)
+TESS_STEPV_FUNCTION;
 
 #define TESS_END_FUNCTION \
 void \

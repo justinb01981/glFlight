@@ -211,7 +211,7 @@ static void actions_display_menu(char *dest)
 {
     dest[0] = '\0';
     int lines = 0;
-    int maxlines = 10;
+    int maxlines = 7;
     
     sprintf(dest,
             "%s %s %s %s %s\n",

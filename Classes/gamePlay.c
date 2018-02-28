@@ -258,6 +258,8 @@ game_over()
                                  my_ship_z);
     
     gameStateSinglePlayer.started = 0;
+    
+    gameStateSinglePlayer.stats.score = 0;
 }
 
 int
@@ -587,26 +589,38 @@ game_add_spawnpoint(float x, float y, float z, char* game_name)
 void
 game_move_spawnpoint(WorldElem* pElem)
 {
+    static float orbit_T = 0.0;
+    float radius = 50;
+    
     if(time_ms - pElem->stuff.u.spawnpoint.time_last_move >
        pElem->stuff.u.spawnpoint.time_move_interval &&
        pElem->stuff.u.spawnpoint.time_move_interval != 0)
     {
         pElem->stuff.u.spawnpoint.time_last_move = time_ms;
         
-        float V[] = {
-            my_ship_x - pElem->physics.ptr->x,
-            my_ship_y - pElem->physics.ptr->y,
-            my_ship_z - pElem->physics.ptr->z
+        float P[] = {
+            pElem->physics.ptr->x,
+            pElem->physics.ptr->y,
+            pElem->physics.ptr->z
         };
         float v[] = {
-            V[0]/fabs(V[0]),
-            V[1]/fabs(V[1]),
-            V[2]/fabs(V[2])
+            0,
+            gWorld->bound_y / 2,
+            0
         };
         
         if(pElem->physics.ptr->velocity < GAME_VARIABLE("ENEMY_SPAWNPOINT_MAXSPEED"))
         {
-            update_object_velocity(pElem->elem_id, v[0], v[1], v[2], 1);
+            orbit_T += 0.01;
+            if(orbit_T > 2.0*M_PI) orbit_T = 0;
+            v[0] = (gWorld->bound_x/2) + sin(orbit_T)*radius;
+            v[2] = (gWorld->bound_z/2) + cos(orbit_T)*radius;
+            //world_move_elem(pElem, v[0], v[1], v[2], 0);
+            update_object_velocity(pElem->elem_id,
+                                   (v[0]-P[0]) / (1000/pElem->stuff.u.spawnpoint.time_move_interval),
+                                   (v[1]-P[1]) / (1000/pElem->stuff.u.spawnpoint.time_move_interval),
+                                   (v[2]-P[2]) / (1000/pElem->stuff.u.spawnpoint.time_move_interval),
+                                   1);
         }
     }
 }
@@ -639,7 +653,7 @@ game_init_objects()
         {
             case OBJ_SPAWNPOINT_ENEMY:
                 pCur->elem->stuff.u.spawnpoint.time_spawn_interval = (1000 * gameStateSinglePlayer.enemy_spawnpoint_interval) / gameStateSinglePlayer.difficulty;
-                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000/2;
+                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000/50;
                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence = 3 + gameStateSinglePlayer.difficulty;
                 break;
                 
@@ -1588,9 +1602,45 @@ game_run()
                     obj_id_friendly_spawn = pCur->elem->elem_id;
                     break;
                     
-                case OBJ_SPAWNPOINT_ENEMY:
+                case OBJ_SPAWNPOINT_ENEMY: {
                     spawn_points_found++;
                     obj_id_enemy_spawn = pCur->elem->elem_id;
+                    
+                    if (gameStateSinglePlayer.counter_enemies_spawned > 0 &&
+                        enemies_found < floor(gameStateSinglePlayer.max_enemies) &&
+                        time_ms - pCur->elem->stuff.u.spawnpoint.time_last_spawn >
+                        pCur->elem->stuff.u.spawnpoint.time_spawn_interval)
+                    {
+                        pCur->elem->stuff.u.spawnpoint.time_last_spawn = time_ms;
+                        gameStateSinglePlayer.counter_enemies_spawned--;
+                        
+                        // spawn faster
+                        pCur->elem->stuff.u.spawnpoint.time_spawn_interval *= 0.9;
+                        pCur->elem->stuff.u.spawnpoint.spawn_intelligence *= 1.1;
+                        
+                        if(rand_in_range(1, 4) == 4)
+                        {
+                            game_add_enemy_bountyhunter(pCur->elem->physics.ptr->x,
+                                                        pCur->elem->physics.ptr->y,
+                                                        pCur->elem->physics.ptr->z);
+                            world_get_last_object()->stuff.u.enemy.intelligence =
+                            pCur->elem->stuff.u.spawnpoint.spawn_intelligence * 2;
+                        }
+                        else
+                        {
+                            game_add_enemy(pCur->elem->physics.ptr->x,
+                                           pCur->elem->physics.ptr->y,
+                                           pCur->elem->physics.ptr->z);
+                            world_get_last_object()->stuff.u.enemy.intelligence =
+                            pCur->elem->stuff.u.spawnpoint.spawn_intelligence;
+                        }
+                        
+                        world_get_last_object()->stuff.affiliation = pCur->elem->stuff.affiliation;
+                    }
+                    
+                    game_move_spawnpoint(pCur->elem);
+                    break;
+                }
                     break;
                 
                 case OBJ_BASE:
@@ -1717,43 +1767,6 @@ game_run()
                         case OBJ_SPAWNPOINT:
                             pCur->elem->stuff.affiliation = gameNetworkState.my_player_id;
                             gameStateSinglePlayer.elem_id_spawnpoint = pCur->elem->elem_id;
-                            game_move_spawnpoint(pCur->elem);
-                            break;
-                            
-                        case OBJ_SPAWNPOINT_ENEMY:
-                            if (gameStateSinglePlayer.counter_enemies_spawned > 0 &&
-                                enemies_found < floor(gameStateSinglePlayer.max_enemies) &&
-                                time_ms - pCur->elem->stuff.u.spawnpoint.time_last_spawn >
-                                pCur->elem->stuff.u.spawnpoint.time_spawn_interval)
-                            {
-                                pCur->elem->stuff.u.spawnpoint.time_last_spawn = time_ms;
-                                gameStateSinglePlayer.counter_enemies_spawned--;
-                                
-                                // spawn faster
-                                pCur->elem->stuff.u.spawnpoint.time_spawn_interval *= 0.9;
-                                pCur->elem->stuff.u.spawnpoint.spawn_intelligence *= 1.1;
-                                
-                                if(rand_in_range(1, 4) == 4)
-                                {
-                                    game_add_enemy_bountyhunter(pCur->elem->physics.ptr->x,
-                                                                pCur->elem->physics.ptr->y,
-                                                                pCur->elem->physics.ptr->z);
-                                    world_get_last_object()->stuff.u.enemy.intelligence =
-                                    pCur->elem->stuff.u.spawnpoint.spawn_intelligence * 2;
-                                }
-                                else
-                                {
-                                    game_add_enemy(pCur->elem->physics.ptr->x,
-                                                   pCur->elem->physics.ptr->y,
-                                                   pCur->elem->physics.ptr->z);
-                                    world_get_last_object()->stuff.u.enemy.intelligence =
-                                    pCur->elem->stuff.u.spawnpoint.spawn_intelligence;
-                                }
-                                
-                                world_get_last_object()->stuff.affiliation = pCur->elem->stuff.affiliation;
-                                
-                            }
-                            
                             game_move_spawnpoint(pCur->elem);
                             break;
                             

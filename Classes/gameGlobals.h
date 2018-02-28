@@ -70,7 +70,7 @@ extern int fireActionQueued;
 #define PLATFORM_TICK_RATE 60
 #define PLATFORM_DRAW_ELEMS_MAX 1000
 #define GYRO_SAMPLE_RATE (60)
-#define VISIBLE_DISTANCE_PLATFORM 100
+#define VISIBLE_DISTANCE_PLATFORM 200
 #else
 #define GAME_PLATFORM_IS_LANDSCAPE 0
 #define GYRO_FEEDBACK_COEFF (0.002)
@@ -79,10 +79,8 @@ extern int fireActionQueued;
 #define PLATFORM_TICK_RATE 60
 #define PLATFORM_DRAW_ELEMS_MAX 1000
 #define GYRO_SAMPLE_RATE (30)
-#define VISIBLE_DISTANCE_PLATFORM 100
+#define VISIBLE_DISTANCE_PLATFORM 200
 #endif
-
-#define TESSELATE_TERRAIN 1
 
 /* reducing friction influences this... should be MAX_THRUST really */
 #define MAX_SPEED /*(15)*/ (10)
