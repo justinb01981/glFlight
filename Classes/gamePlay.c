@@ -615,7 +615,7 @@ game_move_spawnpoint(WorldElem* pElem)
             if(orbit_T > 2.0*M_PI) orbit_T = 0;
             v[0] = (gWorld->bound_x/2) + sin(orbit_T)*radius;
             v[2] = (gWorld->bound_z/2) + cos(orbit_T)*radius;
-            //world_move_elem(pElem, v[0], v[1], v[2], 0);
+            
             update_object_velocity(pElem->elem_id,
                                    (v[0]-P[0]) / (1000/pElem->stuff.u.spawnpoint.time_move_interval),
                                    (v[1]-P[1]) / (1000/pElem->stuff.u.spawnpoint.time_move_interval),
@@ -1439,7 +1439,6 @@ game_handle_destruction(WorldElem* elem)
             {
                 console_write(game_log_messages[GAME_LOG_GAMEOVER_KILLED]);
                 game_over();
-                gameInterfaceControls.dialogRect.tex_id = TEXTURE_ID_DIALOG_GAMEOVER;
             }
             
             if(elem->stuff.flags.mask &= STUFF_FLAGS_TURRET)

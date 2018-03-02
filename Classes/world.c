@@ -336,7 +336,36 @@ world_add_object_core(Model type,
             model_primitives = model_sphere_primitives;
             break;
             
+        case MODEL_ENEMY_BASE:
+            model_coords = model_enemy_base_coords;
+            model_sizeof = sizeof(model_enemy_base_coords);
+            model_indices = model_enemy_base_indices;
+            model_indices_sizeof = sizeof(model_enemy_base_indices);
+            model_texcoords = model_enemy_base_texcoords;
+            model_texcoords_sizeof = sizeof(model_enemy_base_texcoords);
+            model_primitives_sizeof = sizeof(model_enemy_base_primatives);
+            model_primitives = model_enemy_base_primatives;
+        {
+            int Mi;
+            for(Mi = 0; Mi < 5*3; Mi += 3)
+            {
+                printf("%02f, %02f, %02f,\n", model_coords[Mi+1], model_coords[Mi] + 0.5, model_coords[Mi+2]);
+            }
+            
+            for(Mi = 0; Mi < 5*3; Mi += 3)
+            {
+                printf("%02f, %02f, %02f,\n", -model_coords[Mi+1], model_coords[Mi] + 0.5, model_coords[Mi+2]);
+            }
+            printf("\n");
+            for(Mi = 0; Mi < 18; Mi+=3)
+            {
+                printf("%u,%u,%u,", model_indices[Mi]+5*3, model_indices[Mi+1]+5*3, model_indices[Mi+2]+5*3);
+            }
+        }
+            break;
+            
         default:
+            assert(0);
             break;
 	}
     
@@ -391,6 +420,10 @@ world_add_object_core(Model type,
             break;
             
         case MODEL_SURFACE:
+            pElem->renderInfo.priority = 1;
+            break;
+            
+        case MODEL_ENEMY_BASE:
             pElem->renderInfo.priority = 1;
             break;
             

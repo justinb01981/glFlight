@@ -32,6 +32,7 @@
 #define MAPMODEL_ICOSAHEDRON "15"
 #define MAPMODEL_CUBE_INVERTED "16"
 #define MAPMODEL_SPHERE "17"
+#define MAPMODEL_ENEMYBASE "18"
 
 /*
  (Model type, float x, float y, float z, float yaw, float pitch, float roll, float scale, int texture_id)
@@ -216,7 +217,7 @@ ADD_OBJ_END(4, 40) \
 "object_set_info 8\n"
 
 #define BASE_ENEMY_1                           \
-"add_object "MAPMODEL_SPHERE" rndx 50 rndz 0 0 0 8 "BASE_TEXTURE_ID_ENEMY"\n"       \
+"add_object "MAPMODEL_ENEMYBASE" rndx 50 rndz 0 0 0 8 "BASE_TEXTURE_ID_ENEMY"\n"       \
 "object_set_info 15\n"
 
 #define BASE_TURRET_1                        \
