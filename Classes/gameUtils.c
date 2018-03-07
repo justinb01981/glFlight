@@ -135,7 +135,6 @@ element_visible(WorldElem* pElem, float visibleDistance, float min_dot)
     {
         return FALSE;
     }
-
     
     /*
      * a better visibility test involves checking all the points
@@ -189,7 +188,7 @@ element_dist_compare(WorldElem* pElemA, WorldElem* pElemB)
     // if A > B return true
     if(pElemA->head_elem || pElemA->linked_elem)
     {
-        // find nearest point in this primitive
+        // TODO: find nearest point in this primitive
         for(int i = 0; i < pElem->n_indices; i++)
         {
             unsigned int c = pElem->indices[i] * 3;

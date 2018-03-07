@@ -17,12 +17,57 @@
 
 #include "gameIncludes.h"
 
-
 typedef GLfloat model_coord_t;
 // keep these in-sync
 #define index_type_enum GL_UNSIGNED_INT
 typedef GLuint model_index_t;
 typedef GLfloat model_texcoord_t;
+
+typedef struct
+{
+    model_coord_t model_coords_buffer[512];
+    model_texcoord_t model_texcoords_buffer[512];
+    model_index_t model_indices_buffer[512];
+    unsigned int model_coords_buffer_len;
+    unsigned int model_faces_buffer_n;
+    int primitives[512];
+} model_poly_components_t;
+
+#define MODEL_POLY_COMPONENTS_DECLARE() \
+    model_poly_components_t poly_comp
+
+#define MODEL_POLY_COMPONENTS_INIT() \
+    poly_comp.model_faces_buffer_n = poly_comp.model_coords_buffer_len = poly_comp.primitives[0] = 0;
+
+/* static array of coordinates, texture-coordinates, triangle-faces, matrix */
+#define MODEL_POLY_COMPONENTS_ADD(Ac, At, Af, M)    \
+    {   \
+        int i;  \
+        int triangle_st = poly_comp.model_coords_buffer_len; \
+        \
+        for(i = 0; i < sizeof(Ac)/sizeof(model_coord_t); i += 3)    \
+        {   \
+            int R = 4;  \
+            poly_comp.model_coords_buffer[poly_comp.model_coords_buffer_len*3] = M[R*0]*Ac[i] + M[R*0+1]*Ac[i+1] + M[R*0+2]*Ac[i+2] + M[R*0+3];   \
+            poly_comp.model_coords_buffer[poly_comp.model_coords_buffer_len*3+1] = M[R*1]*Ac[i] + M[R*1+1]*Ac[i+1] + M[R*1+2]*Ac[i+2] + M[R*1+3]; \
+            poly_comp.model_coords_buffer[poly_comp.model_coords_buffer_len*3+2] = M[R*2]*Ac[i] + M[R*2+1]*Ac[i+1] + M[R*2+2]*Ac[i+2] + M[R*2+3]; \
+            \
+            poly_comp.model_texcoords_buffer[poly_comp.model_coords_buffer_len*2] = At[i*2];    \
+            poly_comp.model_texcoords_buffer[poly_comp.model_coords_buffer_len*2+1] = At[i*2+1];    \
+            poly_comp.model_coords_buffer_len++;    \
+        }   \
+            \
+         \
+        for(i = 0; i < sizeof(Af)/sizeof(model_index_t)/3; i++) \
+        {   \
+            poly_comp.model_indices_buffer[poly_comp.model_faces_buffer_n*3] = Af[i*3] + triangle_st;    \
+            poly_comp.model_indices_buffer[poly_comp.model_faces_buffer_n*3+1] = Af[i*3+1] + triangle_st;    \
+            poly_comp.model_indices_buffer[poly_comp.model_faces_buffer_n*3+2] = Af[i*3+2] + triangle_st;    \
+            poly_comp.model_faces_buffer_n ++;  \
+        }   \
+            \
+        for(i = 0; poly_comp.primitives[i] != 0; i++) model_primitives_sizeof += sizeof(int);   \
+    }
 
 #include "sphere_model.h"
 
@@ -173,11 +218,13 @@ static model_index_t model_ship1_indices[] = {
 };
 
 static int model_ship1_primitives[] = {
+    /*
     24,
     12,
     12,
     18,
     18,
+     */
 };
 
 #if 0
@@ -289,9 +336,11 @@ static model_index_t model_turret_indices[] = {
 };
 
 static int model_turret_primitives[] = {
+    /*
     24,
     6,
     6,
+     */
 };
 
 static model_texcoord_t model_turret_texcoords[] = {
@@ -318,8 +367,8 @@ static model_coord_t model_bullet[] =
     -0.1, 0, 0,
     0.1, 0, 0,
     0, 0, -1,
-    0, 0.1, 0,
     0, -0.1, 0,
+    0, 0.1, 0,
 };
 
 static model_index_t model_bullet_indices[] = {
@@ -660,9 +709,11 @@ static model_index_t model_ship2_indices[] = {
 };
 
 static int model_ship2_primitives[] = {
+    /*
     24,
     18,
     18,
+     */
 };
 
 static model_texcoord_t model_ship2_texcoords[] = {
@@ -821,11 +872,13 @@ static model_index_t model_ship3_indices[] = {
 };
 
 static int model_ship3_primitives[] = {
+    /*
     24,
     24,
     24,
     24,
     24
+     */
 };
 
 static model_texcoord_t model_ship3_texcoords[] = {
@@ -1145,10 +1198,12 @@ static model_texcoord_t model_enemy_base_texcoords[] =
 
 static int model_enemy_base_primatives[] =
 {
+    /*
     18,
     18,
     18,
     18
+     */
 };
 
 /********************************************************/

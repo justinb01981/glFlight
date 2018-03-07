@@ -74,8 +74,11 @@ world_add_object_core(Model type,
     int* model_primitives;
     int new_durability = 1;
     int model_changed = 0;
-    
     WorldElem* pElem;
+    
+    MODEL_POLY_COMPONENTS_DECLARE();
+    
+    MODEL_POLY_COMPONENTS_INIT();
     
     if(type >= MODEL_LAST) return WORLD_ELEM_ID_INVALID;
     
@@ -103,7 +106,8 @@ world_add_object_core(Model type,
     }
     else
     {
-        if(type == MODEL_SPHERE)
+        if(type == MODEL_SPHERE ||
+           type == MODEL_ENEMY_BASE)
         {
             pElem = world_elem_alloc_extended_model();
         }
@@ -337,30 +341,62 @@ world_add_object_core(Model type,
             break;
             
         case MODEL_ENEMY_BASE:
-            model_coords = model_enemy_base_coords;
-            model_sizeof = sizeof(model_enemy_base_coords);
-            model_indices = model_enemy_base_indices;
-            model_indices_sizeof = sizeof(model_enemy_base_indices);
-            model_texcoords = model_enemy_base_texcoords;
-            model_texcoords_sizeof = sizeof(model_enemy_base_texcoords);
-            model_primitives_sizeof = sizeof(model_enemy_base_primatives);
-            model_primitives = model_enemy_base_primatives;
         {
-            int Mi;
-            for(Mi = 0; Mi < 5*3; Mi += 3)
-            {
-                printf("%02f, %02f, %02f,\n", model_coords[Mi+1], model_coords[Mi] + 0.5, model_coords[Mi+2]);
-            }
+            float M1[] = {
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+            };
             
-            for(Mi = 0; Mi < 5*3; Mi += 3)
-            {
-                printf("%02f, %02f, %02f,\n", -model_coords[Mi+1], model_coords[Mi] + 0.5, model_coords[Mi+2]);
-            }
-            printf("\n");
-            for(Mi = 0; Mi < 18; Mi+=3)
-            {
-                printf("%u,%u,%u,", model_indices[Mi]+5*3, model_indices[Mi+1]+5*3, model_indices[Mi+2]+5*3);
-            }
+            // TODO: build model by applying rotation matrix to convex primitive and appending coordinates/indices/texture-coordinates
+            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords, model_cube_indices, M1);
+            /*
+             {
+             1, 0, 0, 0,
+             0, cos(r), -sin(r), 0,
+             0, sin(r), cos(r), 0,
+             0, 0, 0, 1
+             }
+             */
+            float M2[] = {
+                1, 0, 0, 0,
+                0, 0.70710678118, -0.70710678118, -0.75,
+                0, 0.70710678118, 0.70710678118, 0,
+                0, 0, 0, 1
+            };
+            MODEL_POLY_COMPONENTS_ADD(model_bullet, model_bullet_texcoords, model_bullet_indices, M2);
+            float M3[] = {
+                1, 0, 0, 0,
+                0, 0.70738826916, 0.70710807985, 0.75,
+                0, -0.70710807985, 0.70738826916, 0,
+                0, 0, 0, 1
+            };
+            MODEL_POLY_COMPONENTS_ADD(model_bullet, model_bullet_texcoords, model_bullet_indices, M3);
+            float M4[] = {
+                0.70710678118, 0, -0.70710678118, -0.75,
+                0, 1, 0, 0,
+                0.70710678118, 0, 0.70710678118, 0,
+                0, 0, 0, 1
+            };
+            MODEL_POLY_COMPONENTS_ADD(model_bullet, model_bullet_texcoords, model_bullet_indices, M4);
+            float M5[] = {
+                0.70710678118, 0, 0.70710678118, 0.75,
+                0, 1, 0, 0,
+                -0.70710678118, 0, 0.70710678118, 0,
+                0, 0, 0, 1
+            };
+            MODEL_POLY_COMPONENTS_ADD(model_bullet, model_bullet_texcoords, model_bullet_indices, M5);
+            
+            model_coords = poly_comp.model_coords_buffer;
+            model_sizeof = poly_comp.model_coords_buffer_len * 3 * sizeof(model_coord_t);
+            model_indices = poly_comp.model_indices_buffer;
+            model_indices_sizeof = poly_comp.model_faces_buffer_n * 3 * sizeof(model_index_t);
+            model_texcoords = poly_comp.model_texcoords_buffer;
+            model_texcoords_sizeof = poly_comp.model_coords_buffer_len * 2 * sizeof(model_texcoord_t);
+            
+            model_primitives = poly_comp.primitives;
+            model_primitives_sizeof = 0;
         }
             break;
             
@@ -553,6 +589,8 @@ world_add_object_core(Model type,
         memcpy(pElem->indices, &pElem->indices[offset], primitive_size * sizeof(model_index_t));
         pElem->n_indices = primitive_size;
         offset += primitive_size;
+        
+        break;
     }
     
     pElem = pElemHead;

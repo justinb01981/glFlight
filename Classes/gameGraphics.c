@@ -1082,45 +1082,104 @@ drawElem(WorldElem* pElem)
             int *coord_table = malloc(pElemIndicesCount * 4 * sizeof(int));
             if(!coord_table) return;
             
+            model_index_t** face_table = malloc((pElemIndicesCount) * sizeof(model_index_t*));
+            if(!face_table)
+            {
+                free(coord_table);
+                return;
+            }
+            
+            int iFace = 0;
+            while(iFace < pElemIndicesCount/3)
+            {
+                face_table[iFace] = &(pElemIndices[iFace*3]);
+                iFace++;
+            }
+            
             for(idx = 0; idx < pElemIndicesCount * 4; idx++)
             {
                 coord_table[idx] = coord_inval;
             }
             
-            idx = 0;
-            while(idx < pElemIndicesCount)
+            // TODO: only sort faces on "complex" objects
+            while(1)
             {
-                model_index_t index = pElemIndices[idx];
+                int swapped = 0;
                 
-                if(coord_table[index] == coord_inval)
+                for(iFace = 0; iFace+1 < pElemIndicesCount/3; iFace++)
                 {
-                    coord_table[index] = drawElem_vertexBatchBuffer_count / coord_size;
+                    model_index_t *pTriangle;
                     
-                    // copy coordinates
-                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+0] = pElemCoords[index*coord_size+0];
-                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+1] = pElemCoords[index*coord_size+1];
-                    drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+2] = pElemCoords[index*coord_size+2];
+                    pTriangle = face_table[iFace];
                     
-                    // copy texture coordinates
-                    drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+0] = pElemTexCoords[index*texcoord_size+0];
-                    drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+1] = pElemTexCoords[index*texcoord_size+1];
+                    model_coord_t a[] = {
+                        pElem->coords[pTriangle[0]*coord_size],
+                        pElem->coords[pTriangle[1]*coord_size],
+                        pElem->coords[pTriangle[2]*coord_size]
+                    };
+                    pTriangle = face_table[iFace+1];
+                    model_coord_t b[] = {
+                        pElem->coords[pTriangle[0]*coord_size],
+                        pElem->coords[pTriangle[1]*coord_size],
+                        pElem->coords[pTriangle[2]*coord_size]
+                    };
                     
-                    drawElem_vertexBatchBuffer_count += coord_size;
-                    drawElem_textCoordBatchBuffer_count += texcoord_size;
+                    if(cam_distance(a[0], a[1], a[2]) > cam_distance(b[0], b[1], b[2]))
+                    {
+                        model_index_t* tmp = face_table[iFace];
+                        face_table[iFace] = face_table[iFace+1];
+                        face_table[iFace+1] = tmp;
+                        swapped = 1;
+                    }
                 }
                 
-                // remap
-                index = coord_table[index];
-                
-                // copy index
-                drawElem_indicesBatchBufferCur[indicesBatchOffset+idx] = index;
+                if(!swapped)
+                {
+                    break;
+                }
+            }
+
+            iFace = 0;
+            idx = 0;
+            while(iFace < pElemIndicesCount/3)
+            {
+                model_index_t *pTriangle = face_table[iFace];
             
-                idx++;
+                for(int i = 0; i < 3; i++)
+                {
+                    int coord_unmapped = pTriangle[i];
+                    
+                    if(coord_table[coord_unmapped] == coord_inval)
+                    {
+                        coord_table[coord_unmapped] = (int) drawElem_vertexBatchBuffer_count/coord_size;
+                        
+                        // copy coordinates
+                        drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+0] = pElemCoords[pTriangle[i]*coord_size];
+                        drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+1] = pElemCoords[pTriangle[i]*coord_size+1];
+                        drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+2] = pElemCoords[pTriangle[i]*coord_size+2];
+                        
+                        // copy texture coordinates
+                        drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+0] = pElemTexCoords[pTriangle[i]*texcoord_size];
+                        drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+1] = pElemTexCoords[pTriangle[i]*texcoord_size+1];
+                        
+                        drawElem_vertexBatchBuffer_count += coord_size;
+                        drawElem_textCoordBatchBuffer_count += texcoord_size;
+                    }
+                    
+                    // copy index
+                    drawElem_indicesBatchBufferCur[indicesBatchOffset+idx] = coord_table[pTriangle[i]];
+                    idx++;
+                }
+                
+                iFace++;
             }
             drawElem_indicesBatchBuffer_count += idx;
             
             free(coord_table);
             coord_table = NULL;
+            
+            free(face_table);
+            face_table = NULL;
             
             //if(gl_vertex_ptr_last != drawElem_vertexBatchBuffer)
             //{

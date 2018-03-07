@@ -525,13 +525,13 @@ calibrate_bail:
     pVisCheckPtr = gWorld->elements_to_be_added.next;
     while(pVisCheckPtr)
     {
-        pVisCheckPtr->elem->renderInfo.distance = distance(gameCamera_getX(),
-                                                       gameCamera_getY(),
-                                                       gameCamera_getZ(),
-                                                       pVisCheckPtr->elem->physics.ptr->x,
-                                                       pVisCheckPtr->elem->physics.ptr->y,
-                                                       pVisCheckPtr->elem->physics.ptr->z);
-        
+        pVisCheckPtr->elem->renderInfo.distance =
+            distance(gameCamera_getX(),
+                     gameCamera_getY(),
+                     gameCamera_getZ(),
+                     pVisCheckPtr->elem->physics.ptr->x,
+                     pVisCheckPtr->elem->physics.ptr->y,
+                     pVisCheckPtr->elem->physics.ptr->z);
         
         world_elem_btree_add_all(pVisCheckPtr->elem);
         
@@ -617,23 +617,21 @@ calibrate_bail:
         }
         else
         {
-            WorldElem* pElem = btreeVisibleTest->elem;
+            btreeVisibleTest->elem->renderInfo.distance =
+                distance(gameCamera_getX(),
+                         gameCamera_getY(),
+                         gameCamera_getZ(),
+                         btreeVisibleTest->elem->physics.ptr->x,
+                         btreeVisibleTest->elem->physics.ptr->y,
+                         btreeVisibleTest->elem->physics.ptr->z);
             
-            pElem->renderInfo.distance = distance(gameCamera_getX(),
-                                                  gameCamera_getY(),
-                                                  gameCamera_getZ(),
-                                                  pElem->physics.ptr->x,
-                                                  pElem->physics.ptr->y,
-                                                  pElem->physics.ptr->z);
-            
-            // approx dist to boundaries of the model poly
-            pElem->renderInfo.distance -= pElem->scale * 1.0;
+            // TODO: account for scale approx dist to boundaries of the model poly
             
             int visible = element_visible(btreeVisibleTest->elem, visible_distance, visible_dot);
             
             if(visible)
             {
-                world_elem_btree_insert(visibleBtreeRootBuilding, pElem, pElem->renderInfo.distance);
+                world_elem_btree_insert(visibleBtreeRootBuilding, btreeVisibleTest->elem, btreeVisibleTest->elem->renderInfo.distance);
             }
         }
         btreeVisibleTest = btreeVisibleTest->next;

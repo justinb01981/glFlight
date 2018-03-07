@@ -36,6 +36,20 @@ gameDialogCancel(void)
 }
 
 static void
+gameDialogGraphicCancel()
+{
+    gameInterfaceControls.graphicDialog.visible = 0;
+    gameInterfaceControls.graphicDialogHelp.visible = 0;
+}
+
+static void
+gameDialogGraphic(int tex_id)
+{
+    gameInterfaceControls.graphicDialog.visible = 1;
+    gameInterfaceControls.graphicDialog.tex_id = tex_id;
+}
+
+static void
 gameDialogStopGameStatusMessages(void)
 {
     gameDialogState.hideNetworkStatus = 1;
@@ -142,7 +156,7 @@ gameDialogWelcomeNoRating()
 static void
 gameDialogMenuCountdown()
 {
-    static int passes = 60;
+    static int passes = 120;
     passes--;
     
     if(passes > 0)
@@ -152,6 +166,7 @@ gameDialogMenuCountdown()
     }
     
     gameDialogWelcomeMenu();
+    gameDialogGraphicCancel();
     glFlightDrawframeHook = NULL;
 }
 
@@ -516,20 +531,6 @@ gameDialogMessagePopup(char *str)
     gameInterfaceModalDialogWithRect(str, "", "", gameDialogCancelString, gameDialogCancelString, &r, GAME_FRAME_RATE * 2.0);
     r.tex_id = TEXTURE_ID_CONTROLS_POPUPOVER_DIALOG_BOX;
     gameInterfaceControls.dialogRect.modal = 0;
-}
-
-static void
-gameDialogGraphicCancel()
-{
-    gameInterfaceControls.graphicDialog.visible = 0;
-    gameInterfaceControls.graphicDialogHelp.visible = 0;
-}
-
-static void
-gameDialogGraphic(int tex_id)
-{
-    gameInterfaceControls.graphicDialog.visible = 1;
-    gameInterfaceControls.graphicDialog.tex_id = tex_id;
 }
 
 #endif
