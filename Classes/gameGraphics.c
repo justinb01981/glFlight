@@ -1102,29 +1102,30 @@ drawElem(WorldElem* pElem)
             }
             
             // TODO: only sort faces on "complex" objects
-            while(1)
+            while(pElem->renderInfo.priority)
             {
                 int swapped = 0;
                 
                 for(iFace = 0; iFace+1 < pElemIndicesCount/3; iFace++)
                 {
-                    model_index_t *pTriangle;
-                    
-                    pTriangle = face_table[iFace];
+                    model_index_t *Ta = face_table[iFace];
+                    model_index_t *Tb = face_table[iFace+1];
+                    model_coord_t *Ca = &pElem->coords[*Ta * coord_size];
+                    model_coord_t *Cb = &pElem->coords[*Tb * coord_size];
                     
                     model_coord_t a[] = {
-                        pElem->coords[pTriangle[0]*coord_size],
-                        pElem->coords[pTriangle[1]*coord_size],
-                        pElem->coords[pTriangle[2]*coord_size]
-                    };
-                    pTriangle = face_table[iFace+1];
-                    model_coord_t b[] = {
-                        pElem->coords[pTriangle[0]*coord_size],
-                        pElem->coords[pTriangle[1]*coord_size],
-                        pElem->coords[pTriangle[2]*coord_size]
+                        Ca[0],
+                        Ca[1],
+                        Ca[2]
                     };
                     
-                    if(cam_distance(a[0], a[1], a[2]) > cam_distance(b[0], b[1], b[2]))
+                    model_coord_t b[] = {
+                        Cb[0],
+                        Cb[1],
+                        Cb[2]
+                    };
+                    
+                    if(cam_distance(a[0], a[1], a[2]) < cam_distance(b[0], b[1], b[2]))
                     {
                         model_index_t* tmp = face_table[iFace];
                         face_table[iFace] = face_table[iFace+1];

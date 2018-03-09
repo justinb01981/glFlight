@@ -586,11 +586,18 @@ game_add_spawnpoint(float x, float y, float z, char* game_name)
     return obj_id;
 }
 
+static int object_id_portal = WORLD_ELEM_ID_INVALID;
+
 void
 game_move_spawnpoint(WorldElem* pElem)
 {
     static float orbit_T = 0.0;
-    float radius = 50;
+    float radius = 75;
+    float orbit_origin[] = {
+        gWorld->bound_x/2,
+        gWorld->bound_y/2,
+        gWorld->bound_z/2
+    };
     
     if(time_ms - pElem->stuff.u.spawnpoint.time_last_move >
        pElem->stuff.u.spawnpoint.time_move_interval &&
@@ -598,29 +605,39 @@ game_move_spawnpoint(WorldElem* pElem)
     {
         pElem->stuff.u.spawnpoint.time_last_move = time_ms;
         
-        float P[] = {
-            pElem->physics.ptr->x,
-            pElem->physics.ptr->y,
-            pElem->physics.ptr->z
-        };
+        // orbit around center of world
+        // orbit period
+        orbit_T += (M_PI * pElem->stuff.u.spawnpoint.time_move_interval) / 15000;
+        if(orbit_T > 2.0*M_PI) orbit_T = 0;
+        
         float v[] = {
-            0,
-            gWorld->bound_y / 2,
-            0
+            orbit_origin[0] + sin(orbit_T)*radius,
+            orbit_origin[1],
+            orbit_origin[2] + cos(orbit_T)*radius
         };
         
-        if(pElem->physics.ptr->velocity < GAME_VARIABLE("ENEMY_SPAWNPOINT_MAXSPEED"))
+        world_replace_object(pElem->elem_id, pElem->type, v[0], v[1], v[2],
+                             M_PI/2, orbit_T, -M_PI/2, pElem->scale,
+                             pElem->texture_id);
+        
+        // add decoration
+        float vD[] = {
+            orbit_origin[0] + sin(orbit_T)*(radius+1),
+            orbit_origin[1],
+            orbit_origin[2] + cos(orbit_T)*(radius+1)
+        };
+        if(object_id_portal != WORLD_ELEM_ID_INVALID)
         {
-            orbit_T += 0.01;
-            if(orbit_T > 2.0*M_PI) orbit_T = 0;
-            v[0] = (gWorld->bound_x/2) + sin(orbit_T)*radius;
-            v[2] = (gWorld->bound_z/2) + cos(orbit_T)*radius;
-            
-            update_object_velocity(pElem->elem_id,
-                                   (v[0]-P[0]) / (1000/pElem->stuff.u.spawnpoint.time_move_interval),
-                                   (v[1]-P[1]) / (1000/pElem->stuff.u.spawnpoint.time_move_interval),
-                                   (v[2]-P[2]) / (1000/pElem->stuff.u.spawnpoint.time_move_interval),
-                                   1);
+            object_id_portal =
+            world_replace_object(object_id_portal, MODEL_SPRITE, vD[0], vD[1], vD[2],
+                                 0, 0, 0, pElem->scale, TEXTURE_ID_PORTAL);
+        }
+        else
+        {
+            object_id_portal =
+            world_add_object(MODEL_SPRITE, vD[0], vD[1], vD[2], 0, 0, 0, pElem->scale, TEXTURE_ID_PORTAL);
+            world_get_last_object()->object_type = OBJ_DISPLAYONLY;
+            world_get_last_object()->renderInfo.priority = 1;
         }
     }
 }
@@ -653,7 +670,7 @@ game_init_objects()
         {
             case OBJ_SPAWNPOINT_ENEMY:
                 pCur->elem->stuff.u.spawnpoint.time_spawn_interval = (1000 * gameStateSinglePlayer.enemy_spawnpoint_interval) / gameStateSinglePlayer.difficulty;
-                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000/50;
+                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000/120;
                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence = 3 + gameStateSinglePlayer.difficulty;
                 break;
                 
@@ -1165,6 +1182,13 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
                                        elemA->physics.ptr->vz * 1.5,
                                        0);
                 
+                world_add_object(MODEL_CUBE2,
+                                 elemB->physics.ptr->x,
+                                 elemB->physics.ptr->y,
+                                 elemB->physics.ptr->z,
+                                 0, 0, 0, elemB->scale, TEXTURE_ID_DATA_GRABBED);
+                world_get_last_object()->object_type = OBJ_DISPLAYONLY;
+                
                 console_write(game_log_messages[GAME_LOG_FILESAVED]);
             }
             else
@@ -1340,6 +1364,8 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                 
                 console_write(game_log_messages[GAME_LOG_FILELOST]);
                 gameDialogMessagePopup(game_log_messages[GAME_LOG_FILELOST]);
+                
+                glFlightDrawframeHook = gameDialogGraphicDangerCountdown;
                 
                 // add an explosion
                 {
@@ -1537,9 +1563,9 @@ game_run()
     pMyShipNode = world_elem_list_find(my_ship_id, &gWorld->elements_moving);
     if(!pMyShipNode) return;
     
-    if(time_ms - game_run_last >= 100)
+    if(time_ms - game_run_last >= 1000/GAME_FRAME_RATE)
     {
-        gameStateSinglePlayer.time_elapsed += 100;
+        gameStateSinglePlayer.time_elapsed += 1000/GAME_FRAME_RATE;
         
         if(game_setup_needed)
         {
@@ -1898,7 +1924,7 @@ game_run()
                         if(pElemNodeSpawn)
                         {
                             float v[3];
-                            float vel = rand_in_range(10, 200);
+                            float vel = rand_in_range(gWorld->bound_z / 100 * 20, gWorld->bound_z / 2);
                             
                             int collect_elem_new_id =
                                 game_add_powerup(pElemNodeSpawn->elem->physics.ptr->x,

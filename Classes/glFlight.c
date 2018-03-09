@@ -197,7 +197,7 @@ calibrate_bail:
 #endif
     
     if(gameInterfaceControls.textMenuControl.visible ||
-       gameInterfaceControls.keyboardEntry.visible)
+       gameInterfaceControls.keyboardEntry.visible || !controlsCalibrated)
     {
         game_paused = 1;
     }

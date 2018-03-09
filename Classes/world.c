@@ -341,52 +341,36 @@ world_add_object_core(Model type,
             break;
             
         case MODEL_ENEMY_BASE:
-        {
-            float M1[] = {
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1
-            };
-            
+        {   
             // TODO: build model by applying rotation matrix to convex primitive and appending coordinates/indices/texture-coordinates
-            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords, model_cube_indices, M1);
-            /*
-             {
-             1, 0, 0, 0,
-             0, cos(r), -sin(r), 0,
-             0, sin(r), cos(r), 0,
-             0, 0, 0, 1
-             }
-             */
             float M2[] = {
                 1, 0, 0, 0,
-                0, 0.70710678118, -0.70710678118, -0.75,
+                0, 0.70710678118, -0.70710678118, -1.0,
                 0, 0.70710678118, 0.70710678118, 0,
                 0, 0, 0, 1
             };
-            MODEL_POLY_COMPONENTS_ADD(model_bullet, model_bullet_texcoords, model_bullet_indices, M2);
+            MODEL_POLY_COMPONENTS_ADD(model_enemy_base_core, model_enemy_base_core_texcoords, model_enemy_base_core_indices, M2);
             float M3[] = {
                 1, 0, 0, 0,
-                0, 0.70738826916, 0.70710807985, 0.75,
+                0, 0.70738826916, 0.70710807985, 1.0,
                 0, -0.70710807985, 0.70738826916, 0,
                 0, 0, 0, 1
             };
-            MODEL_POLY_COMPONENTS_ADD(model_bullet, model_bullet_texcoords, model_bullet_indices, M3);
+            MODEL_POLY_COMPONENTS_ADD(model_enemy_base_core, model_enemy_base_core_texcoords, model_enemy_base_core_indices, M3);
             float M4[] = {
-                0.70710678118, 0, -0.70710678118, -0.75,
+                0.70710678118, 0, -0.70710678118, -1.0,
                 0, 1, 0, 0,
                 0.70710678118, 0, 0.70710678118, 0,
                 0, 0, 0, 1
             };
-            MODEL_POLY_COMPONENTS_ADD(model_bullet, model_bullet_texcoords, model_bullet_indices, M4);
+            MODEL_POLY_COMPONENTS_ADD(model_enemy_base_core, model_enemy_base_core_texcoords, model_enemy_base_core_indices, M4);
             float M5[] = {
-                0.70710678118, 0, 0.70710678118, 0.75,
+                0.70710678118, 0, 0.70710678118, 1.0,
                 0, 1, 0, 0,
                 -0.70710678118, 0, 0.70710678118, 0,
                 0, 0, 0, 1
             };
-            MODEL_POLY_COMPONENTS_ADD(model_bullet, model_bullet_texcoords, model_bullet_indices, M5);
+            MODEL_POLY_COMPONENTS_ADD(model_enemy_base_core, model_enemy_base_core_texcoords, model_enemy_base_core_indices, M5);
             
             model_coords = poly_comp.model_coords_buffer;
             model_sizeof = poly_comp.model_coords_buffer_len * 3 * sizeof(model_coord_t);

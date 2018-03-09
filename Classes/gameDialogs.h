@@ -50,6 +50,19 @@ gameDialogGraphic(int tex_id)
 }
 
 static void
+gameDialogGraphicDangerCountdown()
+{
+    static int passes = 60;
+    gameDialogGraphic(TEXTURE_ID_DIALOG_GAMEOVER);
+    passes--;
+    if(passes <= 0)
+    {
+        gameDialogGraphicCancel();
+        glFlightDrawframeHook = NULL;
+    }
+}
+
+static void
 gameDialogStopGameStatusMessages(void)
 {
     gameDialogState.hideNetworkStatus = 1;
@@ -197,10 +210,12 @@ gameDialogWelcome()
 static void
 gameDialogCancelTrim()
 {
+    /*
     extern void gameInputTrimAbort(void);
     
     gameInputTrimAbort();
     gameDialogCancel();
+     */
 }
 
 static void

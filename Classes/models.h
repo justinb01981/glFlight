@@ -1196,6 +1196,36 @@ static model_texcoord_t model_enemy_base_texcoords[] =
     0,1
 };
 
+static model_coord_t model_enemy_base_core[] =
+{
+    0, 0, 0.5,
+    -0.2, 0, 0,
+    0.2, 0, 0,
+    0, 0, -0.5,
+    0, -0.2, 0,
+    0, 0.2, 0,
+};
+
+static model_index_t model_enemy_base_core_indices[] = {
+    0, 1, 4,
+    4, 2, 0,
+    2, 5, 0,
+    5, 1, 0,
+    5, 3, 1,
+    5, 2, 3,
+    2, 4, 3,
+    4, 1, 3,
+};
+
+static model_texcoord_t model_enemy_base_core_texcoords[] = {
+    0.5, 0,
+    0, 0.5,
+    1, 0.5,
+    0.5, 1,
+    0.5, 0.5,
+    0.5, 0.5
+};
+
 static int model_enemy_base_primatives[] =
 {
     /*

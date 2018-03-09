@@ -110,7 +110,7 @@ static char *game_log_messages[] = {
     /*"^D: firewalled :-)\n"*/ "^D secured\n",
     "HIDDEN: detected: virus\n",
     "HIDDEN: detected: bounty hunter\n",
-    "virus deleted \n^D\n",
+    "virus\ndeleted \n^D\n",
     "detected: ally AI\n",
     "HIDDEN: warning: virus capturing ^D\n",
     "killed: virus\n",
