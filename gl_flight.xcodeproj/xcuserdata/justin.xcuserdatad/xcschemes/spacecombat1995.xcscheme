@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D0BCC8FB2052EDC100094809"
-               BuildableName = "spacecombat1995.app"
-               BlueprintName = "spacecombat1995"
+               BuildableName = "Space Combat 95.app"
+               BlueprintName = "Space Combat 95"
                ReferencedContainer = "container:gl_flight.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -34,8 +34,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D0BCC8FB2052EDC100094809"
-            BuildableName = "spacecombat1995.app"
-            BlueprintName = "spacecombat1995"
+            BuildableName = "Space Combat 95.app"
+            BlueprintName = "Space Combat 95"
             ReferencedContainer = "container:gl_flight.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -58,8 +58,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D0BCC8FB2052EDC100094809"
-            BuildableName = "spacecombat1995.app"
-            BlueprintName = "spacecombat1995"
+            BuildableName = "Space Combat 95.app"
+            BlueprintName = "Space Combat 95"
             ReferencedContainer = "container:gl_flight.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -77,8 +77,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D0BCC8FB2052EDC100094809"
-            BuildableName = "spacecombat1995.app"
-            BlueprintName = "spacecombat1995"
+            BuildableName = "Space Combat 95.app"
+            BlueprintName = "Space Combat 95"
             ReferencedContainer = "container:gl_flight.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

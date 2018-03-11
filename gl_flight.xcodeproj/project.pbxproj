@@ -228,7 +228,6 @@
 		D0BCC9342052EDC100094809 /* texture70.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F041954A91000830369 /* texture70.bmp */; };
 		D0BCC9352052EDC100094809 /* texture17.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D595F73165B896700C21926 /* texture17.bmp */; };
 		D0BCC9362052EDC100094809 /* flyby.wav in Resources */ = {isa = PBXBuildFile; fileRef = D00D78C919FB18EC00E701B9 /* flyby.wav */; };
-		D0BCC9372052EDC100094809 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D062FE171FEAF7DC00ABE435 /* LaunchScreen.xib */; };
 		D0BCC9382052EDC100094809 /* texture18.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D91DEA6166C73FD00362864 /* texture18.bmp */; };
 		D0BCC9392052EDC100094809 /* texture98.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D04256661DA75CFB00E9C17B /* texture98.bmp */; };
 		D0BCC93A2052EDC100094809 /* highscore.wav in Resources */ = {isa = PBXBuildFile; fileRef = D065B0FE1888412E002C1980 /* highscore.wav */; };
@@ -267,7 +266,6 @@
 		D0BCC95B2052EDC100094809 /* texture34.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2B1757CEA000B5B815 /* texture34.bmp */; };
 		D0BCC95C2052EDC100094809 /* texture33.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2D1757CFFD00B5B815 /* texture33.bmp */; };
 		D0BCC95D2052EDC100094809 /* texture35.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2F1757D69200B5B815 /* texture35.bmp */; };
-		D0BCC95E2052EDC100094809 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB311757D9B200B5B815 /* Default-568h@2x.png */; };
 		D0BCC95F2052EDC100094809 /* app_icon76x76.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4D01BDE0F5F0089D9F0 /* app_icon76x76.png */; };
 		D0BCC9602052EDC100094809 /* Default2.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C133C419F448BF003A6949 /* Default2.png */; };
 		D0BCC9612052EDC100094809 /* texture37.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0309F1F1770F3A600100357 /* texture37.bmp */; };
@@ -298,7 +296,6 @@
 		D0BCC97A2052EDC100094809 /* texture103.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665E420162CF000B106AE /* texture103.bmp */; };
 		D0BCC97B2052EDC100094809 /* Default-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = D09A4E311840196E004C73F2 /* Default-Landscape.png */; };
 		D0BCC97C2052EDC100094809 /* texture41.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02DAC1517D14AE400035601 /* texture41.bmp */; };
-		D0BCC97D2052EDC100094809 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC117D5C5F200C03EB5 /* Default@2x.png */; };
 		D0BCC97E2052EDC100094809 /* texture75.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A8D74519F9983C006FE907 /* texture75.bmp */; };
 		D0BCC97F2052EDC100094809 /* texture102.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D077BA4A1DB435DB00B4C701 /* texture102.bmp */; };
 		D0BCC9802052EDC100094809 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC317D5C5FF00C03EB5 /* Default.png */; };
@@ -370,6 +367,11 @@
 		D0BCC9C42052EDC100094809 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D033788614D9FEFD00FD8A74 /* CoreMotion.framework */; };
 		D0BCC9C52052EDC100094809 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0AD4F6516D6F11600664895 /* AVFoundation.framework */; };
 		D0BCC9C62052EDC100094809 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */; };
+		D0BD22DA2054F28200D4AEE3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0BD22D92054F28100D4AEE3 /* LaunchScreen.xib */; };
+		D0BD22E620556F4900D4AEE3 /* sc.Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0BD22E520556F4800D4AEE3 /* sc.Default@2x.png */; };
+		D0BD22E82055703100D4AEE3 /* sc.Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0BD22E72055703100D4AEE3 /* sc.Default-568h@2x.png */; };
+		D0BD22E9205571CB00D4AEE3 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC117D5C5F200C03EB5 /* Default@2x.png */; };
+		D0BD22EA205571CB00D4AEE3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB311757D9B200B5B815 /* Default-568h@2x.png */; };
 		D0C133C319F448A1003A6949 /* greenhex.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0C133C219F448A1003A6949 /* greenhex.bmp */; };
 		D0C133C519F448BF003A6949 /* Default2.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C133C419F448BF003A6949 /* Default2.png */; };
 		D0C225F01CB9361300A08AEB /* teleport.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0C225EF1CB9361200A08AEB /* teleport.wav */; };
@@ -616,8 +618,11 @@
 		D0B918EF1F5BC27B0073ECD6 /* engineloop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engineloop.wav; sourceTree = "<group>"; };
 		D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		D0BCBFB3176136CF00003168 /* gameLock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameLock.h; sourceTree = "<group>"; };
-		D0BCC9CA2052EDC100094809 /* spacecombat1995.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = spacecombat1995.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0BCC9CA2052EDC100094809 /* Space Combat 95.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Space Combat 95.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0BCC9CB2052EDC500094809 /* gl_flight copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "gl_flight copy-Info.plist"; path = "/Users/justin/workspace/glFlight/gl_flight copy-Info.plist"; sourceTree = "<absolute>"; };
+		D0BD22D92054F28100D4AEE3 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		D0BD22E520556F4800D4AEE3 /* sc.Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sc.Default@2x.png"; sourceTree = "<group>"; };
+		D0BD22E72055703100D4AEE3 /* sc.Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sc.Default-568h@2x.png"; sourceTree = "<group>"; };
 		D0C133C219F448A1003A6949 /* greenhex.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = greenhex.bmp; sourceTree = "<group>"; };
 		D0C133C419F448BF003A6949 /* Default2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default2.png; sourceTree = "<group>"; };
 		D0C225EF1CB9361200A08AEB /* teleport.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = teleport.wav; sourceTree = "<group>"; };
@@ -780,7 +785,7 @@
 			isa = PBXGroup;
 			children = (
 				1D6058910D05DD3D006BFB54 /* d0gf1ght.app */,
-				D0BCC9CA2052EDC100094809 /* spacecombat1995.app */,
+				D0BCC9CA2052EDC100094809 /* Space Combat 95.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -978,6 +983,7 @@
 				28EC4C5811D54ECE0027AA9F /* gl_flightViewController.xib */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				D062FE171FEAF7DC00ABE435 /* LaunchScreen.xib */,
+				D0BD22ED2055734F00D4AEE3 /* spacecombat */,
 				8D1107310486CEB800E47090 /* gl_flight-Info.plist */,
 				6D413C031688150500A37ADF /* Settings.bundle */,
 				D062FE151FEADFDF00ABE435 /* Media.xcassets */,
@@ -1005,6 +1011,16 @@
 				D02B8F14195DF47A00830369 /* glFlightAndroid.h */,
 			);
 			name = Android;
+			sourceTree = "<group>";
+		};
+		D0BD22ED2055734F00D4AEE3 /* spacecombat */ = {
+			isa = PBXGroup;
+			children = (
+				D0BD22E520556F4800D4AEE3 /* sc.Default@2x.png */,
+				D0BD22E72055703100D4AEE3 /* sc.Default-568h@2x.png */,
+				D0BD22D92054F28100D4AEE3 /* LaunchScreen.xib */,
+			);
+			path = spacecombat;
 			sourceTree = "<group>";
 		};
 		D0DA47AC18186E0D00BD4DC2 /* iPad */ = {
@@ -1035,9 +1051,9 @@
 			productReference = 1D6058910D05DD3D006BFB54 /* d0gf1ght.app */;
 			productType = "com.apple.product-type.application";
 		};
-		D0BCC8FB2052EDC100094809 /* spacecombat1995 */ = {
+		D0BCC8FB2052EDC100094809 /* Space Combat 95 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D0BCC9C72052EDC100094809 /* Build configuration list for PBXNativeTarget "spacecombat1995" */;
+			buildConfigurationList = D0BCC9C72052EDC100094809 /* Build configuration list for PBXNativeTarget "Space Combat 95" */;
 			buildPhases = (
 				D0BCC8FC2052EDC100094809 /* Resources */,
 				D0BCC99E2052EDC100094809 /* Sources */,
@@ -1047,9 +1063,9 @@
 			);
 			dependencies = (
 			);
-			name = spacecombat1995;
+			name = "Space Combat 95";
 			productName = gl_flight;
-			productReference = D0BCC9CA2052EDC100094809 /* spacecombat1995.app */;
+			productReference = D0BCC9CA2052EDC100094809 /* Space Combat 95.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -1084,7 +1100,7 @@
 			projectRoot = "";
 			targets = (
 				1D6058900D05DD3D006BFB54 /* gl_flight */,
-				D0BCC8FB2052EDC100094809 /* spacecombat1995 */,
+				D0BCC8FB2052EDC100094809 /* Space Combat 95 */,
 			);
 		};
 /* End PBXProject section */
@@ -1262,6 +1278,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0BD22E9205571CB00D4AEE3 /* Default@2x.png in Resources */,
+				D0BD22EA205571CB00D4AEE3 /* Default-568h@2x.png in Resources */,
 				D0BCC8FD2052EDC100094809 /* texture50.bmp in Resources */,
 				D0BCC8FE2052EDC100094809 /* Shader.fsh in Resources */,
 				D0BCC8FF2052EDC100094809 /* Shader.vsh in Resources */,
@@ -1320,7 +1338,6 @@
 				D0BCC9342052EDC100094809 /* texture70.bmp in Resources */,
 				D0BCC9352052EDC100094809 /* texture17.bmp in Resources */,
 				D0BCC9362052EDC100094809 /* flyby.wav in Resources */,
-				D0BCC9372052EDC100094809 /* LaunchScreen.xib in Resources */,
 				D0BCC9382052EDC100094809 /* texture18.bmp in Resources */,
 				D0BCC9392052EDC100094809 /* texture98.bmp in Resources */,
 				D0BCC93A2052EDC100094809 /* highscore.wav in Resources */,
@@ -1343,6 +1360,7 @@
 				D0BCC94B2052EDC100094809 /* texture73.bmp in Resources */,
 				D0BCC94C2052EDC100094809 /* enemydead.wav in Resources */,
 				D0BCC94D2052EDC100094809 /* texture69.bmp in Resources */,
+				D0BD22DA2054F28200D4AEE3 /* LaunchScreen.xib in Resources */,
 				D0BCC94E2052EDC100094809 /* texture54.bmp in Resources */,
 				D0BCC94F2052EDC100094809 /* texture57.bmp in Resources */,
 				D0BCC9502052EDC100094809 /* texture26.bmp in Resources */,
@@ -1359,7 +1377,6 @@
 				D0BCC95B2052EDC100094809 /* texture34.bmp in Resources */,
 				D0BCC95C2052EDC100094809 /* texture33.bmp in Resources */,
 				D0BCC95D2052EDC100094809 /* texture35.bmp in Resources */,
-				D0BCC95E2052EDC100094809 /* Default-568h@2x.png in Resources */,
 				D0BCC95F2052EDC100094809 /* app_icon76x76.png in Resources */,
 				D0BCC9602052EDC100094809 /* Default2.png in Resources */,
 				D0BCC9612052EDC100094809 /* texture37.bmp in Resources */,
@@ -1375,6 +1392,7 @@
 				D0BCC96B2052EDC100094809 /* texture65.bmp in Resources */,
 				D0BCC96C2052EDC100094809 /* texture40.bmp in Resources */,
 				D0BCC96D2052EDC100094809 /* app_icon120x120_orig.png in Resources */,
+				D0BD22E82055703100D4AEE3 /* sc.Default-568h@2x.png in Resources */,
 				D0BCC96E2052EDC100094809 /* engine.wav in Resources */,
 				D0BCC96F2052EDC100094809 /* texture78.bmp in Resources */,
 				D0BCC9702052EDC100094809 /* missle.wav in Resources */,
@@ -1382,6 +1400,7 @@
 				D0BCC9722052EDC100094809 /* texture97.bmp in Resources */,
 				D0BCC9732052EDC100094809 /* texture100.bmp in Resources */,
 				D0BCC9742052EDC100094809 /* texture91.bmp in Resources */,
+				D0BD22E620556F4900D4AEE3 /* sc.Default@2x.png in Resources */,
 				D0BCC9752052EDC100094809 /* Media.xcassets in Resources */,
 				D0BCC9762052EDC100094809 /* bump.wav in Resources */,
 				D0BCC9772052EDC100094809 /* collect.wav in Resources */,
@@ -1390,7 +1409,6 @@
 				D0BCC97A2052EDC100094809 /* texture103.bmp in Resources */,
 				D0BCC97B2052EDC100094809 /* Default-Landscape.png in Resources */,
 				D0BCC97C2052EDC100094809 /* texture41.bmp in Resources */,
-				D0BCC97D2052EDC100094809 /* Default@2x.png in Resources */,
 				D0BCC97E2052EDC100094809 /* texture75.bmp in Resources */,
 				D0BCC97F2052EDC100094809 /* texture102.bmp in Resources */,
 				D0BCC9802052EDC100094809 /* Default.png in Resources */,
@@ -1581,7 +1599,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = d0gf1ght;
-				PROVISIONING_PROFILE = "5fe03160-0723-4955-8049-f4109b8a60f5";
 				SDKROOT = iphoneos;
 				VALID_ARCHS = "arm64 armv7 arm7s";
 			};
@@ -1602,7 +1619,6 @@
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PREBINDING = NO;
 				PRODUCT_NAME = d0gf1ght;
-				PROVISIONING_PROFILE = "5fe03160-0723-4955-8049-f4109b8a60f5";
 				SDKROOT = iphoneos;
 			};
 			name = Release;
@@ -1612,7 +1628,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: JUSTIN Brady (ZQVH66AQJ9)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
@@ -1629,8 +1645,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.spacecombat1995;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "74ef79e5-21e9-4d6d-9e40-82dfee76cd6d";
-				PROVISIONING_PROFILE_SPECIFIER = spacecombat1995;
+				PROVISIONING_PROFILE_SPECIFIER = "spacecombat1995 Development";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7 arm7s";
 			};
@@ -1656,8 +1671,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.spacecombat1995;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "74ef79e5-21e9-4d6d-9e40-82dfee76cd6d";
-				PROVISIONING_PROFILE_SPECIFIER = spacecombat1995;
+				PROVISIONING_PROFILE_SPECIFIER = "spacecombat1995 Development";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 arm7s arm64";
@@ -1685,7 +1699,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D0BCC9C72052EDC100094809 /* Build configuration list for PBXNativeTarget "spacecombat1995" */ = {
+		D0BCC9C72052EDC100094809 /* Build configuration list for PBXNativeTarget "Space Combat 95" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D0BCC9C82052EDC100094809 /* Debug */,
