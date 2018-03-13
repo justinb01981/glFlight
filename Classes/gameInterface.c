@@ -198,7 +198,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.fireRectBoost.tex_id = TEXTURE_ID_CONTROLS_BOOST;
     gameInterfaceControls.fireRectBoost.visible = 0;
     
-    gameInterfaceControls.consoleTextRect.x = screenWidth - gameInterfaceControls.textHeight*console_lines_max;
+    gameInterfaceControls.consoleTextRect.x = screenWidth - gameInterfaceControls.textHeight*(console_lines_max-1);
     gameInterfaceControls.consoleTextRect.y = screenHeight * 0.15;
     gameInterfaceControls.consoleTextRect.xw = 0.1*screenWidth;
     gameInterfaceControls.consoleTextRect.yw = 0.5*screenHeight;

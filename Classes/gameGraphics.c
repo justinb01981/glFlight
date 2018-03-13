@@ -287,7 +287,7 @@ void drawText(char *str, float x, float y, float scale)
         ds->texcoords[6] = row;
         ds->texcoords[7] = col;
         
-        r.x = x - (line*fscreenheight);
+        r.x = x - (line*fscreenheight) - fscreenheight*(scalechar);
         r.y = y + j*fscreenwidth;
         r.xw = fscreenheight * scalechar;
         r.yw = fscreenwidth * scalechar;

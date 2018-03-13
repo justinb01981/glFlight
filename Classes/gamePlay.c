@@ -796,7 +796,7 @@ game_start(float difficulty, int type)
     {
         sprintf(dialogStr, "^D^D^D     INTRUDER ALERT    ^D^D^D\n"
                            "^D^D^D   ACTIVATE FIREWALL   ^D^D^D\n"
-                           "^D^D^D   PROTECT CORE ^2^D^1   ^D^D^D\n"
+                           "^D^D^D   PROTECT CORE ^2^D^1    ^D^D^D\n"
                             "\n"
                            "****   High Score: %d  ****",
                 gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
