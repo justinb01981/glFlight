@@ -59,6 +59,7 @@ gameDialogGraphicDangerCountdown()
     {
         gameDialogGraphicCancel();
         glFlightDrawframeHook = NULL;
+        passes = 60;
     }
 }
 

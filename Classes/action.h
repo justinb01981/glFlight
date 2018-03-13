@@ -92,15 +92,15 @@ extern int actions_sub_cur;
 
 static const char* action_strings[ACTION_LAST] =
 {
-    "game: firewall",
+    "Single Player Game",
     "game: resume",
     "game: survival",
     "game: speedrun",
     "game: defend",
     "game: turret",
-    "game: multiplayer",
+    "Multiplayer Local Game",
     "game: lob",
-    "display scores",
+    "High Scores",
     "help/about",
     "host internet game",
     "host local game",

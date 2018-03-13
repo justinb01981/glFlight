@@ -494,7 +494,9 @@ static GameNetworkBonjourManager* instance;
                 }
                 else
                 {
+                    gameNetworkState.msgQueue.cleanupWaiting = 1;
                     while(gameNetworkState.msgQueue.cleanup) { int i; i++; }
+                    gameNetworkState.msgQueue.cleanupWaiting = 0;
                     
                     gameNetworkMessageQueued* cur = &gameNetworkState.msgQueue.head;
                     while(cur->next != NULL)

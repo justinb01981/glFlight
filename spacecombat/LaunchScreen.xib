@@ -15,7 +15,7 @@
             <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="sc.Default.png" translatesAutoresizingMaskIntoConstraints="NO" id="6rO-cF-k5H">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Default.sc.png" translatesAutoresizingMaskIntoConstraints="NO" id="6rO-cF-k5H">
                     <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
                 </imageView>
             </subviews>
@@ -29,6 +29,6 @@
         </view>
     </objects>
     <resources>
-        <image name="sc.Default.png" width="568" height="320"/>
+        <image name="Default.sc.png" width="1136" height="568"/>
     </resources>
 </document>

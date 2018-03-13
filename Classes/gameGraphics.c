@@ -184,6 +184,7 @@ void drawText(char *str, float x, float y, float scale)
     unsigned long len = strlen(str);
     float fscreenwidth = /*8*/ gameInterfaceControls.textWidth * scale;
     float fscreenheight = /*12*/ gameInterfaceControls.textHeight * scale;
+    float scalechar = 1.0;
     float fmapwidth = 512; // width of the font bitmap
     float fmapheight = 512; // height of the font bitmap
     float rows = 6;
@@ -232,12 +233,32 @@ void drawText(char *str, float x, float y, float scale)
             else continue;
         }
         
+        if(str[i] == ' ')
+        {
+            j++;
+            continue;
+        }
+        
         ds->tex_id = TEXTURE_ID_FONTMAP;
         
         if(str[i] == '^' && i < len-1)
         {
             i++;
-            ds->tex_id = TEXTURE_ID_FONTMAP2;
+            if(str[i] == '2' && i < len-1)
+            {
+                scalechar *= 2;
+                continue;
+            }
+            else if(str[i] == '1' && i < len-1)
+            {
+                scalechar /= 2;
+                j++;
+                continue;
+            }
+            else
+            {
+                ds->tex_id = TEXTURE_ID_FONTMAP2;
+            }
         }
         
         int c = toupper(str[i]);
@@ -268,8 +289,8 @@ void drawText(char *str, float x, float y, float scale)
         
         r.x = x - (line*fscreenheight);
         r.y = y + j*fscreenwidth;
-        r.xw = fscreenheight;
-        r.yw = fscreenwidth;
+        r.xw = fscreenheight * scalechar;
+        r.yw = fscreenwidth * scalechar;
         
         // HACK: to flip instead of glRotatef
         r.y = screenHeight - r.y-r.yw;

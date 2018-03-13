@@ -794,9 +794,10 @@ game_start(float difficulty, int type)
     }
     else if(gameStateSinglePlayer.game_type == GAME_TYPE_COLLECT)
     {
-        sprintf(dialogStr, "^D^D^DWARNING: INTRUDER_ALERT^D^D^D\n"
-                           "^D^D^D   ACTIVATE_FIREWALL   ^D^D^D\n"
-                           "^D^D^D       CAPTURE ^D       ^D^D^D\n"
+        sprintf(dialogStr, "^D^D^D     INTRUDER ALERT    ^D^D^D\n"
+                           "^D^D^D   ACTIVATE FIREWALL   ^D^D^D\n"
+                           "^D^D^D   PROTECT CORE ^2^D^1   ^D^D^D\n"
+                            "\n"
                            "****   High Score: %d  ****",
                 gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
         gameDialogDisplayString(dialogStr);
@@ -1619,8 +1620,14 @@ game_run()
                     missles_found++;
                     break;
                     
-                case OBJ_TURRET:
-                    turrets_found++;
+                case OBJ_TURRET: {
+                        turrets_found++;
+                        update_object_velocity(pCur->elem->elem_id,
+                                               0,
+                                               pCur->elem->physics.ptr->y > 2 ? -1 : 0,
+                                               0,
+                                               0);
+                    }
                     break;
                     
                 case OBJ_SPAWNPOINT:

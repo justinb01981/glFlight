@@ -227,17 +227,19 @@ static unsigned long strcksum(const char* str)
 {
     size_t cksumlen = strlen(str);
     unsigned long cksum = 0, *pcksum = (unsigned long*) str;
+    unsigned char *pcksumc;
     while(cksumlen >= sizeof(cksum))
     {
         cksum ^= *pcksum;
         pcksum ++;
         cksumlen -= sizeof(cksum);
     }
+    pcksumc = (unsigned char*) pcksum;
     while(cksumlen > 0)
     {
         cksum = cksum << 8;
-        cksum ^= *((unsigned char*) pcksum);
-        pcksum = (unsigned long*) (((unsigned char*)pcksum)+1);
+        cksum ^= *pcksumc;
+        pcksumc++;
         cksumlen--;
     }
     return cksum;
@@ -2487,13 +2489,15 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                     {
                         char* ptr = playerInfo->map_data_ptr;
                         
+                        msgOut.params.mapData.offset = playerInfo->map_data_ptr - playerInfo->map_data;
+                        
                         while(*playerInfo->map_data_ptr && playerInfo->map_data_ptr - ptr < GAME_NETWORK_MAX_STRING_LEN)
                         {
                             playerInfo->map_data_ptr++;
                             block_sent++;
                         }
                         memset(msgOut.params.mapData.s, 0, sizeof(msgOut.params.mapData.s));
-                        msgOut.params.mapData.offset = playerInfo->map_data_ptr - playerInfo->map_data;
+                        
                         memcpy(msgOut.params.mapData.s, ptr, playerInfo->map_data_ptr - ptr);
 
                         send_to_address_udp(&msgOut, srcAddr);
@@ -2502,6 +2506,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                         {
                             msgOut.cmd = GAME_NETWORK_MSG_GET_MAP_END;
                             msgOut.params.mapData.offset = strcksum(playerInfo->map_data);
+                            console_append("map cksum:\n%lu\nbytes:%lu\n", msgOut.params.mapData.offset, strlen(playerInfo->map_data));
                             send_to_address_udp(&msgOut, srcAddr);
                             free(playerInfo->map_data);
                             playerInfo->map_data = playerInfo->map_data_ptr = NULL;
@@ -2967,12 +2972,15 @@ int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress
     {
         gameNetworkState.gameNetworkHookOnMessage = NULL;
         
-        if(strcksum(gameNetworkState.server_map_data) == msg->params.mapData.offset)
+        unsigned long mapcksum = strcksum(gameNetworkState.server_map_data);
+        if(mapcksum == msg->params.mapData.offset)
         {
             gameDialogConnectToGameSuccessful2();
         
             gameMapSetMap(gameNetworkState.server_map_data);
         }
+        
+        console_append("map cksum:\n%lu\nbytes:%lu\n", mapcksum, strlen(gameNetworkState.server_map_data));
         
         return 1;
     }
@@ -2980,9 +2988,16 @@ int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress
     {
         unsigned long l = gameNetworkState.server_map_data_end - gameNetworkState.server_map_data;
         
+        if(msg->params.mapData.offset != l)
+        {
+            return 1;
+        }
+        
         char* catbuf = malloc(l + GAME_NETWORK_MAX_MAP_STRING_LEN + 1);
         
         memcpy(catbuf, gameNetworkState.server_map_data, l);
+        memset(catbuf + l, 0, GAME_NETWORK_MAX_MAP_STRING_LEN+1);
+        
         free(gameNetworkState.server_map_data);
         
         gameNetworkState.server_map_data = catbuf;
@@ -3016,7 +3031,7 @@ int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress
         return 1;
     }
 
-    return 0;
+    return 1;
 }
     
 int gameNetwork_onBonjourConnecting2(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)

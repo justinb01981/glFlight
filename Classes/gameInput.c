@@ -193,7 +193,7 @@ void
 gyro_calibrate_log(float pct)
 {
     console_clear();
-    console_write("calibrating: ");
+    console_write("calibrating: ^2^2");
     int s = 0;
     float width = (24.0 * pct) / 100;
     for(s = 0; s < width && s <= 24; s++)
@@ -201,7 +201,7 @@ gyro_calibrate_log(float pct)
         console_append("^I");
     }
     while(s < 24) { console_append("^J"); s++; }
-    console_append("]");
+    console_append("]^1^1");
 }
 
 void
