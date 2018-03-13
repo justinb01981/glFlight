@@ -303,7 +303,7 @@ gameInterfaceFindControl(float x, float y)
 void
 gameInterfaceHandleTouchMove(float x, float y)
 {
-    const float move_thresh = 10;
+    const float move_thresh = gameInterfaceControls.interfaceHeight/30;
     
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
     if(touchedControl)
