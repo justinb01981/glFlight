@@ -2,12 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:sc.Default@2x.png">
-   </FileRef>
-   <FileRef
-      location = "group:../../../Desktop/sc.Default@2x.png">
-   </FileRef>
-   <FileRef
       location = "self:gl_flight.xcodeproj">
    </FileRef>
 </Workspace>

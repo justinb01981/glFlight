@@ -21,7 +21,6 @@ struct gameDialogStateStruct
 {
     int ratingDesired;
     char gameDialogPortalToGameLast[255];
-    int lanGameScanning;
     int networkGameNameEntered;
     int hideNetworkStatus;
 };
@@ -324,32 +323,33 @@ gameDialogBrowseGames()
     gameInterfaceModalDialog("Enter node to connect...", "OK", "", gameDialogCancel, gameDialogCancel);
 }
 
-static void gameDialogLanConnect()
-{
-    gameDialogCancel();
-    fireAction = ACTION_CONNECT_TO_GAME_LAN;
-    gameInterfaceProcessAction();
-}
+//static void gameDialogLanConnect()
+//{
+//    gameDialogCancel();
+//    fireAction = ACTION_CONNECT_TO_GAME_LAN;
+//    gameInterfaceProcessAction();
+//}
 
-static int
-gameDialogSearchingForGame()
-{
-    extern int GameNetworkBonjourManagerBrowseBegin();
-    
-    if(gameDialogState.lanGameScanning)
-    {
-        gameDialogState.lanGameScanning = 0;
-        return 1;
-    }
-    else
-    {
-        GameNetworkBonjourManagerBrowseBegin();
-        gameInterfaceModalDialog("Searching for game...\nConnect?", "", "",
-                                 gameDialogLanConnect, gameDialogCancel);
-        gameDialogState.lanGameScanning = 1;
-        return 0;
-    }
-}
+//static int
+//gameDialogSearchingForGame()
+//{
+//    extern int GameNetworkBonjourManagerBrowseBegin();
+//    
+//    if(gameDialogState.lanGameScanning)
+//    {
+//        gameDialogState.lanGameScanning = 0;
+//        return 1;
+//    }
+//    else
+//    {
+//        gameNetwork_disconnect();
+//        GameNetworkBonjourManagerBrowseBegin();
+//        gameInterfaceModalDialog("Searching for game...\nConnect?", "", "",
+//                                 gameDialogLanConnect, gameDialogCancel);
+//        gameDialogState.lanGameScanning = 1;
+//        return 0;
+//    }
+//}
 
 static void
 gameDialogConnectToGameSuccessful()
@@ -384,6 +384,13 @@ gameDialogStartNetworkGame2()
     gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
     
     gameNetwork_alert("ALERT:game started!");
+}
+
+static void
+gameDialogStartNetworkGameWait()
+{
+    gameInterfaceModalDialog("Waiting for guests\nTap when ready to start", "", "",
+                             gameDialogStartNetworkGame2, gameDialogStartNetworkGame2);
 }
 
 static void
@@ -438,6 +445,33 @@ gameDialogStartNetworkGameNewMap()
 //}
 
 static void
+gameDialogEnterGameNameDone()
+{
+    gameDialogClose();
+    fireActionQueuedAfterEdit = ACTION_HOST_GAME;
+    fireAction = ACTION_HOST_GAME;
+    gameInterfaceProcessAction();
+}
+
+static void
+gameDialogEnterGameName()
+{
+    const char* msg = ""
+    "Local Game:\n"
+    "* enter same \"game name\" as\n"
+    "  your guests\n"
+    "* first person hosts\n"
+    "Internet Game:\n"
+    "* host - leave this blank\n"
+    "  (or type \"host\")\n"
+    "* guest - enter IP address of\n"
+    "  your host (see the help)\n"
+    "* read help for firewall port config\n"
+    ;
+    gameInterfaceModalDialog(msg, "OK", "OK", gameDialogEnterGameNameDone, gameDialogCancel);
+}
+
+static void
 gameDialogNetworkGameStatus()
 {
     void (*okFunc)(void) = gameDialogCancel;
@@ -453,7 +487,7 @@ gameDialogNetworkGameStatus()
         okFunc = gameDialogClose;
     }
     
-    gameInterfaceModalDialog(gameNetworkState.gameStatsMessage, "OK", "OK", okFunc, gameDialogStopGameStatusMessages);
+    gameInterfaceModalDialog(gameNetworkState.gameStatsMessage, "OK", "OK", gameDialogStopGameStatusMessages, gameDialogStopGameStatusMessages);
 }
 
 static char gameDialogDisplayStringStr[16][1024];

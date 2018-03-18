@@ -31,7 +31,7 @@ typedef struct
 } glFlightPrefs;
 
 // TODO:bump this every time settings change
-const static int settings_version = 35;
+const static int settings_version = 36;
 
 // HACK: externs built in .m files
 extern double dz_roll, dz_pitch, dz_yaw;
@@ -48,6 +48,16 @@ extern int gameSettingsPortNumber;
 extern char gameSettingsLocalIPOverride[255];
 extern int gameSettingsSimpleControls;
 extern char gameSettingsVersionStr[255];
+static char gameSettingsDirectoryServerNameREMOVED[255];
+
+static char* nullableStrings[] = {
+    gameSettingsPlayerName,
+    gameSettingsMapName,
+    gameSettingGameTitle,
+    gameSettingsDirectoryServerNameREMOVED,
+    gameSettingsLocalIPOverride,
+    gameSettingsVersionStr
+};
 
 static void
 gameSettingsStatsReset()
@@ -95,6 +105,16 @@ static void
 gameSettingsWrite(const char *filename)
 {
     FILE* fp;
+    int i;
+    
+    // HACK: don't allow "empty" strings to corrupt the (awful) settings format
+    for(i = 0; i < sizeof(nullableStrings)/sizeof(char*); i++)
+    {
+        if(strlen(nullableStrings[i]) == 0)
+        {
+            strcpy(nullableStrings[i], "null");
+        }
+    }
     
     fp = fopen(filename, "w");
     if(fp)
@@ -115,11 +135,11 @@ gameSettingsWrite(const char *filename)
         fprintf(fp, "%d\n", gameStateSinglePlayer.last_game.score);
         fprintf(fp, "%d\n", gameSettingsLaunchCount);
         fprintf(fp, "%d\n", gameSettingsRatingGiven);
-        fprintf(fp, "%s\n", gameSettingsPlayerName);
-        fprintf(fp, "%s\n", gameSettingsMapName);
-        fprintf(fp, "%s\n", gameSettingGameTitle);
+        fprintf(fp, "%s\n", strlen(gameSettingsPlayerName) > 0 ? gameSettingsPlayerName : "null");
+        fprintf(fp, "%s\n", strlen(gameSettingsMapName) > 0 ? gameSettingsMapName : "NULL");
+        fprintf(fp, "%s\n", strlen(gameSettingGameTitle) > 0 ? gameSettingGameTitle : "NULL");
         fprintf(fp, "%s\n", "d0gf1ght.domain17.net");
-        fprintf(fp, "%s\n", gameSettingsLocalIPOverride);
+        fprintf(fp, "%s\n", strlen(gameSettingsLocalIPOverride) > 0 ? gameSettingsLocalIPOverride : "NULL");
         fprintf(fp, "%d\n", gameSettingsNetworkFrequency);
         fprintf(fp, "%d\n", gameSettingsPortNumber);
         fprintf(fp, "%lu\n", gameStateSinglePlayer.lifetime_credits);
@@ -127,6 +147,14 @@ gameSettingsWrite(const char *filename)
         fprintf(fp, "%s\n", GAME_VERSION_STR);
         
         fclose(fp);
+    }
+    
+    for(i = 0; i < sizeof(nullableStrings)/sizeof(char*); i++)
+    {
+        if(!strcmp(nullableStrings[i], "null"))
+        {
+            nullableStrings[i][0] = '\0';
+        }
     }
 }
 
@@ -137,7 +165,7 @@ gameSettingsRead(const char *filename)
     int settings_ver;
     int err = 0;
     int ignored = 0;
-    char gameSettingsDirectoryServerNameREMOVED[255];
+    int i;
     
     while(fp)
     {
@@ -193,6 +221,14 @@ gameSettingsRead(const char *filename)
         fclose(fp);
         
         err = 1;
+    }
+    
+    for(i = 0; i < sizeof(nullableStrings)/sizeof(char*); i++)
+    {
+        if(!strcmp(nullableStrings[i], "null"))
+        {
+            nullableStrings[i][0] = '\0';
+        }
     }
     
     // version changed

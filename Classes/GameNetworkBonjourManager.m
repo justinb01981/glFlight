@@ -174,9 +174,7 @@ const int PEER_ID_INITIAL = 1001;
 // implementation
 @implementation GameNetworkBonjourManager
 {
-    NSNetService* server;
-    NSNetService* clientService;
-    NSHost* serverHost;
+    NSNetService* server;    NSHost* serverHost;
     NSMutableArray<NSString*>* foundDomains;
     NSMutableArray<NSNetServiceBrowser*>* browsers;
     NSString* type;
@@ -239,8 +237,6 @@ static GameNetworkBonjourManager* instance;
         peerIdNext = PEER_ID_INITIAL;
         
         type = @"_d0gf1ght._tcp.";
-        
-        clientService = nil;;
     }
     return self;
 }
@@ -257,7 +253,7 @@ static GameNetworkBonjourManager* instance;
         server = [[NSNetService alloc] initWithDomain:@"" type:type name:[NSString stringWithUTF8String:name] port:GAME_NETWORK_PORT_BONJOUR];
         server.includesPeerToPeer = YES;
         [server setDelegate:self];
-        [server publishWithOptions: NSNetServiceListenForConnections];
+        [server publishWithOptions: NSNetServiceListenForConnections | NSNetServiceNoAutoRename];
     }
 }
 
@@ -270,10 +266,9 @@ static GameNetworkBonjourManager* instance;
     }
 }
 
-- (int) connectToServer:(const char*) name
+- (int) connectToServer:(NSNetService*) serviceFound
 {
     __block int peerIdAdded = -1;
-    __block NSNetService* serviceFound = nil;
     
     /*
     [[self.browsedServices allKeys] enumerateObjectsUsingBlock:^(NSData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -288,8 +283,6 @@ static GameNetworkBonjourManager* instance;
         }
     }];
     */
-
-    serviceFound = clientService;
     
     if(serviceFound && serviceFound.addresses.count > 0)
     {
@@ -331,9 +324,15 @@ static GameNetworkBonjourManager* instance;
     
     [servicesResolving removeAllObjects];
     
-    clientService = nil;
-    
     return 1;
+}
+
+- (void) browseEnd
+{
+    [browsers enumerateObjectsUsingBlock:^(NSNetServiceBrowser * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [obj stop];
+    }];
+    [browsers removeAllObjects];
 }
 
 - (void) sendPeer:(gameNetworkMessage*) msg peer:(int)peer_id
@@ -368,8 +367,6 @@ static GameNetworkBonjourManager* instance;
     }];
     
     [peers removeAllObjects];
-    
-    clientService = nil;
 }
 
 // NSNetServiceDelegate delegate
@@ -396,6 +393,7 @@ static GameNetworkBonjourManager* instance;
 - (void)netService:(NSNetService *)sender didNotPublish:(NSDictionary<NSString *,NSNumber *> *)errorDict
 {
     NSLog(@"netServiceDidNotPublish");
+    console_write("ERROR: netService didNotPublish");
 }
 
 - (void)netService:(NSNetService *)sender didAcceptConnectionWithInputStream:(NSInputStream *)inputStream outputStream:(NSOutputStream *)outputStream
@@ -516,6 +514,8 @@ static GameNetworkBonjourManager* instance;
             // fall through
         case NSStreamEventErrorOccurred: {
             NSLog(@"NSStreamEventErrorOccurred: %@/%@",  [[stream streamError] localizedDescription], [[stream streamError] localizedFailureReason]);
+            [peer disconnect];
+            [peers removeObject: peer];
         } break;
             
         case NSStreamEventEndEncountered: {
@@ -547,12 +547,8 @@ static GameNetworkBonjourManager* instance;
     
     [sender.addresses enumerateObjectsUsingBlock:^(NSData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         self.browsedServices[obj] = sender;
-        if(clientService == nil)
-        {
-            clientService = sender;
-            
-            [self connectToServer:sender.name.UTF8String];
-        }
+        
+        [self connectToServer: sender];
     }];
     
     [servicesResolving removeObject:sender];
@@ -635,4 +631,5 @@ void GameNetworkBonjourManagerDisconnect()
 {
     [GameNetworkBonjourManager.instance stopServer];
     [GameNetworkBonjourManager.instance disconnectPeers];
+    [GameNetworkBonjourManager.instance browseEnd];
 }

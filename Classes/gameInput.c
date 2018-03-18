@@ -201,7 +201,7 @@ gyro_calibrate_log(float pct)
         console_append("^I");
     }
     while(s < 24) { console_append("^J"); s++; }
-    console_append("]^1^1");
+    console_append("^1^1 \n");
 }
 
 void

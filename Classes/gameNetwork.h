@@ -28,7 +28,7 @@
 #define GAME_NETWORK_BONJOUR_ADDRFAMILY_HACK 0x09
 #define GAME_NETWORK_MAP_REQUEST_BLOCK_LEN (GAME_NETWORK_MAX_STRING_LEN * 32)
 
-const static char *GAME_NETWORK_LAN_GAME_NAME = "d0gf1ght_lan";
+//const static char *GAME_NETWORK_LAN_GAME_NAME = "d0gf1ght_lan";
 
 typedef enum
 {
@@ -278,7 +278,7 @@ gameNetworkError
 gameNetwork_resume();
 
 int
-gameNetwork_connect(char* server_name, int host);
+gameNetwork_connect(char* server_name, void (*callback_becomehost)());
 
 void
 gameNetwork_worldInit();

@@ -28,6 +28,11 @@ typedef struct
     char *textDest;
     int *textDestInt;
     int modal:1, text_align_topleft:1;
+    
+    struct {
+        void (*dialogRectActionLeft)(void);
+        void (*dialogRectActionRight)(void);
+    } d;
 } controlRect;
 
 typedef struct {
@@ -51,6 +56,7 @@ typedef struct {
     controlRect graphicDialog;
     controlRect graphicDialogHelp;
     controlRect dialogRect;
+    controlRect dialogRectQueued;
     controlRect consoleTextRect;
     controlRect statsTextRect;
     controlRect keyboardEntry;
@@ -66,9 +72,9 @@ typedef struct {
     float textWidth;
     float textHeight;
     
-    void (*dialogRectActionLeft)(void);
-    void (*dialogRectActionRight)(void);
-    
+    struct {
+    } dialogMessages;
+
     int consoleHidden;
     
     controlRect* controlArray[64];

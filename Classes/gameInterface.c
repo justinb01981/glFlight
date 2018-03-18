@@ -37,7 +37,7 @@ static float y_last = -1;
 
 // variables scoped for fireAction menu handling
 unsigned int maps_list_idx = 0;
-static int game_map_custom_loaded = 0;
+int game_map_custom_loaded = 0;
 int game_start_difficulty = 1;
 int game_start_score = 0;
 
@@ -430,8 +430,8 @@ gameInterfaceEditDone()
     
     gameInterfaceControls.keyboardEntry.text[0] = '\0';
     
-    fireAction = fireActionQueued;
-    fireActionQueued = ACTION_INVALID;
+    fireAction = fireActionQueuedAfterEdit;
+    fireActionQueuedAfterEdit = ACTION_INVALID;
     gameInterfaceProcessAction();
     
     appWriteSettings();
@@ -526,12 +526,14 @@ gameInterfaceHandleTouchBegin(float x, float y)
                     touchedControl->visible = 0;
                     gameInterfaceEditDone();
                     
+                    /*
                     if(fireAction == ACTION_CONNECT_TO_GAME ||
                        fireAction == ACTION_HOST_GAME)
                     {
                         // re-perform the action that brought up the keyvboard
                         rgnv = 5;
                     }
+                     */
                 }
                 else if(key == 'D')
                 {
@@ -577,14 +579,17 @@ gameInterfaceHandleTouchBegin(float x, float y)
         {
             touchedControl->visible = 0;
             gameInterfaceControls.consoleHidden = 0;
-            if(gameInterfaceControls.dialogRectActionLeft) gameInterfaceControls.dialogRectActionLeft();
+            if(gameInterfaceControls.dialogRect.d.dialogRectActionLeft) gameInterfaceControls.dialogRect.d.dialogRectActionLeft();
         }
         else
         {
             touchedControl->visible = 0;
             gameInterfaceControls.consoleHidden = 0;
-            if(gameInterfaceControls.dialogRectActionRight) gameInterfaceControls.dialogRectActionRight();
+            if(gameInterfaceControls.dialogRect.d.dialogRectActionRight) gameInterfaceControls.dialogRect.d.dialogRectActionRight();
         }
+        
+        gameInterfaceControls.dialogRect = gameInterfaceControls.dialogRectQueued;
+        memset(&gameInterfaceControls.dialogRectQueued, 0, sizeof(gameInterfaceControls.dialogRectQueued));
     }
     
     if(touchedControl == &gameInterfaceControls.fireRectBoost)
@@ -647,41 +652,41 @@ void gameInterfaceProcessAction()
             gameStateSinglePlayer.map_use_current = 1;
             console_write("map loaded:%s", maps_list_names[maps_list_idx]);
             break;
-            
-        case ACTION_CONNECT_TO_GAME_LAN:
-            goto connect_to_game_name_set;
+        
+        case ACTION_NETWORK_MULTIPLAYER_MENU:
+        case ACTION_HOST_GAME_LAN:
         case ACTION_CONNECT_TO_GAME:
+        case ACTION_HOST_GAME:
         {
             char* gameName = gameSettingGameTitle;
             
-            if(!gameDialogState.networkGameNameEntered)
+            if(gameDialogState.networkGameNameEntered == 1)
             {
                 gameNetwork_disconnect();
-                gameDialogState.networkGameNameEntered = 1;
-                fireActionQueued = fireAction;
+                gameDialogState.networkGameNameEntered++;
                 console_clear();
-                console_write("Enter the host game-ID:");
-                console_append("(or IP address)");
+                console_write("Enter the \"gameID\":\n");
+                console_append("or IP address to join an internet game");
+                {
+                    extern void GameNetworkBonjourManagerBrowseBegin();
+                    GameNetworkBonjourManagerBrowseBegin();
+                }
                 goto fire_action_setting_game_name;
             }
-            
-        connect_to_game_name_set:
-            
-            if(fireAction == ACTION_CONNECT_TO_GAME_LAN &&
-               !gameDialogSearchingForGame())
+            else if(gameDialogState.networkGameNameEntered == 0)
             {
-                gameNetwork_disconnect();
+                gameDialogState.networkGameNameEntered++;
+                gameDialogEnterGameName();
                 break;
             }
+
+            gameDialogState.networkGameNameEntered = 0;
+            gameDialogClose();
             
-            if(fireAction == ACTION_CONNECT_TO_GAME_LAN)
-            {
-                gameName = (char*) GAME_NETWORK_LAN_GAME_NAME;
-            }
+            extern void load_map_and_host_game();
             
-            if(gameNetwork_connect(gameName, 0) == GAME_NETWORK_ERR_NONE)
+            if(gameNetwork_connect(gameName, load_map_and_host_game) == GAME_NETWORK_ERR_NONE)
             {
-                gameStateSinglePlayer.started = 0;
             }
             else
             {
@@ -690,34 +695,39 @@ void gameInterfaceProcessAction()
         }
             break;
             
-        case ACTION_HOST_GAME_LAN:
-            pGameConnectName = GAME_NETWORK_LAN_GAME_NAME;
-        case ACTION_HOST_GAME:
-            
-            if(!gameDialogState.networkGameNameEntered && fireAction != ACTION_HOST_GAME_LAN)
-            {
-                gameDialogState.networkGameNameEntered = 1;
-                fireActionQueued = fireAction;
-                console_clear();
-                console_write("Enter a host game-ID:\n(share this with guests)");
-                goto fire_action_setting_game_name;
-            }
-            
-            gameInterfaceControls.mainMenu.visible = 0;
-            gameNetwork_disconnect();
-            if(gameNetwork_connect((char *) pGameConnectName, 1) == GAME_NETWORK_ERR_NONE)
-            {
-                actions_menu_reset();
-                gameStateSinglePlayer.started = 0;
-                save_map = 0;
-                console_write("Hosting game: %s\nWaiting for guests...",
-                              gameNetworkState.hostInfo.name);
-                if(!game_map_custom_loaded) gameMapSetMap(initial_map_deathmatch);
-            }
-            break;
+//        case ACTION_HOST_GAME:
+//            if(!gameDialogState.networkGameNameEntered && fireAction != ACTION_HOST_GAME_LAN)
+//            {
+//                gameDialogState.networkGameNameEntered = 1;
+//                fireActionQueued = fireAction;
+//                console_clear();
+//                console_write("Enter a host game-ID:\n(share this with guests)");
+//                goto fire_action_setting_game_name;
+//            }
+//
+//            gameInterfaceControls.mainMenu.visible = 0;
+//            gameNetwork_disconnect();
+//            if(gameNetwork_connect((char *) pGameConnectName) == GAME_NETWORK_ERR_NONE)
+//            {
+//                actions_menu_reset();
+//                gameStateSinglePlayer.started = 0;
+//                save_map = 0;
+//                console_write("Hosting game: %s\nWaiting for guests...",
+//                              gameNetworkState.hostInfo.name);
+//                if(!game_map_custom_loaded) gameMapSetMap(initial_map_deathmatch);
+//            }
+//            break;
             
         case ACTION_DISPLAY_SCORES:
-            gameDialogScores();
+            if(gameNetworkState.connected)
+            {
+                gameDialogState.hideNetworkStatus = 0;
+                gameDialogNetworkGameStatus();
+            }
+            else
+            {
+                gameDialogScores();
+            }
             break;
             
         case ACTION_HELP:
@@ -802,10 +812,6 @@ void gameInterfaceProcessAction()
             game_start(1, GAME_TYPE_TURRET);
             gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
             save_map = 0;
-            break;
-            
-        case ACTION_NETWORK_MULTIPLAYER_MENU:
-            action_sub_next();
             break;
             
         case ACTION_SETTING_PLAYER_NAME:
@@ -1017,6 +1023,14 @@ void
 gameInterfaceModalDialogWithRect(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void),
                          controlRect* overrideRect, unsigned long life_frames)
 {
+    if(gameInterfaceControls.dialogRectQueued.visible)
+    {
+        printf("too many dialogs, ignoring\n");
+        return;
+    }
+    
+    gameInterfaceControls.dialogRectQueued = gameInterfaceControls.dialogRect;
+    
     gameInterfaceControls.dialogLifeFrames = life_frames;
     
     gameInterfaceControls.dialogRect = *overrideRect;
@@ -1030,8 +1044,8 @@ gameInterfaceModalDialogWithRect(char* msg, char *buttonLeft, char *buttonRight,
     sprintf(gameInterfaceControls.dialogRect.textRight,
             "%s",
             buttonRight? buttonRight: "");
-    gameInterfaceControls.dialogRectActionLeft = cbLeft;
-    gameInterfaceControls.dialogRectActionRight = cbRight;
+    gameInterfaceControls.dialogRect.d.dialogRectActionLeft = cbLeft;
+    gameInterfaceControls.dialogRect.d.dialogRectActionRight = cbRight;
     gameInterfaceControls.dialogRect.visible = 1;
     gameInterfaceControls.dialogRect.modal = 1;
 }

@@ -70,6 +70,7 @@ extern int gameNetwork_onBonjourConnecting1(gameNetworkMessage*, gameNetworkAddr
 int gameNetwork_onDirectorySearch(gameNetworkMessage* msg, gameNetworkAddress* srcAddr);
 
 static char* do_game_map_render();
+void send_bonjour_beacon_callback();
 
 
 ////////////////////////////////
@@ -440,7 +441,7 @@ gameNetwork_resume()
 }
 
 int
-gameNetwork_connect(char* server_name, int host)
+gameNetwork_connect(char* server_name, void (*callback_becamehost)())
 {
     int retries = 0;
     gameNetworkAddress gameAddress;
@@ -448,7 +449,7 @@ gameNetwork_connect(char* server_name, int host)
     struct sockaddr* sockaddr_p = (struct sockaddr*) gameAddress.storage;
     gameNetworkPlayerInfo* playerInfo = NULL;
     int host_player_id = GAME_NETWORK_PLAYER_ID_HOST;
-    int directory_search_retries = 1, bonjour_search_retries = 0;
+    int directory_search_retries = 1, bonjour_search_retries = 1;
     unsigned short server_port_resolved = gameNetworkState.hostInfo.port;
     int retries_udp = 1;
     char strtmp[256];
@@ -457,16 +458,7 @@ gameNetwork_connect(char* server_name, int host)
     
     assert(sizeof(gameAddress.storage) >= sizeof(struct sockaddr_storage));
     
-    if(strcmp(server_name, GAME_NETWORK_LAN_GAME_NAME) == 0)
-    {
-        gameNetworkState.hostInfo.lan_only = 1;
-        bonjour_search_retries = 1;
-        directory_search_retries = 0;
-    }
-    
     gameNetworkState.connected = 0;
-    
-    gameNetworkState.hostInfo.hosting = host;
     
     gameNetwork_initsockets();
     
@@ -479,47 +471,60 @@ gameNetwork_connect(char* server_name, int host)
     }
     gameNetworkState.player_list_head.next = NULL;
     
-    // if its an IP, treat as ip address
-    if(inet_pton(AF_INET, server_name, sockaddr_p) == 1)
+    // blank to host an IP game
+    if(strlen(server_name) == 0 || !strcmp(server_name, "host"))
     {
+        strcpy(gameNetworkState.hostInfo.name, "0.0.0.0");
         directory_search_retries = bonjour_search_retries = 0;
-    }
-    else
-    {
-        if(!gameNetworkState.hostInfo.lan_only &&
-           gameNetwork_getDNSAddress(gameNetworkState.gameDirectory.directory_name,
-                                     &gameNetworkState.gameDirectory.directory_address) == GAME_NETWORK_ERR_NONE)
-        {
-            directory_search_retries = 1;
-        }
-        else
-        {
-            directory_search_retries = 0;
-        }
-    }
-    
-    if(host)
-    {
+        gameNetworkState.hostInfo.hosting = 1;
+        
         // register game with directory server
+        // TODO: broken for now
         gameNetworkState.my_player_id = GAME_NETWORK_PLAYER_ID_HOST;
         if(server_name != gameNetworkState.hostInfo.name)
         {
-            strcpy(gameNetworkState.hostInfo.name, server_name);
+            strcpy(gameNetworkState.hostInfo.name, gameSettingGameTitle);
         }
         
         console_clear();
         console_write("Hosting game %s\non port %d\n",
-                       gameNetworkState.hostInfo.name,
-                       gameNetworkState.hostInfo.port);
+                      gameNetworkState.hostInfo.name,
+                      gameNetworkState.hostInfo.port);
         
         // add self to player list
         gameNetwork_getPlayerInfo(gameNetworkState.my_player_id, &playerInfo, 1);
         strcpy(playerInfo->name, gameNetworkState.my_player_name);
         
-        if(gameNetworkState.hostInfo.lan_only)
-        {
-            GameNetworkBonjourManagerHost(GAME_NETWORK_LAN_GAME_NAME, &gameNetworkState.hostInfo.socket.s);
-        }
+        callback_becamehost();
+        goto gameNetwork_connect_done;
+    }
+    
+    // if its an IP, treat as ip address
+    if(inet_pton(AF_INET, server_name, sockaddr_p) == 1)
+    {
+        directory_search_retries = bonjour_search_retries = 0;
+        gameNetworkState.hostInfo.hosting = 0;
+    }
+    else
+    {
+        // intially attempt to connect to game name, and start hosting one if not found
+        gameNetworkState.hostInfo.lan_only = 1;
+    }
+    
+    if(!gameNetworkState.hostInfo.lan_only &&
+       gameNetwork_getDNSAddress(gameNetworkState.gameDirectory.directory_name,
+                                 &gameNetworkState.gameDirectory.directory_address) == GAME_NETWORK_ERR_NONE)
+    {
+        directory_search_retries = 1;
+    }
+    else
+    {
+        directory_search_retries = 0;
+    }
+    
+    if(gameNetworkState.hostInfo.hosting)
+    {
+        
     }
     else
     {
@@ -548,13 +553,25 @@ gameNetwork_connect(char* server_name, int host)
                 
                 gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting1;
 
-                send_beacon(&gameAddress, GAME_NETWORK_LAN_GAME_NAME);
+                send_beacon(&gameAddress, server_name);
                 goto gameNetwork_connect_done;
             }
             else
             {
-                console_append("No local games found\n");
-                return GAME_NETWORK_ERR_FAIL;
+                console_write("No local games found named \"%s\" creating...\n", server_name);
+                
+                gameNetworkState.hostInfo.bonjour_lan = 1;
+                gameNetworkState.hostInfo.hosting = 1;
+                
+                // add self to player list
+                gameNetworkState.my_player_id = GAME_NETWORK_PLAYER_ID_HOST;
+                gameNetwork_getPlayerInfo(gameNetworkState.my_player_id, &playerInfo, 1);
+                strcpy(playerInfo->name, gameNetworkState.my_player_name);
+                GameNetworkBonjourManagerHost(server_name, &gameNetworkState.hostInfo.socket.s);
+                
+                callback_becamehost();
+                
+                goto gameNetwork_connect_done;
             }
         }
     
@@ -2723,9 +2740,10 @@ gameNetwork_sendStatsAlert()
     static int time_remaining_last = 1;
     int clear_stats = 0;
     const char* decor = "^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L\n";
-    char *rows[] = {"NAME ", "K^N   ", "D^M   ", "SHOTS", "PTS  ", "PING "};
+    char *rows[] = {"NAME ","", "K^N   ", "D^M   ", "SHOTS", "PTS  ", "PING "};
     char *cSep = "|";
     char *pRowTop = NULL;
+    static unsigned NAME_BREAK = 6;
     
     if(game_time_remaining() <= 0 && time_remaining_last > 0)
     {
@@ -2735,78 +2753,99 @@ gameNetwork_sendStatsAlert()
     time_remaining_last = game_time_remaining();
     
     str[0] = '\0';
-    strcat(str, "ALERT:\n");
+    strncat(str, "ALERT:\n", sizeof(str)-1);
     
-    strcat(str, decor);
+    strncat(str, decor, sizeof(str)-1);
     sprintf(tmp, "remaining time: %f\n", game_time_remaining());
-    strcat(str, tmp);
-    strcat(str, decor);
+    strncat(str, tmp, sizeof(str)-1);
+    strncat(str, decor, sizeof(str)-1);
     
     int row = 0;
     while(row < sizeof(rows)/sizeof(char*))
     {
+        int col = 0;
         pInfo = gameNetworkState.player_list_head.next;
         
         if(!pRowTop) pRowTop = str + strlen(str);
         
         char* pLastSep = pRowTop;
         
-        strcat(str, rows[row]);
+        strncat(str, rows[row], sizeof(str)-1);
         
         while(pInfo && strlen(str) < sizeof(str)-64)
         {
             while(row > 0 && *pLastSep && *pLastSep != cSep[0])
             {
-                strcat(str, " ");
+                strncat(str, " ", sizeof(str)-1);
                 pLastSep++;
             }
+            
             pLastSep++;
             
             switch(row)
             {
                 case 0:
-                    strcat(str, cSep);
-                    strcat(str, pInfo->name);
+                    strncat(str, cSep, sizeof(str)-1);
+                    strncat(str, pInfo->name, NAME_BREAK);
                     break;
                     
                 case 1:
-                    sprintf(tmp, "%d", pInfo->stats.killer);
-                    strcat(str, tmp);
-                    if(clear_stats) pInfo->stats.killer = 0;
+                    if(strlen(pInfo->name) > NAME_BREAK)
+                    {
+                        char* p = str+strlen(str), *rp = pInfo->name + NAME_BREAK;
+                        *p = ' ';
+                        p++;
+                        while(*(pLastSep) != cSep[0] && *(pLastSep) != '\n')
+                        {
+                            if(*rp != '\0') *p = *rp;
+                            else *p = ' ';
+                            p++;
+                            pLastSep++;
+                            rp++;
+                        }
+                        *p = '\0';
+                    }
                     break;
                     
                 case 2:
-                    sprintf(tmp, "%d", pInfo->stats.killed);
-                    strcat(str, tmp);
-                    if(clear_stats) pInfo->stats.killed = 0;
+                    sprintf(tmp, "%d", pInfo->stats.killer);
+                    strncat(str, tmp, sizeof(str)-1);
+                    if(clear_stats) pInfo->stats.killer = 0;
                     break;
                     
                 case 3:
-                    sprintf(tmp, "%d", pInfo->stats.shots_fired);
-                    strcat(str, tmp);
-                    if(clear_stats) pInfo->stats.shots_fired = 0;
+                    sprintf(tmp, "%d", pInfo->stats.killed);
+                    strncat(str, tmp, sizeof(str)-1);
+                    if(clear_stats) pInfo->stats.killed = 0;
                     break;
                     
                 case 4:
-                    sprintf(tmp, "%d", pInfo->stats.points);
-                    strcat(str, tmp);
-                    if(clear_stats) pInfo->stats.points = 0;
+                    sprintf(tmp, "%d", pInfo->stats.shots_fired);
+                    strncat(str, tmp, sizeof(str)-1);
+                    if(clear_stats) pInfo->stats.shots_fired = 0;
                     break;
                     
                 case 5:
+                    sprintf(tmp, "%d", pInfo->stats.points);
+                    strncat(str, tmp, sizeof(str)-1);
+                    if(clear_stats) pInfo->stats.points = 0;
+                    break;
+                    
+                case 6:
                     sprintf(tmp, "%.0f", pInfo->network_latency);
-                    strcat(str, tmp);
+                    strncat(str, tmp, sizeof(str)-1);
                     if(clear_stats) pInfo->stats.score_calculated = 0;
                     break;
             }
             
             pInfo = pInfo->next;
+            col++;
         }
-        strcat(str, "\n");
+        strncat(str, "\n", sizeof(str)-1);
         row++;
     }
     
-    strcat(str, decor);
+    strncat(str, decor, sizeof(str)-1);
     
     gameNetwork_alert(str);
     
@@ -3111,6 +3150,17 @@ int gameNetwork_onDirectorySearch(gameNetworkMessage* msg, gameNetworkAddress* s
         return 1;
     }
     return 0;
+}
+    
+void load_map_and_host_game()
+{
+    actions_menu_reset();
+    save_map = 0;
+    console_write("Hosting game: %s\nWaiting for guests...",
+                  gameNetworkState.hostInfo.name);
+    if(!game_map_custom_loaded) gameMapSetMap(initial_map_deathmatch);
+    
+    gameDialogStartNetworkGameWait();
 }
     
 #ifdef __cplusplus

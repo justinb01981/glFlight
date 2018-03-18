@@ -137,8 +137,6 @@ glFlightFrameStage1()
     int ship_durability = DURABILITY_PLAYER;
     float tc = 0;
     float spawn[6];
-    float lineA[3];
-    float lineB[3];
     static int gameDialogCalibrateDone = 0;
     
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -444,23 +442,6 @@ calibrate_bail:
             targetingReticleElem.texture_id = TEXTURE_ID_CONTROLS_FIRE;
             targetingReticleElem.scale = 2;
             
-            // update elems used in drawLines
-            if(pWorldElemMyShip->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID)
-            {
-                WorldElemListNode *pNodeTowed = world_elem_list_find(pWorldElemMyShip->stuff.towed_elem_id, &gWorld->elements_moving);
-                if(pNodeTowed)
-                {
-                    int idx = 0;
-                    lineA[idx++] = my_ship_x;
-                    lineA[idx++] = my_ship_y;
-                    lineA[idx++] = my_ship_z;
-                    idx = 0;
-                    lineB[idx++] = pNodeTowed->elem->physics.ptr->x;
-                    lineB[idx++] = pNodeTowed->elem->physics.ptr->y;
-                    lineB[idx++] = pNodeTowed->elem->physics.ptr->z;
-                }
-            }
-            
             sprintf(statsMessage, "^C:%.0f ^B:%.0f ^A:%.0f "
                     //"CP:%d/%d Trt:%d Ally:%d "
                     "Score:%d Time:%d %s",
@@ -745,13 +726,6 @@ calibrate_bail:
     drawBillboard(&targetingReticleElem);
     
     drawLineBegin();
-    
-    if((lineA[0] - lineB[0]) + (lineA[1] - lineB[1]) - (lineA[2] - lineB[2]) != 0)
-    {
-        float lineColor[] = {1.0, 0.5, 0.0};
-        
-        drawLineWithColorAndWidth(lineA, lineB, lineColor, 2.0);
-    }
     
     // draw world-defined lines
     WorldElemListNode* lineCur = gWorld->drawline_list_head.next;

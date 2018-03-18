@@ -19,8 +19,9 @@
 
 - (void) startServer:(const char*)name;
 - (void) stopServer;
-- (int) connectToServer:(const char*) name;
+- (int) connectToServer:(NSNetService*) service;
 - (int) browse;
+- (void) browseEnd;
 - (void) disconnectPeers;
 - (void) sendPeer:(gameNetworkMessage*) msg peer:(int)peer_id;
 
