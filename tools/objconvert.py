@@ -8,7 +8,7 @@ Anormals = []
 Afaces = []
 
 vcam = [1, 1, 1]
-mname = 'sphere'
+mname = 'object'
 
 def vCross(a, b):
     return [
@@ -89,9 +89,9 @@ while 1:
       uvN = vCross(u, v)
       vuN = vCross(v, u)
 
-      print '// u='+str(u)
-      print '// v='+str(v)
-      print '// uvN='+str(uvN[0])+str(uvN[1]) + str(uvN[2])
+      print('// u='+str(u))
+      print('// v='+str(v))
+      print('// uvN='+str(uvN[0])+str(uvN[1]) + str(uvN[2]))
       triangles -= 1
 
     ## calculate face normal
@@ -102,7 +102,7 @@ while 1:
             nA[d] += ((Acoords[face[k]*3+d] - Acoords[face[k-1]*3+d]) * 0.5)
     nA = [nA[0], nA[1], nA[2]]
 
-    print '// normal=' + str(nA[0]) + ' ' + str(nA[1]) + ' ' + str(nA[2])
+    print ('// normal=' + str(nA[0]) + ' ' + str(nA[1]) + ' ' + str(nA[2]))
 
     ## face U, V cross product coliniear with normal?
 
@@ -123,34 +123,34 @@ while 1:
     #    Afaces += [face[2], face[1], face[0]]
 
   else:
-    print '// ignoring line ' + tok[0]
+    print ('// ignoring line ' + tok[0])
 
 ## print model coordinates
-print 'static model_coord_t model_' + mname + '_coords[] = {'
+print ('static model_coord_t model_' + mname + '_coords[] = {')
 idx = 0
 c = Acoords
 while idx < len(c):
   eol = ',' if idx+3 < len(c) else ''
-  print str(c[idx]) + ', ' + str(c[idx+1]) + ', ' + str(c[idx+2]) + eol
+  print (str(c[idx]) + ', ' + str(c[idx+1]) + ', ' + str(c[idx+2]) + eol)
   idx += 3
-print '};'
+print ('};')
 
 ## print model texture coordinates
-print 'static model_texcoord_t model_' + mname + '_texcoords[] = {'
+print ('static model_texcoord_t model_' + mname + '_texcoords[] = {')
 idx = 0
 c = AtcoordsOrdered
 while idx < len(c):
   eol = ',' if idx+2 < len(c) else ''
-  print str(c[idx]) + ', ' + str(c[idx+1]) + eol
+  print (str(c[idx]) + ', ' + str(c[idx+1]) + eol)
   idx += 2
-print '};'
+print ('};')
 
 ## print model face indices
-print 'static model_index_t model_' + mname + '_indices[] = {'
+print ('static model_index_t model_' + mname + '_indices[] = {')
 idx = 0
 c = Afaces
 while idx < len(c):
   eol = ',' if idx+3 < len(c) else ''
-  print str(c[idx]) + ', ' + str(c[idx+1]) + ', ' + str(c[idx+2]) + eol
+  print (str(c[idx]) + ', ' + str(c[idx+1]) + ', ' + str(c[idx+2]) + eol)
   idx += 3
-print '};'
+print ('};')
