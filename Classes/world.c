@@ -334,7 +334,7 @@ world_add_object_core(Model type,
             model_sizeof = sizeof(model_sphere_coords);
             model_indices = model_sphere_indices;
             model_indices_sizeof = sizeof(model_sphere_indices);
-            model_texcoords = model_sphere_texcoords;
+            model_texcoords = model_blendship_texcoords;
             model_texcoords_sizeof = sizeof(model_sphere_texcoords);
             model_primitives_sizeof = sizeof(model_sphere_primitives);
             model_primitives = model_sphere_primitives;

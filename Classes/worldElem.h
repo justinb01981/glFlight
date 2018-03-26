@@ -160,9 +160,9 @@ struct WorldElem {
                 int last_state;
                 game_timeval_t time_last_run, time_last_bullet, time_last_trail, time_next_decision, time_last_deploy, time_target_acquired, time_run_interval;
                 int target_id;
-                float spawn_x, spawn_y, spawn_z;
+                float vthrust[3];
                 float tgt_x, tgt_y, tgt_z;
-                float max_speed;
+                float speed, max_speed;
                 float max_turn, rate_pitch, rate_yaw;
                 float run_distance, pursue_distance, scan_distance;
                 float intelligence;

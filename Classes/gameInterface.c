@@ -257,6 +257,8 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.consoleHidden = 0;
     
     gameInterfaceControls.touchCount = 0;
+    
+    memset(&gameInterfaceControls.dialogRectQueued, 0, sizeof(gameInterfaceControls.dialogRectQueued));
 }
 
 void

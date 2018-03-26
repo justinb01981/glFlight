@@ -37,7 +37,7 @@ gameAIState_t gameAIState;
 
 
 static float
-pursuit_speed_for_object(WorldElem* elem, float* accel);
+pursuit_speed_for_object(WorldElem* elem);
 
 void
 ai_debug(char* msg, WorldElem* elem, float f)
@@ -376,6 +376,10 @@ game_ai_run()
         }
         
     game_ai_run_skip_ai:
+        if(pCur->elem->stuff.intelligent && !pCur->elem->stuff.u.enemy.fixed)
+        {
+            update_object_velocity_with_friction(pCur->elem->elem_id, pCur->elem->stuff.u.enemy.vthrust, C_THRUST, C_FRICTION);
+        }
         
         pCur = pNext;
     }
@@ -394,7 +398,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     Object targetElemType = OBJ_UNKNOWN;
     float zdot_ikillyou = 0.5;
     float zdot_juke = 0.3;
-    float direction = 1.0;
     
     //if(time_ms - elem->stuff.u.enemy.time_last_run < elem->stuff.u.enemy.time_run_interval) return;
     
@@ -570,16 +573,12 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     // rate at which enemy rotates
     float turn_r = (elem->stuff.u.enemy.max_turn / 4) * tc;
     
-    // rate at which object accelerates
-    float accel = 0;
-    
-    // HACK
-    float vdesired = pursuit_speed_for_object(elem, &accel);
+    float vdesired = pursuit_speed_for_object(elem);
     
     if(vdesired < MAX_SPEED) ai_debug("vdesired:", elem, vdesired);
     
     // accel/decel
-    float v = vcur > vdesired? 0.1: accel;
+    float v = vcur > vdesired? 0.1: vdesired;
     
     dist = sqrt(ax*ax + ay*ay + az*az);
     
@@ -641,7 +640,10 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             -zq.z * v
         };
         
-        update_object_velocity(elem->elem_id, tv[0], tv[1], tv[2], direction * 1.0);
+        elem->stuff.u.enemy.speed = v;
+        for(int i = 0; i < 3; i++) elem->stuff.u.enemy.vthrust[i] = tv[i];
+        
+        //update_object_velocity_with_friction(elem->elem_id, tv, C_THRUST, C_FRICTION);
     }
     else
     {
@@ -787,7 +789,7 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
 }
 
 static float
-pursuit_speed_for_object(WorldElem* elem, float* accel)
+pursuit_speed_for_object(WorldElem* elem)
 {
     float v = 0;
     float s = 1.0;
@@ -799,7 +801,6 @@ pursuit_speed_for_object(WorldElem* elem, float* accel)
         case OBJ_MISSLE:
             v = elem->stuff.u.enemy.max_speed;
             s = 2.0;
-            *accel = 3;
             break;
             
         default:
@@ -810,7 +811,6 @@ pursuit_speed_for_object(WorldElem* elem, float* accel)
                  elem->stuff.u.enemy.max_speed:
                     // pursue
                  elem->stuff.u.enemy.max_speed;
-            *accel = 2;
             break;
     }
     

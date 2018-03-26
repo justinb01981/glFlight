@@ -23,6 +23,9 @@ struct gameDialogStateStruct
     char gameDialogPortalToGameLast[255];
     int networkGameNameEntered;
     int hideNetworkStatus;
+    
+    char displayStringBuf[1024][16];
+    int displayStringCount;
 };
 
 extern struct gameDialogStateStruct gameDialogState;
@@ -490,22 +493,19 @@ gameDialogNetworkGameStatus()
     gameInterfaceModalDialog(gameNetworkState.gameStatsMessage, "OK", "OK", gameDialogStopGameStatusMessages, gameDialogStopGameStatusMessages);
 }
 
-static char gameDialogDisplayStringStr[16][1024];
-static int gameDialogDisplayString_n = 0;
-
 static void gameDialogCancelString();
 
 static void
 gameDialogDisplayString(char *str)
 {
-    if(gameDialogDisplayString_n > 15) return;
+    if(gameDialogState.displayStringCount > 15) return;
     
-    strcpy(gameDialogDisplayStringStr[gameDialogDisplayString_n], str);
-    gameDialogDisplayString_n++;
+    strcpy(gameDialogState.displayStringBuf[gameDialogState.displayStringCount], str);
+    gameDialogState.displayStringCount++;
     
-    if(gameDialogDisplayString_n == 1)
+    if(gameDialogState.displayStringCount == 1)
     {
-        gameInterfaceModalDialog(gameDialogDisplayStringStr[gameDialogDisplayString_n-1], "OK", "",
+        gameInterfaceModalDialog(gameDialogState.displayStringBuf[0], "OK", "",
                                  gameDialogCancelString, gameDialogCancelString);
     }
 }
@@ -513,11 +513,11 @@ gameDialogDisplayString(char *str)
 static void
 gameDialogCancelString()
 {
-    gameDialogDisplayString_n--;
-    if(gameDialogDisplayString_n >= 1)
+    if(gameDialogState.displayStringCount > 0) gameDialogState.displayStringCount--;
+    
+    if(gameDialogState.displayStringCount > 0)
     {
-        gameInterfaceModalDialog(gameDialogDisplayStringStr[gameDialogDisplayString_n],
-                                 "OK", "OK",
+        gameInterfaceModalDialog(gameDialogState.displayStringBuf[gameDialogState.displayStringCount-1], "OK", "",
                                  gameDialogCancelString, gameDialogCancelString);
     }
 }
