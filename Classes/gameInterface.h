@@ -28,6 +28,7 @@ typedef struct
     char *textDest;
     int *textDestInt;
     int modal:1, text_align_topleft:1;
+    void *pnext;
     
     struct {
         void (*dialogRectActionLeft)(void);
@@ -56,7 +57,6 @@ typedef struct {
     controlRect graphicDialog;
     controlRect graphicDialogHelp;
     controlRect dialogRect;
-    controlRect dialogRectQueued;
     controlRect consoleTextRect;
     controlRect statsTextRect;
     controlRect keyboardEntry;
@@ -119,10 +119,13 @@ void
 gameInterfaceModalDialog(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void));
 
 void
-gameInterfaceModalDialogWithRect(char* msg, char *buttonLeft, char *buttonRight,
-                                 void (*cbLeft)(void), void (*cbRight)(void),
-                                 controlRect* overrideRect,
-                                 unsigned long life_frames);
+gameInterfaceModalDialogEnqueue(char* msg, char *buttonLeft, char *buttonRight,
+                                void (*cbLeft)(void), void (*cbRight)(void),
+                                controlRect* overrideRect,
+                                unsigned long life_frames);
+
+void
+gameInterfaceModalDialogDequeue();
 
 static controlRect**
 gameInterfaceGetControlArray()

@@ -558,7 +558,7 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
             }
             else
             {
-                console_write("No local games found named \"%s\" creating...\n", server_name);
+                console_write("\nNo local games found named \"%s\" creating...\n", server_name);
                 
                 gameNetworkState.hostInfo.bonjour_lan = 1;
                 gameNetworkState.hostInfo.hosting = 1;

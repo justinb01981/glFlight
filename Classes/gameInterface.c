@@ -257,8 +257,6 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.consoleHidden = 0;
     
     gameInterfaceControls.touchCount = 0;
-    
-    memset(&gameInterfaceControls.dialogRectQueued, 0, sizeof(gameInterfaceControls.dialogRectQueued));
 }
 
 void
@@ -590,8 +588,7 @@ gameInterfaceHandleTouchBegin(float x, float y)
             if(gameInterfaceControls.dialogRect.d.dialogRectActionRight) gameInterfaceControls.dialogRect.d.dialogRectActionRight();
         }
         
-        gameInterfaceControls.dialogRect = gameInterfaceControls.dialogRectQueued;
-        memset(&gameInterfaceControls.dialogRectQueued, 0, sizeof(gameInterfaceControls.dialogRectQueued));
+        gameInterfaceModalDialogDequeue();
     }
     
     if(touchedControl == &gameInterfaceControls.fireRectBoost)
@@ -1022,40 +1019,58 @@ gameInterfaceHandleAllTouchEnd()
 }
 
 void
-gameInterfaceModalDialogWithRect(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void),
+gameInterfaceModalDialogEnqueue(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void),
                          controlRect* overrideRect, unsigned long life_frames)
 {
-    if(gameInterfaceControls.dialogRectQueued.visible)
-    {
-        printf("too many dialogs, ignoring\n");
-        return;
-    }
-    
-    gameInterfaceControls.dialogRectQueued = gameInterfaceControls.dialogRect;
+    controlRect *pcur;
+    controlRect *pdialog = (controlRect*) malloc(sizeof(controlRect));
+    if(!pdialog) return;
     
     gameInterfaceControls.dialogLifeFrames = life_frames;
     
-    gameInterfaceControls.dialogRect = *overrideRect;
+    *pdialog = *overrideRect;
+    pdialog->pnext = NULL;
     
-    sprintf(gameInterfaceControls.dialogRect.text,
+    sprintf(pdialog->text,
             "%s",
             msg? msg: "");
-    sprintf(gameInterfaceControls.dialogRect.textLeft,
+    sprintf(pdialog->textLeft,
             "%s",
             buttonLeft? buttonLeft: "");
-    sprintf(gameInterfaceControls.dialogRect.textRight,
+    sprintf(pdialog->textRight,
             "%s",
             buttonRight? buttonRight: "");
-    gameInterfaceControls.dialogRect.d.dialogRectActionLeft = cbLeft;
-    gameInterfaceControls.dialogRect.d.dialogRectActionRight = cbRight;
-    gameInterfaceControls.dialogRect.visible = 1;
-    gameInterfaceControls.dialogRect.modal = 1;
+    pdialog->d.dialogRectActionLeft = cbLeft;
+    pdialog->d.dialogRectActionRight = cbRight;
+    pdialog->visible = 1;
+    pdialog->modal = 1;
+    
+    pcur = &gameInterfaceControls.dialogRect;
+    while(pcur->pnext) pcur = pcur->pnext;
+    
+    pcur->pnext = pdialog;
+    
+    gameInterfaceModalDialogDequeue();
+}
+
+void
+gameInterfaceModalDialogDequeue()
+{
+    if(gameInterfaceControls.dialogRect.visible) return;
+    
+    // dequeue next dialog
+    controlRect* pqueued = gameInterfaceControls.dialogRect.pnext;
+    if(pqueued)
+    {
+        gameInterfaceControls.dialogRect = *pqueued;
+        free(pqueued);
+    }
 }
 
 void
 gameInterfaceModalDialog(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void))
 {
-    gameInterfaceModalDialogWithRect(msg, buttonLeft, buttonRight, cbLeft, cbRight, &gameInterfaceControls.dialogRectDefault, 999999);
+    gameInterfaceModalDialogEnqueue(msg, buttonLeft, buttonRight, cbLeft, cbRight, &gameInterfaceControls.dialogRectDefault, 999999);
 }
 
 void

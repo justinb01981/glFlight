@@ -105,8 +105,6 @@ void glFlightInit(gl_flightViewController* viewController)
                   [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]UTF8String]);
     
     gameInterfaceInit(viewWidth, viewHeight);
-        
-    gameDialogLoading();
 }
 
 void glFlightResume(time_t time_last_suspend)

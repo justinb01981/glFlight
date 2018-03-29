@@ -222,21 +222,6 @@ gameDialogCancelTrim()
 }
 
 static void
-gameDialogLoading()
-{
-    gameInterfaceModalDialog(
-                             "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
-                             "^C                             ^C\n"
-                             "^C                             ^C\n"
-                             "^C        Loading....          ^C\n"
-                             "^C                             ^C\n"
-                             "^C                             ^C\n"
-                             "^C                             ^C\n"
-                             "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
-                             "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
-}
-
-static void
 gameDialogCalibrate()
 {
     gameInputInit();
@@ -255,6 +240,8 @@ gameDialogCalibrate()
 static void
 gameDialogCalibrateBegin()
 {
+    console_clear();
+    
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
                              "^C                             ^C\n"
@@ -556,7 +543,7 @@ gameDialogScorePopup(char *scoreStr)
     r.ym = 0;
     r.tex_id = 4;
     
-    gameInterfaceModalDialogWithRect(scoreStr, "", "", gameDialogCancelString, gameDialogCancelString, &r, GAME_FRAME_RATE * 2.0);
+    gameInterfaceModalDialogEnqueue(scoreStr, "", "", gameDialogCancelString, gameDialogCancelString, &r, GAME_FRAME_RATE * 2.0);
     r.tex_id = TEXTURE_ID_CONTROLS_POPUPOVER_DIALOG_BOX;
     gameInterfaceControls.dialogRect.modal = 0;
 }
@@ -578,7 +565,7 @@ gameDialogMessagePopup(char *str)
     r.ym = 0;
     r.tex_id = 4;
     
-    gameInterfaceModalDialogWithRect(str, "", "", gameDialogCancelString, gameDialogCancelString, &r, GAME_FRAME_RATE * 2.0);
+    gameInterfaceModalDialogEnqueue(str, "", "", gameDialogCancelString, gameDialogCancelString, &r, GAME_FRAME_RATE * 2.0);
     r.tex_id = TEXTURE_ID_CONTROLS_POPUPOVER_DIALOG_BOX;
     gameInterfaceControls.dialogRect.modal = 0;
 }
