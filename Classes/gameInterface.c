@@ -489,7 +489,7 @@ gameInterfaceHandleTouchBegin(float x, float y)
                     {'q','w','e','r','t','y','u','i','o','p'},
                     {'a','s','d','f','g','h','j','k','l','@'},
                     {':','z','x','c','v','b','n','m',',','.'},
-                    {'D',' ',' ',' ',' ',' ',' ',' ',' ','\n'}
+                    {'D','D',' ',' ',' ',' ',' ',' ',' ','\n'}
                 };
                 
                 char key = KB[(int)roundf(row)][(int)roundf(col)];

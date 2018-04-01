@@ -88,7 +88,7 @@ extern int fireActionQueuedAfterEdit;
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "1.0.8.0_core";
+const static char* GAME_VERSION_STR = "1.0.12.0_core";
 
 const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2.5);
 const static float SPEED_BOOST_FRAMES = 60 * 5;
