@@ -266,6 +266,12 @@ typedef struct
 
 extern gameNetworkState_t gameNetworkState;
 
+static void
+gameNetwork_init_mem()
+{
+    gameNetworkState.inited = 0;
+}
+
 gameNetworkError
 gameNetwork_init(int broadcast_mode,
                  const char* server_name,

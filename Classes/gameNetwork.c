@@ -51,7 +51,6 @@ gameNetworkState_t gameNetworkState;
 
 static unsigned long update_frequency_ms = 20;
 static unsigned long update_time_last = 0;
-static int gameNetwork_inited = 0;
 const static float euler_interp_range_max = (M_PI/8);
 const static float velo_interp_update_mult = 8;
 const static char *map_eom = "\nmap_eom\n";
@@ -210,7 +209,7 @@ static void
 send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
 {
     struct sockaddr_in6 sa;
-    long r;
+    ssize_t r;
     
     memcpy(&sa, address->storage, address->len);
     
@@ -220,8 +219,13 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
         return;
     }
     
+    errno = 0;
     r = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg),
                0, (struct sockaddr*) &sa, address->len);
+    if(r < 0)
+    {
+        printf("sendto: %ld - errno:%s\n", r, strerror(errno));
+    }
 }
     
 static unsigned long strcksum(const char* str)
@@ -331,12 +335,14 @@ static int
 gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
 {
     char buf[128];
-    struct sockaddr_in6 *addr6 = (void*) addr->storage;
+    struct sockaddr_in6 addr6;
     
     // find directory server
     struct hostent* he = gethostbyname(name);
     if(he && he->h_length > 0)
     {
+        memset(addr->storage, 0, sizeof(addr->storage));
+        
         addr->len = sizeof(struct sockaddr_in);
         struct sockaddr_in* sa = (struct sockaddr_in*) addr->storage;
         sa->sin_family = AF_INET;
@@ -350,15 +356,18 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
         
         // convert to ipv6
         sprintf(buf, "::FFFF:%s", inet_ntoa(sa->sin_addr));
+        memset(addr->storage, 0, sizeof(addr->storage));
+        addr->len = 0;
         
-        if(inet_pton(AF_INET6, buf, &addr6->sin6_addr) == 1)
+        if(inet_pton(AF_INET6, buf, &addr6.sin6_addr) == 1)
         {
-            addr6->sin6_port = htons(gameNetworkState.hostInfo.port);
-            addr6->sin6_family = AF_INET6;
+            addr6.sin6_port = htons(gameNetworkState.hostInfo.port);
+            addr6.sin6_family = AF_INET6;
 #ifdef BSD_SOCKETS
-            addr6->sin6_len = addr->len;
+            addr6.sin6_len = sizeof(struct sockaddr_in6);
 #endif
             addr->len = sizeof(struct sockaddr_in6);
+            memcpy(addr->storage, &addr6, sizeof(addr6));
             return GAME_NETWORK_ERR_NONE;
         }
     }
@@ -394,6 +403,11 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
 {
     const char *directory_name = "d0gf1ght.domain17.net";
     
+    if(gameNetworkState.inited)
+    {
+        gameNetwork_disconnect();
+    }
+    
     update_frequency_ms = update_ms;
     
     memset(&gameNetworkState, 0, sizeof(gameNetworkState));
@@ -414,16 +428,11 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
     {
         inet_pton(AF_INET6, local_inet_addr, &(GAME_NETWORK_ADDRESS_INADDR(&gameNetworkState.hostInfo.local_inet_addr)));
     }
-    
-    if(!gameNetwork_inited)
-    {
-        gameNetwork_inited = 1;
         
-        gameNetworkState.hostInfo.socket.s = -1;
-        gameNetworkState.hostInfo.map_socket.s = -1;
-        gameNetworkState.hostInfo.stream_socket.s = -1;
-        gameNetworkState.hostInfo.map_socket_sending.s = -1;
-    }
+    gameNetworkState.hostInfo.socket.s = -1;
+    gameNetworkState.hostInfo.map_socket.s = -1;
+    gameNetworkState.hostInfo.stream_socket.s = -1;
+    gameNetworkState.hostInfo.map_socket_sending.s = -1;
     
     gameNetworkState.inited = 1;
     
@@ -478,8 +487,6 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
         directory_search_retries = bonjour_search_retries = 0;
         gameNetworkState.hostInfo.hosting = 1;
         
-        // register game with directory server
-        // TODO: broken for now
         gameNetworkState.my_player_id = GAME_NETWORK_PLAYER_ID_HOST;
         if(server_name != gameNetworkState.hostInfo.name)
         {
@@ -496,7 +503,7 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
         strcpy(playerInfo->name, gameNetworkState.my_player_name);
         
         callback_becamehost();
-        goto gameNetwork_connect_done;
+        goto gameNetwork_wan_register;
     }
     
     // if its an IP, treat as ip address
@@ -511,11 +518,14 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
         gameNetworkState.hostInfo.lan_only = 1;
     }
     
+    // register game with directory server if wan game
+gameNetwork_wan_register:
     if(!gameNetworkState.hostInfo.lan_only &&
        gameNetwork_getDNSAddress(gameNetworkState.gameDirectory.directory_name,
                                  &gameNetworkState.gameDirectory.directory_address) == GAME_NETWORK_ERR_NONE)
     {
         directory_search_retries = 1;
+        send_beacon(&gameNetworkState.gameDirectory.directory_address, gameNetworkState.hostInfo.name);
     }
     else
     {
@@ -524,7 +534,7 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
     
     if(gameNetworkState.hostInfo.hosting)
     {
-        
+
     }
     else
     {
@@ -872,13 +882,15 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
         memset(msg, 0, sizeof(*msg));
         
         from_addr_len = sizeof(from_addr);
+        errno = 0;
         r = (int) recvfrom(*pSock,
                      (void*) msg, sizeof(*msg),
                      0, (struct sockaddr*) &from_addr, &from_addr_len);
         if(r <= 0)
         {
-            close(*pSock);
-            *pSock = -1;
+            printf("recvfrom: %ld errno:%s\n", r, strerror(errno));
+            //close(*pSock);
+            //*pSock = -1;
             return GAME_NETWORK_ERR_FAIL;
         }
         

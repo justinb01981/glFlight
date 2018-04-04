@@ -84,6 +84,7 @@ void glFlightInit(gl_flightViewController* viewController)
     gameMapFilePrefix((char*) [docsPrefix UTF8String]);
     gameMapFileName("temp");
     
+    gameNetwork_init_mem();
     gameNetwork_init(0, gameSettingGameTitle, gameSettingsPlayerName, gameSettingsNetworkFrequency,
                      gameSettingsPortNumber, gameSettingsLocalIPOverride);
     
