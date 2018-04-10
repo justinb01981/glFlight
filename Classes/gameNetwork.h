@@ -26,7 +26,7 @@
 #define GAME_NETWORK_ADDRESS_PORT(x) (((struct sockaddr_in6*) (x)->storage)->sin6_port)
 #define GAME_NETWORK_ADDRESS_LEN_CORRECT(x) ((x)->len == sizeof(struct sockaddr_in6))
 #define GAME_NETWORK_BONJOUR_ADDRFAMILY_HACK 0x09
-#define GAME_NETWORK_MAP_REQUEST_BLOCK_LEN (GAME_NETWORK_MAX_STRING_LEN * 32)
+#define GAME_NETWORK_MAP_REQUEST_WINDOW_LEN (GAME_NETWORK_MAX_MAP_STRING_LEN * 1)
 
 //const static char *GAME_NETWORK_LAN_GAME_NAME = "d0gf1ght_lan";
 
@@ -116,7 +116,6 @@ typedef struct
         
         struct {
             unsigned long offset;
-            unsigned short block_len;
             char s[GAME_NETWORK_MAX_MAP_STRING_LEN];
         } mapData;
         
@@ -157,7 +156,7 @@ struct gameNetworkPlayerInfo
     game_timeval_t time_status_last;
     game_timeval_t time_cube_pooped_last;
     game_timeval_t euler_last_interp;
-    char* map_data, *map_data_ptr;
+    char* map_data;
     
     struct
     {
@@ -202,7 +201,6 @@ typedef struct
     struct
     {
         int hosting;
-        int lan_only;
         int bonjour_lan;
         char name[GAME_NETWORK_MAX_STRING_LEN];
         gameNetworkSocket socket;
@@ -222,7 +220,6 @@ typedef struct
     gameNetworkSocket server_socket;
     
     char *server_map_data, *server_map_data_end;
-    unsigned long map_request_offset;
     
     int inited;
     int connected;

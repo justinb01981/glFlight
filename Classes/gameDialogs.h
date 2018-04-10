@@ -35,6 +35,7 @@ extern int gameDialogCounter;
 static void
 gameDialogCancel(void)
 {
+    fireActionQueuedAfterEdit = ACTION_INVALID;
 }
 
 static void
@@ -313,6 +314,58 @@ gameDialogBrowseGames()
     gameInterfaceModalDialog("Enter node to connect...", "OK", "", gameDialogCancel, gameDialogCancel);
 }
 
+static void
+gameDialogBrowseGamesCountdown()
+{
+    static int passes = 120;
+    passes--;
+    if(passes <= 0)
+    {
+        extern void gameInterfaceGameSearchTimedOut();
+        extern void load_map_and_host_game();
+        
+        if(gameNetworkState.hostInfo.bonjour_lan)
+        {
+            if(gameNetwork_connect(gameSettingGameTitle, load_map_and_host_game) == GAME_NETWORK_ERR_NONE)
+            {
+            }
+            else
+            {
+                console_write("Connection failed to %s", gameSettingGameTitle);
+            }
+        }
+        else
+        if(!gameNetworkState.map_downloaded)
+        {
+            gameInterfaceGameSearchTimedOut();
+            strcpy(gameSettingGameTitle, "host");
+            if(gameNetwork_connect(gameSettingGameTitle, load_map_and_host_game) == GAME_NETWORK_ERR_NONE)
+            {
+            }
+            else
+            {
+                console_write("Connection failed to %s", gameSettingGameTitle);
+            }
+        }
+        
+        glFlightDrawframeHook = NULL;
+        passes = 120;
+    }
+}
+
+static void
+gameDialogMuteCountdown()
+{
+    static int passes = 8;
+    passes--;
+    if(passes <= 0)
+    {
+        gameInterfaceModalDialogDequeue();
+        glFlightDrawframeHook = NULL;
+        passes = 8;
+    }
+}
+
 //static void gameDialogLanConnect()
 //{
 //    gameDialogCancel();
@@ -435,30 +488,43 @@ gameDialogStartNetworkGameNewMap()
 //}
 
 static void
-gameDialogEnterGameNameDone()
+gameDialogEnterGameNameDoneInternet()
 {
     gameDialogClose();
-    fireActionQueuedAfterEdit = ACTION_HOST_GAME;
-    fireAction = ACTION_HOST_GAME;
     gameInterfaceProcessAction();
 }
 
 static void
-gameDialogEnterGameName()
+gameDialogEnterGameNameDoneLan()
+{
+    gameDialogClose();
+    fireAction = ACTION_HOST_GAME_LAN;
+    gameInterfaceProcessAction();
+}
+
+static void
+gameDialogEnterGameName(int action)
 {
     const char* msg = ""
-    "Local Game:\n"
-    "* enter same \"game name\" as\n"
-    "  your guests\n"
-    "* first person hosts\n"
-    "Internet Game:\n"
-    "* host - leave this blank\n"
-    "  (or type \"host\")\n"
-    "* guest - enter IP address of\n"
-    "  your host (see the help)\n"
-    "* read help for firewall port config\n"
+    "^D^D^Dmultiplayer howto^D^D^D\n"
+    "^D^D^Don the next screen^D^D^D\n"
+    "^Blocal games:\n"
+    "^A to host - enter any room-name\n"
+    "^A guest - enter host room-name\n"
+    "^Binternet games:\n"
+    "^A to host - blank room-name \n"
+    "^A guest - enter d0gf1ght.domain17.net\n"
+    "  or IP address of host\n"
     ;
-    gameInterfaceModalDialog(msg, "OK", "OK", gameDialogEnterGameNameDone, gameDialogCancel);
+    fireActionQueuedAfterEdit = action;
+    if(action == ACTION_HOST_GAME_LAN)
+    {
+        gameInterfaceModalDialog(msg, "OK", "OK", gameDialogEnterGameNameDoneLan, gameDialogCancel);
+    }
+    else
+    {
+        gameInterfaceModalDialog(msg, "OK", "OK", gameDialogEnterGameNameDoneInternet, gameDialogCancel);
+    }
 }
 
 static void

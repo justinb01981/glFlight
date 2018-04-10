@@ -27,6 +27,7 @@
 #include "gameDialogs.h"
 
 extern void appWriteSettings();
+extern void GameNetworkBonjourManagerBrowseBegin();
 
 int texture_id_block = TEXTURE_ID_BLOCK;
 
@@ -366,7 +367,6 @@ gameInterfaceHandleTouchMove(float x, float y)
     else if(touchedControl == &gameInterfaceControls.action)
     {
         gameInterfaceControls.textMenuControl.visible = !gameInterfaceControls.textMenuControl.visible;
-        //gameInterfaceControls.consoleHidden = gameInterfaceControls.textMenuControl.visible;
     }
     else if(touchedControl == &gameInterfaceControls.menuControl)
     {
@@ -588,7 +588,7 @@ gameInterfaceHandleTouchBegin(float x, float y)
             if(gameInterfaceControls.dialogRect.d.dialogRectActionRight) gameInterfaceControls.dialogRect.d.dialogRectActionRight();
         }
         
-        gameInterfaceModalDialogDequeue();
+        glFlightDrawframeHook = gameDialogMuteCountdown;
     }
     
     if(touchedControl == &gameInterfaceControls.fireRectBoost)
@@ -614,11 +614,69 @@ gameInterfaceHandleTouchBegin(float x, float y)
     gameInterfaceControls.touchCount++;
 }
 
+void
+gameInterfaceGameSearchTimedOut()
+{
+    console_write("no game named \"%s\" was found\ncreating/hosting \"%s\"", gameSettingGameTitle, gameSettingGameTitle);
+    gameNetwork_disconnect();
+}
+
+static int
+gameInterfaceMultiplayerConfigure(int action)
+{
+    switch(gameDialogState.networkGameNameEntered)
+    {
+            // pop dialog
+        case 0:
+            gameDialogState.networkGameNameEntered++;
+            gameDialogEnterGameName(action);
+            return 0;
+            
+            // dialog closed - pop keyboard
+        case 1:
+            if(action == ACTION_CONNECT_TO_GAME)
+            {
+                sprintf(gameSettingGameTitle, "d0gf1ght.domain17.net");
+            }
+            
+            gameNetwork_disconnect();
+            gameDialogState.networkGameNameEntered++;
+            
+            fireActionQueuedAfterEdit = action;
+            fireAction = ACTION_SETTING_GAME_NAME;
+            gameInterfaceProcessAction();
+            return 0;
+            
+            // ready to connect - clean up
+        case 2:
+            if(action == ACTION_HOST_GAME_LAN)
+            {
+                gameNetworkState.hostInfo.bonjour_lan = 1;
+                GameNetworkBonjourManagerBrowseBegin();
+            }
+            else
+            {
+                gameNetwork_connect(gameSettingGameTitle, gameInterfaceGameSearchTimedOut);
+            }
+            
+            gameDialogState.networkGameNameEntered = 0;
+            gameDialogClose();
+            return 1;
+            
+        default:
+            return 0;
+    }
+}
+
 void gameInterfaceProcessAction()
 {
     char *mapBuffer = NULL;
-    const char* pGameConnectName = gameSettingGameTitle;
     char strTmp[256];
+    
+    if(fireAction > ACTION_HOST_GAME_LAN && fireAction <= ACTION_CONNECT_TO_GAME)
+    {
+        gameNetworkState.hostInfo.bonjour_lan = 0;
+    }
 
     switch(fireAction)
     {
@@ -653,46 +711,19 @@ void gameInterfaceProcessAction()
             break;
         
         case ACTION_NETWORK_MULTIPLAYER_MENU:
+            actions_menu_set(ACTION_HOST_GAME_LAN);
+            break;
+        
         case ACTION_HOST_GAME_LAN:
         case ACTION_CONNECT_TO_GAME:
         case ACTION_HOST_GAME:
         {
-            char* gameName = gameSettingGameTitle;
-            
-            if(gameDialogState.networkGameNameEntered == 1)
+            if(gameInterfaceMultiplayerConfigure(fireAction))
             {
-                gameNetwork_disconnect();
-                gameDialogState.networkGameNameEntered++;
-                console_clear();
-                console_write("Enter the \"gameID\":\n");
-                console_append("or IP address to join an internet game");
-                {
-                    extern void GameNetworkBonjourManagerBrowseBegin();
-                    GameNetworkBonjourManagerBrowseBegin();
-                }
-                goto fire_action_setting_game_name;
+                glFlightDrawframeHook = gameDialogBrowseGamesCountdown;
             }
-            else if(gameDialogState.networkGameNameEntered == 0)
-            {
-                gameDialogState.networkGameNameEntered++;
-                gameDialogEnterGameName();
-                break;
-            }
-
-            gameDialogState.networkGameNameEntered = 0;
-            gameDialogClose();
-            
-            extern void load_map_and_host_game();
-            
-            if(gameNetwork_connect(gameName, load_map_and_host_game) == GAME_NETWORK_ERR_NONE)
-            {
-            }
-            else
-            {
-                console_write("Connection failed to %s", gameName);
-            }
-        }
             break;
+        }
             
 //        case ACTION_HOST_GAME:
 //            if(!gameDialogState.networkGameNameEntered && fireAction != ACTION_HOST_GAME_LAN)
@@ -743,17 +774,6 @@ void gameInterfaceProcessAction()
             gameInterfaceControls.mainMenu.visible = 0;
             game_start(game_start_difficulty, GAME_TYPE_COLLECT);
             gameStateSinglePlayer.stats.score = game_start_score;
-            gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
-            save_map = 0;
-            break;
-            
-        case ACTION_START_DEATHMATCH_GAME:
-            gameInterfaceControls.mainMenu.visible = 0;
-            sprintf(strTmp, "5m deathmatch started!\nNetworked:%s",
-                    gameNetworkState.hostInfo.hosting? "YES": "NO");
-            gameNetwork_alert(strTmp);
-            gameNetwork_startGame(300);
-            game_start(1, GAME_TYPE_DEATHMATCH);
             gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
             save_map = 0;
             break;
