@@ -200,12 +200,6 @@ void glFlightResume(time_t time_last_suspend)
 {
     while(1)
     {
-        if(gameDialogState.ratingDesired)
-        {
-            gameDialogState.ratingDesired = 0;
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@APP_ITUNES_URL]];
-        }
-        
         /*
         if(gameAIState.started)
         {
@@ -253,3 +247,9 @@ void glFlightResume(time_t time_last_suspend)
 }
 
 @end
+
+void
+AppDelegateOpenURL(const char* url)
+{
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:url]]];
+}

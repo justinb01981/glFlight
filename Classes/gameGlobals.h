@@ -63,6 +63,13 @@ extern int controls_simple;
 extern int fireAction;
 extern int fireActionQueuedAfterEdit;
 
+#define APP_ITUNES_URL_BASE "itms://itunes.apple.com/us/app/apple-store/"
+#ifdef BUILD_SC95
+#define APP_ITUNES_URL APP_ITUNES_URL_BASE"id1348498612?mt=8"
+#else
+#define APP_ITUNES_URL APP_ITUNES_URL_BASE"id698938088?mt=8"
+#endif
+
 #if GAME_PLATFORM_ANDROID
 #define GAME_PLATFORM_IS_LANDSCAPE 0
 #define GYRO_FEEDBACK_COEFF (0.001)

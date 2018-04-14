@@ -143,6 +143,10 @@
 		D098934F1937FA4100298C8E /* texture66.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D098934E1937FA4100298C8E /* texture66.bmp */; };
 		D09893511937FD7D00298C8E /* texture67.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09893501937FD7D00298C8E /* texture67.bmp */; };
 		D09A4E321840196E004C73F2 /* Default-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = D09A4E311840196E004C73F2 /* Default-Landscape.png */; };
+		D09A5F3B208172D9009F9618 /* texture110.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3A208172D8009F9618 /* texture110.bmp */; };
+		D09A5F3C208172D9009F9618 /* texture110.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3A208172D8009F9618 /* texture110.bmp */; };
+		D09A5F3E208174EB009F9618 /* texture111.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3D208174EB009F9618 /* texture111.bmp */; };
+		D09A5F3F208174EB009F9618 /* texture111.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3D208174EB009F9618 /* texture111.bmp */; };
 		D09E7FC816EFBFC500343CE6 /* texture27.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09E7FC716EFBFC400343CE6 /* texture27.bmp */; };
 		D0A5039A1A43EF8C00C4BBD1 /* engineslow.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A503991A43EF8C00C4BBD1 /* engineslow.wav */; };
 		D0A5039C1A43EF9400C4BBD1 /* enginefast.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A5039B1A43EF9400C4BBD1 /* enginefast.wav */; };
@@ -583,6 +587,8 @@
 		D098934E1937FA4100298C8E /* texture66.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture66.bmp; sourceTree = "<group>"; };
 		D09893501937FD7D00298C8E /* texture67.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture67.bmp; sourceTree = "<group>"; };
 		D09A4E311840196E004C73F2 /* Default-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape.png"; sourceTree = "<group>"; };
+		D09A5F3A208172D8009F9618 /* texture110.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture110.bmp; sourceTree = "<group>"; };
+		D09A5F3D208174EB009F9618 /* texture111.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture111.bmp; sourceTree = "<group>"; };
 		D09E7FC716EFBFC400343CE6 /* texture27.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture27.bmp; sourceTree = "<group>"; };
 		D0A503991A43EF8C00C4BBD1 /* engineslow.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engineslow.wav; sourceTree = "<group>"; };
 		D0A5039B1A43EF9400C4BBD1 /* enginefast.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = enginefast.wav; sourceTree = "<group>"; };
@@ -825,6 +831,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D09A5F3D208174EB009F9618 /* texture111.bmp */,
+				D09A5F3A208172D8009F9618 /* texture110.bmp */,
 				D087BAEA204707B300F4D6E0 /* texture109.bmp */,
 				D079A83220217FFC0098641B /* texture108.bmp */,
 				D03665F3201801FD00B106AE /* texture107.bmp */,
@@ -1101,6 +1109,7 @@
 			files = (
 				D07B356618527FE200900D60 /* texture50.bmp in Resources */,
 				2514C27B10084DCA00A42282 /* Shader.fsh in Resources */,
+				D09A5F3B208172D9009F9618 /* texture110.bmp in Resources */,
 				2514C27C10084DCA00A42282 /* Shader.vsh in Resources */,
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
 				28EC4C5A11D54ECE0027AA9F /* gl_flightViewController.xib in Resources */,
@@ -1239,6 +1248,7 @@
 				D02D2CC917D67C9B00C03EB5 /* screenshot1.jpg in Resources */,
 				D02D2CCA17D67C9B00C03EB5 /* screenshot2.jpg in Resources */,
 				D098934D1937F44400298C8E /* speedboost.wav in Resources */,
+				D09A5F3E208174EB009F9618 /* texture111.bmp in Resources */,
 				D0F3BE2417DFEDE100E9C49E /* texture42.bmp in Resources */,
 				D034416C1A1E7B9200C89475 /* texture82.bmp in Resources */,
 				D0F3BE2617E3C72400E9C49E /* texture43.bmp in Resources */,
@@ -1298,6 +1308,7 @@
 				D0BCC9192052EDC100094809 /* texture6.bmp in Resources */,
 				D0BCC91A2052EDC100094809 /* texture7.bmp in Resources */,
 				D0BCC91B2052EDC100094809 /* texture5.bmp in Resources */,
+				D09A5F3C208172D9009F9618 /* texture110.bmp in Resources */,
 				D0BCC91C2052EDC100094809 /* app_icon_lg_prev.jpg in Resources */,
 				D0BCC91D2052EDC100094809 /* texture8.bmp in Resources */,
 				D0BCC91E2052EDC100094809 /* texture9.bmp in Resources */,
@@ -1322,6 +1333,7 @@
 				D0BCC9312052EDC100094809 /* texture53.bmp in Resources */,
 				D0BCC9322052EDC100094809 /* texture14.bmp in Resources */,
 				D0BCC9332052EDC100094809 /* texture15.bmp in Resources */,
+				D09A5F3F208174EB009F9618 /* texture111.bmp in Resources */,
 				D0BCC9342052EDC100094809 /* texture70.bmp in Resources */,
 				D0BCC9352052EDC100094809 /* texture17.bmp in Resources */,
 				D0BCC9362052EDC100094809 /* flyby.wav in Resources */,
@@ -1625,8 +1637,13 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "gl_flight copy-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				OTHER_CFLAGS = (
+					"-DNS_BLOCK_ASSERTIONS=1",
+					"-DBUILD_SC95=1",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.spacecombat1995;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "0fb38577-a5a2-4383-a922-bad9b72c5386";
 				PROVISIONING_PROFILE_SPECIFIER = "spacecombat1995 Development";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7 arm7s";
@@ -1638,7 +1655,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: JUSTIN Brady (ZQVH66AQJ9)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = YES;
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
@@ -1651,9 +1668,14 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "gl_flight copy-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				OTHER_CFLAGS = (
+					"-DNS_BLOCK_ASSERTIONS=1",
+					"-DBUILD_SC95=1",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.spacecombat1995;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = spacecombat1995;
+				PROVISIONING_PROFILE = "0fb38577-a5a2-4383-a922-bad9b72c5386";
+				PROVISIONING_PROFILE_SPECIFIER = "spacecombat1995 Development";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 arm7s arm64";

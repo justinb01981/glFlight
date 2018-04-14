@@ -520,7 +520,8 @@ gameInput()
         fcy = deviceYaw/fabs(deviceYaw) > 0? -fcamp: fcamp;
         
         float cap = /*0.05*/ 0.1; // radians
-        float sm[] = /*{0.6, 0.8, 0.8}*/ {0.7, 0.9, 0.6};
+        // output response amplfiers
+        float sm[] = /*{0.6, 0.8, 0.8}*/ {0.5, 0.6, 0.9};
         
         float cs = (speed - minSpeed) / (maxSpeed*2);
         float speedC = 1.0 - (cs*cs*0.9);

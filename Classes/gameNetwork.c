@@ -530,11 +530,13 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
     }
     else
     {
-        // try DNS
-        if(gameNetwork_getDNSAddress(server_name,
-                                     &gameAddress) == GAME_NETWORK_ERR_NONE)
+        // try directory
+        // register with directory
+        if(gameNetwork_getDNSAddress(gameNetworkState.gameDirectory.directory_name,
+                                     &gameNetworkState.gameDirectory.directory_address) == GAME_NETWORK_ERR_NONE)
         {
-            console_write("\rconnecting to internet game...");
+            //TODO: add a check for a successful directory response
+            gameAddress = gameNetworkState.gameDirectory.directory_address;
         }
         else
         {
@@ -2413,13 +2415,13 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                         int v = 0;
                         v = rand() % (sizeof(gameKillVerbs) / sizeof(char*) );
                         
-                        sprintf(deathMsg, "\n%s %s %s (%s)\n", playerInfoFound->name, gameKillVerbs[v],
+                        sprintf(deathMsg, "\n%s %s %s (%s)", playerInfoFound->name, gameKillVerbs[v],
                                 playerInfo->name,
                                 msg->params.i[1] == OBJ_MISSLE? "with a missle": "with a laser");
                     }
                     else
                     {
-                        sprintf(deathMsg, "\n%s was killed\n", playerInfo->name);
+                        sprintf(deathMsg, "\n%s was killed", playerInfo->name);
                     }
                     
                     pNode = world_elem_list_find(playerInfo->elem_id, &gWorld->elements_list);

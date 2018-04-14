@@ -602,6 +602,8 @@ BASE_ENEMY_1
 // "core" that spits out data
 BASE_GENERIC(200, 50, 200)
 
+"add_spawn 200 0 200 3.14 0 0\n"
+
 /*
 "register_params 1 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0\n"
 "add_object 1 r r r 0 0 0 10 40\n"

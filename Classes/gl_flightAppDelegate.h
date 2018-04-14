@@ -9,8 +9,6 @@
 #import <UIKit/UIKit.h>
 #include <time.h>
 
-#define APP_ITUNES_URL "itms://itunes.com/apps/d0gf1ght"
-
 @class gl_flightViewController;
 
 @interface gl_flightAppDelegate : NSObject <UIApplicationDelegate> {

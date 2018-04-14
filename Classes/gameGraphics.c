@@ -747,7 +747,7 @@ void drawControls()
             {
                 //yphase = speed / maxSpeed;
                 subElements[subElementsN].xw = 0.1;
-                subElements[subElementsN].x = (targetSpeed / maxSpeed) - subElements[subElementsN].xw/2;
+                subElements[subElementsN].x = (targetSpeed / maxSpeed) - subElements[subElementsN].xw/2 + subElements[subElementsN].xw;
                 subElements[subElementsN].y = 0;
                 subElements[subElementsN].yw = 1;
                 subElements[subElementsN].tex_id = 21;
@@ -945,7 +945,7 @@ void drawControls()
 
                 float scale = 2.0;
                 drawText(displayText,
-                         controls[i]->x + controls[i]->xw+16+gameInterfaceControls.textWidth*2,
+                         controls[i]->x + controls[i]->xw+32+gameInterfaceControls.textWidth*2,
                          controls[i]->y + controls[i]->yw*0.5 - (gameInterfaceControls.textWidth * scale * (dl/2)), scale);
             }
             else

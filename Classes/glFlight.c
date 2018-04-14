@@ -452,6 +452,8 @@ calibrate_bail:
                     //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_TURRET? 1: 0,
                     //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_SHIP? 1: 0,
                     gameStateSinglePlayer.stats.score,
+                    gameNetworkState.connected ?
+                    (int) 0 : 
                     game_time_elapsed(),
                     game_status_string);
             strcpy(gameInterfaceControls.statsTextRect.text, statsMessage);

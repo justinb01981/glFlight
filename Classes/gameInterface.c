@@ -130,15 +130,15 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.mainMenu.tex_id = /*29*/ TEXTURE_ID_MAINMENU;
     gameInterfaceControls.mainMenu.visible = 1;
     
-    gameInterfaceControls.textMenuControl.x = screenWidth*0.2;
+    gameInterfaceControls.textMenuControl.x = screenWidth*0.1;
     gameInterfaceControls.textMenuControl.y = screenHeight*0.2;
-    gameInterfaceControls.textMenuControl.xw = screenWidth*0.6;
+    gameInterfaceControls.textMenuControl.xw = screenWidth*0.8;
     gameInterfaceControls.textMenuControl.yw = screenHeight*0.6;
     gameInterfaceControls.textMenuControl.tex_id = TEXTURE_ID_CONTROLS_TEXTMENU;
     gameInterfaceControls.textMenuControl.visible = 0;
     
-    float helpWidth = 0.8;
-    float helpHeight = 0.8;
+    float helpWidth = 1.0;
+    float helpHeight = 1.0;
     gameInterfaceControls.graphicDialog.x = ((1.0-helpWidth)/2) * screenWidth;
     gameInterfaceControls.graphicDialog.y = ((1.0-helpHeight)/2) * screenHeight;
     gameInterfaceControls.graphicDialog.xw = helpWidth*screenWidth;
@@ -163,7 +163,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.dialogRectDefault.visible = 0;
     gameInterfaceControls.dialogRect = gameInterfaceControls.dialogRectDefault;
     
-    gameInterfaceControls.keyboardEntry.xw = screenWidth * 0.6;
+    gameInterfaceControls.keyboardEntry.xw = screenWidth * 0.64;
     gameInterfaceControls.keyboardEntry.yw = screenHeight * 0.5;
     gameInterfaceControls.keyboardEntry.x = screenWidth*0.1;
     gameInterfaceControls.keyboardEntry.y = (screenHeight - gameInterfaceControls.keyboardEntry.yw)/2;
@@ -617,13 +617,15 @@ gameInterfaceHandleTouchBegin(float x, float y)
 void
 gameInterfaceGameSearchTimedOut()
 {
-    console_write("no game named \"%s\" was found\ncreating/hosting \"%s\"", gameSettingGameTitle, gameSettingGameTitle);
+    console_write("no game named \"%s\" was found\n", gameSettingGameTitle, gameSettingGameTitle);
     gameNetwork_disconnect();
 }
 
 static int
 gameInterfaceMultiplayerConfigure(int action)
 {
+    extern void load_map_and_host_game();
+    
     switch(gameDialogState.networkGameNameEntered)
     {
             // pop dialog
@@ -634,11 +636,6 @@ gameInterfaceMultiplayerConfigure(int action)
             
             // dialog closed - pop keyboard
         case 1:
-            if(action == ACTION_CONNECT_TO_GAME)
-            {
-                sprintf(gameSettingGameTitle, "d0gf1ght.domain17.net");
-            }
-            
             gameNetwork_disconnect();
             gameDialogState.networkGameNameEntered++;
             
@@ -654,9 +651,15 @@ gameInterfaceMultiplayerConfigure(int action)
                 gameNetworkState.hostInfo.bonjour_lan = 1;
                 GameNetworkBonjourManagerBrowseBegin();
             }
+            else if(action == ACTION_HOST_GAME)
+            {
+                gameNetwork_connect(gameSettingGameTitle, load_map_and_host_game);
+                gameDialogStartNetworkGameWait();
+            }
             else
             {
-                gameNetwork_connect(gameSettingGameTitle, gameInterfaceGameSearchTimedOut);
+                glFlightDrawframeHook = gameDialogBrowseGamesCountdown;
+                gameNetwork_connect(gameSettingGameTitle, gameDialogBrowseGamesCountdown);
             }
             
             gameDialogState.networkGameNameEntered = 0;
@@ -720,7 +723,6 @@ void gameInterfaceProcessAction()
         {
             if(gameInterfaceMultiplayerConfigure(fireAction))
             {
-                glFlightDrawframeHook = gameDialogBrowseGamesCountdown;
             }
             break;
         }
@@ -761,7 +763,12 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_HELP:
+            gameDialogVisitHomepage();
             gameDialogGraphic(TEXTURE_ID_CONTROLS_HELP);
+            break;
+            
+        case ACTION_OPEN_RATING_URL:
+            gameDialogRating();
             break;
             
         case ACTION_RESUME_GAME:

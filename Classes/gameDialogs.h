@@ -19,7 +19,6 @@
 
 struct gameDialogStateStruct
 {
-    int ratingDesired;
     char gameDialogPortalToGameLast[255];
     int networkGameNameEntered;
     int hideNetworkStatus;
@@ -31,6 +30,8 @@ struct gameDialogStateStruct
 extern struct gameDialogStateStruct gameDialogState;
 
 extern int gameDialogCounter;
+
+extern void AppDelegateOpenURL(const char* url);
 
 static void
 gameDialogCancel(void)
@@ -56,7 +57,7 @@ static void
 gameDialogGraphicDangerCountdown()
 {
     static int passes = 60;
-    gameDialogGraphic(TEXTURE_ID_DIALOG_GAMEOVER);
+    gameDialogGraphic(TEXTURE_ID_DAMAGE_FLASH);
     passes--;
     if(passes <= 0)
     {
@@ -143,8 +144,8 @@ static void gameDialogWelcome();
 static void
 gameDialogRating()
 {
-    gameDialogState.ratingDesired = 1;
     gameSettingsRatingGiven = 1;
+    AppDelegateOpenURL(APP_ITUNES_URL);
     gameInterfaceModalDialog("Launching ratings app...",
                              "Done", "OK",
                              gameDialogCancel, gameDialogCancel);
@@ -153,7 +154,6 @@ gameDialogRating()
 static void
 gameDialogWelcomeRating()
 {
-    gameDialogState.ratingDesired = 1;
     gameSettingsRatingGiven = 1;
     gameDialogWelcome();
 }
@@ -165,6 +165,20 @@ gameDialogWelcomeNoRating()
     gameDialogWelcome();
 }
 
+static void
+gameDialogVisitHomepageYes()
+{
+    AppDelegateOpenURL("https://www.domain17.net/d0gf1ght");
+}
+
+static void
+gameDialogVisitHomepage()
+{
+    gameInterfaceModalDialog("open browser\n(www.domain17.net/d0gf1ght)?",
+                             "Done", "OK",
+                             gameDialogVisitHomepageYes, gameDialogCancel);
+}
+
 #define WELCOMESTR                                  \
 "^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D\n"    \
 "^DWelcome to d0gf1ght!^D\n"                        \
@@ -173,7 +187,7 @@ gameDialogWelcomeNoRating()
 static void
 gameDialogMenuCountdown()
 {
-    static int passes = 120;
+    static int passes = 240;
     passes--;
     
     if(passes > 0)
@@ -338,6 +352,7 @@ gameDialogBrowseGamesCountdown()
         if(!gameNetworkState.map_downloaded)
         {
             gameInterfaceGameSearchTimedOut();
+            /*
             strcpy(gameSettingGameTitle, "host");
             if(gameNetwork_connect(gameSettingGameTitle, load_map_and_host_game) == GAME_NETWORK_ERR_NONE)
             {
@@ -346,6 +361,7 @@ gameDialogBrowseGamesCountdown()
             {
                 console_write("Connection failed to %s", gameSettingGameTitle);
             }
+             */
         }
         
         glFlightDrawframeHook = NULL;
@@ -432,7 +448,7 @@ gameDialogStartNetworkGame2()
 static void
 gameDialogStartNetworkGameWait()
 {
-    gameInterfaceModalDialog("Waiting for guests\nTap when ready to start", "", "",
+    gameInterfaceModalDialog("Waiting for guests\nTap when everyone has\njoined, and 5 min round\nwill start...", "", "",
                              gameDialogStartNetworkGame2, gameDialogStartNetworkGame2);
 }
 
@@ -512,8 +528,10 @@ gameDialogEnterGameName(int action)
     "^A to host - enter any room-name\n"
     "^A guest - enter host room-name\n"
     "^Binternet games:\n"
-    "^A to host - blank room-name \n"
+    "^A to host - enter any room name\n"
+    "^A or blank to host a public game\n"
     "^A guest - enter d0gf1ght.domain17.net\n"
+    "  for public game\n"
     "  or IP address of host\n"
     ;
     fireActionQueuedAfterEdit = action;
@@ -531,9 +549,7 @@ static void
 gameDialogNetworkGameStatus()
 {
     void (*okFunc)(void) = gameDialogCancel;
-    
-    if(gameDialogState.hideNetworkStatus) return;
-    
+
     if(gameNetworkState.hostInfo.hosting)
     {
         okFunc = gameDialogStartNetworkGame2;
@@ -543,7 +559,20 @@ gameDialogNetworkGameStatus()
         okFunc = gameDialogClose;
     }
     
-    gameInterfaceModalDialog(gameNetworkState.gameStatsMessage, "OK", "OK", gameDialogStopGameStatusMessages, gameDialogStopGameStatusMessages);
+    if(strstr(gameNetworkState.gameStatsMessage, "ALERT:"))
+    {
+        // modal dialog if > 1 line
+        if(gameDialogState.hideNetworkStatus) return;
+        gameInterfaceModalDialog(gameNetworkState.gameStatsMessage, "OK", "OK", gameDialogStopGameStatusMessages, gameDialogStopGameStatusMessages);
+    }
+    else if(strstr(gameNetworkState.gameStatsMessage, "HIDDEN:"))
+    {
+        
+    }
+    else
+    {
+        console_write(gameNetworkState.gameStatsMessage);
+    }
 }
 
 static void gameDialogCancelString();
