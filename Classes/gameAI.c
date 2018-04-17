@@ -192,6 +192,7 @@ game_ai_run()
         {
             float pv[6];
             int pi = 0;
+            int target_objtype = OBJ_UNKNOWN;
             
             if(pCurElem->stuff.u.enemy.time_last_run == 0)
             {
@@ -247,6 +248,7 @@ game_ai_run()
                     pCurElem->stuff.u.enemy.tgt_z = pBaseElem->physics.ptr->z;
                     pCurElem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
                     pCurElem->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
+                    target_objtype = pBaseElem->object_type;
                 }
             }
             
@@ -272,6 +274,8 @@ game_ai_run()
                     pv[pi++] = pTargetListNode->elem->physics.ptr->vx;
                     pv[pi++] = pTargetListNode->elem->physics.ptr->vy;
                     pv[pi++] = pTargetListNode->elem->physics.ptr->vz;
+                    
+                    target_objtype = pTargetListNode->elem->object_type;
                 }
                 else
                 {
@@ -361,7 +365,7 @@ game_ai_run()
             {
                 object_pursue(pv[0], pv[1], pv[2],
                               pv[3], pv[4], pv[5],
-                              pCurElem);
+                              pCurElem, target_objtype);
             }
             
             if(GAME_AI_DEBUG)
@@ -386,7 +390,7 @@ game_ai_run()
 }
 
 void
-object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem *elem)
+object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem *elem, int target_objtype)
 {
     int fireBullet = 0;
     int do_pitch = 1;
@@ -394,8 +398,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     int skill = elem->stuff.u.enemy.intelligence;
     quaternion_t xq, yq, zq;
     float tc;
-    WorldElem* pTargetElem = NULL;
-    Object targetElemType = OBJ_UNKNOWN;
     float zdot_ikillyou = 0.5;
     float zdot_juke = 0.3;
     
@@ -403,13 +405,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     tc = time_ms - elem->stuff.u.enemy.time_last_run;
     tc /= 1000.0;
-    
-    WorldElemListNode* pTargetNode = world_elem_list_find(elem->stuff.u.enemy.target_id, &gWorld->elements_list);
-    if(pTargetNode)
-    {
-        pTargetElem = pTargetNode->elem;
-        targetElemType = pTargetElem->object_type;
-    }
     
     // AI speed
     float vcur = world_elem_get_velocity(elem);
@@ -463,8 +458,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         az -= vz*leadv;
         
         // if distance is too great, forget target
-        // TODO: why qualify with fixed?
-        //if(!elem->stuff.u.enemy.fixed)
         if(dist > elem->stuff.u.enemy.scan_distance && elem->stuff.u.enemy.changes_target)
         {
             elem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
@@ -475,14 +468,14 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             elem->stuff.u.enemy.scan_distance = 1;
         }
         
+        // avoid collision
         if(elem->stuff.u.enemy.run_distance > 0 &&
            dist <= elem->stuff.u.enemy.run_distance /* - (run_distance*skill*diff_m) && zdot < 0 */ &&
            zdot <= 0.2 &&
-           pTargetElem &&
-           target_avoid_collision(pTargetElem->object_type))
+           target_avoid_collision(target_objtype))
         {
             elem->stuff.u.enemy.enemy_state = ENEMY_STATE_RUN;
-            ax = -ax; ay = -ay; az = -vz;
+            ax = -ax; ay = -ay; az = -az;
         }
         
         if(time_ms >= elem->stuff.u.enemy.time_next_decision &&
@@ -653,8 +646,8 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PURSUE &&
        elem->stuff.u.enemy.fires &&
-       (collision_actions[OBJ_BULLET][targetElemType] == COLLISION_ACTION_DAMAGE ||
-        collision_actions[OBJ_MISSLE][targetElemType] == COLLISION_ACTION_DAMAGE) &&
+       (collision_actions[OBJ_BULLET][target_objtype] == COLLISION_ACTION_DAMAGE ||
+        collision_actions[OBJ_MISSLE][target_objtype] == COLLISION_ACTION_DAMAGE) &&
        zdot >= zdot_ikillyou)
     {
         fireBullet = 1;

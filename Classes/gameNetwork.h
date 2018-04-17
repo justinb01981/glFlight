@@ -289,6 +289,9 @@ gameNetwork_worldInit();
 int
 gameNetwork_directoryList();
 
+int
+gameNetwork_directoryRegister(const char* roomName);
+
 void
 gameNetwork_disconnect();
 

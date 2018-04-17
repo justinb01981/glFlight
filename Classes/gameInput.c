@@ -524,7 +524,7 @@ gameInput()
         float sm[] = /*{0.6, 0.8, 0.8}*/ {0.5, 0.6, 0.9};
         
         float cs = (speed - minSpeed) / (maxSpeed*2);
-        float speedC = 1.0 - (cs*cs*0.9);
+        float speedC = 1.0 /* - (cs*cs*0.9) */ ;
         
         if(gameSettingsSimpleControls)
         {

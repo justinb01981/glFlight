@@ -548,21 +548,13 @@ gameDialogEnterGameName(int action)
 static void
 gameDialogNetworkGameStatus()
 {
-    void (*okFunc)(void) = gameDialogCancel;
-
-    if(gameNetworkState.hostInfo.hosting)
-    {
-        okFunc = gameDialogStartNetworkGame2;
-    }
-    else
-    {
-        okFunc = gameDialogClose;
-    }
+    controlRect* pNextDialog = gameInterfaceModalDialogPeek();
     
+    // modal dialog if ALERT
     if(strstr(gameNetworkState.gameStatsMessage, "ALERT:"))
     {
-        // modal dialog if > 1 line
-        if(gameDialogState.hideNetworkStatus) return;
+        if(gameDialogState.hideNetworkStatus || (pNextDialog && strstr(pNextDialog->text, "ALERT:"))) return;
+        
         gameInterfaceModalDialog(gameNetworkState.gameStatsMessage, "OK", "OK", gameDialogStopGameStatusMessages, gameDialogStopGameStatusMessages);
     }
     else if(strstr(gameNetworkState.gameStatsMessage, "HIDDEN:"))

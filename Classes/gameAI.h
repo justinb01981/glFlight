@@ -41,7 +41,7 @@ void
 game_ai_run();
 
 void
-object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem *elem);
+object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem *elem, int target_objtype);
 
 void
 game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action);

@@ -127,6 +127,9 @@ gameInterfaceModalDialogEnqueue(char* msg, char *buttonLeft, char *buttonRight,
 void
 gameInterfaceModalDialogDequeue();
 
+controlRect*
+gameInterfaceModalDialogPeek();
+
 static controlRect**
 gameInterfaceGetControlArray()
 {

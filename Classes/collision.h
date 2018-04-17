@@ -22,7 +22,8 @@ enum
     COLLISION_ACTION_DAMAGE = 1,
     COLLISION_ACTION_REPULSE = 2,
     COLLISION_ACTION_FLAG = 3,
-    COLLISION_ACTION_SPAWNPOINT_TELEPORT = 4
+    COLLISION_ACTION_SPAWNPOINT_TELEPORT = 4,
+    COLLISION_ACTION_POWERUP_GRAB = 5
 };
 
 typedef unsigned int collision_action_t;
@@ -34,7 +35,7 @@ collision_actions_default[OBJ_LAST][OBJ_LAST] =
 {
     {0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0,       2, 0, 0, 0, 0, 0, 2, 0, 0}, // unknown
     {2, 2, 2, 0, 2, 2, 0, 0, 0, 0, 0,       3, 1, 0, 0, 0, 0, 1, 0, 0}, // ship
-    {2, 2, 2, 3, 2, 2, 0, 4, 3, 0, 0, /*3*/ 1, 1, 0, 0, 0, 0, 0, 0, 0}, // player
+    {2, 2, 2, 3, 2, 2, 0, 4, 3, 0, 0, /*3*/ 5, 1, 0, 0, 0, 0, 0, 0, 0}, // player
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // turret
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // block_moving
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // block
@@ -43,7 +44,7 @@ collision_actions_default[OBJ_LAST][OBJ_LAST] =
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // spawnpoint
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // poopedcube
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // wreckage
-    {2, 3, 1, 0, 2, 2, 0, 0, 3, 0, 0,       0, 0, 0, 0, 3, 0, 0, 0, 0}, // powerup generic
+    {2, 3, 5, 0, 2, 2, 0, 0, 3, 0, 0,       0, 0, 0, 0, 3, 0, 0, 0, 0}, // powerup generic
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // capture
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // base
     {1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,       0, 1, 0, 0, 0, 0, 0, 0, 0}, // missle
@@ -94,8 +95,8 @@ collision_actions_set_default()
 inline static void
 collision_actions_set_grab_powerup()
 {
-    collision_actions[OBJ_PLAYER][OBJ_POWERUP_GENERIC] = COLLISION_ACTION_DAMAGE;
-    collision_actions[OBJ_POWERUP_GENERIC][OBJ_PLAYER] = COLLISION_ACTION_DAMAGE;
+    collision_actions[OBJ_PLAYER][OBJ_POWERUP_GENERIC] = COLLISION_ACTION_POWERUP_GRAB;
+    collision_actions[OBJ_POWERUP_GENERIC][OBJ_PLAYER] = COLLISION_ACTION_POWERUP_GRAB;
 }
 
 inline static void
@@ -124,6 +125,8 @@ do_world_collision_handling(float tc)
 {
     // collisions
     WorldElemListNode* pCollisionCur = gWorld->elements_collided.next;
+    WorldElemListNode* pCollisionTmp;
+    
     while(pCollisionCur && pCollisionCur->next)
     {
         // pairs of objects
@@ -160,6 +163,15 @@ do_world_collision_handling(float tc)
     
             case COLLISION_ACTION_NONE:
                 break;
+                    
+            case COLLISION_ACTION_POWERUP_GRAB:
+                // swap if necessary
+                if(pCollisionA->elem->object_type == OBJ_POWERUP_GENERIC)
+                {
+                    pCollisionTmp = pCollisionA;
+                    pCollisionA = pCollisionB;
+                    pCollisionB = pCollisionTmp;
+                }
                     
             case COLLISION_ACTION_FLAG:
                 pCollisionA->elem->stuff.flags.mask |= pCollisionB->elem->stuff.flags.mask;

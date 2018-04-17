@@ -653,7 +653,8 @@ gameInterfaceMultiplayerConfigure(int action)
             }
             else if(action == ACTION_HOST_GAME)
             {
-                gameNetwork_connect(gameSettingGameTitle, load_map_and_host_game);
+                gameNetwork_connect("", load_map_and_host_game);
+                gameNetwork_directoryRegister(gameSettingGameTitle);
                 gameDialogStartNetworkGameWait();
             }
             else
@@ -1098,6 +1099,12 @@ void
 gameInterfaceModalDialog(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void))
 {
     gameInterfaceModalDialogEnqueue(msg, buttonLeft, buttonRight, cbLeft, cbRight, &gameInterfaceControls.dialogRectDefault, 999999);
+}
+
+controlRect*
+gameInterfaceModalDialogPeek()
+{
+    return gameInterfaceControls.dialogRect.pnext;
 }
 
 void

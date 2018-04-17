@@ -300,35 +300,7 @@ send_endgame()
     
     gameNetwork_send(&msg);
 }
-    
-void
-send_register_hosting_game(gameNetworkAddress* addr)
-{
-    gameNetworkMessage msg;
-    struct sockaddr_in6* addr6 = (void*) msg.params.directoryInfo.addr.storage;
-    
-    memset(&msg, 0, sizeof(msg));
-    msg.cmd = GAME_NETWORK_MSG_DIRECTORY_ADD;
-    strncpy(msg.params.directoryInfo.c, gameNetworkState.hostInfo.name, sizeof(msg.params.c));
-    
-    addr6->sin6_len = msg.params.directoryInfo.addr.len = sizeof(struct sockaddr_in6);
-    addr6->sin6_addr = in6addr_any;
-    addr6->sin6_port = htons(GAME_NETWORK_PORT);
-    addr6->sin6_family = AF_INET6;
-    
-    if(strlen(gameSettingsLocalIPOverride) > 0 && strcmp(gameSettingsLocalIPOverride, "0.0.0.0") != 0)
-    {
-        char buf[128];
-        sprintf(buf, "::FFFF:%s", gameSettingsLocalIPOverride);
-        if(inet_pton(AF_INET6, buf, &addr6->sin6_addr) == 1)
-        {
-            // override-ip was parsed
-        }
-    }
-    msg.player_id = gameNetworkState.my_player_id;
-    
-    send_to_address_udp(&msg, addr);
-}
+
 
 static int
 gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
@@ -504,13 +476,7 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
         strcpy(playerInfo->name, gameNetworkState.my_player_name);
         
         callback_becamehost();
-        
-        // register with directory
-        if(gameNetwork_getDNSAddress(gameNetworkState.gameDirectory.directory_name,
-                                     &gameNetworkState.gameDirectory.directory_address) == GAME_NETWORK_ERR_NONE)
-        {
-            send_beacon(&gameNetworkState.gameDirectory.directory_address, gameNetworkState.hostInfo.name);
-        }
+
         goto gameNetwork_connect_done;
     }
     
@@ -625,6 +591,21 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
 gameNetwork_connect_done:
     gameNetworkState.connected = 1;
     return GAME_NETWORK_ERR_NONE;
+}
+
+int
+gameNetwork_directoryRegister(const char* roomName)
+{
+    // register with directory
+    if(gameNetworkState.hostInfo.hosting &&
+       gameNetwork_getDNSAddress(gameNetworkState.gameDirectory.directory_name,
+                                 &gameNetworkState.gameDirectory.directory_address) == GAME_NETWORK_ERR_NONE)
+    {
+        strcpy(gameNetworkState.hostInfo.name, roomName);
+        send_beacon(&gameNetworkState.gameDirectory.directory_address, roomName);
+        return GAME_NETWORK_ERR_NONE;
+    }
+    return GAME_NETWORK_ERR_FAIL;
 }
 
 void
@@ -1342,7 +1323,7 @@ game_network_periodic_check()
             gameNetwork_sendPing();
             
             // register game with directory
-            send_register_hosting_game(&gameNetworkState.gameDirectory.directory_address);
+            send_beacon(&gameNetworkState.gameDirectory.directory_address, gameNetworkState.hostInfo.name);
         }
     }
     
@@ -2733,7 +2714,7 @@ void
 gameNetwork_sendStatsAlert()
 {
     gameNetworkPlayerInfo* pInfo;
-    char str[1024];
+    char str[4096];
     char tmp[128];
     char nameBuf[32];
     static int time_remaining_last = 1;
@@ -2784,6 +2765,7 @@ gameNetwork_sendStatsAlert()
             switch(row)
             {
                 case 0:
+                    strncat(str, " ", sizeof(str)-1);
                     strncat(str, cSep, sizeof(str)-1);
                     strncat(str, pInfo->name, NAME_BREAK);
                     break;
@@ -2918,11 +2900,9 @@ gameNetwork_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_a
         pElemC = elemA;
     }
     
-    if(collision_action != COLLISION_ACTION_DAMAGE) return;
-    
     if(gameNetworkState.hostInfo.hosting)
     {
-        if(elemB->object_type == OBJ_POWERUP_GENERIC)
+        if(collision_action == COLLISION_ACTION_POWERUP_GRAB)
         {
             gameNetwork_getPlayerInfo(elemA->stuff.affiliation, &pInfo, 0);
             
@@ -2932,6 +2912,8 @@ gameNetwork_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_a
             }
         }
     }
+    
+    if(collision_action != COLLISION_ACTION_DAMAGE) return;
     
     if(pElemMyShip && (pElemC->object_type == OBJ_BULLET || pElemC->object_type == OBJ_MISSLE))
     {

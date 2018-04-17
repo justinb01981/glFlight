@@ -376,6 +376,7 @@ game_add_powerup(float x, float y, float z, int type, int lifetime)
     world_get_last_object()->stuff.affiliation = AFFILIATION_POWERUP;
     world_get_last_object()->bounding_remain = 1;
     world_get_last_object()->physics.ptr->friction = 1;
+    world_get_last_object()->physics.ptr->gravity = 1;
     update_object_velocity(obj_id, 0, 1, 0, 0);
     game_elem_setup_powerup(world_get_last_object());
     
@@ -1141,7 +1142,7 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
     int do_data_grab_score_immediate = 0;
     WorldElemListNode* myShipListNode = world_elem_list_find(my_ship_id, &gWorld->elements_moving);
     if(!myShipListNode) return;
-    
+
     int collect_sound = 0;
     switch(elemB->stuff.subtype)
     {
@@ -1634,7 +1635,8 @@ game_run()
                     obj_id_friendly_spawn = pCur->elem->elem_id;
                     break;
                     
-                case OBJ_SPAWNPOINT_ENEMY: {
+                case OBJ_SPAWNPOINT_ENEMY:
+                {
                     spawn_points_found++;
                     obj_id_enemy_spawn = pCur->elem->elem_id;
                     
@@ -1671,9 +1673,8 @@ game_run()
                     }
                     
                     game_move_spawnpoint(pCur->elem);
-                    break;
                 }
-                    break;
+                break;
                 
                 case OBJ_BASE:
                     obj_id_base = pCur->elem->elem_id;
