@@ -248,6 +248,8 @@ gameInput()
         gyroInputStableThresh += fabs(((devicePitch-gyroInputDeltaLast[0]) +
                                   (deviceYaw-gyroInputDeltaLast[1]) +
                                   (deviceRoll-gyroInputDeltaLast[2])) / 3) * 0.1;
+        
+        printf("gyroInputStableThresh:%f\n", gyroInputStableThresh);
     }
     else
     {
@@ -544,6 +546,7 @@ gameInput()
             
             double s = input_roll * fabs(input_roll*sm[0]) * GYRO_DC * tc * speedC;
             
+            // apply capping
             if(fabs(s) > cap) s = cap * (s/fabs(s));
             
             //gameCamera_rollRadians(s);

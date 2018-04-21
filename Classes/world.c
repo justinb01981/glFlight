@@ -58,9 +58,10 @@ models_shared_t models_shared;
 struct {
     WorldElemListNode* ptr_objects_moving;
     WorldElemListNode* world_region_iterate_cur;
-} world_update_state = {NULL, NULL};
-
-void (*world_remove_hook)(WorldElem* pElem) = NULL;
+    
+    void (*world_remove_hook)(WorldElem* pElem);
+    void (*world_rgn_remove_hook)(WorldElem* pElem);
+} world_update_state = {NULL, NULL, NULL, NULL};
 
 static int
 world_add_object_core(Model type,
@@ -668,7 +669,7 @@ world_remove_object(int elem_id)
     
     if(pElem && !pElem->remove_pending)
     {
-        if(world_remove_hook) world_remove_hook(pElem);
+        if(world_update_state.world_remove_hook) world_update_state.world_remove_hook(pElem);
         
         remove_element_from_region(pElem);
         
@@ -1397,7 +1398,7 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc)
 
     for(int i = 0; i < 3; i++) if(fabs(mv[i]) < repulse_min) mv[i] = 0.1;
 
-    world_move_elem(pCollisionA, mv[0], mv[1], mv[2], 1);
+    move_elem_relative(pCollisionA, mv[0], mv[1], mv[2]);
 }
 
 inline static void
@@ -1580,6 +1581,8 @@ add_element_to_region(WorldElem* pElem)
 void
 remove_element_from_region(WorldElem* pElem)
 {
+    if(world_update_state.world_rgn_remove_hook != NULL) world_update_state.world_rgn_remove_hook(pElem);
+    
     if(pElem->spans_regions)
     {
         // walk list-back references and remove from all LIST_TYPE_REGION lists
@@ -1620,7 +1623,7 @@ world_update_elem_removed_hook(WorldElem* pElem)
     if(world_update_state.world_region_iterate_cur && world_update_state.world_region_iterate_cur->elem == pElem)
     {
         // our position in the list was invalidated
-        world_update_state.world_region_iterate_cur = NULL;
+        world_update_state.world_region_iterate_cur = world_update_state.world_region_iterate_cur->next;
     }
     
     if(world_update_state.ptr_objects_moving && world_update_state.ptr_objects_moving->elem == pElem)
@@ -1634,16 +1637,13 @@ world_update(float tc)
 {
     // TODO: for meshes test collision by checking if object is < plane-normal vector
     int do_check_collisions = 1;
-    int do_oob_gravity_sound = 1;
     int do_sound_checks = 1;
-    int allow_oob_moving_objects = 0;
-    int collision_model = 0;
     
     WorldElemListNode* pCur = gWorld->elements_moving.next;
     
     // TODO: first apply boundary enforcement, THEN iterate moving objects again and apply collision
     
-    world_remove_hook = world_update_elem_removed_hook;
+    world_update_state.world_remove_hook = world_update_elem_removed_hook;
     
     world_update_state.ptr_objects_moving = &gWorld->elements_moving;
     while(world_update_state.ptr_objects_moving && world_update_state.ptr_objects_moving->next)
@@ -1678,7 +1678,11 @@ world_update(float tc)
                     pElem->physics.ptr->vz
                 };
                 
+                world_update_state.world_rgn_remove_hook = NULL;
+                
                 remove_element_from_region(pElem);
+                
+                world_update_state.world_rgn_remove_hook = world_update_elem_removed_hook;
                 
                 if(do_sound_checks)
                 {
@@ -1718,11 +1722,13 @@ world_update(float tc)
                             {
                                 if(pElem->bounding_remain)
                                 {
-                                    //vm[d] = -vm[d];
-                                    //vm[d] = 0;
-                                    if(d == 0) pElem->physics.ptr->vx += V[d]*maxAccelDecel;
-                                    if(d == 1) pElem->physics.ptr->vy += V[d]*maxAccelDecel;
-                                    if(d == 2) pElem->physics.ptr->vz += V[d]*maxAccelDecel;
+                                    pElem->physics.ptr->vx *= 0.80;
+                                    pElem->physics.ptr->vy *= 0.80;
+                                    pElem->physics.ptr->vz *= 0.80;
+                                    
+                                    if(d == 0) pElem->physics.ptr->vx += V[d]*maxAccelDecel*2;
+                                    if(d == 1) pElem->physics.ptr->vy += V[d]*maxAccelDecel*2;
+                                    if(d == 2) pElem->physics.ptr->vz += V[d]*maxAccelDecel*2;
                                     
                                     bounding_enforced = 1;
                                 }
@@ -1743,16 +1749,6 @@ world_update(float tc)
                     
                     if(!out_of_bounds_remove)
                     {
-                        GLfloat collision_rollback_coord[] =
-                        {
-                            pElem->physics.ptr->x,
-                            pElem->physics.ptr->y,
-                            pElem->physics.ptr->z
-                        };
-                        GLfloat collision_rollback_velocity = pElem->physics.ptr->velocity;
-                        
-                        int rollback_done = 0;
-                        
                         // MARK: -- attempt to move along vm
                         move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
                         
@@ -1823,13 +1819,6 @@ world_update(float tc)
 //                                                    rollback_done = 1;
 //                                                }
 
-                                                if(colact == COLLISION_ACTION_REPULSE)
-                                                {
-                                                    world_repulse_elem(pElem, pElemCollided, tc);
-                                                    cl = 0;
-                                                    goto region_collision_retry;
-                                                }
-                                                
                                                 // HACK: removed a hack that enforced elemA had higher velocity than B and swapped
                                                 
                                                 game_handle_collision(pElem, pElemCollided, colact);
@@ -1843,6 +1832,13 @@ world_update(float tc)
                                                                                  pElem->physics.ptr->x,
                                                                                  pElem->physics.ptr->y,
                                                                                  pElem->physics.ptr->z);
+                                                }
+                                                
+                                                if(colact == COLLISION_ACTION_REPULSE)
+                                                {
+                                                    world_repulse_elem(pElem, pElemCollided, tc);
+                                                    cl = 0;
+                                                    goto region_collision_retry;
                                                 }
 
                                                 if(!world_elem_list_find_elem(pElem, &gWorld->elements_collided) &&
@@ -1914,7 +1910,8 @@ world_update(float tc)
         pCur = pNext;
     }
     
-    world_remove_hook = NULL;
+    world_update_state.world_remove_hook = NULL;
+    world_update_state.world_rgn_remove_hook = NULL;
 }
 
 void

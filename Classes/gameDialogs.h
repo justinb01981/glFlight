@@ -17,6 +17,8 @@
 #include "world_file.h"
 #include "gameInput.h"
 
+#define GAME_DIALOG_LIFE_MAX 999999
+
 struct gameDialogStateStruct
 {
     char gameDialogPortalToGameLast[255];
@@ -187,7 +189,7 @@ gameDialogVisitHomepage()
 static void
 gameDialogMenuCountdown()
 {
-    static int passes = 240;
+    static int passes = 200;
     passes--;
     
     if(passes > 0)

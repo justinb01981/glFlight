@@ -46,6 +46,12 @@ void
 gameInterfaceInit(double screenWidth, double screenHeight)
 {
     int i;
+    controlRect tmpRect = {
+        screenWidth-(screenWidth * 0.15),
+        screenHeight-(screenHeight * 0.15),
+        screenWidth * 0.15,
+        screenHeight * 0.15
+    };
     
     gameInterfaceControls.interfaceHeight = screenHeight;
     gameInterfaceControls.interfaceWidth = screenWidth;
@@ -59,20 +65,19 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.accelerator.tex_id = /*37*/ 5;
     gameInterfaceControls.accelerator.visible = 1;
     
-    controlRect trimRect = {screenWidth-(screenWidth * 0.15),
-        screenHeight-(screenHeight * 0.15),
-        screenWidth * 0.15,
-        screenHeight * 0.15};
-    gameInterfaceControls.trim = trimRect;
     gameInterfaceControls.trim.tex_id = 7;
     gameInterfaceControls.trim.visible = 1;
+    gameInterfaceControls.trim.x = screenWidth - (screenWidth*0.15);
+    gameInterfaceControls.trim.y = screenHeight * 0.0;
+    gameInterfaceControls.trim.xw = 0.15*screenWidth;
+    gameInterfaceControls.trim.yw = 0.15*screenHeight;
     
-    
-    controlRect fireRect = {0,
+    tmpRect = (controlRect) {
+        0,
         screenHeight-(screenHeight*0.15),
         screenWidth * 0.15,
         screenHeight * 0.15};
-    gameInterfaceControls.fire = fireRect;
+    gameInterfaceControls.fire = tmpRect;
     gameInterfaceControls.fire.tex_id = TEXTURE_ID_CONTROLS_FIRE;
     gameInterfaceControls.fire.visible = 1;
     
@@ -109,7 +114,12 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.accelIndicator.tex_id = 37;
     gameInterfaceControls.accelIndicator.visible = 1;
     
-    gameInterfaceControls.radar = trimRect;
+    gameInterfaceControls.radar = (controlRect) {
+        screenWidth-screenWidth*0.15,
+        screenHeight-screenHeight*0.15,
+        screenWidth*0.15,
+        screenHeight*0.15
+    };
     gameInterfaceControls.radar.y -= (screenHeight*0.15);
     gameInterfaceControls.radar.tex_id = TEXTURE_ID_CONTROLS_RADAR;
     gameInterfaceControls.radar.visible = 1;
@@ -192,10 +202,9 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.fireRectMisc.tex_id = TEXTURE_ID_CONTROLS_TOW;
     
     gameInterfaceControls.fireRectBoost.x = screenWidth - (screenWidth*0.15);
-    gameInterfaceControls.fireRectBoost.y = screenHeight * 0.0;
+    gameInterfaceControls.fireRectBoost.y = screenHeight;
     gameInterfaceControls.fireRectBoost.xw = 0.15*screenWidth;
     gameInterfaceControls.fireRectBoost.yw = 0.15*screenHeight;
-    
     gameInterfaceControls.fireRectBoost.tex_id = TEXTURE_ID_CONTROLS_BOOST;
     gameInterfaceControls.fireRectBoost.visible = 0;
     
@@ -1054,6 +1063,10 @@ gameInterfaceModalDialogEnqueue(char* msg, char *buttonLeft, char *buttonRight, 
     controlRect *pdialog = (controlRect*) malloc(sizeof(controlRect));
     if(!pdialog) return;
     
+    if(life_frames != GAME_DIALOG_LIFE_MAX)
+    {
+        if(gameInterfaceModalDialogPeek() != NULL) return;
+    }
     gameInterfaceControls.dialogLifeFrames = life_frames;
     
     *pdialog = *overrideRect;
@@ -1098,7 +1111,7 @@ gameInterfaceModalDialogDequeue()
 void
 gameInterfaceModalDialog(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void))
 {
-    gameInterfaceModalDialogEnqueue(msg, buttonLeft, buttonRight, cbLeft, cbRight, &gameInterfaceControls.dialogRectDefault, 999999);
+    gameInterfaceModalDialogEnqueue(msg, buttonLeft, buttonRight, cbLeft, cbRight, &gameInterfaceControls.dialogRectDefault, GAME_DIALOG_LIFE_MAX);
 }
 
 controlRect*
