@@ -62,6 +62,7 @@ extern int GameNetworkBonjourManagerHost(const char* name, int* sock_out);
 extern int GameNetworkBonjourManagerBrowseBegin();
 extern int GameNetworkBonjourManagerBrowseEnd(gameNetworkAddress* address_returned);
 extern int GameNetworkBonjourManagerDisconnect();
+extern int GameNetworkBonjourManagerDisconnectPeer(int peer_id);
 void GameNetworkBonjourManagerSendMessageToPeer(uint8_t* msg_, int peer_id);
 extern int gameNetwork_onBonjourConnecting1(gameNetworkMessage*, gameNetworkAddress*);
 int gameNetwork_onDirectorySearch(gameNetworkMessage* msg, gameNetworkAddress* srcAddr);
@@ -494,7 +495,7 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
 #endif
         gameNetworkState.hostInfo.hosting = 0;
     }
-    else
+    else if(!gameNetworkState.hostInfo.bonjour_lan)
     {
         // try directory
         // register with directory
@@ -541,6 +542,7 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
                 
                 gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting1;
 
+                // TODO: for some reason we don't see a beacon response?
                 send_beacon(&gameAddress, server_name);
                 goto gameNetwork_connect_done;
             }
@@ -1112,6 +1114,11 @@ gameNetwork_removePlayer(int player_id)
                 close(pFree->stream_socket.s);
             }
             
+            if(gameNetworkState.hostInfo.bonjour_lan)
+            {
+                GameNetworkBonjourManagerDisconnectPeer(pFree->player_id);
+            }
+            
             if(pFree->map_data)
             {
                 free(pFree->map_data);
@@ -1232,7 +1239,7 @@ game_network_periodic_check()
     int map_retransmit = 0;
     
     static game_timeval_t time_retransmit_map_last = 0;
-    if(network_time_ms - time_retransmit_map_last > 200)
+    if(network_time_ms - time_retransmit_map_last > 200 && !gameNetworkState.hostInfo.bonjour_lan)
     {
         time_retransmit_map_last = network_time_ms;
         map_retransmit = 1;
@@ -1250,7 +1257,7 @@ game_network_periodic_check()
                 if(pInfo->player_id == GAME_NETWORK_PLAYER_ID_HOST)
                 {
                     console_write("Lost connection to server");
-                    gameNetworkState.connected = 1;
+                    gameNetworkState.connected = 0;
                 }
                 
                 world_remove_object(pInfo->elem_id);
@@ -3152,6 +3159,6 @@ void load_map_and_host_game()
     gameDialogStartNetworkGameWait();
 }
     
-//#ifdef __cplusplus
-//}
-//#endif
+#ifdef __cplusplus
+}
+#endif

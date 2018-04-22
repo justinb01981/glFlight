@@ -153,19 +153,18 @@ const int PEER_ID_INITIAL = 1001;
     if(self.connected == NOT_CONNECTED) return;
     self.connected = NOT_CONNECTED;
     
-    if(inputStream && outputStream)
+    if(inputStream)
     {
-        [inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        //[inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         [inputStream close];
         inputStream = nil;
-
-        [outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    }
+    
+    if(outputStream)
+    {
+        //[outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         [outputStream close];
         outputStream = nil;
-    }
-    else
-    {
-        NSLog(@"\(self) disconnect called with missing input/outputstream");
     }
 }
 
@@ -422,7 +421,7 @@ static GameNetworkBonjourManager* instance;
     __block int peerId;
     NSMutableArray<GameNetworkPeer*>* peers = (void*) self.peers;
     
-    //NSLog(@"NSStream %@ event %u", [stream debugDescription], (unsigned int) eventCode);
+    NSLog(@"NSStream %@ event %u", [stream debugDescription], (unsigned int) eventCode);
 
     // find peer
     [peers enumerateObjectsUsingBlock:^(GameNetworkPeer * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop)
@@ -514,13 +513,18 @@ static GameNetworkBonjourManager* instance;
             // fall through
         case NSStreamEventErrorOccurred: {
             NSLog(@"NSStreamEventErrorOccurred: %@/%@",  [[stream streamError] localizedDescription], [[stream streamError] localizedFailureReason]);
-            [peer disconnect];
-            [peers removeObject: peer];
+            gameNetwork_removePlayer(peer.peerId);
+            // the above call will disconnect/remove
+            //[peer disconnect];
+            //[peers removeObject: peer];
         } break;
             
         case NSStreamEventEndEncountered: {
-            [peer disconnect];
-            [peers removeObject: peer];
+            NSLog(@"NSStreamEventEndEncountered for peer: %@",  [peer debugDescription]);
+            gameNetwork_removePlayer(peer.peerId);
+            // the above call will disconnect/remove
+            //[peer disconnect];
+            //[peers removeObject: peer];
         } break;
     }
 }
@@ -614,6 +618,8 @@ int GameNetworkBonjourManagerBrowseBegin()
 
 int GameNetworkBonjourManagerBrowseEnd(gameNetworkAddress* server_address_ptr)
 {
+    [GameNetworkBonjourManager.instance browseEnd];
+    
     if(![GameNetworkBonjourManager.instance isConnected]) return 0;
     
     memset(server_address_ptr->storage, 0, sizeof(server_address_ptr->storage));
@@ -632,4 +638,20 @@ void GameNetworkBonjourManagerDisconnect()
     [GameNetworkBonjourManager.instance stopServer];
     [GameNetworkBonjourManager.instance disconnectPeers];
     [GameNetworkBonjourManager.instance browseEnd];
+}
+
+int GameNetworkBonjourManagerDisconnectPeer(int peer_id)
+{
+    __block GameNetworkPeer* p = nil;
+    [[[GameNetworkBonjourManager instance] peers] enumerateObjectsUsingBlock:^(NSObject * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        p = (GameNetworkPeer*) obj;
+        if(p.peerId == peer_id)
+        {
+            [p disconnect];
+        }
+    }];
+    
+    if(p) [[[GameNetworkBonjourManager instance] peers] removeObject:p];
+    
+    return 1;
 }

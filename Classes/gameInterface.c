@@ -659,6 +659,7 @@ gameInterfaceMultiplayerConfigure(int action)
             {
                 gameNetworkState.hostInfo.bonjour_lan = 1;
                 GameNetworkBonjourManagerBrowseBegin();
+                glFlightDrawframeHook = gameDialogBrowseGamesCountdown;
             }
             else if(action == ACTION_HOST_GAME)
             {
