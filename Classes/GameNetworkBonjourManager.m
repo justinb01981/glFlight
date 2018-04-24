@@ -421,7 +421,7 @@ static GameNetworkBonjourManager* instance;
     __block int peerId;
     NSMutableArray<GameNetworkPeer*>* peers = (void*) self.peers;
     
-    NSLog(@"NSStream %@ event %u", [stream debugDescription], (unsigned int) eventCode);
+    //NSLog(@"NSStream %@ event %u", [stream debugDescription], (unsigned int) eventCode);
 
     // find peer
     [peers enumerateObjectsUsingBlock:^(GameNetworkPeer * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop)

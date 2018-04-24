@@ -35,7 +35,7 @@ collision_actions_default[OBJ_LAST][OBJ_LAST] =
 {
     {0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0,       2, 0, 0, 0, 0, 0, 2, 0, 0}, // unknown
     {2, 2, 2, 0, 2, 2, 1, 0, 0, 0, 0,       3, 1, 0, 0, 0, 0, 1, 0, 0}, // ship
-    {2, 2, 2, 3, 2, 2, 1, 4, 3, 0, 0, /*3*/ 5, 1, 0, 0, 0, 0, 0, 0, 0}, // player
+    {2, 2, 2, 3, 2, 2, 1, 4, 3, 0, 0, /*3*/ 5, 1, 0, 1, 0, 0, 0, 0, 0}, // player
     {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // turret
     {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // block_moving
     {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // block
@@ -363,6 +363,14 @@ do_world_collision_handling(float tc)
                     int object_damage = world_coll_act == COLLISION_ACTION_DAMAGE;
                     int durability_a = pCollisionA->elem->durability;
                     int durability_b = pCollisionB->elem->durability;
+                    
+                    // HACK: expect A to point at faster object (missle/bullet)
+                    if(pCollisionA->elem->physics.ptr->velocity < pCollisionB->elem->physics.ptr->velocity)
+                    {
+                        WorldElemListNode* tmp = pCollisionA;
+                        pCollisionA = pCollisionB;
+                        pCollisionB = tmp;
+                    }
                     
                     if(object_damage)
                     {

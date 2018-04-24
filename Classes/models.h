@@ -264,11 +264,11 @@ static model_texcoord_t model_ship1_texcoords[] = {
 static model_texcoord_t model_ship1_texcoords[] = {
     // diamond polygon cockpit
     0.5, 1,
-    0.4, 0.75, //1
-    0.4, 0.75,
+    0.40, 0.75, //1
+    0.40, 0.75,
     0.5, /*0.5*/0.4, //3
     0.5, 0.75,
-    0.5, 0.25,
+    0.05, 0.98,
     
     // wing 1
     0, 1-0.6, //6

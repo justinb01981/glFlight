@@ -173,7 +173,7 @@ const static float game_variables_default[] = {
     0.05,        // ENEMY1_MAX_TURN_SKILL_SCALE
     /*25*/10,    // ENEMY1_JUKE_PCT
     2,           // ENEMY1_COLLECT_DURABILITY
-    20,          // ENEMY_RUN_DISTANCE
+    10,          // ENEMY_RUN_DISTANCE
     MAX_SPEED/2,
     0,0,0,0,0,0,0,0,0,0,0,0,0,
     0            // END

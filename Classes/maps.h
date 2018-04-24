@@ -564,6 +564,7 @@ RANDOM_FLOATING_BLOCKS_1
 */
 ;
 
+// MARK: -- map - collection
 const static char initial_map_collection[] = ""
 
 //"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
@@ -602,7 +603,7 @@ BASE_ENEMY_1
 // "core" that spits out data
 BASE_GENERIC(200, 50, 200)
 
-"add_spawn 200 0 200 3.14 0 0\n"
+"add_spawn 200 8 200 3.14 0 0\n"
 
 /*
 "register_params 1 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0\n"
@@ -814,6 +815,7 @@ RANDOM_DECORATION_1
  */
 ;
 
+// MARK: -- map - deathmatch
 const static char initial_map_deathmatch[] = ""
 
 "set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS

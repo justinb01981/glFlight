@@ -2947,10 +2947,7 @@ gameNetwork_handle_destruction(WorldElem* elem)
 {
     gameNetworkPlayerInfo *pInfo = NULL;
     
-    if(gameNetworkState.hostInfo.hosting)
-    {
-        
-    }
+    if(!gameNetworkState.connected) return;
     
     if(elem->object_type == OBJ_PLAYER)
     {

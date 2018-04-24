@@ -574,7 +574,7 @@ static void gameDialogCancelString();
 static void
 gameDialogDisplayString(char *str)
 {
-    if(gameDialogState.displayStringCount > 15) return;
+    //if(gameDialogState.displayStringCount > 15) return;
     
     strcpy(gameDialogState.displayStringBuf[gameDialogState.displayStringCount], str);
     gameDialogState.displayStringCount++;

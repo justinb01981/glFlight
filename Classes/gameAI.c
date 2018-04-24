@@ -471,10 +471,11 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         // avoid collision
         if(elem->stuff.u.enemy.run_distance > 0 &&
            dist <= elem->stuff.u.enemy.run_distance /* - (run_distance*skill*diff_m) && zdot < 0 */ &&
-           zdot <= 0.2 &&
+           zdot > 0.2 &&
            target_avoid_collision(target_objtype))
         {
             elem->stuff.u.enemy.enemy_state = ENEMY_STATE_RUN;
+            elem->stuff.u.enemy.time_next_decision = 3000;
             ax = -ax; ay = -ay; az = -az;
         }
         
