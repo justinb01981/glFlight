@@ -16,6 +16,7 @@
 #include "maps.h"
 #include "world_file.h"
 #include "gameInput.h"
+#include "gameCamera.h"
 
 #define GAME_DIALOG_LIFE_MAX 999999
 
@@ -100,44 +101,8 @@ gameDialogResetScores()
 }
 
 static void
-gameDialogWelcomeSingle()
-{
-    fireAction = ACTION_START_GAME;
-    gameInterfaceControls.textMenuControl.visible = 1;
-}
-
-static void
-gameDialogWelcomeMultiHost()
-{
-    actions_menu_set(ACTION_HOST_GAME);
-    fireAction = ACTION_HOST_GAME;
-}
-
-static void
-gameDialogWelcomeMultiJoin()
-{
-    actions_menu_set(ACTION_CONNECT_TO_GAME);
-    fireAction = ACTION_CONNECT_TO_GAME;
-}
-
-static void
-gameDialogWelcomeMulti()
-{
-    gameInterfaceModalDialog("Join or host:", "Join", "Host",
-                             gameDialogWelcomeMultiJoin, gameDialogWelcomeMultiHost);
-}
-
-static void
-gameDialogWelcomeQuick()
-{
-    gameInterfaceModalDialog("Game type:", "Firewall", "Multiplayer",
-                             gameDialogWelcomeSingle, gameDialogWelcomeMulti);
-}
-
-static void
 gameDialogWelcomeMenu()
 {
-    gameInterfaceControls.mainMenu.visible = 1;
     gameInterfaceControls.textMenuControl.visible = 1;
 }
 
@@ -192,6 +157,11 @@ gameDialogMenuCountdown()
     static int passes = 200;
     passes--;
     
+    if(gameInterfaceControls.touchCount > 0)
+    {
+        passes = 0;
+    }
+    
     if(passes > 0)
     {
         gameInterfaceControls.graphicDialogHelp.visible = 1;
@@ -206,8 +176,6 @@ gameDialogMenuCountdown()
 static void
 gameDialogWelcome()
 {
-    gameInterfaceControls.mainMenu.visible = 1;
-    
     if(/*gameSettingsLaunchCount % 2 == 1 && !gameSettingsRatingGiven*/ 0)
     {
         gameInterfaceModalDialog(WELCOMESTR
@@ -218,9 +186,6 @@ gameDialogWelcome()
     }
     else
     {
-        //gameInterfaceModalDialog(WELCOMESTR, "Quick Game", "Menu",
-        //                         /*gameDialogWelcomeQuick*/ gameDialogWelcomeSingle, gameDialogWelcomeMenu);
-        
         glFlightDrawframeHook = gameDialogMenuCountdown;
     }
     
@@ -230,17 +195,14 @@ gameDialogWelcome()
 static void
 gameDialogCancelTrim()
 {
-    /*
-    extern void gameInputTrimAbort(void);
-    
-    gameInputTrimAbort();
-    gameDialogCancel();
-     */
 }
 
 static void
 gameDialogCalibrate()
 {
+    gameDialogClose();
+    gameInterfaceModalDialogDequeue();
+    
     gameInputInit();
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
@@ -255,7 +217,7 @@ gameDialogCalibrate()
 }
 
 static void
-gameDialogCalibrateBegin()
+gameDialogInitial()
 {
     console_clear();
     
@@ -269,6 +231,38 @@ gameDialogCalibrateBegin()
                              "^C                             ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
                              "", "cancel", gameDialogCalibrate, gameDialogCalibrate);
+}
+
+static void
+gameDialogInitialCountdown()
+{
+    static int count = 240;
+    
+    if(count == 0)
+    {
+        glFlightDrawframeHook = NULL;
+        count = 240;
+        gameDialogInitial();
+        
+        return;
+    }
+    
+    if(count == 240-32)
+    {
+        // TODO: freeze camera here and display ship
+        gameInterfaceControls.mainMenu.visible = 0;
+        
+        // init camera
+        camera_locked_frames = 240-32;
+        
+        gameCamera_yawRadians(3.14);
+        gameCamera_MoveZ(-11);
+        gameCamera_MoveY(3);
+        gameCamera_pitchRadians(0.52);
+    }
+    gameCamera_MoveZ(0.03);
+    
+    count--;
 }
 
 static void

@@ -541,13 +541,14 @@ void map_render(char *map_buf)
                         }
                         break;
                         
-                         case MAP_ADD_SPAWN_POINT:
-                         last_object_id =
-                         world_add_object(MODEL_CUBE, map_cmd.params[0], map_cmd.params[1], map_cmd.params[2],
-                                          map_cmd.params[3], map_cmd.params[4], map_cmd.params[5],
-                                          10, TEXTURE_ID_ANIMATED_STATIC);
-                         world_get_last_object()->object_type = OBJ_SPAWNPOINT;
-                         break;
+                    case MAP_ADD_SPAWN_POINT:
+                        last_object_id =
+                        world_add_object(MODEL_CUBE, map_cmd.params[0], map_cmd.params[1], map_cmd.params[2],
+                                         map_cmd.params[3], map_cmd.params[4], map_cmd.params[5],
+                                         10, TEXTURE_ID_ANIMATED_STATIC);
+                        world_get_last_object()->object_type = OBJ_SPAWNPOINT;
+                        world_object_set_lifetime(last_object_id, 300);
+                        break;
                         
                     case MAP_ADD_MESH:
                         world_add_mesh(map_cmd.params[0], map_cmd.params[1], map_cmd.params[2],

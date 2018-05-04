@@ -2058,8 +2058,9 @@ game_run()
         {
             if(gameStateSinglePlayer.game_type == GAME_TYPE_COLLECT)
             {
-                sprintf(game_status_string, "^Dintegrity:%.0f%%",
-                        gameStateSinglePlayer.collect_system_integrity);
+                int collect_system_integrity = gameStateSinglePlayer.collect_system_integrity;
+                sprintf(game_status_string, "^2^2^d^1^1 %00d%%",
+                        collect_system_integrity);
             }
         }
     }

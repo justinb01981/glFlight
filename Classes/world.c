@@ -342,10 +342,21 @@ world_add_object_core(Model type,
             model_sizeof = sizeof(model_sphere_coords);
             model_indices = model_sphere_indices;
             model_indices_sizeof = sizeof(model_sphere_indices);
-            model_texcoords = model_blendship_texcoords;
+            model_texcoords = model_sphere_texcoords;
             model_texcoords_sizeof = sizeof(model_sphere_texcoords);
             model_primitives_sizeof = sizeof(model_sphere_primitives);
             model_primitives = model_sphere_primitives;
+            break;
+            
+        case MODEL_TBUILDING:
+            model_coords = model_tbuilding_coords;
+            model_sizeof = sizeof(model_tbuilding_coords);
+            model_indices = model_tbuilding_indices;
+            model_indices_sizeof = sizeof(model_tbuilding_indices);
+            model_texcoords = model_tbuilding_texcoords;
+            model_texcoords_sizeof = sizeof(model_tbuilding_texcoords);
+            model_primitives_sizeof = sizeof(model_tbuilding_primitives);
+            model_primitives = model_tbuilding_primitives;
             break;
             
         case MODEL_ENEMY_BASE:
@@ -449,6 +460,9 @@ world_add_object_core(Model type,
             
         case MODEL_SURFACE:
             pElem->renderInfo.priority = 1;
+            break;
+            
+        case MODEL_TBUILDING:
             break;
             
         case MODEL_ENEMY_BASE:
@@ -1638,6 +1652,7 @@ world_update(float tc)
     // TODO: for meshes test collision by checking if object is < plane-normal vector
     int do_check_collisions = 1;
     int do_sound_checks = 1;
+    unsigned int collision_resolve_retries = 100;
     
     WorldElemListNode* pCur = gWorld->elements_moving.next;
     
@@ -1765,6 +1780,11 @@ world_update(float tc)
                         int cl = 0;
                         
                         region_collision_retry:
+                        
+                        if(collision_resolve_retries == 0) break;
+                        
+                        collision_resolve_retries--;
+                        
                         while(collision_actions_table_list[cl])
                         {
                             collision_action_table_t *collision_actions_cur = collision_actions_table_list[cl];

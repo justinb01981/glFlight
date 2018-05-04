@@ -216,7 +216,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.consoleTextRect.tex_id = -1;
     gameInterfaceControls.consoleTextRect.text_align_topleft = 1;
     
-    gameInterfaceControls.statsTextRect.x = screenWidth * 0.00;
+    gameInterfaceControls.statsTextRect.x = screenWidth * 0.1;
     gameInterfaceControls.statsTextRect.y = screenHeight * 0.15;
     gameInterfaceControls.statsTextRect.xw = 0.05*screenWidth;
     gameInterfaceControls.statsTextRect.yw = screenHeight/3;

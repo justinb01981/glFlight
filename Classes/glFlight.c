@@ -43,7 +43,7 @@ int world_inited = 0;
 int game_terminated_gracefully = 0;
 char *world_data = NULL;
 int game_paused = 1;
-void (*glFlightDrawframeHook)(void) = NULL;
+void (*glFlightDrawframeHook)(void) = gameDialogInitialCountdown;
 
 unsigned int visibleElementsLen = 0;
 
@@ -137,7 +137,6 @@ glFlightFrameStage1()
     int ship_durability = DURABILITY_PLAYER;
     float tc = 0;
     float spawn[6];
-    static int gameDialogCalibrateDone = 0;
     
     glEnableClientState(GL_VERTEX_ARRAY);
     
@@ -179,11 +178,11 @@ glFlightFrameStage1()
         goto draw_bail;
     }
     
-    if(!gameDialogCalibrateDone && n_textures < TEXTURE_ID_PRELOAD+1)
-    {
-        gameDialogCalibrateDone = 1;
-        gameDialogCalibrateBegin();
-    }
+//    if(!gameDialogCalibrateDone && n_textures < TEXTURE_ID_PRELOAD+1)
+//    {
+//        gameDialogCalibrateDone = 1;
+//        gameDialogInitialCountdown();
+//    }
 
     extern void update_time_ms_frame_tick();
     update_time_ms_frame_tick();
@@ -442,9 +441,8 @@ calibrate_bail:
             targetingReticleElem.texture_id = TEXTURE_ID_CONTROLS_FIRE;
             targetingReticleElem.scale = 2;
             
-            sprintf(statsMessage, "^C:%.0f ^B:%.0f ^A:%.0f "
-                    //"CP:%d/%d Trt:%d Ally:%d "
-                    "Score:%d Time:%d %s",
+            sprintf(statsMessage, "%.0f %.0f  %.0f   %03d %03d\n"
+                    "^2^2^C   ^B   ^A    ^P   ^O   ^1^1  %s",
                     (pWorldElemMyShip->durability / (float) DURABILITY_PLAYER) * 100.0,
                     (game_ammo_bullets / game_ammo_bullets_max) * 100,
                     game_ammo_missles,
@@ -888,6 +886,10 @@ draw_btree_elements(WorldElem* pElem, float priority)
     {
         if(pElem->renderInfo.wireframe || (pElem->head_elem && pElem->head_elem->renderInfo.wireframe))
         {
+            if(pElem->type == MODEL_TBUILDING)
+            {
+            }
+            
             drawLineBegin();
             drawLinesElemTriangles(pElem);
             drawLineEnd();

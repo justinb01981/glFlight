@@ -90,7 +90,6 @@
 		D02B8F1F1969E7B800830369 /* texture73.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F1E1969E7B800830369 /* texture73.bmp */; };
 		D02D2CC217D5C5F200C03EB5 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC117D5C5F200C03EB5 /* Default@2x.png */; };
 		D02D2CC417D5C5FF00C03EB5 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC317D5C5FF00C03EB5 /* Default.png */; };
-		D02D2CC617D67C9100C03EB5 /* app_icon_lg.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC517D67C9100C03EB5 /* app_icon_lg.jpg */; };
 		D02D2CC917D67C9B00C03EB5 /* screenshot1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC717D67C9A00C03EB5 /* screenshot1.jpg */; };
 		D02D2CCA17D67C9B00C03EB5 /* screenshot2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC817D67C9B00C03EB5 /* screenshot2.jpg */; };
 		D02DAC0E17C72E9700035601 /* engine2.wav in Resources */ = {isa = PBXBuildFile; fileRef = D02DAC0D17C72E9700035601 /* engine2.wav */; };
@@ -299,7 +298,6 @@
 		D0BCC9812052EDC100094809 /* texture106.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665EA20162D5A00B106AE /* texture106.bmp */; };
 		D0BCC9822052EDC100094809 /* texture56.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0FE6D0E1859C97B007D67CF /* texture56.bmp */; };
 		D0BCC9832052EDC100094809 /* texture105.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665E820162D3500B106AE /* texture105.bmp */; };
-		D0BCC9842052EDC100094809 /* app_icon_lg.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC517D67C9100C03EB5 /* app_icon_lg.jpg */; };
 		D0BCC9852052EDC100094809 /* texture66.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D098934E1937FA4100298C8E /* texture66.bmp */; };
 		D0BCC9862052EDC100094809 /* texture29.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F08195DF2CC00830369 /* texture29.bmp */; };
 		D0BCC9872052EDC100094809 /* screenshot1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC717D67C9A00C03EB5 /* screenshot1.jpg */; };
@@ -524,7 +522,6 @@
 		D02B8F1E1969E7B800830369 /* texture73.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture73.bmp; sourceTree = "<group>"; };
 		D02D2CC117D5C5F200C03EB5 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		D02D2CC317D5C5FF00C03EB5 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
-		D02D2CC517D67C9100C03EB5 /* app_icon_lg.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = app_icon_lg.jpg; sourceTree = "<group>"; };
 		D02D2CC717D67C9A00C03EB5 /* screenshot1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = screenshot1.jpg; sourceTree = "<group>"; };
 		D02D2CC817D67C9B00C03EB5 /* screenshot2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = screenshot2.jpg; sourceTree = "<group>"; };
 		D02DAC0D17C72E9700035601 /* engine2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engine2.wav; sourceTree = "<group>"; };
@@ -953,7 +950,6 @@
 				D04EB4D41BDE0F8E0089D9F0 /* app_icon152x152.png */,
 				D02D2CC717D67C9A00C03EB5 /* screenshot1.jpg */,
 				D02D2CC817D67C9B00C03EB5 /* screenshot2.jpg */,
-				D02D2CC517D67C9100C03EB5 /* app_icon_lg.jpg */,
 				D04EB4CE1BDDF9DB0089D9F0 /* app_icon_lg_prev.jpg */,
 				6D91DEAD167A9C6A00362864 /* shipicon.png */,
 				D0C225EF1CB9361200A08AEB /* teleport.wav */,
@@ -1242,7 +1238,6 @@
 				D03665EB20162D5A00B106AE /* texture106.bmp in Resources */,
 				D0FE6D0F1859C97B007D67CF /* texture56.bmp in Resources */,
 				D03665E920162D3500B106AE /* texture105.bmp in Resources */,
-				D02D2CC617D67C9100C03EB5 /* app_icon_lg.jpg in Resources */,
 				D098934F1937FA4100298C8E /* texture66.bmp in Resources */,
 				D02B8F0C195DF2CC00830369 /* texture29.bmp in Resources */,
 				D02D2CC917D67C9B00C03EB5 /* screenshot1.jpg in Resources */,
@@ -1409,7 +1404,6 @@
 				D0BCC9812052EDC100094809 /* texture106.bmp in Resources */,
 				D0BCC9822052EDC100094809 /* texture56.bmp in Resources */,
 				D0BCC9832052EDC100094809 /* texture105.bmp in Resources */,
-				D0BCC9842052EDC100094809 /* app_icon_lg.jpg in Resources */,
 				D0BCC9852052EDC100094809 /* texture66.bmp in Resources */,
 				D0BD22F020559D9000D4AEE3 /* Default.sc.png in Resources */,
 				D0BCC9862052EDC100094809 /* texture29.bmp in Resources */,

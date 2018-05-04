@@ -1,14 +1,20 @@
+## reference face coordinates (for a cube)
+#v -0.018826 0.018826 -0.981174
+#v -0.018826 0.018826 0.981174
+#v -0.159622 0.018826 0.981174
+#v -0.159622 0.018826 -0.981174
 import sys
 import math
 
 Acoords = []
+AcoordsOrdered = []
 Atcoords = []
 AtcoordsOrdered = []
 Anormals = []
 Afaces = []
 
 vcam = [1, 1, 1]
-mname = 'object'
+mname = 'tbuilding'
 
 def vCross(a, b):
     return [
@@ -31,6 +37,7 @@ while 1:
       i += 1
 
   elif(tok[0] == 'vn'):
+    print('//vn='+str([float(tok[1]), float(tok[2]), float(tok[3])]))
     Anormals += [float(tok[1]), float(tok[2]), float(tok[3])]
 
   elif(tok[0] == 'vt'):
@@ -43,9 +50,13 @@ while 1:
 
     if len(tok) == 5:
       triangles = int(2)
-      tokF = [[tok[0], tok[4], tok[2], tok[1]], [tok[0], tok[4], tok[2], tok[3]]]
+      tokF = [[tok[0], tok[3], tok[4], tok[1]], [tok[0], tok[1], tok[2], tok[3]]]
     else:
       tokF = [[tok[0], tok[1], tok[2], tok[3]]]
+
+    print('//tokf='+str(tokF))
+
+    AcoordsOffset = len(AcoordsOrdered)/3
 
     while(triangles > 0):
 
@@ -58,10 +69,8 @@ while 1:
         tokV = tokT[i].split('/')
 
         if tokV[0] != '':
-          #Afaces += [int(tokV[0])]
           face += [int(tokV[0])-1]
         else:
-          #Afaces += [int(0)]
           face += [int(0)]
 
         if tokV[1] != '':
@@ -71,10 +80,12 @@ while 1:
           AtcoordsOrdered += [0, 0]
 
         if tokV[2] != '':
-          idx = int(tokV[2])-1
+          idx = (int(tokV[2])-1) * 3
           vnormal = [Anormals[idx], Anormals[idx+1], Anormals[idx+2]]
+          print('// vnormal='+str(vnormal)+' (idx='+str(idx)+')')
           
         i += 1
+      ##-- end a/b/c token parsing
 
       u = [
               (Acoords[face[1]*3] - Acoords[face[0]*3]) * vcam[0],
@@ -92,28 +103,46 @@ while 1:
       print('// u='+str(u))
       print('// v='+str(v))
       print('// uvN='+str(uvN[0])+str(uvN[1]) + str(uvN[2]))
+
+      nA = vnormal
+
+      print ('// normal=' + str(nA[0]) + ' ' + str(nA[1]) + ' ' + str(nA[2]))
+
+      ## face U, V cross product coliniear with normal?
+
+      uvD = nA[0]*uvN[0] + nA[1]*uvN[1] + nA[2]*uvN[2]
+      vuD = nA[0]*vuN[0] + nA[1]*vuN[1] + nA[2]*vuN[2]
+    
+      AfacesOffset = len(Afaces)
+      Afaces += [face[0]]
+
+      if uvD < vuD:
+          Afaces += [face[2], face[1]]
+      else:
+          Afaces += [face[1], face[2]]
+
+      flen = len(Afaces)
+      #for i in [1,2,3]:
+      #    Afaces[flen-i] += AcoordsOffset
+
+      for i in [0,1,2]:
+          for d in [0,1,2]:
+              AcoordsOrdered += [Acoords[(Afaces[AfacesOffset+i]*3)+d]]
+
+      for i in [1,2,3]:
+          Afaces[flen-i] = flen-i
+
       triangles -= 1
+    ##-- end triangles
 
     ## calculate face normal
-    ## approx unitvec from origin to face midpoint
-    nA = [Acoords[face[0]*3], Acoords[face[0]*3+1], Acoords[face[0]*3+2]]
-    for k in [1, 2]:
-        for d in [0, 1, 2]:
-            nA[d] += ((Acoords[face[k]*3+d] - Acoords[face[k-1]*3+d]) * 0.5)
-    nA = [nA[0], nA[1], nA[2]]
+    ## approx unitvec from origin to face midpoint (only works for convex models)
+    #nA = [Acoords[face[0]*3], Acoords[face[0]*3+1], Acoords[face[0]*3+2]]
+    #for k in [1, 2]:
+    #    for d in [0, 1, 2]:
+    #        nA[d] += ((Acoords[face[k]*3+d] - Acoords[face[k-1]*3+d]) * 0.5)
+    #nA = [nA[0], nA[1], nA[2]]
 
-    print ('// normal=' + str(nA[0]) + ' ' + str(nA[1]) + ' ' + str(nA[2]))
-
-    ## face U, V cross product coliniear with normal?
-
-    uvD = nA[0]*uvN[0] + nA[1]*uvN[1] + nA[2]*uvN[2]
-    vuD = nA[0]*vuN[0] + nA[1]*vuN[1] + nA[2]*vuN[2]
-    
-    Afaces += [face[0]]
-    if uvD < vuD:
-        Afaces += [face[2], face[1]]
-    else:
-        Afaces += [face[1], face[2]]
 
     #if uvN[0]*nA[0] + uvN[1]*nA[1] + uvN[2]*nA[2] < 0:
     #    print "// ->"
@@ -123,12 +152,12 @@ while 1:
     #    Afaces += [face[2], face[1], face[0]]
 
   else:
-    print ('// ignoring line ' + tok[0])
+      print ('// ignoring line ' + tok[0])
 
 ## print model coordinates
 print ('static model_coord_t model_' + mname + '_coords[] = {')
 idx = 0
-c = Acoords
+c = AcoordsOrdered
 while idx < len(c):
   eol = ',' if idx+3 < len(c) else ''
   print (str(c[idx]) + ', ' + str(c[idx+1]) + ', ' + str(c[idx+2]) + eol)

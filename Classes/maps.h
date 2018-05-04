@@ -262,15 +262,28 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0) \
 ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 
 #define BUILDING_1(x, y, z)                         \
-"set_vector "#x" "#y" "#z" 0 1 0\n"                 \
+"set_vector "#x" "#y" "#z" 0 4 0\n"                 \
 "add_object 1 vecx_0 vecy_0 vecz_0 0 0 0 4 16\n"    \
-"add_object 1 vecx_0 vecy_4 vecz_0 0 0 0 4 16\n"    \
-"add_object 1 vecx_0 vecy_8 vecz_0 0 0 0 4 16\n"   \
-"add_object 1 vecx_0 vecy_12 vecz_0 0 0 0 4 16\n"   \
-"add_object 1 vecx_0 vecy_16 vecz_0 0 0 0 4 16\n"   \
-"add_object 1 vecx_0 vecy_20 vecz_0 0 0 0 4 16\n"   \
-"add_object 1 vecx_0 vecy_24 vecz_0 0 0 0 4 16\n"   \
-"add_object 1 vecx_0 vecy_28 vecz_0 0 0 0 4 16\n"
+"add_object 1 vecx_0 vecy_1 vecz_0 0 0 0 4 16\n"    \
+"add_object 1 vecx_0 vecy_2 vecz_0 0 0 0 4 16\n"   \
+"add_object 1 vecx_0 vecy_3 vecz_0 0 0 0 4 16\n"   \
+"add_object 1 vecx_0 vecy_4 vecz_0 0 0 0 4 16\n"   \
+"add_object 1 vecx_0 vecy_5 vecz_0 0 0 0 4 16\n"   \
+
+#define BUILDING_2(x, y, z)                         \
+"set_vector "#x" "#y" "#z" 0 1 0\n"                 \
+"add_object 19 vecx_0 vecy_2 vecz_0 0 0 0 4 16\n"
+
+#define BUILDING_3(x, y, z)                         \
+"set_vector "#x" "#y" "#z" 2 2 2\n"                 \
+"add_object 2 vecx_0 vecy_0 vecz_0 0 0 0 2 31\n"    \
+"add_object 2 vecx_1 vecy_0 vecz_0 0 0 0 2 31\n"    \
+"add_object 2 vecx_2 vecy_0 vecz_0 0 0 0 2 31\n"    \
+"add_object 2 vecx_0 vecy_1 vecz_0 0 0 0 2 31\n"    \
+"add_object 2 vecx_1 vecy_1 vecz_0 0 0 0 2 31\n"    \
+"add_object 2 vecx_2 vecy_1 vecz_0 0 0 0 2 31\n"    \
+"add_object 2 vecx_2 vecy_1 vecz_1 0 0 0 2 31\n"    \
+"add_object 2 vecx_2 vecy_0 vecz_1 0 0 0 2 31\n"
 
 #define BUILDING_PYRAMID(x, y, z)                   \
 ADD_OBJ_BEGIN(2, x, y, z) \
@@ -587,6 +600,44 @@ BUILDING_1(rndx, 2, rndz)
 BUILDING_1(rndx, 2, rndz)
 BUILDING_1(rndx, 2, rndz)
 
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+/*
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+BUILDING_3(rndx, 1, rndz)
+*/
+
 BUILDING_PYRAMID(100, 2, 100)
 BUILDING_PYRAMID(300, 2, 100)
 BUILDING_PYRAMID(100, 2, 300)
@@ -723,17 +774,16 @@ COLLECT_POINT_ADD(rnd_-10_10, 0, rnd_-10_10)
 BASE_ENEMY_1
 
 // air platform
-/*
- "register_params 2 rndx 20 rndy 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "register_params_update 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 6 31\n"
- "register_params_update 0 -20 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 6 31\n"
- "register_params_update 0 10 0 10 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 6 31\n"
- "register_params_update 0 0 0 -20 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 6 31\n"
- */
+"register_params 2 rndx 20 rndy 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"register_params_update 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 6 31\n"
+"register_params_update 0 -20 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 6 31\n"
+"register_params_update 0 10 0 10 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 6 31\n"
+"register_params_update 0 0 0 -20 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"add_object r r r r 0 0 0 6 31\n"
+
 
 /*
 RANDOM_DECORATION_1

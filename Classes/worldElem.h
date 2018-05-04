@@ -15,7 +15,7 @@
 #include "simple_hash.h"
 #include "gameTimeval.h"
 
-#define MAX_ELEM 128
+#define MAX_ELEM 256
 #define MODEL_EXTENSION_MAX 1024
 
 #define IS_LINKED_ELEM(e) ((e)->head_elem != NULL)
