@@ -339,12 +339,16 @@ gameInterfaceHandleTouchMove(float x, float y)
         gameInterfaceControls.touchUnmapped = 1;
     }
     
-    // controls after this ignore move events
+    
     if(fabs(x-x_last) < move_thresh &&
        fabs(y-y_last) < move_thresh)
     {
         return;
     }
+    
+    // controls after this ignore move events
+    if(!touchedControl || !touchedControl->touch_began) return;
+    
     x_last = x;
     y_last = y;
     
@@ -454,7 +458,7 @@ gameInterfaceHandleTouchBegin(float x, float y)
     
     if(touchedControl)
     {
-        touchedControl->touched = 1;
+        touchedControl->touch_began = 1;
         gameInterfaceHandleTouchMove(x, y);
     }
     
@@ -1026,7 +1030,7 @@ gameInterfaceHandleTouchEnd(float x, float y)
     
     if(touchedControl)
     {
-        touchedControl->touched = 0;
+        touchedControl->touch_began = 0;
         //gameInterfaceHandleTouchMove(x, y);
         touchedControl->touch_end_last = time_ms;
     }
@@ -1049,7 +1053,7 @@ gameInterfaceHandleAllTouchEnd()
     
     for(int i = 0; controlSet[i] != NULL; i++)
     {
-        controlSet[i]->touched = 0;
+        controlSet[i]->touch_began = 0;
     }
     
     gameInterfaceControls.touchUnmapped = 0;

@@ -463,6 +463,7 @@ world_add_object_core(Model type,
             break;
             
         case MODEL_TBUILDING:
+            new_durability = DURABILITY_BLOCK;
             break;
             
         case MODEL_ENEMY_BASE:

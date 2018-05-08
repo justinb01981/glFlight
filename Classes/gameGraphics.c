@@ -747,7 +747,7 @@ void drawControls()
             {
                 //yphase = speed / maxSpeed;
                 subElements[subElementsN].xw = 0.1;
-                subElements[subElementsN].x = (targetSpeed / maxSpeed) - subElements[subElementsN].xw/2 + subElements[subElementsN].xw;
+                subElements[subElementsN].x = (targetSpeed / maxSpeed) - 0.1;
                 subElements[subElementsN].y = 0;
                 subElements[subElementsN].yw = 1;
                 subElements[subElementsN].tex_id = 21;

@@ -2201,7 +2201,7 @@ game_run()
         break;
     }
     
-    if(gameInterfaceControls.fire.touched && time_ms - firedLast > 200)
+    if(gameInterfaceControls.fire.touch_began && time_ms - firedLast > 200)
     {
         firedLast = time_ms;
         fireBullet(ACTION_FIRE_BULLET);
@@ -2209,7 +2209,7 @@ game_run()
         console_write(game_log_messages[GAME_LOG_SHOTFIRED]);
     }
     
-    if(gameInterfaceControls.fireRectMissle.touched && time_ms - firedLastMissle > 1000)
+    if(gameInterfaceControls.fireRectMissle.touch_began && time_ms - firedLastMissle > 1000)
     {
         firedLastMissle = time_ms;
         fireBullet(ACTION_FIRE_MISSLE);
@@ -2219,9 +2219,9 @@ game_run()
     {
         gameInterfaceSetInterfaceState(INTERFACE_STATE_TOWING);
         
-        if(gameInterfaceControls.fireRectMisc.touched)
+        if(gameInterfaceControls.fireRectMisc.touch_began)
         {
-            gameInterfaceControls.fireRectMisc.touched = 0;
+            gameInterfaceControls.fireRectMisc.touch_began = 0;
             pMyShipNode->elem->stuff.towed_elem_id = WORLD_ELEM_ID_INVALID;
             gameInterfaceSetInterfaceState(INTERFACE_STATE_NONE);
         }

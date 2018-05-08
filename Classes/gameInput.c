@@ -532,7 +532,7 @@ gameInput()
         {
             // simplified controls (roll buttons)? on-screen controls?
             gameInterfaceSetInterfaceState(INTERFACE_STATE_ONSCREEN_INPUT_CONTROL);
-            if(!gameInterfaceControls.altControl.touched)
+            if(!gameInterfaceControls.altControl.touch_began)
             {
                 roll_m = deviceRoll;
                 input_roll = 0;

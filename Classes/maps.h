@@ -271,8 +271,8 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 "add_object 1 vecx_0 vecy_5 vecz_0 0 0 0 4 16\n"   \
 
 #define BUILDING_2(x, y, z)                         \
-"set_vector "#x" "#y" "#z" 0 1 0\n"                 \
-"add_object 19 vecx_0 vecy_2 vecz_0 0 0 0 4 16\n"
+"set_vector "#x" "#y" "#z" 0 4 0\n"                 \
+"add_object 19 vecx_0 vecy_0 vecz_0 0 0 0 4 16\n"
 
 #define BUILDING_3(x, y, z)                         \
 "set_vector "#x" "#y" "#z" 2 2 2\n"                 \

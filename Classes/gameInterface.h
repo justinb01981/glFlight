@@ -18,7 +18,7 @@ typedef struct
     double xw, yw;
     double xm, ym;
     int tex_id;
-    int touched;
+    int touch_began;
     int visible;
     int hide_frames;
     int blinking;
