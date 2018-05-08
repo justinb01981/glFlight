@@ -346,13 +346,13 @@ gameInterfaceHandleTouchMove(float x, float y)
         return;
     }
     
+    gameDialogGraphicCancel();
+    
     // controls after this ignore move events
     if(!touchedControl || !touchedControl->touch_began) return;
     
     x_last = x;
     y_last = y;
-    
-    gameDialogGraphicCancel();
     
     if(touchedControl == &gameInterfaceControls.radar)
     {
@@ -456,10 +456,19 @@ gameInterfaceHandleTouchBegin(float x, float y)
     int rgnv = 0;
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
     
-    if(touchedControl)
+    if((touchedControl && !gameInterfaceControls.textMenuControl.visible)
+       || touchedControl == &gameInterfaceControls.textMenuControl
+       || touchedControl == &gameInterfaceControls.dialogRect
+       || touchedControl == &gameInterfaceControls.menuControl)
     {
         touchedControl->touch_began = 1;
         gameInterfaceHandleTouchMove(x, y);
+        
+        gameInterfaceControls.textMenuControl.tex_id = TEXTURE_ID_CONTROLS_TEXTMENU;
+    }
+    else
+    {
+        gameInterfaceControls.textMenuControl.tex_id = TEXTURE_ID_CONTROLS_TEXTMENU_OUTOFBOUNDS;
     }
     
     if(touchedControl == &gameInterfaceControls.textMenuControl ||
@@ -478,6 +487,7 @@ gameInterfaceHandleTouchBegin(float x, float y)
         
         if(touchedControl == &gameInterfaceControls.textMenuControl)
         {
+            int outofbounds = 1;
             int r;
             for(r = 0; r < sizeof(touchRegionsXY2048)/(sizeof(float)*2); r++)
             {
@@ -488,8 +498,11 @@ gameInterfaceHandleTouchBegin(float x, float y)
                 {
                     RMin = R;
                     rgnv = touchRegionsXY2048[r][2];
+                    outofbounds = 0;
                 }
             }
+            
+            gameInterfaceControls.textMenuControl.tex_id = outofbounds ? TEXTURE_ID_CONTROLS_TEXTMENU_OUTOFBOUNDS : TEXTURE_ID_CONTROLS_TEXTMENU;
         }
         else if(touchedControl == &gameInterfaceControls.keyboardEntry)
         {

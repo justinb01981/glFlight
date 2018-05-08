@@ -74,6 +74,10 @@
 		D00D78D81A0AFA4800E701B9 /* app_icon_64x64.png in Resources */ = {isa = PBXBuildFile; fileRef = D00D78D71A0AFA4800E701B9 /* app_icon_64x64.png */; };
 		D02071731BF282D4000AC2BA /* texture88.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02071721BF282D4000AC2BA /* texture88.bmp */; };
 		D02071751BF29F11000AC2BA /* texture89.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02071741BF29F11000AC2BA /* texture89.bmp */; };
+		D0290F3120A24460002935C3 /* texture112.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0290F3020A2445F002935C3 /* texture112.bmp */; };
+		D0290F3220A24460002935C3 /* texture112.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0290F3020A2445F002935C3 /* texture112.bmp */; };
+		D0290F3420A25BF3002935C3 /* texture113.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0290F3320A25BF2002935C3 /* texture113.bmp */; };
+		D0290F3520A25BF3002935C3 /* texture113.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0290F3320A25BF2002935C3 /* texture113.bmp */; };
 		D02B8EFF195357FE00830369 /* gameSettings.c in Sources */ = {isa = PBXBuildFile; fileRef = D02B8EFE195357FE00830369 /* gameSettings.c */; };
 		D02B8F0119535AAB00830369 /* gameDialogs.c in Sources */ = {isa = PBXBuildFile; fileRef = D02B8F0019535AAB00830369 /* gameDialogs.c */; };
 		D02B8F031954A74400830369 /* texture69.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F021954A74400830369 /* texture69.bmp */; };
@@ -502,6 +506,8 @@
 		D011EF5B19BE46EE004A56CB /* gameDebug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameDebug.h; sourceTree = "<group>"; };
 		D02071721BF282D4000AC2BA /* texture88.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture88.bmp; sourceTree = "<group>"; };
 		D02071741BF29F11000AC2BA /* texture89.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture89.bmp; sourceTree = "<group>"; };
+		D0290F3020A2445F002935C3 /* texture112.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture112.bmp; sourceTree = "<group>"; };
+		D0290F3320A25BF2002935C3 /* texture113.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture113.bmp; sourceTree = "<group>"; };
 		D02B8EFE195357FE00830369 /* gameSettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gameSettings.c; sourceTree = "<group>"; };
 		D02B8F0019535AAB00830369 /* gameDialogs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gameDialogs.c; sourceTree = "<group>"; };
 		D02B8F021954A74400830369 /* texture69.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture69.bmp; sourceTree = "<group>"; };
@@ -828,6 +834,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D0290F3320A25BF2002935C3 /* texture113.bmp */,
+				D0290F3020A2445F002935C3 /* texture112.bmp */,
 				D09A5F3D208174EB009F9618 /* texture111.bmp */,
 				D09A5F3A208172D8009F9618 /* texture110.bmp */,
 				D087BAEA204707B300F4D6E0 /* texture109.bmp */,
@@ -1126,6 +1134,7 @@
 				D0A66F41194B9497004A5E42 /* texture68.bmp in Resources */,
 				D0017FC71C62B9D4003F0368 /* texture96.bmp in Resources */,
 				D08AC6C11DAAE3DA00E367B7 /* texture99.bmp in Resources */,
+				D0290F3420A25BF3002935C3 /* texture113.bmp in Resources */,
 				6DF4AFBF15B2531C00A5C8B9 /* texture4.bmp in Resources */,
 				D0A5536018B6DDD700F7E798 /* texture58.bmp in Resources */,
 				D0CB80E31BFB9F5500E52F43 /* texture90.bmp in Resources */,
@@ -1183,6 +1192,7 @@
 				D0FE6D0418553E6E007D67CF /* texture51.bmp in Resources */,
 				D09051CA196DD87200E5F29E /* texture74.bmp in Resources */,
 				D02B8F1F1969E7B800830369 /* texture73.bmp in Resources */,
+				D0290F3120A24460002935C3 /* texture112.bmp in Resources */,
 				D02B8F031954A74400830369 /* texture69.bmp in Resources */,
 				D0FE6D0B1859C6C3007D67CF /* texture54.bmp in Resources */,
 				D0A5535E18A6C79900F7E798 /* texture57.bmp in Resources */,
@@ -1272,6 +1282,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0BCC8FD2052EDC100094809 /* texture50.bmp in Resources */,
+				D0290F3520A25BF3002935C3 /* texture113.bmp in Resources */,
 				D0BCC8FE2052EDC100094809 /* Shader.fsh in Resources */,
 				D0BCC8FF2052EDC100094809 /* Shader.vsh in Resources */,
 				D0BCC9002052EDC100094809 /* MainWindow.xib in Resources */,
@@ -1342,6 +1353,7 @@
 				D0BCC93F2052EDC100094809 /* texture89.bmp in Resources */,
 				D0BCC9402052EDC100094809 /* texture20.bmp in Resources */,
 				D0BCC9412052EDC100094809 /* texture21.bmp in Resources */,
+				D0290F3220A24460002935C3 /* texture112.bmp in Resources */,
 				D0BCC9422052EDC100094809 /* app_icon_64x64.png in Resources */,
 				D0BCC9432052EDC100094809 /* texture76.bmp in Resources */,
 				D0BCC9442052EDC100094809 /* texture22.bmp in Resources */,

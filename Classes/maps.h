@@ -270,9 +270,16 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 "add_object 1 vecx_0 vecy_4 vecz_0 0 0 0 4 16\n"   \
 "add_object 1 vecx_0 vecy_5 vecz_0 0 0 0 4 16\n"   \
 
-#define BUILDING_2(x, y, z)                         \
-"set_vector "#x" "#y" "#z" 0 4 0\n"                 \
-"add_object 19 vecx_0 vecy_0 vecz_0 0 0 0 4 16\n"
+#define BUILDING_2(x, y, z)                          \
+"set_vector "#x" "#y" "#z" 0 2 0\n"                  \
+"add_object 19 vecx_0 vecy_0 vecz_0 0 0 0 2 112\n"   \
+"add_object 19 vecx_0 vecy_1 vecz_0 0 0 0 2 112\n"   \
+"add_object 19 vecx_0 vecy_2 vecz_0 0 0 0 2 112\n"   \
+"add_object 19 vecx_0 vecy_3 vecz_0 0 0 0 2 112\n"   \
+"add_object 19 vecx_0 vecy_4 vecz_0 0 0 0 2 112\n"   \
+"add_object 19 vecx_0 vecy_5 vecz_0 0 0 0 2 112\n"   \
+"add_object 19 vecx_0 vecy_6 vecz_0 0 0 0 2 112\n"   \
+"add_object 19 vecx_0 vecy_7 vecz_0 0 0 0 2 112\n"
 
 #define BUILDING_3(x, y, z)                         \
 "set_vector "#x" "#y" "#z" 2 2 2\n"                 \
@@ -606,6 +613,53 @@ BUILDING_1(rndx, 2, rndz)
 BUILDING_1(rndx, 2, rndz)
 BUILDING_1(rndx, 2, rndz)
 BUILDING_1(rndx, 2, rndz)
+
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
 
 BUILDING_2(rndx, 2, rndz)
 BUILDING_2(rndx, 2, rndz)
