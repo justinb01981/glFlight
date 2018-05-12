@@ -52,8 +52,9 @@ typedef struct
             poly_comp.model_coords_buffer[poly_comp.model_coords_buffer_len*3+1] = M[R*1]*Ac[i] + M[R*1+1]*Ac[i+1] + M[R*1+2]*Ac[i+2] + M[R*1+3]; \
             poly_comp.model_coords_buffer[poly_comp.model_coords_buffer_len*3+2] = M[R*2]*Ac[i] + M[R*2+1]*Ac[i+1] + M[R*2+2]*Ac[i+2] + M[R*2+3]; \
             \
-            poly_comp.model_texcoords_buffer[poly_comp.model_coords_buffer_len*2] = At[i*2];    \
-            poly_comp.model_texcoords_buffer[poly_comp.model_coords_buffer_len*2+1] = At[i*2+1];    \
+            int Ti = i/3;    \
+            poly_comp.model_texcoords_buffer[poly_comp.model_coords_buffer_len*2] = At[Ti*2];    \
+            poly_comp.model_texcoords_buffer[poly_comp.model_coords_buffer_len*2+1] = At[Ti*2+1];    \
             poly_comp.model_coords_buffer_len++;    \
         }   \
             \
@@ -93,6 +94,7 @@ typedef enum {
     MODEL_SPHERE,
     MODEL_ENEMY_BASE,
     MODEL_TBUILDING,
+    MODEL_FLATTENED_CUBE,
     MODEL_LAST,
 } Model;
 

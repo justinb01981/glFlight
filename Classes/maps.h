@@ -279,71 +279,12 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 "add_object 19 vecx_0 vecy_4 vecz_0 0 0 0 2 112\n"   \
 "add_object 19 vecx_0 vecy_5 vecz_0 0 0 0 2 112\n"   \
 "add_object 19 vecx_0 vecy_6 vecz_0 0 0 0 2 112\n"   \
-"add_object 19 vecx_0 vecy_7 vecz_0 0 0 0 2 112\n"
+"add_object 19 vecx_0 vecy_7.5 vecz_0 0 0 0 1 112\n"
 
-#define BUILDING_3(x, y, z)                         \
-"set_vector "#x" "#y" "#z" 2 2 2\n"                 \
-"add_object 2 vecx_0 vecy_0 vecz_0 0 0 0 2 31\n"    \
-"add_object 2 vecx_1 vecy_0 vecz_0 0 0 0 2 31\n"    \
-"add_object 2 vecx_2 vecy_0 vecz_0 0 0 0 2 31\n"    \
-"add_object 2 vecx_0 vecy_1 vecz_0 0 0 0 2 31\n"    \
-"add_object 2 vecx_1 vecy_1 vecz_0 0 0 0 2 31\n"    \
-"add_object 2 vecx_2 vecy_1 vecz_0 0 0 0 2 31\n"    \
-"add_object 2 vecx_2 vecy_1 vecz_1 0 0 0 2 31\n"    \
-"add_object 2 vecx_2 vecy_0 vecz_1 0 0 0 2 31\n"
-
-#define BUILDING_PYRAMID(x, y, z)                   \
-ADD_OBJ_BEGIN(2, x, y, z) \
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(4, 0, 0)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(4, 0, 0)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(4, 0, 0)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(4, 0, 0)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(0, 0, 4)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(0, 0, 4)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(0, 0, 4)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(0, 0, 4)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(-4, 0, 0)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(-4, 0, 0)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(-4, 0, 0)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(-4, 0, 0)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(0, 0, -4)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(0, 0, -4)\
-ADD_OBJ_END(4, 31)\
-ADD_OBJ_MOVE(0, 0, -4)\
-ADD_OBJ_END(4, 31) \
-ADD_OBJ_BEGIN(2, x, y, z) \
-ADD_OBJ_MOVE(4, 4, 4)\
-ADD_OBJ_END(4, 16) \
-ADD_OBJ_MOVE(4, 0, 0) \
-ADD_OBJ_END(4, 16) \
-ADD_OBJ_MOVE(4, 0, 0) \
-ADD_OBJ_END(4, 16) \
-ADD_OBJ_MOVE(0, 0, 4) \
-ADD_OBJ_END(4, 16) \
-ADD_OBJ_MOVE(0, 0, 4) \
-ADD_OBJ_END(4, 16) \
-ADD_OBJ_MOVE(-4, 0, 0) \
-ADD_OBJ_END(4, 16) \
-ADD_OBJ_MOVE(-4, 0, 0) \
-ADD_OBJ_END(4, 16) \
-ADD_OBJ_MOVE(0, 0, -4) \
-ADD_OBJ_END(4, 16) \
-ADD_OBJ_MOVE(4, 4, 0) \
-ADD_OBJ_END(4, 31) \
+#define FLOATING_ISLAND(x, y, z)             \
+"set_vector "#x" "#y" "#z" 4 1 0\n"    \
+"add_object 20 vecx_0 vecy_0 vecz_0 0 0 0 10 31\n" \
+"add_object 2 vecx_1 vecy_1 vecz_0 0 0 0 1 29\n"
 
 #define WORLD_SCALED_FRAME_TURRET(x, tex, scale)                         \
 "register_params 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
@@ -592,7 +533,6 @@ const static char initial_map_collection[] = ""
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
 
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
-//WORLD_SCALED_FRAME_TERRAIN(-10, 28, 4)
 
 // else
 //GREEN_TENDRILS_1
@@ -671,31 +611,88 @@ BUILDING_2(rndx, 2, rndz)
 BUILDING_2(rndx, 2, rndz)
 BUILDING_2(rndx, 2, rndz)
 BUILDING_2(rndx, 2, rndz)
-/*
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-BUILDING_3(rndx, 1, rndz)
-*/
 
-BUILDING_PYRAMID(100, 2, 100)
-BUILDING_PYRAMID(300, 2, 100)
-BUILDING_PYRAMID(100, 2, 300)
-BUILDING_PYRAMID(300, 2, 300)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+
 
 // drifting asteroid example
 //"add_object "MAPMODEL_CUBE2" 100 20 100 0 0 0 11 56\n"
@@ -721,54 +718,6 @@ BASE_GENERIC(200, 50, 200)
 "add_object 1 r r r 0 0 0 10 40\n"
 "register_params_update 0 10 10 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
 "add_object 1 r r r 0 0 0 10 40\n"
- */
-
-/*
-// turret tower
-"register_params 1 rndx 0 rndz 0 0 0 4 40 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 11 r r r 0 0 0 4 35\n"
-"object_set_info 3\n"
-
-// turret tower
-"register_params 1 rndx 0 rndz 0 0 0 4 40 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 11 r r r 0 0 0 4 35\n"
-"object_set_info 3\n"
-
-// turret tower
-"register_params 1 rndx 0 rndz 0 0 0 2 40 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 r r\n"
-"register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 11 r r r 0 0 0 4 35\n"
-"object_set_info 3\n"
-
  */
 ;
 

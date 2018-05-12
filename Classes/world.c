@@ -403,6 +403,28 @@ world_add_object_core(Model type,
         }
             break;
             
+        case MODEL_FLATTENED_CUBE:
+        {
+            float M2[] = {
+                1, 0, 0, 0,
+                0, 0.1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+            };
+            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords, model_cube_indices, M2);
+        
+            model_coords = poly_comp.model_coords_buffer;
+            model_sizeof = poly_comp.model_coords_buffer_len * 3 * sizeof(model_coord_t);
+            model_indices = poly_comp.model_indices_buffer;
+            model_indices_sizeof = poly_comp.model_faces_buffer_n * 3 * sizeof(model_index_t);
+            model_texcoords = poly_comp.model_texcoords_buffer;
+            model_texcoords_sizeof = poly_comp.model_coords_buffer_len * 2 * sizeof(model_texcoord_t);
+            
+            model_primitives = poly_comp.primitives;
+            model_primitives_sizeof = 0;
+        }
+            break;
+            
         default:
             assert(0);
             break;
@@ -1408,8 +1430,8 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc)
     mv[2] = (pCollisionA->physics.ptr->z - pCollisionB->physics.ptr->z) * v * tc * s;
     
     // treat as a flat surface parallel to one axis
-    for(d = 0; d < 3; d++) { if(fabs(mv[d]) > fabs(mv[dmax])) dmax = d; }
-    for(d = 0; d < 3; d++) { if(d != dmax) mv[d] = -mv[d]; }
+    //for(d = 0; d < 3; d++) { if(fabs(mv[d]) > fabs(mv[dmax])) dmax = d; }
+    //for(d = 0; d < 3; d++) { if(d != dmax) mv[d] = -mv[d]; }
 
     for(int i = 0; i < 3; i++) if(fabs(mv[i]) < repulse_min) mv[i] = 0.1;
 

@@ -456,10 +456,7 @@ gameInterfaceHandleTouchBegin(float x, float y)
     int rgnv = 0;
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
     
-    if((touchedControl && !gameInterfaceControls.textMenuControl.visible)
-       || touchedControl == &gameInterfaceControls.textMenuControl
-       || touchedControl == &gameInterfaceControls.dialogRect
-       || touchedControl == &gameInterfaceControls.menuControl)
+    if(touchedControl)
     {
         touchedControl->touch_began = 1;
         gameInterfaceHandleTouchMove(x, y);
