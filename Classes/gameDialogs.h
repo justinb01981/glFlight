@@ -327,7 +327,7 @@ gameDialogBrowseGames()
 static void
 gameDialogBrowseGamesCountdown()
 {
-    static int passes = 120;
+    static int passes = 240;
     passes--;
     if(passes <= 0)
     {
@@ -361,7 +361,7 @@ gameDialogBrowseGamesCountdown()
         }
         
         glFlightDrawframeHook = NULL;
-        passes = 120;
+        passes = 240;
     }
 }
 

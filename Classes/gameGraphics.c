@@ -1123,7 +1123,8 @@ drawElem(WorldElem* pElem)
             }
             
             // TODO: only sort faces on "complex" objects
-            while(pElem->renderInfo.priority)
+            while(pElem->renderInfo.priority ||
+                  pElem->renderInfo.concavepoly)
             {
                 int swapped = 0;
                 

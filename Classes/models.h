@@ -110,12 +110,12 @@ static model_coord_t model_pyramid[] =
 
 static model_index_t model_pyramid_indices[] = 
 {
-    0,4,1,
-    0,3,4,
-    0,2,3,
-    0,1,2,
-    1,4,3,
-    1,3,2
+    1,4,0,
+    4,3,0,
+    3,2,0,
+    2,1,0,
+    3,4,1,
+    2,3,1
 };
 
 static model_texcoord_t model_pyramid_texcoords[] = 

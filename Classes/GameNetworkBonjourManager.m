@@ -285,15 +285,12 @@ static GameNetworkBonjourManager* instance;
     
     if(serviceFound && serviceFound.addresses.count > 0)
     {
-        [peers removeAllObjects];
-
         GameNetworkPeer* p = [[GameNetworkPeer alloc] initWith:serviceFound];
         
         [peers addObject:p];
         
         p.peerId = PEER_ID_INITIAL;
         peerIdAdded = p.peerId;
-        p.address = [NSData dataWithData: serviceFound.addresses[0]];
         
         [serviceFound setDelegate:self];
         
@@ -305,6 +302,8 @@ static GameNetworkBonjourManager* instance;
 
 - (int) browse
 {
+    [peers removeAllObjects];
+    
     [browsers enumerateObjectsUsingBlock:^(NSNetServiceBrowser * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj stop];
     }];
@@ -452,6 +451,10 @@ static GameNetworkBonjourManager* instance;
             
         case NSStreamEventOpenCompleted: {
             peer.connected = peer.inputStream && peer.outputStream ? FULLY_CONNECTED : HALF_CONNECTED;
+            if(peer.connected == FULLY_CONNECTED)
+            {
+                NSLog(@"BONJOUR connected\n");
+            }
         } break;
             
         case NSStreamEventHasSpaceAvailable: {
@@ -551,8 +554,6 @@ static GameNetworkBonjourManager* instance;
     
     [sender.addresses enumerateObjectsUsingBlock:^(NSData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         self.browsedServices[obj] = sender;
-        
-        [self connectToServer: sender];
     }];
     
     [servicesResolving removeObject:sender];
@@ -618,9 +619,12 @@ int GameNetworkBonjourManagerBrowseBegin()
 
 int GameNetworkBonjourManagerBrowseEnd(gameNetworkAddress* server_address_ptr)
 {
-    [GameNetworkBonjourManager.instance browseEnd];
+    GameNetworkBonjourManager* m = GameNetworkBonjourManager.instance;
+    [m browseEnd];
     
-    if(![GameNetworkBonjourManager.instance isConnected]) return 0;
+    if(m.browsedServices.count == 0) return 0;
+    
+    [m connectToServer: m.browsedServices[m.browsedServices.allKeys.firstObject]];
     
     memset(server_address_ptr->storage, 0, sizeof(server_address_ptr->storage));
     

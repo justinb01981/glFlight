@@ -405,13 +405,13 @@ world_add_object_core(Model type,
             
         case MODEL_FLATTENED_CUBE:
         {
-            float M2[] = {
+            float M1[] = {
                 1, 0, 0, 0,
                 0, 0.1, 0, 0,
                 0, 0, 1, 0,
                 0, 0, 0, 1
             };
-            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords, model_cube_indices, M2);
+            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords, model_cube_indices, M1);
         
             model_coords = poly_comp.model_coords_buffer;
             model_sizeof = poly_comp.model_coords_buffer_len * 3 * sizeof(model_coord_t);
@@ -490,6 +490,12 @@ world_add_object_core(Model type,
             
         case MODEL_ENEMY_BASE:
             pElem->renderInfo.priority = 1;
+            pElem->renderInfo.concavepoly = 1;
+            break;
+            
+        case MODEL_FLATTENED_CUBE:
+            pElem->renderInfo.concavepoly = 1;
+            new_durability = DURABILITY_BLOCK;
             break;
             
         case MODEL_MESH:

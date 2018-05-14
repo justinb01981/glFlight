@@ -71,6 +71,7 @@ struct WorldElem {
 		GLint tex_pass;
         char visible;
         GLint priority;
+        GLint concavepoly;
         char wireframe;
         char tex_adjust;
         char tex_phase;
