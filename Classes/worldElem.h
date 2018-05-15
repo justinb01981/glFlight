@@ -146,6 +146,13 @@ struct WorldElem {
             
             struct
             {
+                float theta;
+                float radius;
+                float period;
+            } orbiter;
+            
+            struct
+            {
                 int inventory[OBJ_LAST];
             } player;
             

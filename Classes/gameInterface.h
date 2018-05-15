@@ -80,6 +80,7 @@ typedef struct {
     controlRect* controlArray[64];
     
     int touchCount;
+    int touchId;
 
     float interfaceWidth;
     float interfaceHeight;

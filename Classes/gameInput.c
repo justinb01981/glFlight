@@ -202,6 +202,7 @@ gyro_calibrate_log(float pct)
     }
     while(s < 24) { console_append("^J"); s++; }
     console_append("^1^1 \n");
+    console_flush();
 }
 
 void
@@ -289,6 +290,10 @@ gameInput()
                 needTrim = 0;
                 trimCountLast = 1;
                 gameInterfaceControls.trim.blinking = 0;
+                
+                roll_m = deviceRoll;
+                pitch_m = devicePitch;
+                yaw_m = deviceYaw;
             }
         }
     }

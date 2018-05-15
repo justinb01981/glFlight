@@ -174,6 +174,7 @@ struct gameNetworkPlayerInfo
     int shot_fired;
     
     struct gameNetworkPlayerInfo* next;
+    struct gameNetworkPlayerInfo* next_store;
 };
 
 struct gameNetworkObjectInfo

@@ -33,8 +33,9 @@ int texture_id_block = TEXTURE_ID_BLOCK;
 
 const char *charMap = "abcdefghijklmnopqrstuvwxyz0123456789. _-@!$%^&*";
 
-static float x_last = -1;
-static float y_last = -1;
+static unsigned int TOUCHES_MAX = 4;
+static float x_last[] = {-1, -1, -1, -1};
+static float y_last[] = {-1, -1, -1, -1};
 
 // variables scoped for fireAction menu handling
 unsigned int maps_list_idx = 0;
@@ -315,6 +316,8 @@ gameInterfaceHandleTouchMove(float x, float y)
 {
     const float move_thresh = gameInterfaceControls.interfaceHeight/30;
     
+    if(gameInterfaceControls.touchId-1 >= TOUCHES_MAX) return;
+    
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
     if(touchedControl)
     {
@@ -340,8 +343,8 @@ gameInterfaceHandleTouchMove(float x, float y)
     }
     
     
-    if(fabs(x-x_last) < move_thresh &&
-       fabs(y-y_last) < move_thresh)
+    if(fabs(x-x_last[gameInterfaceControls.touchId-1]) < move_thresh &&
+       fabs(y-y_last[gameInterfaceControls.touchId-1]) < move_thresh)
     {
         return;
     }
@@ -351,8 +354,8 @@ gameInterfaceHandleTouchMove(float x, float y)
     // controls after this ignore move events
     if(!touchedControl || !touchedControl->touch_began) return;
     
-    x_last = x;
-    y_last = y;
+    x_last[gameInterfaceControls.touchId-1] = x;
+    y_last[gameInterfaceControls.touchId-1] = y;
     
     if(touchedControl == &gameInterfaceControls.radar)
     {
@@ -1035,8 +1038,9 @@ void
 gameInterfaceHandleTouchEnd(float x, float y)
 {
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
+    int i;
     
-    x_last = y_last = -1;
+    for(i = 0; i < TOUCHES_MAX; i++) x_last[i] = y_last[i] = -1;
     
     if(touchedControl)
     {
@@ -1080,7 +1084,11 @@ gameInterfaceModalDialogEnqueue(char* msg, char *buttonLeft, char *buttonRight, 
     
     if(life_frames != GAME_DIALOG_LIFE_MAX)
     {
-        if(gameInterfaceModalDialogPeek() != NULL) return;
+        if(gameInterfaceModalDialogPeek() != NULL)
+        {
+            free(pdialog);
+            return;
+        }
     }
     gameInterfaceControls.dialogLifeFrames = life_frames;
     

@@ -504,6 +504,7 @@
 		D00D78D71A0AFA4800E701B9 /* app_icon_64x64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon_64x64.png; sourceTree = "<group>"; };
 		D011EF5A19BE45C0004A56CB /* gamePlatform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gamePlatform.h; sourceTree = "<group>"; };
 		D011EF5B19BE46EE004A56CB /* gameDebug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameDebug.h; sourceTree = "<group>"; };
+		D015A3F620AA3D2600CB1C31 /* world_motion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = world_motion.h; sourceTree = "<group>"; };
 		D02071721BF282D4000AC2BA /* texture88.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture88.bmp; sourceTree = "<group>"; };
 		D02071741BF29F11000AC2BA /* texture89.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture89.bmp; sourceTree = "<group>"; };
 		D0290F3020A2445F002935C3 /* texture112.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture112.bmp; sourceTree = "<group>"; };
@@ -714,6 +715,7 @@
 				D05C28A71F9FEBC700BC2194 /* sphere_model.h */,
 				D0CF62B514A919D600E08151 /* object.h */,
 				D03ABA6414ADACF000C44538 /* world.h */,
+				D015A3F620AA3D2600CB1C31 /* world_motion.h */,
 				6D91DE9F16697F0B00362864 /* world.c */,
 				D0CF62B614A919D600E08151 /* object.m */,
 				D02F630E14C6ABD80028601F /* textures.h */,

@@ -787,11 +787,30 @@ calibrate_bail:
     
     if(!gameInterfaceControls.consoleHidden)
     {
+        /*
         if(time_ms - console_write_time > 5000 && !game_paused)
         {
             consoleMessage[0] = '\0';
         }
-        strncpy(gameInterfaceControls.consoleTextRect.text, consoleMessage, sizeof(gameInterfaceControls.consoleTextRect.text)-1);
+        */
+        
+        unsigned l = console_typewriter_lag+1;
+        char* p = consoleMessage, *pdest = gameInterfaceControls.consoleTextRect.text;
+        while(*p && l > 0)
+        {
+            if(*p == '\n')
+            {
+                
+            }
+            
+            *pdest = *p;
+            pdest++;
+            p++;
+            l--;
+        }
+        *pdest = '\0';
+        
+        if(l == 0) console_typewriter_lag += 1;
     }
     
     /****************************************

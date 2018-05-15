@@ -445,14 +445,15 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
     
     gameNetwork_initsockets();
     
-    playerInfo = gameNetworkState.player_list_head.next;
+    playerInfo = gameNetworkState.player_list_head.next_store;
     while(playerInfo)
     {
         gameNetworkPlayerInfo* del = playerInfo;
-        playerInfo = playerInfo->next;
+        playerInfo = playerInfo->next_store;
         free(del);
     }
     gameNetworkState.player_list_head.next = NULL;
+    gameNetworkState.player_list_head.next_store = NULL;
     
     // blank to host an IP game
     if(strlen(server_name) == 0 || !strcmp(server_name, "host"))
@@ -1049,6 +1050,9 @@ gameNetwork_addPlayerInfo(int player_id)
     }
     pInfoTail->next = pInfo;
     
+    pInfo->next_store = gameNetworkState.player_list_head.next_store;
+    gameNetworkState.player_list_head.next_store = pInfo;
+    
     return GAME_NETWORK_ERR_NONE;
 }
 
@@ -1125,7 +1129,8 @@ gameNetwork_removePlayer(int player_id)
                 pFree->map_data = NULL;
             }
             
-            free(pFree);
+            // do not deallocate, the next_store linked list must retain
+            //free(pFree);
             continue;
         }
         pInfo = pInfo->next;
@@ -2751,7 +2756,7 @@ gameNetwork_sendStatsAlert()
     while(row < sizeof(rows)/sizeof(char*))
     {
         int col = 0;
-        pInfo = gameNetworkState.player_list_head.next;
+        pInfo = gameNetworkState.player_list_head.next_store;
         
         if(!pRowTop) pRowTop = str + strlen(str);
         
@@ -2826,7 +2831,7 @@ gameNetwork_sendStatsAlert()
                     break;
             }
             
-            pInfo = pInfo->next;
+            pInfo = pInfo->next_store;
             col++;
         }
         strncat(str, "\n", sizeof(str)-1);

@@ -25,7 +25,7 @@
 #include "gameGlobals.h"
 #include "gameAI.h"
 #include "gameTimeval.h"
-#include "world.h"
+#include "world_motion.h"
 #include "gameUtils.h"
 #include "textures.h"
 #include "gameAudio.h"
@@ -611,15 +611,7 @@ game_move_spawnpoint(WorldElem* pElem)
         orbit_T += (M_PI * pElem->stuff.u.spawnpoint.time_move_interval) / 15000;
         if(orbit_T > 2.0*M_PI) orbit_T = 0;
         
-        float v[] = {
-            orbit_origin[0] + sin(orbit_T)*radius,
-            orbit_origin[1],
-            orbit_origin[2] + cos(orbit_T)*radius
-        };
-        
-        world_replace_object(pElem->elem_id, pElem->type, v[0], v[1], v[2],
-                             M_PI/2, orbit_T, -M_PI/2, pElem->scale,
-                             pElem->texture_id);
+        orbit_around(pElem, orbit_origin, orbit_T, radius);
         
         // add decoration
         float vD[] = {
@@ -677,6 +669,12 @@ game_init_objects()
                 
             case OBJ_BASE:
                 pCur->elem->destructible = 0;
+                break;
+                
+            case OBJ_BLOCK_MOVING:
+                pCur->elem->stuff.u.orbiter.radius = rand_in_range(12, 75);
+                pCur->elem->stuff.u.orbiter.period = rand_in_range(4, 16);
+                pCur->elem->stuff.u.orbiter.theta = rand_in_range(0, 628) / 100.0;
                 break;
                 
             default:
@@ -993,8 +991,8 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.end_time = time_ms + (300 * 1000); // 5 min
     
     console_write(gameStateSinglePlayer.game_help_message);
-    console_append("\n***high score this session: %d***",
-                   gameStateSinglePlayer.high_score_session[gameStateSinglePlayer.game_type]);
+    //console_append("\n***high score this session: %d***",
+    //               gameStateSinglePlayer.high_score_session[gameStateSinglePlayer.game_type]);
     console_append("\n***record high score: %d***",
                    gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
     
@@ -1693,6 +1691,19 @@ game_run()
                     if(pCur->elem->stuff.subtype == GAME_SUBTYPE_ASTEROID)
                     {
                         asteroids_found++;
+                    }
+                    
+                    if(pCur->elem->object_type == OBJ_BLOCK_MOVING)
+                    {
+                        float orbit_origin[] = {
+                            gWorld->bound_x/2,
+                            gWorld->bound_y/2,
+                            gWorld->bound_z/2
+                        };
+                        
+                        orbit_around(pCur->elem, orbit_origin, pCur->elem->stuff.u.orbiter.theta, pCur->elem->stuff.u.orbiter.radius);
+                        
+                        pCur->elem->stuff.u.orbiter.theta += M_PI / (pCur->elem->stuff.u.orbiter.period * GAME_FRAME_RATE);
                     }
                     break;
                     

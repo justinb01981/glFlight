@@ -444,11 +444,14 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
         if(touch)
         {
             CGPoint pt = touchPointInView(touch, self.view);
+            gameInterfaceControls.touchId = i+1;
             gameInterfaceHandleTouchBegin(pt.x, pt.y);
         }
     }
     
     [super touchesBegan:touches withEvent:event];
+    
+    gameInterfaceControls.touchId = 0;
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -461,11 +464,13 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
         if(touch)
         {
             CGPoint pt = touchPointInView(touch, self.view);
+            gameInterfaceControls.touchId = i+1;
             gameInterfaceHandleTouchMove(pt.x, pt.y);
         }
     }
     
     [super touchesMoved:touches withEvent:event];
+    gameInterfaceControls.touchId = 0;
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -480,6 +485,7 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
         if(touch)
         {
             CGPoint pt = touchPointInView(touch, self.view);
+            gameInterfaceControls.touchId = i+1;
             gameInterfaceHandleTouchEnd(pt.x, pt.y);
         }
     }
@@ -490,6 +496,7 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
     }
 
     [super touchesEnded:touches withEvent:event];
+    gameInterfaceControls.touchId = 0;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
@@ -503,9 +510,12 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
             CGPoint pt = [touch locationInView: self.view];
             int x = pt.x;
             int y = pt.y;
+            gameInterfaceControls.touchId = i+1;
             gameInterfaceHandleTouchEnd(x, y);
         }
     }
+    
+    gameInterfaceControls.touchId = 0;
 }
 
 @end

@@ -22,6 +22,7 @@ extern int do_visibility_test;
 extern int nearest_first;
 extern game_timeval_t console_write_time;
 extern int console_lines_max;
+extern int console_typewriter_lag;
 
 struct console_entry
 {
@@ -100,6 +101,9 @@ console_log_search(char *key, unsigned idx);
 
 void
 console_append(char* fmt, ...);
+
+void
+console_flush();
 
 float
 rand_in_range(float b, float e);

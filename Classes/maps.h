@@ -284,7 +284,7 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 #define FLOATING_ISLAND(x, y, z)             \
 "set_vector "#x" "#y" "#z" 4 1 0\n"    \
 "add_object 20 vecx_0 vecy_0 vecz_0 0 0 0 10 31\n" \
-"add_object 2 vecx_0 vecy_1.1 vecz_0 0 0 0 2 57\n"
+"add_object 2 vecx_0 vecy_1.2 vecz_0 0 0 0 2 57\n"
 
 #define WORLD_SCALED_FRAME_TURRET(x, tex, scale)                         \
 "register_params 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
@@ -692,12 +692,20 @@ FLOATING_ISLAND(rndx, rndy, rndz)
 FLOATING_ISLAND(rndx, rndy, rndz)
 FLOATING_ISLAND(rndx, rndy, rndz)
 
-
-
 // drifting asteroid example
-//"add_object "MAPMODEL_CUBE2" 100 20 100 0 0 0 11 56\n"
-//"object_set_info 4\n" // moving block
-//"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" 100 20 100 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" 100 20 100 0 0 0 1 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" 100 20 100 0 0 0 4 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" 100 20 100 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+
 
 // enemy base
 BASE_ENEMY_1

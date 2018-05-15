@@ -36,6 +36,8 @@ const int console_write_append_thresh_ms = 1000;
 
 int console_lines_max = 5;
 
+int console_typewriter_lag = 0;
+
 float 
 distance(float x1, float y1, float z1, float x2, float y2, float z2)
 {
@@ -481,7 +483,15 @@ console_write(char* fmt, ...)
         strncpy(curnew->msg, msgPtr, sizeof(cur->next->msg)-1);
         cur->next = curnew;
         g_console_message_log_len++;
+        
+        if(msgPtr != consoleMessageHidden) console_typewriter_lag = 0;
     }
+}
+
+void
+console_flush()
+{
+    console_typewriter_lag = sizeof(consoleMessage);
 }
 
 void
