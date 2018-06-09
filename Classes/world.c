@@ -1133,7 +1133,8 @@ void world_init(float radius)
         quaternion_rotate_inplace(&U, &Qy, Ty);
         quaternion_rotate_inplace(&V, &Qy, Ty);
         
-        for(Tx = 0; Tx < R; Tx += R/i)
+        // bounding vectors only for top hemisphere
+        for(Tx = 0; Tx < R/2; Tx += R/i)
         {
             float P[] = {
                 U.x * Rad,
@@ -1162,25 +1163,28 @@ void world_init(float radius)
                 
                 for(d = 0; d < 3; d++)
                 {
+                    int i;
+                    float *LClamp[] = { L1, L2, L3, L4 };
+                    
                     L1[d] = P[d] + UVcross[d+9] * Rad/2.4;
                     L2[d] = P[d] + UVcross[d+9] * -Rad/2.4;
                     L3[d] = P[d] + UVcross[d+12] * Rad/2.4;
                     L4[d] = P[d] + UVcross[d+12] * -Rad/2.4;
+                    
+                    for(i = 0; i < sizeof(LClamp)/sizeof(float*); i++)
+                    {
+                        if(LClamp[i][1] < 0) LClamp[i][1] = 0;
+                    }
                 }
+                
                 
                 float LColor[] = {
                     0, 0xff, 0
                 };
                 
-                if(L1[1] >= 0 && L2[1] >= 0)
-                {
-                    world_add_drawline(L1, L2, LColor, 999999);
-                }
+                world_add_drawline(L1, L2, LColor, 999999);
                 
-                if(L3[1] >= 0 && L4[1] >= 0)
-                {
-                    world_add_drawline(L3, L4, LColor, 999999);
-                }
+                world_add_drawline(L3, L4, LColor, 999999);
             }
             
             quaternion_rotate_inplace(&U, &V, R/i);

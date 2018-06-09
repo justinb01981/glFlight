@@ -505,7 +505,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             }
             
             // add unpredictable behavior by heading off on a tangent periodically for a short period
-            if (rand_in_range(1, 100) <= 25)
+            if (rand_in_range(1, 100) <= game_variable_get("ENEMY1_JUKE_PCT"))
             {
                 elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
                 
@@ -565,7 +565,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     }
     
     // rate at which enemy rotates
-    float turn_r = (elem->stuff.u.enemy.max_turn / 4) * tc;
+    float turn_r = (elem->stuff.u.enemy.max_turn) * tc;
     
     float vdesired = pursuit_speed_for_object(elem);
     

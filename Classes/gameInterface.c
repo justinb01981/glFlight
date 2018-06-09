@@ -626,8 +626,8 @@ gameInterfaceHandleTouchBegin(float x, float y)
     
     if(touchedControl == &gameInterfaceControls.fire)
     {
-        x_last[gameInterfaceControls.touchId-1] = 0;
-        y_last[gameInterfaceControls.touchId-1] = 0;
+        x_last[gameInterfaceControls.touchId-1] = -1;
+        y_last[gameInterfaceControls.touchId-1] = -1;
         gameInterfaceHandleTouchMove(x, y);
     }
     

@@ -717,19 +717,8 @@ calibrate_bail:
         cur = cur->next;
     }
     
-    // actual drawing (happens asynchronouly)
-    drawElemStart(pDrawCur);
-    visibleBtreeDrawn = 0;
-    world_elem_btree_walk_should_abort = 0;
-    world_elem_btree_walk(visibleBtreeRoot, draw_btree_elements);
-    drawElemEnd();
-    count_elems_last = visibleBtreeDrawn;
-    
-    drawBillboard(&targetingReticleElem);
-    
-    drawLineBegin();
-    
     // draw world-defined lines
+    drawLineBegin();
     WorldElemListNode* lineCur = gWorld->drawline_list_head.next;
     while(lineCur)
     {
@@ -753,36 +742,17 @@ calibrate_bail:
             world_elem_free(pElem);
         }
     }
-
-    /*
-    float a[] = {0, 0, 0};
-    for(int i = 0; i < 3; i++)
-    {
-        a[i] = 1;
-        float j[3] = {
-            my_ship_x,
-            my_ship_y,
-            my_ship_z
-        };
-        float d = 1.5;
-        float k1[3] = {
-            j[0] + d*a[0],
-            j[1] + d*a[1],
-            j[2] + d*a[2]
-        };
-        float k2[3] = {
-            j[0] + -d*a[0],
-            j[1] + -d*a[1],
-            j[2] + -d*a[2]
-        };
-        drawLine(j, k1);
-        float color[] = {0xff, 0x00, 0x00};
-        drawLineWithColorAndWidth(j, k2, color, 1);
-        a[i] = 0;
-    }
-     */
-    
     drawLineEnd();
+    
+    // actual drawing (happens asynchronouly)
+    drawElemStart(pDrawCur);
+    visibleBtreeDrawn = 0;
+    world_elem_btree_walk_should_abort = 0;
+    world_elem_btree_walk(visibleBtreeRoot, draw_btree_elements);
+    drawElemEnd();
+    count_elems_last = visibleBtreeDrawn;
+    
+    drawBillboard(&targetingReticleElem);
     
     drawRadar();
     drawControls();
@@ -907,10 +877,6 @@ draw_btree_elements(WorldElem* pElem, float priority)
     {
         if(pElem->renderInfo.wireframe || (pElem->head_elem && pElem->head_elem->renderInfo.wireframe))
         {
-            if(pElem->type == MODEL_TBUILDING)
-            {
-            }
-            
             drawLineBegin();
             drawLinesElemTriangles(pElem);
             drawLineEnd();
