@@ -696,9 +696,11 @@ calibrate_bail:
     // draw bounding lines
     drawLineBegin();
     float lineBounds = 10;
+    /*
     if(my_ship_x <= lineBounds || my_ship_x >= gWorld->bound_x-lineBounds ||
        my_ship_y <= lineBounds || my_ship_y >= gWorld->bound_y-lineBounds ||
        my_ship_z <= lineBounds || my_ship_z >= gWorld->bound_z-lineBounds)
+     */
     {
         drawBoundingLineGrid();
     }

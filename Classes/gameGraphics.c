@@ -618,8 +618,8 @@ int drawControlsRadar(drawSubElement subElemRadarList[], int max)
         {
             if(visible)
             {
-                subElemRadarList[subElementsN].x = cur->elem->physics.ptr->x / gWorld->bound_x;
-                subElemRadarList[subElementsN].y = cur->elem->physics.ptr->z / gWorld->bound_z;
+                subElemRadarList[subElementsN].x = 0.5 + cur->elem->physics.ptr->x / gWorld->bound_radius/2;
+                subElemRadarList[subElementsN].y = 0.5 + cur->elem->physics.ptr->z / gWorld->bound_radius/2;
                 subElemRadarList[subElementsN].xw = 1.0/20;
                 subElemRadarList[subElementsN].yw = 1.0/20;
                 subElemRadarList[subElementsN].tex_id = cur->elem->texture_id;
@@ -1296,18 +1296,21 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
     float Mk = 25; // model - step size
     float Tk = 8; // texture - step-size multiplier
     
-    float Ub = 0;
-    float Vb = 0;
-    float Ue = gWorld->bound_x;
-    float Ve = gWorld->bound_z;
+    float Ub = -gWorld->bound_radius;
+    float Vb = -gWorld->bound_radius;
+    float Ue = gWorld->bound_radius;
+    float Ve = gWorld->bound_radius;
     float Vi = Vb;
     float Ui = Ub;
     
     float M[] = {Ui, 0, Vi};
     float T[] = {0, 0};
     
+    float cam[] = {gameCamera_getX(), gameCamera_getY(), gameCamera_getZ()};
+    
     tess_begin(M, T, bgData->tess.S);
     
+    Vi = Vb;
     while(Vi <= Ve)
     {
         while(Ui+Mk >= Ub && Ui+Mk <= Ue)
@@ -1761,6 +1764,59 @@ drawLineGrid(float start[3], float u[3], float v[3], float nu, float nv)
 void
 drawBoundingLineGrid()
 {
+    /*
+    #define VECBOUND(x) gWorld->boundingRegion->v[(x)].f
+    
+    // TODO: texture-fill a triangle defined by nearest bounding vector plane when approaching boundary
+    int i = 0, j;
+    
+    int N = WORLD_BOUNDING_SPHERE_STEPS+1;
+    for(i = 1; i <= N/2; i += 1)
+    for(j = N; j < N*N; j += N)
+    {
+        float D = sin(M_PI*2 / WORLD_BOUNDING_SPHERE_STEPS) * (gWorld->bound_radius / M_PI*2*i);
+        
+        {
+            float result[3];
+            
+            float c[] = {
+                VECBOUND(j+i)[0],
+                VECBOUND(j+i)[1],
+                VECBOUND(j+i)[2]
+            };
+            float v1[] = {
+                VECBOUND(j+i)[3],
+                VECBOUND(j+i)[4],
+                VECBOUND(j+i)[5]
+            };
+            float v2[] = {
+                VECBOUND(j+i-1)[0],
+                VECBOUND(j+i-1)[1],
+                VECBOUND(j+i-1)[2]
+            };
+
+            vector_cross_product(v1, v2, result);
+            
+            int d;
+            for(d = 0; d < 3; d++)
+            {
+                result[d] = result[d] * D + c[d] - (result[d]*(D/2));
+            }
+                
+            drawLine(c, v2);
+            
+            //vector_cross_product(u1, u3, result);
+            
+            //for(d = 0; d < 3; d++)
+            //{
+            //    result[d] = result[d]*D + u1[d];
+            //}
+            //drawLine(u1, u3);
+        }
+    }
+    */
+    
+    /*
     int linter = 20;
     float lstart[] = {0, 0, 0};
     float u[] = {linter, 0, 0};
@@ -1789,6 +1845,14 @@ drawBoundingLineGrid()
     //drawLineGrid(lstart, u, v, gWorld->bound_x / linter, gWorld->bound_z / linter);
     lstart[1] = gWorld->bound_y;
     drawLineGrid(lstart, u, v, gWorld->bound_z / linter, gWorld->bound_z / linter);
+     */
+    
+    WorldElemListNode* pCur = gWorld->drawline_list_head.next;
+    while(pCur)
+    {
+        drawLine(&pCur->elem->coords[0], &pCur->elem->coords[3]);
+        pCur = pCur->next;
+    }
 }
 
 void

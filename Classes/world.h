@@ -24,19 +24,7 @@
 //#define WORLD_MAX_REGIONS /*50*/ 25
 #define WORLD_MAX_PLANES 16
 #define WORLD_MAX_TRIANGLE_MESH 16
-//#define WORLD_VIS_REGIONS_X ((int) gWorld->bound_x / gWorld->vis_region_m)
-//#define WORLD_VIS_REGIONS_Y ((int) gWorld->bound_y / gWorld->vis_region_m)
-//#define WORLD_VIS_REGIONS_Z ((int) gWorld->bound_z / gWorld->vis_region_m)
-#define VIS_REGION_FOR_COORD(v, x, y, z)                  \
-    v[0] = x / (gWorld->bound_x / WORLD_VIS_REGIONS_X);   \
-    v[1] = y / (gWorld->bound_y / WORLD_VIS_REGIONS_Y);   \
-    v[2] = z / (gWorld->bound_z / WORLD_VIS_REGIONS_Z);
-#define VIS_COORD_VALID(x, y, z)                              \
-    (x >= 0 && x < gWorld->bound_x && \
-     y >= 0 && y < gWorld->bound_y && \
-     z >= 0 && z < gWorld->bound_z && \
-     gWorld->bound_x > 0 && gWorld->bound_y > 0 && gWorld->bound_z > 0)
-
+#define WORLD_BOUNDING_SPHERE_STEPS 8
 
 extern float visible_distance;
 
@@ -66,10 +54,12 @@ typedef struct
     
     int elem_id_next;
 	
-	float bound_x, bound_y, bound_z;
+	//float bound_x, bound_y, bound_z;
     
-    //float region_size_x, region_size_y, region_size_z;
+    float bound_radius;
+    
     float regions_x, regions_y, regions_z;
+    float region_size;
     
     boundingRegion* boundingRegion;
     
@@ -117,7 +107,7 @@ world_region_head(float x, float y, float z);
 WorldElemListNode*
 world_vis_region_head(float x, float y, float z);
 
-void world_init(float size_x, float size_y, float size_z);
+void world_init(float radius);
 
 void world_update(float tc);
 

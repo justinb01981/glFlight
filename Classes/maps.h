@@ -77,15 +77,15 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
 "mesh_manip_complete 1 "#tex" 1 "#scale"\n"
 
 #define WORLD_SCALED_FRAME(x, tex, scale)                                \
-"register_params 400 100 400 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
+"register_params 200 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-"set_world_size r r r\n" \
+"set_world_size r\n" \
 "\n"
 
 #define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
 "register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-"set_world_size r r r\n"                                                 \
+"set_world_size r\n"                                                 \
 "mesh_manip_add 0 " "0" " 0" " 4 0 0" " 0 0 4" " wx0.25 wz0.25\n" \
 "mesh_manip_gltriangles_complete "#tex"\n"
 
@@ -271,15 +271,15 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 "add_object 1 vecx_0 vecy_5 vecz_0 0 0 0 4 16\n"   \
 
 #define BUILDING_2(x, y, z)                          \
-"set_vector "#x" "#y" "#z" 0 2 0\n"                  \
-"add_object 19 vecx_0 vecy_0 vecz_0 0 0 0 2 112\n"   \
-"add_object 19 vecx_0 vecy_1 vecz_0 0 0 0 2 112\n"   \
-"add_object 19 vecx_0 vecy_2 vecz_0 0 0 0 2 112\n"   \
-"add_object 19 vecx_0 vecy_3 vecz_0 0 0 0 2 112\n"   \
-"add_object 19 vecx_0 vecy_4 vecz_0 0 0 0 2 112\n"   \
-"add_object 19 vecx_0 vecy_5 vecz_0 0 0 0 2 112\n"   \
-"add_object 19 vecx_0 vecy_6 vecz_0 0 0 0 2 112\n"   \
-"add_object 19 vecx_0 vecy_7.5 vecz_0 0 0 0 1 112\n"
+"set_vector "#x" "#y" "#z" 0 4 0\n"                  \
+"add_object 19 vecx_0 vecy_0 vecz_0 0 0 0 4 112\n"   \
+"add_object 19 vecx_0 vecy_1 vecz_0 0 0 0 4 112\n"   \
+"add_object 19 vecx_0 vecy_2 vecz_0 0 0 0 4 112\n"   \
+"add_object 19 vecx_0 vecy_3 vecz_0 0 0 0 4 112\n"   \
+"add_object 19 vecx_0 vecy_4 vecz_0 0 0 0 4 112\n"   \
+"add_object 19 vecx_0 vecy_5 vecz_0 0 0 0 4 112\n"   \
+"add_object 19 vecx_0 vecy_6 vecz_0 0 0 0 4 112\n"   \
+"add_object 19 vecx_0 vecy_6.75 vecz_0 0 0 0 2 112\n"
 
 #define FLOATING_ISLAND(x, y, z)             \
 "set_vector "#x" "#y" "#z" 4 1 0\n"    \
@@ -289,7 +289,7 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 #define WORLD_SCALED_FRAME_TURRET(x, tex, scale)                         \
 "register_params 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-"set_world_size r r r\n"                                                 \
+"set_world_size r\n"                                                 \
 "mesh_manip_add wx0.2 " "wy0.2" " wz0.1" " 4 0 0" " 0 0 4" " wx0.2 wz0.2\n" \
 WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
 WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
@@ -299,7 +299,7 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
 ///////////////////////////////////////////////////////
 const static char initial_map_200x100x200[] = ""
 
-"set_world_size 300 100 300\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
+"set_world_size 300\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
 
@@ -711,9 +711,9 @@ FLOATING_ISLAND(rndx, rndy, rndz)
 BASE_ENEMY_1
 
 // "core" that spits out data
-BASE_GENERIC(200, 50, 200)
+BASE_GENERIC(0, 50, 0)
 
-"add_spawn 200 8 200 3.14 0 0\n"
+"add_spawn 0 0 0 3.14 0 0\n"
 
 /*
 "register_params 1 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0\n"
@@ -879,61 +879,163 @@ RANDOM_DECORATION_1
 // MARK: -- map - deathmatch
 const static char initial_map_deathmatch[] = ""
 
-"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
+"set_world_size 200\n" // all must be divisible by MAX_WORLD_REGIONS
 ///WORLD_SCALED_FRAME_TERRAIN(-10, 28, 4)
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
 
-// stuff
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
+// buildings
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
 
-// asteroid
-/*
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
-ASTEROID_FIELD_5
- */
-ASTEROID_FIELD_PLANE(30)
-ASTEROID_FIELD_PLANE(35)
-ASTEROID_FIELD_PLANE(40)
-ASTEROID_FIELD_PLANE(45)
-ASTEROID_FIELD_PLANE(50)
-ASTEROID_FIELD_PLANE(55)
-ASTEROID_FIELD_PLANE(60)
-ASTEROID_FIELD_PLANE(65)
-ASTEROID_FIELD_PLANE(70)
-ASTEROID_FIELD_PLANE(80)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+BUILDING_1(rndx, 2, rndz)
+
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+BUILDING_2(rndx, 2, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(rndx, rndy, rndz)
+    
 ;
 
 const static char initial_map_survival[] = ""
@@ -1282,7 +1384,7 @@ BASE_ENEMY_1
 
 const static char map_400x100x400[] = ""
 
-"set_world_size 400 100 400\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
+"set_world_size 400\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
@@ -1316,7 +1418,7 @@ const static char map_400x100x400[] = ""
 
 const static char map_400x100x400_flat[] = ""
 
-"set_world_size 400 100 400\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
+"set_world_size 400\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
@@ -1328,7 +1430,7 @@ const static char map_400x100x400_flat[] = ""
 
 const static char map_200x100x200_pits[] = ""
 
-"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
+"set_world_size 200\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
@@ -1356,7 +1458,7 @@ RANDOM_FLOATING_BLOCKS_1
 ;
 
 const static char map_portal_lobby[] = ""
-"set_world_size 50 50 50\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
+"set_world_size 50\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
 "mesh_manip_add wx-0.1 " "4" " wz-0.1" " 4 0 0" " 0 0 4" " 10 10\n"
 "mesh_manip_complete 1 19 1 4\n"
@@ -1364,7 +1466,7 @@ const static char map_portal_lobby[] = ""
 
 const static char pokeball_map[] = ""
 
-"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
+"set_world_size 200\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
 
@@ -1385,7 +1487,7 @@ WORLD_ADD_OBJECT(15, 0, 0, 0, 0, 0, 0, 4, 105)
 
 const static char map_speedrun[] = "" \
 "register_params 2000 100 100 0 0 0 0 0 0 0 0 0 0 0 0 0\n"               \
-"set_world_size r r r\n"                                                 \
+"set_world_size r\n"                                                 \
 
 // starting position
 BASE_FRIENDLY_INVISIBLE(50, 50, 50)

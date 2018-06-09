@@ -448,30 +448,6 @@ gameDialogStartNetworkGameWait()
                              gameDialogStartNetworkGame2, gameDialogStartNetworkGame2);
 }
 
-static void
-gameDialogStartNetworkGameBotAdded()
-{
-    gameDialogCounter++;
-    if(world_find_elem_with_attrs(&gWorld->elements_list, OBJ_SPAWNPOINT_ENEMY, AFFILIATION_NONE) == NULL)
-    {
-        game_add_spawnpoint(rand_in_range(1, gWorld->bound_x),
-                            rand_in_range(1, gWorld->bound_y),
-                            rand_in_range(1, gWorld->bound_z),
-                            NULL);
-    }
-
-    // TODO: dialog to indicate local address
-    gameInterfaceModalDialog("(Added)\nReady to start game?", "Start", "+Bot",
-                             gameDialogStartNetworkGame2, gameDialogStartNetworkGameBotAdded);
-}
-
-static void
-gameDialogStartNetworkGameAddBots()
-{
-    gameInterfaceModalDialog("Round started!", "Start", "+1",
-                             gameDialogStartNetworkGame2, gameDialogStartNetworkGameBotAdded);
-}
-
 static void gameDialogStartNetworkGame();
 
 static void

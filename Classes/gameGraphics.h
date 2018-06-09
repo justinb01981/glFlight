@@ -33,6 +33,7 @@ typedef struct
         model_texcoord_t texcoords[3000];
         model_index_t indices[6000];
     } tess;
+    
 } DrawBackgroundData;
 
 typedef struct

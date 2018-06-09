@@ -90,7 +90,7 @@ game_ai_juke(WorldElem* pElem, float distance)
     
     pElem->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
     
-    float b[] = {gWorld->bound_x, gWorld->bound_y, gWorld->bound_z};
+    float b[] = {gWorld->bound_radius, gWorld->bound_radius, gWorld->bound_radius};
     float p[] = {pElem->physics.ptr->x, pElem->physics.ptr->y, pElem->physics.ptr->z};
     float rvec[3], rdist = distance;
     
@@ -534,7 +534,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             }
         }
         
-        if(dist >= (elem->stuff.u.enemy.pursue_distance - (skill * elem->stuff.u.enemy.pursue_distance * diff_m))
+        if(dist >= (elem->stuff.u.enemy.pursue_distance - (elem->stuff.u.enemy.pursue_distance / (skill*diff_m)))
            /* || time_ms - elem->stuff.u.enemy.time_last_decision > 2000 */
            || zdot <= 0)
         {

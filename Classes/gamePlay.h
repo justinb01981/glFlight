@@ -162,7 +162,7 @@ const static float game_variables_default[] = {
     50,          // ENEMY1_FORGET_DISTANCE
     30,          // ENEMY1_PURSUE_DISTANCE
     MAX_SPEED,   // MAX_SPEED
-    /*1.2*/0.8,  // MAX_TURN_RADIANS
+    /*1.2*/0.,  // MAX_TURN_RADIANS
     0,           // FIRES MISSLES
     1,           // FIRES LASERS
     1,           // CHANGES_TARGET
@@ -170,7 +170,7 @@ const static float game_variables_default[] = {
     50,          // RUN_INTERVAL_MS
     1,           // LEAVES TRAIL
     800.0,       // SCAN_DISTANCE_MAX
-    0.05,        // ENEMY1_MAX_TURN_SKILL_SCALE
+    0.02,        // ENEMY1_MAX_TURN_SKILL_SCALE
     /*25*/10,    // ENEMY1_JUKE_PCT
     2,           // ENEMY1_COLLECT_DURABILITY
     10,          // ENEMY_RUN_DISTANCE

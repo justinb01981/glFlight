@@ -624,6 +624,13 @@ gameInterfaceHandleTouchBegin(float x, float y)
         gameAudioPlaySoundAtLocation("speedboost", my_ship_x, my_ship_y, my_ship_z);
     }
     
+    if(touchedControl == &gameInterfaceControls.fire)
+    {
+        x_last[gameInterfaceControls.touchId-1] = 0;
+        y_last[gameInterfaceControls.touchId-1] = 0;
+        gameInterfaceHandleTouchMove(x, y);
+    }
+    
     // update what controls are visible based on menu conditions
     gameInterfaceControls.fireRect2.visible = 0;
     

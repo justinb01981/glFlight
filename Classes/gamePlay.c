@@ -594,11 +594,7 @@ game_move_spawnpoint(WorldElem* pElem)
 {
     static float orbit_T = 0.0;
     float radius = 75;
-    float orbit_origin[] = {
-        gWorld->bound_x/2,
-        gWorld->bound_y/2,
-        gWorld->bound_z/2
-    };
+    float orbit_origin[] = {0, gWorld->bound_radius/2, 0};
     
     if(time_ms - pElem->stuff.u.spawnpoint.time_last_move >
        pElem->stuff.u.spawnpoint.time_move_interval &&
@@ -1021,16 +1017,12 @@ path_generate_random_with_delta(float cur[3], float vec[3], float mag, float del
 static void
 game_setup()
 {
+    int i;
     float vp[3];
     float pos[3];
     float boundmin[3];
     float boundmax[3];
-    float origin[3] = {
-        gWorld->bound_x/2,
-        gWorld->bound_y/2,
-        gWorld->bound_z/2
-    };
-    int do_radius_restrict = 0;
+    float origin[3] = {0, 0, 0};
     
     vp[0] = vp[1] = vp[2] = 0;
     vp[0] = 1;
@@ -1043,30 +1035,7 @@ game_setup()
         origin[2] = elemSpawnPoint->physics.ptr->z;
     }
     
-    if(do_radius_restrict)
-    {
-        float rad = 50 + 10 * gameStateSinglePlayer.difficulty;
-        
-        boundmin[0] = MAX(origin[0] - rad/2, 1);
-        boundmax[0] = MIN(origin[0] + rad/2, gWorld->bound_x);
-
-        boundmin[1] = MAX(origin[1] - rad/2, 1);
-        boundmax[1] = MIN(origin[1] + rad/2, gWorld->bound_y);
-        
-        boundmin[2] = MAX(origin[2] - rad/2, 1);
-        boundmax[2] = MIN(origin[2] + rad/2, gWorld->bound_z);
-    }
-    else
-    {
-        boundmin[0] = 1;
-        boundmax[0] = gWorld->bound_x;
-        
-        boundmin[1] = 1;
-        boundmax[1] = gWorld->bound_y;
-        
-        boundmin[2] = 1;
-        boundmax[2] = gWorld->bound_z;
-    }
+    for(i = 0; i < 3; i++) { boundmin[i] = -gWorld->bound_radius+1; boundmax[i] = gWorld->bound_radius-1; }
     
     int grouplen = 1;
     
@@ -1115,9 +1084,9 @@ game_setup()
     
     if(gameStateSinglePlayer.game_type == GAME_TYPE_DEFEND)
     {
-        gameStateSinglePlayer.defend_id = game_add_ally(rand_in_range(1, gWorld->bound_x),
-                                                        rand_in_range(1, gWorld->bound_y),
-                                                        rand_in_range(1, gWorld->bound_z));
+        gameStateSinglePlayer.defend_id = game_add_ally(rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+                                                        rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+                                                        rand_in_range(-gWorld->bound_radius, gWorld->bound_radius));
         world_get_last_object()->durability = 50;
         world_get_last_object()->stuff.u.enemy.max_speed = MAX_SPEED;
     }
@@ -1191,7 +1160,7 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
                 
                 console_write(game_log_messages[GAME_LOG_FILESAVED]);
             }
-            else
+            else 
             {
                 if(elemA->stuff.towed_elem_id == WORLD_ELEM_ID_INVALID)
                 {
@@ -1246,6 +1215,8 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     if(collision_action != COLLISION_ACTION_DAMAGE && collision_action != COLLISION_ACTION_FLAG) return;
     
     if(!gameStateSinglePlayer.started) return;
+    
+    if(elemA->remove_pending || elemB->remove_pending) return;
     
     WorldElemListNode* myShipListNode = world_elem_list_find(my_ship_id, &gWorld->elements_moving);
     if(!myShipListNode) return;
@@ -1348,9 +1319,9 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                     }
                     
                     int powerup_obj_id =
-                        game_add_powerup(rand_in_range(0, gWorld->bound_x),
-                                     rand_in_range(0, gWorld->bound_y),
-                                     rand_in_range(0, gWorld->bound_z),
+                        game_add_powerup(rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+                                     rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+                                     rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
                                      GAME_SUBTYPE_COLLECT, 0);
                     
                 }
@@ -1695,11 +1666,7 @@ game_run()
                     
                     if(pCur->elem->object_type == OBJ_BLOCK_MOVING)
                     {
-                        float orbit_origin[] = {
-                            gWorld->bound_x/2,
-                            gWorld->bound_y/2,
-                            gWorld->bound_z/2
-                        };
+                        float orbit_origin[] = {0, 50, 0};
                         
                         orbit_around(pCur->elem, orbit_origin, pCur->elem->stuff.u.orbiter.theta, pCur->elem->stuff.u.orbiter.radius);
                         
@@ -1775,7 +1742,7 @@ game_run()
             {
                 if(gameStateSinglePlayer.game_type == GAME_TYPE_TURRET)
                 {
-                    world_move_elem(pCur->elem, gWorld->bound_x/2, gWorld->bound_y/2, gWorld->bound_z/2, 0);
+                    world_move_elem(pCur->elem, 0, 0, 0, 0);
                 }
             }
             
@@ -1843,9 +1810,9 @@ game_run()
                 if(gameStateSinglePlayer.spawn_powerup_m &&
                    rand_in_range(1, gameStateSinglePlayer.spawn_powerup_m) == 1)
                 {
-                    game_add_powerup(rand_in_range(1, gWorld->bound_x),
-                                     rand_in_range(1, gWorld->bound_y),
-                                     rand_in_range(1, gWorld->bound_z),
+                    game_add_powerup(rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+                                     rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+                                     rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
                                      GAME_SUBTYPE_LIFE, 0);
                     
                     world_object_set_lifetime(world_get_last_object()->elem_id,
@@ -1872,9 +1839,9 @@ game_run()
                 {
                     float asteroid[] =
                     {
-                        rand() % (int) gWorld->bound_x,
-                        gWorld->bound_y-1,
-                        rand() % (int) gWorld->bound_z
+                        -gWorld->bound_radius + (rand() % (int) gWorld->bound_radius*2),
+                        -gWorld->bound_radius + (rand() % (int) gWorld->bound_radius*2),
+                        -gWorld->bound_radius + (rand() % (int) gWorld->bound_radius*2)
                     };
                     game_add_asteroid(asteroid[0], asteroid[1], asteroid[2], asteroid[0], 0, asteroid[2]);
                     world_get_last_object()->physics.ptr->gravity = 1;
@@ -1943,7 +1910,7 @@ game_run()
                         if(pElemNodeSpawn)
                         {
                             float v[3];
-                            float vel = rand_in_range(gWorld->bound_z / 100 * 20, gWorld->bound_z / 2);
+                            float vel = rand_in_range(gWorld->bound_radius / 100 * 20, gWorld->bound_radius / 2);
                             
                             int collect_elem_new_id =
                                 game_add_powerup(pElemNodeSpawn->elem->physics.ptr->x,
@@ -1989,9 +1956,9 @@ game_run()
                 {
                     console_write(game_log_messages[GAME_LOG_NEWTURRET]);
                     
-                    game_add_turret(rand_in_range(1, gWorld->bound_x),
-                                    rand_in_range(1, gWorld->bound_y),
-                                    rand_in_range(1, gWorld->bound_z));
+                    game_add_turret(rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+                                    rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+                                    rand_in_range(-gWorld->bound_radius, gWorld->bound_radius));
                     
                     world_get_last_object()->stuff.u.enemy.time_last_run = time_ms + 2000;
                 }

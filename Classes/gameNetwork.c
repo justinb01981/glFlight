@@ -1861,9 +1861,9 @@ do_game_network_handle_directory_msg(gameNetworkMessage *msg, gameNetworkAddress
         case GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET_RESPONSE:
             // add portal
             msg->params.c[sizeof(msg->params.c)-1] = '\0';
-            game_add_spawnpoint(rand_in_range(1, gWorld->bound_x),
-                                rand_in_range(1, gWorld->bound_y),
-                                rand_in_range(1, gWorld->bound_z),
+            game_add_spawnpoint(rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+                                rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+                                rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
                                 msg->params.c);
             
             world_object_set_nametag(world_get_last_object()->elem_id, msg->params.c);

@@ -714,8 +714,8 @@
 				6D512E1915EC21860064DF49 /* models.h */,
 				D05C28A71F9FEBC700BC2194 /* sphere_model.h */,
 				D0CF62B514A919D600E08151 /* object.h */,
-				D03ABA6414ADACF000C44538 /* world.h */,
 				D015A3F620AA3D2600CB1C31 /* world_motion.h */,
+				D03ABA6414ADACF000C44538 /* world.h */,
 				6D91DE9F16697F0B00362864 /* world.c */,
 				D0CF62B614A919D600E08151 /* object.m */,
 				D02F630E14C6ABD80028601F /* textures.h */,
@@ -1576,7 +1576,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = d0gf1ght;
 				PROVISIONING_PROFILE = "4f2d72cc-2578-4b54-8dca-f212ba08c3e4";
-				PROVISIONING_PROFILE_SPECIFIER = "d0gfight2 Distribution";
+				PROVISIONING_PROFILE_SPECIFIER = "d0gfight2 Development";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 arm7s arm64";
@@ -1586,8 +1586,8 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: JUSTIN Brady (FP3HEP75WZ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: JUSTIN Brady (FP3HEP75WZ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: JUSTIN Brady (75WG2NT9R8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Justin Brady (FP3HEP75WZ)";
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (

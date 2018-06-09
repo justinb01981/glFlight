@@ -387,10 +387,6 @@ gameInput()
                     gameDialogWelcome();
                 }
             }
-            else
-            {
-                console_write("\n");
-            }
             
             float div = 6;
             gameInputStatsCalc();
@@ -407,8 +403,6 @@ gameInput()
             roll_m = deviceRoll;
             pitch_m = devicePitch;
             yaw_m = deviceYaw;
-            
-            console_write("\n");
         }
         
         // zero out input-averaging buffer

@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/world_file.c"
-            timestampString = "548029916.280353"
+            timestampString = "549656166.8306251"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "491"
@@ -42,7 +42,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/gameInterface.c"
-            timestampString = "548120105.998788"
+            timestampString = "549914484.169915"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "291"
@@ -58,7 +58,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/gamePlay.c"
-            timestampString = "548120105.99886"
+            timestampString = "550120855.137313"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "309"
@@ -74,7 +74,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/maps.h"
-            timestampString = "548120105.998917"
+            timestampString = "549934193.943958"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "163"
@@ -90,7 +90,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/gameGraphics.c"
-            timestampString = "548120105.9989851"
+            timestampString = "550129114.761657"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "934"
@@ -106,7 +106,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/gameDialogs.h"
-            timestampString = "548120105.999033"
+            timestampString = "549656166.8311419"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "48"
@@ -168,24 +168,8 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Classes/worldElem.c"
-            timestampString = "547771272.2845629"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "137"
-            endingLineNumber = "137"
-            landmarkName = "world_elem_add_list_ref"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "Classes/gameNetwork.c"
-            timestampString = "548120105.9993629"
+            timestampString = "549656166.831183"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2417"
@@ -201,11 +185,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/glFlight.c"
-            timestampString = "548120105.99942"
+            timestampString = "549442308.397626"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "910"
-            endingLineNumber = "910"
+            startingLineNumber = "912"
+            endingLineNumber = "912"
             landmarkName = "draw_btree_elements"
             landmarkType = "9">
          </BreakpointContent>
@@ -216,46 +200,14 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Classes/gameDialogs.h"
-            timestampString = "548120105.999472"
+            filePath = "Classes/gamePlay.c"
+            timestampString = "550120855.137522"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "447"
-            endingLineNumber = "447"
-            landmarkName = "gameDialogStartNetworkGameWait()"
+            startingLineNumber = "1313"
+            endingLineNumber = "1313"
+            landmarkName = "game_handle_collision"
             landmarkType = "9">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "gameDialogStartNetworkGameWait"
-                  moduleName = "d0gf1ght"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
-                  timestampString = "548120106.251573"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "447"
-                  endingLineNumber = "447"
-                  offsetFromSymbolStart = "32">
-               </Location>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "gameDialogStartNetworkGameWait"
-                  moduleName = "d0gf1ght"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
-                  timestampString = "548120106.2539279"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "447"
-                  endingLineNumber = "447"
-                  offsetFromSymbolStart = "32">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

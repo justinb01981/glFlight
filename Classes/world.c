@@ -32,7 +32,6 @@ WorldElemListNode* add_element_to_region(WorldElem* pElem);
 WorldElemListNode* add_element_to_region_for_coord(WorldElem* pElem, model_coord_t x, model_coord_t y, model_coord_t z);
 WorldElemListNode* get_region_list_head(float x, float y, float z);
 void remove_element_from_region(WorldElem* pElem);
-inline static void get_region_bounding_box(float x, float y, float z, float region_bbox[6]);
 static void get_element_bounding_box(WorldElem* pElem, float box[6]);
 inline static int check_bounding_box_overlap(float boxA[6], float boxB[6]);
 void update_regions();
@@ -969,12 +968,11 @@ world_random_spawn_location(float loc[6], int affiliation)
     }
     
     // no spawn point found, spawn randomly
-    loc[i++] = rand_in_range(1, gWorld->bound_x-1);
-    loc[i++] = rand_in_range(1, gWorld->bound_y-1);
-    loc[i++] = rand_in_range(1, gWorld->bound_z-1);
-    loc[i++] = rand_in_range(0, M_PI*2 * 100) / 100; // alpha;
-    loc[i++] = rand_in_range(0, M_PI*2 * 100) / 100; // beta;
-    loc[i++] = rand_in_range(0, M_PI*2 * 100) / 100; // gamma;
+    loc[0] = rand_in_range(-gWorld->bound_radius, gWorld->bound_radius);
+    loc[1] = rand_in_range(0, gWorld->bound_radius);
+    loc[2] = rand_in_range(-gWorld->bound_radius, gWorld->bound_radius);
+    
+    for(i = 3; i < 6; i++) loc[i] = rand_in_range(0, M_PI*2 * 100) / 100;
 }
 
 void world_free()
@@ -1050,9 +1048,11 @@ void world_free()
 void
 region_for_coord(float x, float y, float z, int rgn[3])
 {
-    rgn[0] = floor(x / (gWorld->bound_x/gWorld->regions_x));
-    rgn[1] = floor(y / (gWorld->bound_y/gWorld->regions_y));
-    rgn[2] = floor(z / (gWorld->bound_z/gWorld->regions_z));
+    float Rs = gWorld->region_size;
+    
+    rgn[0] = (x/Rs) + (gWorld->regions_x/2);
+    rgn[1] = (y/Rs) + (gWorld->regions_y/2);
+    rgn[2] = (z/Rs) + (gWorld->regions_z/2);
 }
 
 WorldElemListNode*
@@ -1070,44 +1070,24 @@ world_region_head(float x, float y, float z)
     return pNode;
 }
 
-void world_init(float size_x, float size_y, float size_z)
-{			
-    int use_test_level = 0;
+void world_init(float radius)
+{
     float ws = 25;
     
 	gWorld = malloc(sizeof(world_t));
 	memset(gWorld, 0, sizeof(world_t));
     
-    assert(size_x >= ws && size_y >= ws && size_z >= ws);
+    gWorld->bound_radius = radius;
+    gWorld->region_size = ws;
     
-    gWorld->bound_x = size_x;
-    gWorld->bound_y = size_y;
-    gWorld->bound_z = size_z;
+    gWorld->regions_x = (gWorld->bound_radius*2) / ws;
+    gWorld->regions_y = (gWorld->bound_radius*2) / ws;
+    gWorld->regions_z = (gWorld->bound_radius*2) / ws;
     
-    gWorld->regions_x = gWorld->bound_x / ws;
-    gWorld->regions_y = gWorld->bound_y / ws;
-    gWorld->regions_z = gWorld->bound_z / ws;
+    float alloc_size = sizeof(WorldElemListNode) * gWorld->regions_x * gWorld->regions_y * gWorld->regions_z;
     
-    float alloc_size = sizeof(WorldElemListNode) * (size_x/ws) * (size_y/ws) * (size_z/ws);
     gWorld->elements_by_region = (WorldElemListNode*) malloc(alloc_size);
-    for(int i = 0; i < ((size_x/ws) * (size_y/ws) * (size_z/ws)); i++)
-    {
-        memset(gWorld->elements_by_region+i, 0, sizeof(WorldElemListNode));
-    }
-    
-    float vws = visible_distance;
-    gWorld->vis_regions_x = MAX((size_x/vws), 1);
-    gWorld->vis_regions_y = MAX((size_y/vws), 1);
-    gWorld->vis_regions_z = MAX((size_z/vws), 1);
-    alloc_size = sizeof(WorldElemListNode) * gWorld->vis_regions_x * gWorld->vis_regions_y * gWorld->vis_regions_z;
-    
-    if(size_x == -1 && size_y == -1 && size_z == -1)
-    {
-        use_test_level = 1;
-        size_x = 200;
-        size_y = 100;
-        size_z = 200;
-    }
+    memset(gWorld->elements_by_region, 0, alloc_size);
     
     gWorld->elem_id_next = 1000;
     
@@ -1119,6 +1099,7 @@ void world_init(float size_x, float size_y, float size_z)
     assert(floor(gWorld->regions_z) == gWorld->regions_z);
     
     // build bounding vectors
+    /*
     boundingRegion* br = boundingRegionInit(6);
     boundingRegionAddVec(br, 0, 0, 0, 1, 0, 0);
     boundingRegionAddVec(br, 0, 0, 0, 0, 1, 0);
@@ -1127,160 +1108,92 @@ void world_init(float size_x, float size_y, float size_z)
     boundingRegionAddVec(br, gWorld->bound_x, gWorld->bound_y, gWorld->bound_z, 0, -1, 0);
     boundingRegionAddVec(br, gWorld->bound_x, gWorld->bound_y, gWorld->bound_z, 0, 0, -1);
     gWorld->boundingRegion = br;
+    */
+    
+    // build spherical bounding
+    float Ty, Tx;
+    float i = WORLD_BOUNDING_SPHERE_STEPS;
+    float R = M_PI*2;
+    float Rad = (2*M_PI * gWorld->bound_radius)/i;
+    quaternion_t Qx, Qy, Qz;
+    
+    boundingRegion* br = boundingRegionInit(i * i + 1);
+    
+    Qx.w = Qy.w = Qz.w = 1.0;
+    Qx.x = Qy.y = Qz.z = 1.0;
+    Qx.y = Qx.z = Qy.x = Qy.z = Qz.x = Qz.y = 0.0;
+    
+    for(Ty = 0; Ty < R; Ty += R/i)
+    {
+        quaternion_t U, V;
+        
+        U = Qx;
+        V = Qz;
+        
+        quaternion_rotate_inplace(&U, &Qy, Ty);
+        quaternion_rotate_inplace(&V, &Qy, Ty);
+        
+        for(Tx = 0; Tx < R; Tx += R/i)
+        {
+            float P[] = {
+                U.x * Rad,
+                U.y * Rad,
+                U.z * Rad
+            };
+            
+            boundingRegionAddVec(br, P[0], P[1], P[2], -U.x, -U.y, -U.z);
+            
+            float s;
+            
+            for(s = -1; s <= 1; s += 2)
+            {
+                float UVcross[] = {
+                    U.x, U.y, U.z,
+                    V.x * s, V.y * s, V.z * s,
+                    Qy.x, Qy.y, Qy.z,
+                    0, 0, 0,
+                    0, 0, 0
+                };
+                float L1[3], L2[3], L3[3], L4[3];
+                int d;
+                
+                vector_cross_product(&UVcross[0], &UVcross[3], &(UVcross[9]));
+                vector_cross_product(&UVcross[0], &UVcross[6], &(UVcross[12]));
+                
+                for(d = 0; d < 3; d++)
+                {
+                    L1[d] = P[d] + UVcross[d+9] * Rad/2.4;
+                    L2[d] = P[d] + UVcross[d+9] * -Rad/2.4;
+                    L3[d] = P[d] + UVcross[d+12] * Rad/2.4;
+                    L4[d] = P[d] + UVcross[d+12] * -Rad/2.4;
+                }
+                
+                float LColor[] = {
+                    0, 0xff, 0
+                };
+                
+                if(L1[1] >= 0 && L2[1] >= 0)
+                {
+                    world_add_drawline(L1, L2, LColor, 999999);
+                }
+                
+                if(L3[1] >= 0 && L4[1] >= 0)
+                {
+                    world_add_drawline(L3, L4, LColor, 999999);
+                }
+            }
+            
+            quaternion_rotate_inplace(&U, &V, R/i);
+        }
+    }
+    
+    // boundary on the floor
+    boundingRegionAddVec(br, 0, 0, 0, 0, 1, 0);
+    
+    gWorld->boundingRegion = br;
     
     // gravity vector
     gWorld->vec_gravity[1] = -32.0;
-    
-    // map building begins here
-    if(use_test_level)
-    {
-        int n_barriers = 100;
-        while(n_barriers > 0)
-        {
-            int x = rand() % (int) gWorld->bound_x;
-            int y = rand() % (int) gWorld->bound_y;
-            int z = rand() % (int) gWorld->bound_z;
-            
-            world_add_object(MODEL_CUBE, x, y, z, 0, 0, 0, rand() % 5 + 1, 0);
-            n_barriers--;
-        }
-        
-        /*
-        int n_pillars = 50;
-        while(n_pillars > 0)
-        {
-            int x = rand() % (int) gWorld->bound_x;
-            //int y = rand() % (int) gWorld->bound_y;
-            int y = 2;
-            int z = rand() % (int) gWorld->bound_z;
-            
-            for(int f = 0; f < 24; f += 4)
-            {
-                world_add_object(MODEL_CUBE, x, y + f, z, 0, 0, 0, 4, 3);  
-            }
-            n_pillars--;
-        }
-        
-        int n_enemies = 0;
-        while(n_enemies > 0)
-        {
-            int x = rand() % (int) gWorld->bound_x;
-            int y = rand() % (int) gWorld->bound_y;
-            int z = rand() % (int) gWorld->bound_z;
-            
-            world_add_object(MODEL_SHIP1, x, y, z, 0, 0, 0, 1, 1);
-            n_enemies--;
-        }
-         */
-        
-        /****/
-
-        // if mesh results in a concave object then face-culling will not work correctly
-        // TODO: build mesh, then cut it into many elements and add to world
-        // make an attempt to share coordinates
-        unsigned int m = 20;
-        unsigned int mesh_row_size = gWorld->bound_x / m;
-        unsigned int mesh_col_size = gWorld->bound_x / m;
-        unsigned int mesh_rows_n = m;
-        unsigned int mesh_cols_n = m;
-        unsigned int mesh_random_pulls = 10;
-        float mesh_pull_height = 10.0;
-        float mesh_propagation_c = 0.6;
-        struct mesh_t *mesh_tmp;
-        struct mesh_coordinate_t vis_normal;
-        
-        // floor
-        mesh_tmp = build_mesh(0, 0, 0,
-                              mesh_row_size, 0, 0,
-                              0, 0, mesh_col_size,
-                              mesh_cols_n, mesh_rows_n);
-        if(mesh_tmp)
-        {
-            for(int i = 0; i < mesh_random_pulls; i++)
-            {
-                int x = rand() % mesh_cols_n;
-                int y = rand() % mesh_rows_n;
-                pull_mesh(mesh_tmp, x, y, 0, mesh_pull_height, 0, mesh_propagation_c);
-            }
-            
-            vis_normal.x = vis_normal.z = 1;
-            vis_normal.y = -1;
-            convert_mesh_to_world_elems(mesh_tmp, 10, 1, &vis_normal);
-            
-            free_mesh(mesh_tmp);
-        }
-
-        // ceiling
-        mesh_tmp = build_mesh(0, gWorld->bound_y, 0,
-                              mesh_row_size, 0, 0,
-                              0, 0, mesh_col_size,
-                              mesh_cols_n, mesh_rows_n);
-        if(mesh_tmp)
-        {        
-            vis_normal.x = vis_normal.z = 1;
-            vis_normal.y = 1;
-            convert_mesh_to_world_elems(mesh_tmp, 12, 1, &vis_normal);
-            
-            free_mesh(mesh_tmp);
-        }
-        
-        // wall z0
-        mesh_tmp = build_mesh(0, 0, 0,
-                              mesh_row_size, 0, 0,
-                              0, mesh_col_size, 0,
-                              mesh_cols_n, mesh_rows_n);
-        if(mesh_tmp)
-        {
-            vis_normal.x = vis_normal.y = 1;
-            vis_normal.z = -1;
-            convert_mesh_to_world_elems(mesh_tmp, 4, 10, &vis_normal);
-            
-            free_mesh(mesh_tmp);
-        }
-        
-        // wall z1
-        mesh_tmp = build_mesh(0, 0, gWorld->bound_z,
-                              mesh_row_size, 0, 0,
-                              0, mesh_col_size, 0,
-                              mesh_cols_n, mesh_rows_n);
-        if(mesh_tmp)
-        {
-            vis_normal.x = vis_normal.y = 1;
-            vis_normal.z = 1;
-            convert_mesh_to_world_elems(mesh_tmp, 4, 10, &vis_normal);
-            
-            free_mesh(mesh_tmp);
-        }
-        
-        // wall x0
-        mesh_tmp = build_mesh(0, 0, 0,
-                              0, 0, mesh_row_size,
-                              0, mesh_col_size, 0,
-                              mesh_cols_n, mesh_rows_n);
-        if(mesh_tmp)
-        {
-            vis_normal.x = vis_normal.y = 1;
-            vis_normal.x = -1;
-            convert_mesh_to_world_elems(mesh_tmp, 4, 10, &vis_normal);
-            
-            free_mesh(mesh_tmp);
-        }
-        
-        // wall x1
-        mesh_tmp = build_mesh(gWorld->bound_x, 0, 0,
-                              0, 0, mesh_row_size,
-                              0, mesh_col_size, 0,
-                              mesh_cols_n, mesh_rows_n);
-        if(mesh_tmp)
-        {
-            vis_normal.x = vis_normal.y = 1;
-            vis_normal.x = 1;
-            convert_mesh_to_world_elems(mesh_tmp, 4, 10, &vis_normal);
-            
-            free_mesh(mesh_tmp);
-        }
-    
-    }
     
     //world_build_visibility_data();
     
@@ -1380,27 +1293,6 @@ move_elem_relative(WorldElem* pElem, float x, float y, float z)
     }
 }
 
-void move_elem_wrapped(WorldElem* elem)
-{
-    float m[3];
-    float b[3];
-    
-    b[0] = gWorld->bound_x;
-    b[1] = gWorld->bound_y;
-    b[2] = gWorld->bound_z;
-    m[0] = elem->physics.ptr->x;
-    m[1] = elem->physics.ptr->y;
-    m[2] = elem->physics.ptr->z;
-    for(int d = 0; d < 3; d++)
-    {
-        if(m[d] < 0) m[d] += b[d];
-        if(m[d] > b[d]) m[d] -= b[d];
-        
-    }
-    
-    world_move_elem(elem, m[0], m[1], m[2], 0);
-}
-
 void
 world_move_elem(WorldElem* pElem, float x, float y, float z, int relative)
 {
@@ -1442,23 +1334,6 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc)
     for(int i = 0; i < 3; i++) if(fabs(mv[i]) < repulse_min) mv[i] = 0.1;
 
     move_elem_relative(pCollisionA, mv[0], mv[1], mv[2]);
-}
-
-inline static void
-get_region_bounding_box(float x, float y, float z, float region_bbox[6])
-{
-    float xm = gWorld->bound_x / gWorld->regions_x;
-    float ym = gWorld->bound_y / gWorld->regions_y;
-    float zm = gWorld->bound_z / gWorld->regions_z;
-    
-    region_bbox[0] = x * xm; // xmin
-    region_bbox[3] = (x+1) * xm; // ymax
-    
-    region_bbox[1] = y * ym; // ymin
-    region_bbox[4] = (y+1) * ym; // ymax
-    
-    region_bbox[2] = z * zm; // zmin
-    region_bbox[5] = (z+1) * zm; // zmax
 }
 
 inline static void
@@ -1540,9 +1415,9 @@ froundlong(float f)
 WorldElemListNode*
 get_region_list_head(float x, float y, float z)
 {
-    if(x < 0.0 || x >= gWorld->bound_x ||
-       y < 0.0 || y >= gWorld->bound_y ||
-       z < 0.0 || z >= gWorld->bound_z) return NULL;
+    if(x < -gWorld->bound_radius || x >= gWorld->bound_radius ||
+       y < -gWorld->bound_radius || y >= gWorld->bound_radius ||
+       z < -gWorld->bound_radius || z >= gWorld->bound_radius) return NULL;
     
     return world_region_head(x, y, z);
 }
@@ -1568,6 +1443,8 @@ add_element_to_region(WorldElem* pElem)
     float elem_bbox[6];
   
     WorldElemListNode* pRegionHead = NULL;
+    
+    float Rs = gWorld->bound_radius*2 / gWorld->regions_x;
     
     float x = pElem->physics.ptr->x;
     float y = pElem->physics.ptr->y;
@@ -1600,12 +1477,13 @@ add_element_to_region(WorldElem* pElem)
                        yr < 0 || yr >= gWorld->regions_y ||
                        zr < 0 || zr >= gWorld->regions_z)
                     {
+                        // out of bounds
                         continue;
                     }
                     
-                    WorldElemListNode* pListHead = world_region_head(xr*(gWorld->bound_x/gWorld->regions_x),
-                                                                     yr*(gWorld->bound_y/gWorld->regions_y),
-                                                                     zr*(gWorld->bound_z/gWorld->regions_z));
+                    WorldElemListNode* pListHead = world_region_head(xr*Rs - gWorld->bound_radius,
+                                                                     yr*Rs - gWorld->bound_radius,
+                                                                     zr*Rs - gWorld->bound_radius);
                 
                     if(pListHead) world_elem_list_add_fast(pElem, pListHead, LIST_TYPE_REGION);
                     regions_spanned++;
@@ -1755,31 +1633,29 @@ world_update(float tc)
                     int i;
                     for(i = 0; i < gWorld->boundingRegion->nVectorsInited; i++)
                     {
-                        int d;
-                        for(d = 0; d < 3; d++)
+                        float U[] = {vm[0]*tc, vm[1]*tc, vm[2]*tc};
+                        float V[] = {gWorld->boundingRegion->v[i].f[3], gWorld->boundingRegion->v[i].f[4], gWorld->boundingRegion->v[i].f[5]};
+                        float P[3];
+                        
+                        P[0] = (pElem->physics.ptr->x - gWorld->boundingRegion->v[i].f[0]) + U[0];
+                        P[1] = (pElem->physics.ptr->y - gWorld->boundingRegion->v[i].f[1]) + U[1];
+                        P[2] = (pElem->physics.ptr->z - gWorld->boundingRegion->v[i].f[2]) + U[2];
+                        
+                        float dot = dot2(V, P);
+             
+                        if(dot < 0.001)
                         {
-                            float U[] = {vm[0]*tc, vm[1]*tc, vm[2]*tc};
-                            float V[] = {gWorld->boundingRegion->v[i].f[3], gWorld->boundingRegion->v[i].f[4], gWorld->boundingRegion->v[i].f[5]};
-                            float P[] = {gWorld->boundingRegion->v[i].f[0] - pElem->physics.ptr->x, gWorld->boundingRegion->v[i].f[1] - pElem->physics.ptr->y, gWorld->boundingRegion->v[i].f[2] - pElem->physics.ptr->z};
-                 
-                            if((V[d] > 0 && P[d]-U[d] >= 0) || (V[d] < 0 && P[d]-U[d] <= 0))
+                            if(pElem->bounding_remain)
                             {
-                                if(pElem->bounding_remain)
-                                {
-                                    pElem->physics.ptr->vx *= 0.80;
-                                    pElem->physics.ptr->vy *= 0.80;
-                                    pElem->physics.ptr->vz *= 0.80;
-                                    
-                                    if(d == 0) pElem->physics.ptr->vx += V[d]*maxAccelDecel*2;
-                                    if(d == 1) pElem->physics.ptr->vy += V[d]*maxAccelDecel*2;
-                                    if(d == 2) pElem->physics.ptr->vz += V[d]*maxAccelDecel*2;
-                                    
-                                    bounding_enforced = 1;
-                                }
-                                else
-                                {
-                                    out_of_bounds_remove = 1;
-                                }
+                                pElem->physics.ptr->vx += V[0]*maxAccelDecel*-dot;
+                                pElem->physics.ptr->vy += V[1]*maxAccelDecel*-dot;
+                                pElem->physics.ptr->vz += V[2]*maxAccelDecel*-dot;
+                                
+                                bounding_enforced = 1;
+                            }
+                            else
+                            {
+                                out_of_bounds_remove = 1;
                             }
                         }
                     }

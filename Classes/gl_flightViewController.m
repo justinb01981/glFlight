@@ -55,6 +55,8 @@ enum {
 @interface gl_flightViewController ()
 @property (nonatomic, retain) EAGLContext *context;
 @property (nonatomic, assign) CADisplayLink *displayLink;
+@property (nonatomic, retain) NSMutableArray *activeTouches;
+
 - (BOOL)loadShaders;
 - (BOOL)compileShader:(GLuint *)shader type:(GLenum)type file:(NSString *)file;
 - (BOOL)linkProgram:(GLuint)prog;
@@ -64,6 +66,7 @@ enum {
 @implementation gl_flightViewController
 
 @synthesize animating, context, displayLink;
+@synthesize activeTouches;
 
 -(UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
@@ -443,8 +446,10 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
         UITouch *touch = [[touches allObjects] objectAtIndex:i];
         if(touch)
         {
+            [activeTouches addObject:touch];
+            
             CGPoint pt = touchPointInView(touch, self.view);
-            gameInterfaceControls.touchId = i+1;
+            gameInterfaceControls.touchId = [activeTouches indexOfObject:touch]+1;
             gameInterfaceHandleTouchBegin(pt.x, pt.y);
         }
     }
@@ -464,7 +469,7 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
         if(touch)
         {
             CGPoint pt = touchPointInView(touch, self.view);
-            gameInterfaceControls.touchId = i+1;
+            gameInterfaceControls.touchId = [activeTouches indexOfObject:touch]+1;
             gameInterfaceHandleTouchMove(pt.x, pt.y);
         }
     }
@@ -482,10 +487,13 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
     for (i = 0; i < [touches count]; i++)
     {
         UITouch *touch = [[touches allObjects] objectAtIndex:i];
+        
         if(touch)
         {
+            [activeTouches removeObject:touch];
+            
             CGPoint pt = touchPointInView(touch, self.view);
-            gameInterfaceControls.touchId = i+1;
+            gameInterfaceControls.touchId = [activeTouches indexOfObject:touch]+1;
             gameInterfaceHandleTouchEnd(pt.x, pt.y);
         }
     }
@@ -507,10 +515,12 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
         UITouch *touch = [[touches allObjects] objectAtIndex:i];
         if(touch)
         {
+            [activeTouches removeObject:touch];
+            
             CGPoint pt = [touch locationInView: self.view];
             int x = pt.x;
             int y = pt.y;
-            gameInterfaceControls.touchId = i+1;
+            gameInterfaceControls.touchId = [activeTouches indexOfObject:touch]+1;
             gameInterfaceHandleTouchEnd(x, y);
         }
     }

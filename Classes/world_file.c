@@ -187,7 +187,7 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
         else if(strcmp(token, "set_world_size") == 0)
         {
             map_cmd->type = MAP_SET_SIZE;
-            n_params = 3;
+            n_params = 1;
         }
         else if(strcmp(token, "define_world_plane") == 0)
         {
@@ -254,14 +254,14 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
                 
                 switch(token[3])
                 {
-                case 'x':
-                    f = rand_in_range(1, gWorld->bound_x-1);
-                    break;
+                
+                    // HACK: don't generate elements below floor
                 case 'y':
-                    f = rand_in_range(1, gWorld->bound_y-1);
+                    f = rand_in_range(0, gWorld->bound_radius);
                     break;
+                case 'x':
                 case 'z':
-                    f = rand_in_range(1, gWorld->bound_z-1);
+                    f = rand_in_range(-gWorld->bound_radius, gWorld->bound_radius);
                     break;
                 case 'r':
                     f = ((float) (rand() % (int) (M_PI*2 * 100000)) / 100000.0);
@@ -292,17 +292,17 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
             else if(strncmp(token, "wx", 2) == 0)
             {
                 sscanf(&token[2], "%f", &f);
-                f *= gWorld->bound_x;
+                f *= gWorld->bound_radius;
             }
             else if(strncmp(token, "wy", 2) == 0)
             {
                 sscanf(&token[2], "%f", &f);
-                f *= gWorld->bound_y;
+                f *= gWorld->bound_radius;
             }
             else if(strncmp(token, "wz", 2) == 0)
             {
                 sscanf(&token[2], "%f", &f);
-                f *= gWorld->bound_z;
+                f *= gWorld->bound_radius;
             }
             else if(strncmp(token, "mx", 2) == 0)
             {
@@ -444,7 +444,7 @@ void map_render(char *map_buf)
                 switch(map_cmd.type)
                 {
                     case MAP_SET_SIZE:
-                        world_init(map_cmd.params[0], map_cmd.params[1], map_cmd.params[2]);
+                        world_init(map_cmd.params[0]);
                         break;
                         
                     case MAP_SET_BG_INFO:
@@ -678,8 +678,8 @@ char* world_write_buffer()
     p = malloc(buffer_len);
     if(p)
     {
-        sprintf(p, "set_world_size %f %f %f\n"
-                "set_background_info %f\n", gWorld->bound_x, gWorld->bound_y, gWorld->bound_z,
+        sprintf(p, "set_world_size %f\n"
+                "set_background_info %f\n", gWorld->bound_radius,
                 (float) texture_id_background);
         
         WorldElemListNode* pElemListNode = gWorld->elements_list.next;
