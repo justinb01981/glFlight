@@ -119,7 +119,7 @@ gameAudioPlaySoundAtLocationWithRate(const char* filename, float volumescale, fl
             cocoaMessageListAdd(&msg, &cocoaMessageAudioList);
             gameAudioUnlock();
             
-            printf("Playing sound %s with vol:%f and rate %f\n", msg.str, msg.f[0], msg.f[1]);
+            //printf("Playing sound %s with vol:%f and rate %f\n", msg.str, msg.f[0], msg.f[1]);
         }
     }
 }
@@ -156,7 +156,7 @@ gameAudioPlaySoundAtLocationWithDuration(const char* filename, float volumescale
             cocoaMessageListAdd(&msg, &cocoaMessageAudioList);
             gameAudioUnlock();
             
-            printf("Playing sound %s with vol:%f and duration:%f\n", msg.str, msg.f[0], msg.f[2]);
+            //printf("Playing sound %s with vol:%f and duration:%f\n", msg.str, msg.f[0], msg.f[2]);
         }
     }
 }

@@ -551,7 +551,7 @@ game_add_turret(float x, float y, float z)
     world_get_last_object()->object_type = OBJ_TURRET;
     world_get_last_object()->stuff.intelligent = 1;
     game_elem_setup_turret(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
-    update_object_velocity(obj_id, 0, 0, 0, 0);
+    update_object_velocity(obj_id, 0, -0.1, -0.1, -0.1);
 }
 
 int
@@ -594,17 +594,13 @@ game_move_spawnpoint(WorldElem* pElem)
 {
     static float orbit_T = 0.0;
     float radius = 75;
-    float orbit_origin[] = {0, gWorld->bound_radius/2, 0};
+    float orbit_origin[] = {0, atoi(MAP_BASE_ALT), 0};
     
-    if(time_ms - pElem->stuff.u.spawnpoint.time_last_move >
-       pElem->stuff.u.spawnpoint.time_move_interval &&
-       pElem->stuff.u.spawnpoint.time_move_interval != 0)
+    if(1)
     {
-        pElem->stuff.u.spawnpoint.time_last_move = time_ms;
-        
         // orbit around center of world
         // orbit period
-        orbit_T += (M_PI * pElem->stuff.u.spawnpoint.time_move_interval) / 15000;
+        orbit_T += (M_PI * game_variable_get("ENEMY_SPAWN_MOVE_RATE")) / 15000;
         if(orbit_T > 2.0*M_PI) orbit_T = 0;
         
         orbit_around(pElem, orbit_origin, orbit_T, radius);
@@ -658,8 +654,7 @@ game_init_objects()
         switch(pCur->elem->object_type)
         {
             case OBJ_SPAWNPOINT_ENEMY:
-                pCur->elem->stuff.u.spawnpoint.time_spawn_interval = (1000 * gameStateSinglePlayer.enemy_spawnpoint_interval) / gameStateSinglePlayer.difficulty;
-                pCur->elem->stuff.u.spawnpoint.time_move_interval = 1000/120;
+                pCur->elem->stuff.u.spawnpoint.spawn_coeff = 0;
                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence = 3 + gameStateSinglePlayer.difficulty;
                 break;
                 
@@ -791,11 +786,11 @@ game_start(float difficulty, int type)
     {
         sprintf(dialogStr, "^D^D^D     INTRUDER ALERT    ^D^D^D\n"
                            "^D^D^D   ACTIVATE FIREWALL   ^D^D^D\n"
-                           "^D^D^D   PROTECT CORE ^2^D^1    ^D^D^D\n"
+                           "^D^D^D   PROTECT CORE ^2^D^1     ^D^D^D\n"
                             "\n"
                            "****   High Score: %d  ****",
                 gameStateSinglePlayer.high_score[gameStateSinglePlayer.game_type]);
-        gameDialogDisplayString(dialogStr);
+        console_write(dialogStr);
         
         game_reset();
         
@@ -1331,6 +1326,9 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
         case OBJ_SPAWNPOINT_ENEMY:
             if(elemA->object_type == OBJ_POWERUP_GENERIC)
             {
+                elemA->stuff.u.spawnpoint.spawn_intelligence *= 1.5;
+                elemB->stuff.u.spawnpoint.spawn_coeff += rand_in_range(-INT_MAX/2, INT_MAX) / (float) INT_MAX;
+                
                 gameStateSinglePlayer.collect_system_integrity -= 20;
                 
                 console_write(game_log_messages[GAME_LOG_FILELOST]);
@@ -1338,7 +1336,7 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                 
                 glFlightDrawframeHook = gameDialogGraphicDangerCountdown;
                 
-                // add an explosion
+                // add a marker
                 {
                     int obj_id =
                     world_add_object(MODEL_SPRITE,
@@ -1374,6 +1372,7 @@ game_handle_destruction(WorldElem* elem)
     int add_pow = 0;
     int add_score = 1;
     int score_snap = gameStateSinglePlayer.stats.score;
+    char score_buf[255];
     
     WorldElemListNode* myShipListNode = world_elem_list_find(my_ship_id, &gWorld->elements_moving);
     if(!myShipListNode) return;
@@ -1480,20 +1479,21 @@ game_handle_destruction(WorldElem* elem)
     
     if(add_wreck)
     {
+        int wreck_id;
         // add wreckage
-        int wreck_id =
+        wreck_id =
         world_add_object(MODEL_SPRITE, elem->physics.ptr->x, elem->physics.ptr->y, elem->physics.ptr->z,
-                         0, 0, 0, 1, 22);
+                         0, 0, 0, 1, TEXTURE_ID_WRECKAGE);
         world_get_last_object()->destructible = 0;
         world_get_last_object()->object_type = OBJ_WRECKAGE;
         world_object_set_lifetime(wreck_id, GAME_FRAME_RATE * 5);
+        update_object_velocity(wreck_id, 0, 0, 0, 0);
         
         if(add_score)
         {
-            char scorebuf[255];
             score_total();
-            sprintf(scorebuf, "%d", gameStateSinglePlayer.stats.score - score_snap);
-            world_object_set_nametag(wreck_id, scorebuf);
+            sprintf(score_buf, "%d", gameStateSinglePlayer.stats.score - score_snap);
+            world_object_set_nametag(wreck_id, score_buf);
         }
     }
     
@@ -1592,11 +1592,6 @@ game_run()
                     
                 case OBJ_TURRET: {
                         turrets_found++;
-                        update_object_velocity(pCur->elem->elem_id,
-                                               0,
-                                               pCur->elem->physics.ptr->y > 2 ? -1 : 0,
-                                               0,
-                                               0);
                     }
                     break;
                     
@@ -1606,28 +1601,37 @@ game_run()
                     
                 case OBJ_SPAWNPOINT_ENEMY:
                 {
+                    float rand_range = 1<<16;
                     spawn_points_found++;
                     obj_id_enemy_spawn = pCur->elem->elem_id;
                     
+                    pCur->elem->stuff.u.spawnpoint.spawn_coeff += rand_in_range(-rand_range/2, rand_range) / (rand_range*100);
+                    
                     if (gameStateSinglePlayer.counter_enemies_spawned > 0 &&
                         enemies_found < floor(gameStateSinglePlayer.max_enemies) &&
-                        time_ms - pCur->elem->stuff.u.spawnpoint.time_last_spawn >
-                        pCur->elem->stuff.u.spawnpoint.time_spawn_interval)
+                        pCur->elem->stuff.u.spawnpoint.spawn_coeff > 1.0)
                     {
-                        pCur->elem->stuff.u.spawnpoint.time_last_spawn = time_ms;
+                        float spawn_rand = roundf(rand_in_range(0, rand_range));
+                        
+                        pCur->elem->stuff.u.spawnpoint.spawn_coeff = 0;
                         gameStateSinglePlayer.counter_enemies_spawned--;
                         
-                        // spawn faster
-                        pCur->elem->stuff.u.spawnpoint.time_spawn_interval *= 0.9;
+                        // TODO: spawn faster
                         pCur->elem->stuff.u.spawnpoint.spawn_intelligence *= 1.1;
                         
-                        if(rand_in_range(1, 4) == 4)
+                        if(spawn_rand > (rand_range/3) * 2)
                         {
                             game_add_enemy_bountyhunter(pCur->elem->physics.ptr->x,
                                                         pCur->elem->physics.ptr->y,
                                                         pCur->elem->physics.ptr->z);
                             world_get_last_object()->stuff.u.enemy.intelligence =
                             pCur->elem->stuff.u.spawnpoint.spawn_intelligence * 2;
+                        }
+                        else if(spawn_rand > (rand_range/3))
+                        {
+                            game_add_turret(pCur->elem->physics.ptr->x, pCur->elem->physics.ptr->y, pCur->elem->physics.ptr->z);
+                            world_get_last_object()->stuff.u.enemy.intelligence =
+                            pCur->elem->stuff.u.spawnpoint.spawn_intelligence;
                         }
                         else
                         {
@@ -1666,7 +1670,7 @@ game_run()
                     
                     if(pCur->elem->object_type == OBJ_BLOCK_MOVING)
                     {
-                        float orbit_origin[] = {0, 50, 0};
+                        float orbit_origin[] = {0, atof(MAP_BASE_ALT), 0};
                         
                         orbit_around(pCur->elem, orbit_origin, pCur->elem->stuff.u.orbiter.theta, pCur->elem->stuff.u.orbiter.radius);
                         
@@ -1684,6 +1688,14 @@ game_run()
                     if(!pCur->elem->physics.ptr->gravity)
                     {
                         pElemBallHeld = pCur->elem;
+                    }
+                    break;
+                    
+                case OBJ_WRECKAGE:
+                    {
+                        world_replace_object(pCur->elem->elem_id, pCur->elem->type,
+                                             pCur->elem->physics.ptr->x, pCur->elem->physics.ptr->y, pCur->elem->physics.ptr->z,
+                                             0, 0, 0, pCur->elem->scale * 1.01, pCur->elem->texture_id);
                     }
                     break;
                     
@@ -1957,7 +1969,7 @@ game_run()
                     console_write(game_log_messages[GAME_LOG_NEWTURRET]);
                     
                     game_add_turret(rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
-                                    rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+                                    rand_in_range(0, gWorld->bound_radius),
                                     rand_in_range(-gWorld->bound_radius, gWorld->bound_radius));
                     
                     world_get_last_object()->stuff.u.enemy.time_last_run = time_ms + 2000;
@@ -2589,7 +2601,7 @@ game_ai_target_priority(WorldElem* pSearchElem, WorldElem* pTargetElem, float* d
         if(pTargetElem->object_type == OBJ_PLAYER && !pSearchElem->stuff.u.enemy.ignore_player) return 2;
         else if(pTargetElem->object_type == OBJ_SHIP) return 2;
         else if(pTargetElem->object_type == OBJ_TURRET) return 1;
-        else if(!pSearchElem->stuff.u.enemy.fixed && pTargetElem->object_type == OBJ_POWERUP_GENERIC &&
+        else if(pTargetElem->object_type == OBJ_POWERUP_GENERIC &&
                 !pSearchElem->stuff.u.enemy.ignore_collect &&
                 pTargetElem->stuff.subtype == GAME_SUBTYPE_COLLECT &&
                 pTargetElem->physics.ptr->velocity <= velocity_pickup)

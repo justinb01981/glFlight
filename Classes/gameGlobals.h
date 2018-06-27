@@ -17,7 +17,7 @@
 
 enum {
     DURABILITY_PLAYER = 10,
-    DURABILITY_BLOCK = 1,
+    DURABILITY_BLOCK = 5,
     DURABILITY_ASTEROID = 5,
     DURABILITY_LOW = 5,
     DURABILITY_ENEMY = 10,
@@ -91,7 +91,7 @@ extern int fireActionQueuedAfterEdit;
 #endif
 
 /* reducing friction influences this... should be MAX_THRUST really */
-#define MAX_SPEED /*(15)*/ (10)
+#define MAX_SPEED /*(15)*/ (12)
 
 #define GAME_AI_DEBUG 0
 
@@ -109,7 +109,7 @@ extern float GYRO_DC;
 const static int pooped_cube_interval_ms = 50;
 const static int pooped_cube_lifetime = 100;
 
-const static float collision_repulsion_coeff = 0.2;
+const static float collision_repulsion_coeff = 0.1;
 
 const static float RADAR_MIN_VELOCITY = 1;
 

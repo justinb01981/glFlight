@@ -83,28 +83,6 @@ typedef struct
 #define GAME_VARIABLES_MAX 32
 #define GAME_VARIABLE(x) (game_variable_get(x))
 
-const static char *game_variables_name[] = {
-    "ENEMY_SPAWN_MAX_COUNT",
-    "ENEMY_SPAWN_MAX_ALIVE",
-    "PHYSICS_FRICTION_C",
-    "ENEMY1_FORGET_DISTANCE",
-    "ENEMY1_PURSUE_DISTANCE",
-    "ENEMY1_SPEED_MAX",
-    "ENEMY1_TURN_MAX_RADIANS",
-    "ENEMY1_FIRES_MISSLES",
-    "ENEMY1_FIRES_LASERS",
-    "ENEMY1_CHANGES_TARGET",
-    "ENEMY1_PATROLS_NO_TARGET",
-    "ENEMY1_RUN_INTERVAL_MS",
-    "ENEMY1_LEAVES_TRAIL",
-    "ENEMY1_SCAN_DISTANCE_MAX",
-    "ENEMY1_MAX_TURN_SKILL_SCALE",
-    "ENEMY1_JUKE_PCT",
-    "ENEMY1_COLLECT_DURABILITY",
-    "ENEMY_RUN_DISTANCE",
-    NULL
-};
-
 static char *game_log_messages[] = {
     /*"^D: firewalled :-)\n"*/ "^D secured\n",
     "HIDDEN: detected: virus\n",
@@ -151,12 +129,35 @@ enum {
     GAME_LOG_LAST
 };
 
+const static char *game_variables_name[] = {
+    "ENEMY_SPAWN_MAX_COUNT",
+    "ENEMY_SPAWN_MAX_ALIVE",
+    "ENEMY_SPAWN_MOVE_RATE",
+    "PHYSICS_FRICTION_C",
+    "ENEMY1_FORGET_DISTANCE",
+    "ENEMY1_PURSUE_DISTANCE",
+    "ENEMY1_SPEED_MAX",
+    "ENEMY1_TURN_MAX_RADIANS",
+    "ENEMY1_FIRES_MISSLES",
+    "ENEMY1_FIRES_LASERS",
+    "ENEMY1_CHANGES_TARGET",
+    "ENEMY1_PATROLS_NO_TARGET",
+    "ENEMY1_RUN_INTERVAL_MS",
+    "ENEMY1_LEAVES_TRAIL",
+    "ENEMY1_SCAN_DISTANCE_MAX",
+    "ENEMY1_MAX_TURN_SKILL_SCALE",
+    "ENEMY1_JUKE_PCT",
+    "ENEMY1_COLLECT_DURABILITY",
+    "ENEMY_RUN_DISTANCE",
+    NULL
+};
 
 extern float game_variables_val[GAME_VARIABLES_MAX];
 
 const static float game_variables_default[] = {
     99999999,    // MAX_SPAWN_COUNT
     10,          // MAX_ALIVE_COUNT
+    4,           // ENEMY_SPAWN_MOVE_RATE
     1,           // PHYSICS_FRICTION_C
     50,          // ENEMY1_FORGET_DISTANCE
     30,          // ENEMY1_PURSUE_DISTANCE
@@ -357,7 +358,6 @@ game_elem_setup_ship(WorldElem* elem, int skill)
     elem->stuff.u.enemy.intelligence = skill;
     elem->stuff.u.enemy.leaves_trail = GAME_VARIABLE("ENEMY1_LEAVES_TRAIL");
     elem->stuff.u.enemy.run_distance = rand_in_range(4, GAME_VARIABLE("ENEMY_RUN_DISTANCE"));
-    elem->stuff.u.enemy.fixed = 0;
     elem->stuff.u.enemy.changes_target = GAME_VARIABLE("ENEMY1_CHANGES_TARGET");
     elem->stuff.u.enemy.fires = GAME_VARIABLE("ENEMY1_FIRES_LASERS");
     elem->stuff.u.enemy.patrols_no_target_jukes = GAME_VARIABLE("ENEMY1_PATROLS_NO_TARGET");
@@ -383,12 +383,15 @@ game_elem_setup_turret(WorldElem* elem, int skill)
     elem->stuff.u.enemy.intelligence = skill;
     elem->stuff.u.enemy.leaves_trail = 0;
     elem->stuff.u.enemy.run_distance = 0;
-    elem->stuff.u.enemy.fixed = 1;
+    elem->stuff.u.enemy.ignore_collect = 1;
+    elem->physics.ptr->gravity = 1;
+    elem->physics.ptr->friction = 0;
+    elem->bounding_remain = 1;
     elem->stuff.u.enemy.changes_target = 1;
     elem->stuff.u.enemy.fires = 1;
     elem->stuff.u.enemy.fires_missles = 0;
-    elem->stuff.u.enemy.patrols_no_target_jukes = 0;
-    elem->stuff.u.enemy.max_speed = 0;
+    elem->stuff.u.enemy.patrols_no_target_jukes = 1;
+    elem->stuff.u.enemy.max_speed = MAX_SPEED/2;
     elem->stuff.u.enemy.max_turn = 0.8;
     elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     elem->stuff.u.enemy.scan_distance = 1;
@@ -405,13 +408,13 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.u.enemy.patrols_no_target_jukes = 0;
     x->stuff.u.enemy.leaves_trail = 0;
     x->stuff.u.enemy.run_distance = 0;
-    x->stuff.u.enemy.fixed = 0;
+    x->stuff.u.enemy.ignore_collect = 1;
     x->stuff.u.enemy.fires = 0;
     x->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
     x->stuff.u.enemy.time_last_run = time_ms;
     x->durability = DURABILITY_MISSLE;
     x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
-    x->stuff.u.enemy.max_turn = 4.0; // radians per second
+    x->stuff.u.enemy.max_turn = 1.0; // radians per second
     x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     x->stuff.u.enemy.scan_distance = 50;
     x->stuff.u.enemy.pursue_distance = 30;
@@ -447,6 +450,12 @@ game_elem_setup_spawnpoint_enemy(WorldElem* elem)
 
 inline static void
 game_elem_setup_spawnpoint(WorldElem* elem)
+{
+    elem->renderInfo.priority = 1;
+}
+
+inline static void
+game_elem_setup_base(WorldElem* elem)
 {
     elem->renderInfo.priority = 1;
 }

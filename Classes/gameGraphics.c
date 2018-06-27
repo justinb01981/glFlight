@@ -797,10 +797,10 @@ void drawControls()
             }
             else if(controls[i] == &gameInterfaceControls.dialogRect)
             {
-                if(gameInterfaceControls.dialogLifeFrames > 0)
+                if(gameInterfaceControls.dialogRect.dialogLifeFrames > 0)
                 {
-                    gameInterfaceControls.dialogLifeFrames--;
-                    if(gameInterfaceControls.dialogLifeFrames <= GAME_FRAME_RATE)
+                    gameInterfaceControls.dialogRect.dialogLifeFrames--;
+                    if(gameInterfaceControls.dialogRect.dialogLifeFrames <= GAME_FRAME_RATE)
                     {
                         gameInterfaceControls.dialogRect.x += (gameInterfaceControls.interfaceWidth / GAME_FRAME_RATE) * gameInterfaceControls.dialogRect.xm;
                         gameInterfaceControls.dialogRect.y += (gameInterfaceControls.interfaceHeight / GAME_FRAME_RATE) * gameInterfaceControls.dialogRect.ym;
@@ -809,6 +809,7 @@ void drawControls()
                 else
                 {
                     gameInterfaceControls.dialogRect.visible = 0;
+                    gameInterfaceModalDialogDequeue();
                 }
             }
             

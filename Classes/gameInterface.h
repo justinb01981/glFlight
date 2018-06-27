@@ -29,6 +29,7 @@ typedef struct
     int *textDestInt;
     int modal:1, text_align_topleft:1;
     void *pnext;
+    unsigned long dialogLifeFrames;
     
     struct {
         void (*dialogRectActionLeft)(void);
@@ -64,8 +65,6 @@ typedef struct {
     controlRect dialogRectDefault;
     
     controlRect altControl;
-    
-    unsigned long dialogLifeFrames;
     
     //int menuAction;
     

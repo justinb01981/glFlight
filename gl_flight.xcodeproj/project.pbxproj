@@ -555,6 +555,7 @@
 		D03ABA6414ADACF000C44538 /* world.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = world.h; sourceTree = "<group>"; };
 		D03ADBA617823B5B00D725F7 /* gameSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameSettings.h; sourceTree = "<group>"; };
 		D03ADBA7178271E800D725F7 /* actions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actions.c; sourceTree = "<group>"; };
+		D03BD6BD20E2576E001CC3DC /* mapgenerated.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mapgenerated.h; sourceTree = "<group>"; };
 		D04256661DA75CFB00E9C17B /* texture98.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture98.bmp; sourceTree = "<group>"; };
 		D04EB4CC1BDDCD5E0089D9F0 /* app_icon120x120_orig.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon120x120_orig.png; sourceTree = "<group>"; };
 		D04EB4CE1BDDF9DB0089D9F0 /* app_icon_lg_prev.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = app_icon_lg_prev.jpg; sourceTree = "<group>"; };
@@ -737,6 +738,8 @@
 				6DEA66E715EE96180002C75D /* gameGlobals.h */,
 				6D07DE3A15F7FC830048129B /* gameShip.h */,
 				6D07DE3C15F7FCA00048129B /* gameShip.c */,
+				6D595F641652CB0D00C21926 /* maps.h */,
+				D03BD6BD20E2576E001CC3DC /* mapgenerated.h */,
 				6D3FF5FA15FA7B61009A5388 /* mesh.h */,
 				6D3FF5F815FA7B40009A5388 /* mesh.c */,
 				6D262134163F243600F7EC2D /* simple_list.h */,
@@ -749,7 +752,6 @@
 				D062FE1E1FEB702C00ABE435 /* GameNetworkBonjourManager.m */,
 				6D91DEA1166C0DB200362864 /* cocoaGameAudio.h */,
 				6D91DEA2166C0DB300362864 /* cocoaGameAudio.m */,
-				6D595F641652CB0D00C21926 /* maps.h */,
 				6D91DEAA16754FB800362864 /* gameBounding.h */,
 				6D91DEAB1675556200362864 /* gameBounding.c */,
 				6D413C05168833F500A37ADF /* cocoaNetworkThread.h */,

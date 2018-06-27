@@ -44,13 +44,15 @@ world_t *gWorld = NULL;
 game_lock_t gWorldLock;
 
 float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
-float C_FRICTION = /*0.04*/ 0.02; // higher values = more friction
+float C_FRICTION = /*0.04*/ 0.015; // higher values = more friction
 float GYRO_FEEDBACK = GYRO_FEEDBACK_DEFAULT;
 float GYRO_DC = GYRO_DC_DEFAULT;
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
 
 static struct mesh_t* world_pending_mesh = NULL;
 static float world_pending_mesh_info[3];
+
+static float check_bounding_box_overlap_result[6];
 
 models_shared_t models_shared;
 
@@ -968,11 +970,12 @@ world_random_spawn_location(float loc[6], int affiliation)
     }
     
     // no spawn point found, spawn randomly
-    loc[0] = rand_in_range(-gWorld->bound_radius, gWorld->bound_radius);
-    loc[1] = rand_in_range(0, gWorld->bound_radius);
-    loc[2] = rand_in_range(-gWorld->bound_radius, gWorld->bound_radius);
+    loc[0] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
+    loc[1] = rand_in_range(1, gWorld->bound_radius/2);
+    loc[2] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
     
-    for(i = 3; i < 6; i++) loc[i] = rand_in_range(0, M_PI*2 * 100) / 100;
+    loc[4] = loc[3] = 0;
+    loc[5] = rand_in_range(0, M_PI*2 * 100) / 100;
 }
 
 void world_free()
@@ -1098,7 +1101,7 @@ void world_init(float radius)
     assert(floor(gWorld->regions_y) == gWorld->regions_y);
     assert(floor(gWorld->regions_z) == gWorld->regions_z);
     
-    // build bounding vectors
+    // build bounding vectors (rectangle)
     /*
     boundingRegion* br = boundingRegionInit(6);
     boundingRegionAddVec(br, 0, 0, 0, 1, 0, 0);
@@ -1315,27 +1318,35 @@ world_move_elem(WorldElem* pElem, float x, float y, float z, int relative)
 }
 
 void
-world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc)
+world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, float Frepulse)
 {
     float mv[3];
-    float s = collision_repulsion_coeff;
-    float repulse_min = 0.001;
-    int dmax = 0;
-    int d;
+    float s = Frepulse;
+    float repulse_min = 0.1;
+    int dmin;
+    int i;
 
-    float v = sqrt((pCollisionA->physics.ptr->vx*pCollisionA->physics.ptr->vx) +
-                   (pCollisionA->physics.ptr->vy*pCollisionA->physics.ptr->vy) +
-                   (pCollisionA->physics.ptr->vz*pCollisionA->physics.ptr->vz));
+    float v = pCollisionA->physics.ptr->velocity + repulse_min;
 
     mv[0] = (pCollisionA->physics.ptr->x - pCollisionB->physics.ptr->x) * v * tc * s;
     mv[1] = (pCollisionA->physics.ptr->y - pCollisionB->physics.ptr->y) * v * tc * s;
     mv[2] = (pCollisionA->physics.ptr->z - pCollisionB->physics.ptr->z) * v * tc * s;
     
-    // treat as a flat surface parallel to one axis
-    //for(d = 0; d < 3; d++) { if(fabs(mv[d]) > fabs(mv[dmax])) dmax = d; }
-    //for(d = 0; d < 3; d++) { if(d != dmax) mv[d] = -mv[d]; }
-
-    for(int i = 0; i < 3; i++) if(fabs(mv[i]) < repulse_min) mv[i] = 0.1;
+    // repulse along min overlapping axis
+    dmin = 0;
+    for(i = 0; i < 3; i++)
+    {
+        if(check_bounding_box_overlap_result[i] < check_bounding_box_overlap_result[dmin]) dmin = i;
+    }
+    for(i = 0; i < 3; i++) if(dmin != i) mv[i] = 0.0;
+    
+    // cancel velocity along one axis
+    float* p[] = {
+        &pCollisionA->physics.ptr->vx,
+        &pCollisionA->physics.ptr->vy,
+        &pCollisionA->physics.ptr->vz
+    };
+    for(i = 0; i < 3; i++) if(dmin == i) *(p[i]) = 0;
 
     move_elem_relative(pCollisionA, mv[0], mv[1], mv[2]);
 }
@@ -1379,21 +1390,28 @@ check_bounding_box_overlap(float boxA_in[6], float boxB_in[6])
     float amin, amax;
     float bmin, bmax;
     float *boxA, *boxB;
+    float R;
+    int i;
     
     boxA = boxA_in;
     boxB = boxB_in;
 
     amin = boxA[0]; amax = boxA[3];
     bmin = boxB[0]; bmax = boxB[3];
-    if(amax < bmin || amin > bmax) return 0;
+    R = MAX(bmax-amin, amax-bmin);
+    check_bounding_box_overlap_result[0] = (amax-amin) + (bmax-bmin) - R;
     
     amin = boxA[1]; amax = boxA[4];
     bmin = boxB[1]; bmax = boxB[4];
-    if(amax < bmin || amin > bmax) return 0;
+    R = MAX(bmax-amin, amax-bmin);
+    check_bounding_box_overlap_result[1] = (amax-amin) + (bmax-bmin) - R;
     
     amin = boxA[2]; amax = boxA[5];
     bmin = boxB[2]; bmax = boxB[5];
-    if(amax < bmin || amin > bmax) return 0;
+    R = MAX(bmax-amin, amax-bmin);
+    check_bounding_box_overlap_result[2] = (amax-amin) + (bmax-bmin) - R;
+    
+    for(i = 0; i < 3; i++) if(check_bounding_box_overlap_result[i] < 0) return 0;
     
     return 1;
 }
@@ -1563,7 +1581,10 @@ world_update(float tc)
     // TODO: for meshes test collision by checking if object is < plane-normal vector
     int do_check_collisions = 1;
     int do_sound_checks = 1;
-    unsigned int collision_resolve_retries = 100;
+    float FRdiv = 64;
+    float FRcollision = collision_repulsion_coeff;
+    // HACK: -- apply min velocity "wobble back/forth"
+    float Fmin = 0.01 * (tex_pass % 2) - 1;
     
     WorldElemListNode* pCur = gWorld->elements_moving.next;
     
@@ -1574,13 +1595,17 @@ world_update(float tc)
     world_update_state.ptr_objects_moving = &gWorld->elements_moving;
     while(world_update_state.ptr_objects_moving && world_update_state.ptr_objects_moving->next)
     {
+        WorldElem* pElem;
+        
         if(world_update_state.ptr_objects_moving) world_update_state.ptr_objects_moving = world_update_state.ptr_objects_moving->next;
         
-        WorldElem* pElem = world_update_state.ptr_objects_moving->elem;
+        remove_retry:
+        
+        pElem = world_update_state.ptr_objects_moving->elem;
         
         if(!pElem->head_elem) // not a child elem
         {
-            if(pElem->physics.ptr->vx != 0 || pElem->physics.ptr->vy != 0 || pElem->physics.ptr->vz != 0 || pElem->physics.ptr->gravity)
+            if(pElem->physics.ptr->vx != 0 || pElem->physics.ptr->vy+Fmin != 0 || pElem->physics.ptr->vz != 0 || pElem->physics.ptr->gravity)
             {
                 int out_of_bounds_remove = 0;
                 
@@ -1688,12 +1713,6 @@ world_update(float tc)
                         };
                         int cl = 0;
                         
-                        region_collision_retry:
-                        
-                        if(collision_resolve_retries == 0) break;
-                        
-                        collision_resolve_retries--;
-                        
                         while(collision_actions_table_list[cl])
                         {
                             collision_action_table_t *collision_actions_cur = collision_actions_table_list[cl];
@@ -1711,6 +1730,10 @@ world_update(float tc)
                                 if(pRegionElemsHead)
                                 {
                                     WorldElem* pRegionElem;
+                                    
+                                    region_collision_retry:
+                                    
+                                    if(FRcollision <= 0) break;
                                     
                                     world_update_state.world_region_iterate_cur = pRegionElemsHead->next;
                                     
@@ -1765,8 +1788,11 @@ world_update(float tc)
                                                 
                                                 if(colact == COLLISION_ACTION_REPULSE)
                                                 {
-                                                    world_repulse_elem(pElem, pElemCollided, tc);
+                                                    world_repulse_elem(pElem, pElemCollided, tc, FRcollision);
+                                                    
+                                                    // re-start collision test at new (repulsed) coordinates
                                                     cl = 0;
+                                                    FRcollision -= collision_repulsion_coeff/FRdiv;
                                                     goto region_collision_retry;
                                                 }
 
@@ -1786,7 +1812,11 @@ world_update(float tc)
                                         }
                                         
                                         // check if this was invalidated by the remove-callback
-                                        if(!world_update_state.world_region_iterate_cur) world_update_state.world_region_iterate_cur = pRegionElemsHead;
+                                        if(!world_update_state.world_region_iterate_cur)
+                                        {
+                                            world_update_state.world_region_iterate_cur = pRegionElemsHead;
+                                            FRcollision -= collision_repulsion_coeff/FRdiv;
+                                        }
                                         
                                         world_update_state.world_region_iterate_cur = world_update_state.world_region_iterate_cur->next;
                                     }
@@ -1794,22 +1824,29 @@ world_update(float tc)
                             }
                             cl++;
                         }
-                        // MARK: -- resolve collisions with other objects - DONE
+                        
+                        // MARK: -- resolve collisions with other objects - DONE (restore collision priority)
                         
                         add_element_to_region(pElem);
+                        
+                        FRcollision = collision_repulsion_coeff;
                     }
                     else
                     {
                         WorldElem* pCurRemoveElem = pElem;
-                        if(world_update_state.ptr_objects_moving) world_update_state.ptr_objects_moving = world_update_state.ptr_objects_moving->next;
                         
                         // out of bounds
                         world_elem_list_remove(pCurRemoveElem, &gWorld->elements_expiring);
-                        world_elem_list_remove(pCurRemoveElem, &gWorld->elements_moving);
                         world_elem_list_remove(pCurRemoveElem, &gWorld->elements_list);
-                        
                         world_elem_list_add(pCurRemoveElem, &gWorld->elements_to_be_freed);
-                        continue;
+                        
+                        if(world_update_state.ptr_objects_moving)
+                        {
+                            world_update_state.ptr_objects_moving = world_update_state.ptr_objects_moving->next;
+                        }
+                        
+                        world_elem_list_remove(pCurRemoveElem, &gWorld->elements_moving);
+                        goto remove_retry;
                     }
                 }
             }

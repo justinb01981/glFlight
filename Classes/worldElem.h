@@ -139,8 +139,7 @@ struct WorldElem {
         {
             struct
             {
-                game_timeval_t time_last_spawn, time_spawn_interval, time_last_move, time_move_interval;
-                float spawn_propability;
+                float spawn_coeff;
                 float spawn_intelligence;
             } spawnpoint;
             
@@ -161,12 +160,11 @@ struct WorldElem {
                 float x, y, z;
             } teleporter;
             
-            
             struct
             {
                 int enemy_state;
                 int last_state;
-                game_timeval_t time_last_run, time_last_bullet, time_last_trail, time_next_decision, time_last_deploy, time_target_acquired, time_run_interval;
+                game_timeval_t time_last_run, time_last_bullet, time_last_trail, time_next_retarget, time_last_deploy, time_run_interval;
                 int target_id;
                 float vthrust[3];
                 float tgt_x, tgt_y, tgt_z;
@@ -176,7 +174,7 @@ struct WorldElem {
                 float intelligence;
                 //float pitch_last, yaw_last;
                 int appearance;
-                int fixed:1, changes_target:1, fires:1, fires_missles:1, leaves_trail:1, patrols_no_target_jukes:1, deploys_collect:1, ignore_player:1, ignore_collect:1;
+                int changes_target:1, fires:1, fires_missles:1, leaves_trail:1, patrols_no_target_jukes:1, deploys_collect:1, ignore_player:1, ignore_collect:1;
                 int collided;
             } enemy;
         } u;

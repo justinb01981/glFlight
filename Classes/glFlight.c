@@ -130,6 +130,7 @@ glFlightFrameStage1()
     int dynamic_draw_distance = 0;
     int backface_culling = 1;
     WorldElemListNode* pListNode = NULL;
+    WorldElemListNode* pCameraWatchNode = NULL;
     WorldElem* pWorldElemMyShip = NULL;
     int n_visibleChecks = 400;
     char statsMessage[256];
@@ -406,17 +407,16 @@ calibrate_bail:
             {
                 camera_locked_frames--;
             }
-            else if(camera_fix.frames > 0)
+            else if(camera_fix.frames > 0 && (pCameraWatchNode = world_elem_list_find(camera_fix.elem_id, &gWorld->elements_moving)))
             {
                 camera_fix.frames--;
                 
-                WorldElemListNode* pWatchNode = world_elem_list_find(camera_fix.elem_id, &gWorld->elements_moving);
-                if(pWatchNode)
+                if(pCameraWatchNode)
                 {
                     gameCamera_initWithHeading(my_ship_x, my_ship_y, my_ship_z,
-                                               pWatchNode->elem->physics.ptr->x - my_ship_x,
-                                               pWatchNode->elem->physics.ptr->y - my_ship_y,
-                                               pWatchNode->elem->physics.ptr->z - my_ship_z);
+                                               pCameraWatchNode->elem->physics.ptr->x - my_ship_x,
+                                               pCameraWatchNode->elem->physics.ptr->y - my_ship_y,
+                                               pCameraWatchNode->elem->physics.ptr->z - my_ship_z);
                     gameCamera_MoveZ(-4);
                     gameCamera_MoveY(1);
                 }

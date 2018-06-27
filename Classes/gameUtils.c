@@ -525,8 +525,8 @@ rand_in_range(float b, float e)
     float s = (e - b) / range;
     if(range == 0) return b;
     
-    float k = rand();
-    float r = roundf(fmod(k, range));
+    int k = rand();
+    float r = roundf(fmod(k, range)); // up to e-1
     
     assert(!isnan(b+(r*s)));
     

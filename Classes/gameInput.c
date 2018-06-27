@@ -120,8 +120,8 @@ gameInputInit()
     targetSpeed = speed;
     maxSpeed = MAX_SPEED;
     maxAccelDecel = /*5*/ MAX_SPEED/2; // change per second
-    minSpeed = 0;
-    bulletVel = 40;
+    minSpeed = MAX_SPEED / 20;
+    bulletVel = MAX_SPEED*5;
     
     isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
     
@@ -394,16 +394,12 @@ gameInput()
             trim_dz[1] = ((gameInputStats.max[1] - gameInputStats.min[1]) / div);
             trim_dz[2] = ((gameInputStats.max[2] - gameInputStats.min[2]) / div);
             
-            roll_m  = gameInputStats.avg[0]; pitch_m  = gameInputStats.avg[1]; yaw_m  = gameInputStats.avg[2];
-            
             controlsCalibrated = 1;
         }
-        else
-        {
-            roll_m = deviceRoll;
-            pitch_m = devicePitch;
-            yaw_m = deviceYaw;
-        }
+        
+        roll_m = deviceRoll;
+        pitch_m = devicePitch;
+        yaw_m = deviceYaw;
         
         // zero out input-averaging buffer
         for(int a = 0; a < AVG_INPUTS_LENGTH; a++)
@@ -522,7 +518,7 @@ gameInput()
         
         float cap = /*0.05*/ 0.1; // radians
         // output response amplfiers
-        float sm[] = /*{0.6, 0.8, 0.8}*/ {0.5, 0.6, 0.9};
+        float sm[] = /*{0.6, 0.8, 0.8}*/ {0.7, 0.8, 0.9};
         
         float cs = (speed - minSpeed) / (maxSpeed*2);
         float speedC = 1.0 /* - (cs*cs*0.9) */ ;

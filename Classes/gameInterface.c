@@ -1097,10 +1097,10 @@ gameInterfaceModalDialogEnqueue(char* msg, char *buttonLeft, char *buttonRight, 
             return;
         }
     }
-    gameInterfaceControls.dialogLifeFrames = life_frames;
     
     *pdialog = *overrideRect;
     pdialog->pnext = NULL;
+    pdialog->dialogLifeFrames = life_frames;
     
     sprintf(pdialog->text,
             "%s",

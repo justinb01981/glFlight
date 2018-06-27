@@ -2500,6 +2500,8 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                         break;
                     }
                     
+                    playerInfo->time_last_update = time_ms;
+                    
                     msgOut.cmd = GAME_NETWORK_MSG_GET_MAP_SOME;
                     msgOut.player_id = gameNetworkState.my_player_id;
                     
@@ -2991,6 +2993,17 @@ int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress
     gameNetworkMessage downloadMsg;
     unsigned long l = gameNetworkState.server_map_data_end - gameNetworkState.server_map_data;
     int request_more = 0;
+    
+    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
+    while(pInfo)
+    {
+        if(pInfo->player_id == GAME_NETWORK_PLAYER_ID_HOST)
+        {
+            pInfo->time_last_update = time_ms;
+            break;
+        }
+        pInfo = pInfo->next;
+    }
     
     if(!gameNetworkState.server_map_data) return 0;
     

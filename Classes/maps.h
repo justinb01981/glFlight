@@ -10,6 +10,7 @@
 #define gl_flight_maps_h
 
 #include "textures.h"
+#include "mapgenerated.h"
 
 /*
  * models
@@ -33,6 +34,8 @@
 #define MAPMODEL_CUBE_INVERTED "16"
 #define MAPMODEL_SPHERE "17"
 #define MAPMODEL_ENEMYBASE "18"
+#define MAP_BASE_ALT "50"
+
 
 /*
  (Model type, float x, float y, float z, float yaw, float pitch, float roll, float scale, int texture_id)
@@ -225,8 +228,8 @@ ADD_OBJ_END(4, 40) \
 "add_object r r r r r r r r " "r" "\n" \
 "object_set_info 8\n"
 
-#define BASE_GENERIC(x,y,z)                            \
-"register_params 17 "/*"rndx"*/#x" "#y" "/*"rndz"*/#z" 0 0 0 8 "/*"42"*//*"88"*/MAP_TEXTURE_ID_ANIMATED_STATIC" 0 0 0 0 0 0 0\n"                 \
+#define BASE_GENERIC(x, z)                            \
+"register_params 17 "/*"rndx"*/#x" "MAP_BASE_ALT" "/*"rndz"*/#z" 0 0 0 8 "/*"42"*//*"88"*/MAP_TEXTURE_ID_ANIMATED_STATIC" 0 0 0 0 0 0 0\n"                 \
 "add_object r r r r r r r r " "r" "\n" \
 "object_set_info 13\n" \
 
@@ -282,9 +285,8 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 "add_object 19 vecx_0 vecy_6.75 vecz_0 0 0 0 2 112\n"
 
 #define FLOATING_ISLAND(x, y, z)             \
-"set_vector "#x" "#y" "#z" 4 1 0\n"    \
-"add_object 20 vecx_0 vecy_0 vecz_0 0 0 0 10 31\n" \
-"add_object 2 vecx_0 vecy_1.2 vecz_0 0 0 0 2 57\n"
+"set_vector "#x" "#y" "#z" 1 1 1\n"    \
+"add_object 20 vecx_0 vecy_0 vecz_0 0 0 0 20 31\n"
 
 #define WORLD_SCALED_FRAME_TURRET(x, tex, scale)                         \
 "register_params 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
@@ -540,6 +542,9 @@ WORLD_SCALED_FRAME(1, /*57*/28, 4)
 /////////////
 
 // buildings
+MAP_GENERATED_MACRO
+
+/*
 BUILDING_1(rndx, 2, rndz)
 BUILDING_1(rndx, 2, rndz)
 BUILDING_1(rndx, 2, rndz)
@@ -691,6 +696,7 @@ FLOATING_ISLAND(rndx, rndy, rndz)
 FLOATING_ISLAND(rndx, rndy, rndz)
 FLOATING_ISLAND(rndx, rndy, rndz)
 FLOATING_ISLAND(rndx, rndy, rndz)
+*/
 
 // drifting asteroid example
 "add_object "MAPMODEL_ICOSAHEDRON" 100 20 100 0 0 0 2 14\n"
@@ -706,14 +712,13 @@ FLOATING_ISLAND(rndx, rndy, rndz)
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 
-
 // enemy base
 BASE_ENEMY_1
 
 // "core" that spits out data
-BASE_GENERIC(0, 50, 0)
+BASE_GENERIC(0, 0)
 
-"add_spawn 0 0 0 3.14 0 0\n"
+"add_spawn 0 2 0 3.14 0 0\n"
 
 /*
 "register_params 1 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0\n"
@@ -956,85 +961,19 @@ BUILDING_2(rndx, 2, rndz)
 BUILDING_2(rndx, 2, rndz)
 BUILDING_2(rndx, 2, rndz)
 
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(0, 75, 0)
 
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(100, 50, 100)
+FLOATING_ISLAND(100, 100, 100)
 
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(-100, 50, 100)
+FLOATING_ISLAND(-100, 100, 100)
 
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(-100, 50, -100)
+FLOATING_ISLAND(-100, 100, -100)
 
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
+FLOATING_ISLAND(100, 50, -100)
+FLOATING_ISLAND(100, 100, -100)
     
 ;
 

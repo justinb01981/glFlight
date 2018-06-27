@@ -123,5 +123,4 @@ tess_walk(struct tess_storage_t* S, \
           void (*cb)(float*, float*, unsigned int*, unsigned long))
 TESS_WALK_FUNCTION;
 
-
 #endif

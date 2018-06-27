@@ -138,7 +138,7 @@ WorldElem* world_get_last_object();
 
 void world_move_elem(WorldElem* pElem, float x, float y, float z, int relative);
 
-void world_repulse_elem(WorldElem* pCollisionFast, WorldElem* pCollisionSlow, float tc);
+void world_repulse_elem(WorldElem* pCollisionFast, WorldElem* pCollisionSlow, float tc, float Frepulse);
 
 void
 world_add_mesh(float x, float y, float z,

@@ -487,6 +487,10 @@ void map_render(char *map_buf)
                         
                         switch(world_get_last_object()->object_type)
                         {
+                            case OBJ_BASE:
+                                game_elem_setup_base(world_get_last_object());
+                                break;
+                                
                             case OBJ_TURRET:
                                 game_elem_setup_turret(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
                                 break;
