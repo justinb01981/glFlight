@@ -807,8 +807,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
         gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
-        gameStateSinglePlayer.base_spawn_collect_p = 0.8;
-        gameStateSinglePlayer.base_spawn_collect_m = 1.1;
+        gameStateSinglePlayer.base_spawn_collect_m = 0.9;
         gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/20;
@@ -957,7 +956,6 @@ game_start(float difficulty, int type)
         
         gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
         gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
-        gameStateSinglePlayer.base_spawn_collect_p = 0.5;
         gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/10;
@@ -1601,11 +1599,12 @@ game_run()
                     
                 case OBJ_SPAWNPOINT_ENEMY:
                 {
-                    float rand_range = 1<<16;
+                    float rand_range = 65536;
                     spawn_points_found++;
                     obj_id_enemy_spawn = pCur->elem->elem_id;
                     
-                    pCur->elem->stuff.u.spawnpoint.spawn_coeff += rand_in_range(-rand_range/2, rand_range) / (rand_range*100);
+                    // mark: -- spawn enemies randomly
+                    pCur->elem->stuff.u.spawnpoint.spawn_coeff += rand_in_range(-rand_range*0.5, rand_range) / (rand_range*100);
                     
                     if (gameStateSinglePlayer.counter_enemies_spawned > 0 &&
                         enemies_found < floor(gameStateSinglePlayer.max_enemies) &&
@@ -1766,8 +1765,6 @@ game_run()
         {
             gameStateSinglePlayer.last_run = time_ms;
             
-            gameStateSinglePlayer.base_spawn_collect_m += rand_in_range(-randH/10, randH/5);
-            
             game_target_objective_id = gameStateSinglePlayer.elem_id_spawnpoint;
             
             if(strncmp(gameSettingsPlayerName, "god", 3) == 0) pMyShipNode->elem->durability = 9999;
@@ -1910,11 +1907,14 @@ game_run()
                      */
                 }
                 
+                // mark: -- spawn collect points randomly
                 if(obj_id_base != WORLD_ELEM_ID_INVALID)
                 {
-                    if(gameStateSinglePlayer.base_spawn_collect_m >= gameStateSinglePlayer.base_spawn_collect_p*randH)
+                    gameStateSinglePlayer.base_spawn_collect_m += rand_in_range(-65535*0.8, 65535) / 65535;
+                    
+                    if(gameStateSinglePlayer.base_spawn_collect_m >= 1.0)
                     {
-                        gameStateSinglePlayer.base_spawn_collect_m *= 0.2;
+                        gameStateSinglePlayer.base_spawn_collect_m = 0;
                         
                         // spawn a random collect powerup
                         WorldElemListNode* pElemNodeSpawn = world_elem_list_find(obj_id_base, &gWorld->elements_list);
@@ -1964,6 +1964,7 @@ game_run()
                 }
                 
                 // add a turret which comes online in X seconds
+                /*
                 if(turrets_found < gameStateSinglePlayer.n_turrets)
                 {
                     console_write(game_log_messages[GAME_LOG_NEWTURRET]);
@@ -1974,6 +1975,7 @@ game_run()
                     
                     world_get_last_object()->stuff.u.enemy.time_last_run = time_ms + 2000;
                 }
+                */
             }
             
             if(invuln_count > 0)

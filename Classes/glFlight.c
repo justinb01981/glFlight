@@ -420,6 +420,11 @@ calibrate_bail:
                     gameCamera_MoveZ(-4);
                     gameCamera_MoveY(1);
                 }
+                else
+                {
+                    camera_fix.frames = 0;
+                    camera_fix.elem_id = WORLD_ELEM_ID_INVALID;
+                }
             }
             else
             {

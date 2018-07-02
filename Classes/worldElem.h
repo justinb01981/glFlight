@@ -169,7 +169,7 @@ struct WorldElem {
                 float vthrust[3];
                 float tgt_x, tgt_y, tgt_z;
                 float speed, max_speed;
-                float max_turn, rate_pitch, rate_yaw;
+                float max_turn;
                 float run_distance, pursue_distance, scan_distance;
                 float intelligence;
                 //float pitch_last, yaw_last;

@@ -203,7 +203,6 @@ struct
     float powerup_drop_chance[GAME_POWERUP_DROP_TABLE_LEN];
     int one_collect_at_a_time;
     
-    float base_spawn_collect_p;
     float base_spawn_collect_m;
     
     float log_event_camwatch[GAME_LOG_LAST];
@@ -392,7 +391,7 @@ game_elem_setup_turret(WorldElem* elem, int skill)
     elem->stuff.u.enemy.fires_missles = 0;
     elem->stuff.u.enemy.patrols_no_target_jukes = 1;
     elem->stuff.u.enemy.max_speed = MAX_SPEED/2;
-    elem->stuff.u.enemy.max_turn = 0.8;
+    elem->stuff.u.enemy.max_turn = 0.3;
     elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     elem->stuff.u.enemy.scan_distance = 1;
     elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE");
@@ -414,7 +413,7 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.u.enemy.time_last_run = time_ms;
     x->durability = DURABILITY_MISSLE;
     x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
-    x->stuff.u.enemy.max_turn = 1.0; // radians per second
+    x->stuff.u.enemy.max_turn = 0.8; // radians per second
     x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     x->stuff.u.enemy.scan_distance = 50;
     x->stuff.u.enemy.pursue_distance = 30;

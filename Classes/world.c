@@ -1195,7 +1195,7 @@ void world_init(float radius)
     }
     
     // boundary on the floor
-    boundingRegionAddVec(br, 0, 0, 0, 0, 1, 0);
+    boundingRegionAddVec(br, 0, 0.1, 0, 0, 1, 0);
     
     gWorld->boundingRegion = br;
     

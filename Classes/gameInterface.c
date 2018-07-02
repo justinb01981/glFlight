@@ -117,7 +117,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     
     gameInterfaceControls.radar = (controlRect) {
         screenWidth-screenWidth*0.15,
-        screenHeight-screenHeight*0.15,
+        screenHeight,
         screenWidth*0.15,
         screenHeight*0.15
     };
@@ -344,7 +344,8 @@ gameInterfaceHandleTouchMove(float x, float y)
     
     
     if(fabs(x-x_last[gameInterfaceControls.touchId-1]) < move_thresh &&
-       fabs(y-y_last[gameInterfaceControls.touchId-1]) < move_thresh)
+       fabs(y-y_last[gameInterfaceControls.touchId-1]) < move_thresh &&
+       touchedControl != &gameInterfaceControls.fire)
     {
         return;
     }

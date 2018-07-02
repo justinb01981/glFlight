@@ -29,7 +29,6 @@ float tow_v_scale = /*0.5*/ 1.2;
 float min_patrol_distance = 20;
 float collect_deploy_distance = -2.5;
 float change_target_frequency = 10000;
-float enemy_turn_rate_dampc = 0.9;
 
 float juke_distance = 20.0, juke_distance_patrol = 50.0;
 
@@ -581,9 +580,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     {
         float p = ydot < 0? turn_r: -turn_r;
         
-        elem->stuff.u.enemy.rate_pitch += p;
-        elem->stuff.u.enemy.rate_pitch *= enemy_turn_rate_dampc;
-        
         //quaternion_rotate_inplace(&yq, &xq, elem->stuff.u.enemy.rate_pitch);
         //quaternion_rotate_inplace(&zq, &xq, elem->stuff.u.enemy.rate_pitch);
     }
@@ -592,15 +588,12 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     {
         float y = xdot > 0? turn_r: -turn_r;
         
-        elem->stuff.u.enemy.rate_yaw = elem->stuff.u.enemy.rate_yaw + y;
-        elem->stuff.u.enemy.rate_yaw *= enemy_turn_rate_dampc;
-        
         //quaternion_rotate_inplace(&xq, &yq, elem->stuff.u.enemy.rate_yaw);
         //quaternion_rotate_inplace(&zq, &yq, elem->stuff.u.enemy.rate_yaw);
     }
      
     quaternion_t z1q;
-    slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist, zdot < 0 ? -0.3 : 0.2, &z1q.w, &z1q.x, &z1q.y, &z1q.z);
+    slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist, zdot < 0 ? -elem->stuff.u.enemy.max_turn : elem->stuff.u.enemy.max_turn-0.05, &z1q.w, &z1q.x, &z1q.y, &z1q.z);
     
     xq.w = z1q.w-zq.w;
     xq.x += z1q.x-zq.x;
