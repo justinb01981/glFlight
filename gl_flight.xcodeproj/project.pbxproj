@@ -124,6 +124,8 @@
 		D04EB4D31BDE0F720089D9F0 /* app_icon114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4D21BDE0F720089D9F0 /* app_icon114x114.png */; };
 		D04EB4D51BDE0F8E0089D9F0 /* app_icon152x152.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4D41BDE0F8E0089D9F0 /* app_icon152x152.png */; };
 		D04EB4D71BDE145D0089D9F0 /* app_icon57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4D61BDE145D0089D9F0 /* app_icon57x57.png */; };
+		D0549E8420ED4127009FF191 /* texture114.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0549E8320ED4126009FF191 /* texture114.bmp */; };
+		D0549E8520ED412C009FF191 /* texture114.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0549E8320ED4126009FF191 /* texture114.bmp */; };
 		D05A90B617A1CF8100F40807 /* texture40.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D05A90B517A1CF8100F40807 /* texture40.bmp */; };
 		D05A90B817A1E3F400F40807 /* engine.wav in Resources */ = {isa = PBXBuildFile; fileRef = D05A90B717A1E3F400F40807 /* engine.wav */; };
 		D062ED5A16E0279B00CA4374 /* glFlight.c in Sources */ = {isa = PBXBuildFile; fileRef = D062ED5916E0279B00CA4374 /* glFlight.c */; };
@@ -564,6 +566,7 @@
 		D04EB4D41BDE0F8E0089D9F0 /* app_icon152x152.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon152x152.png; sourceTree = "<group>"; };
 		D04EB4D61BDE145D0089D9F0 /* app_icon57x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon57x57.png; sourceTree = "<group>"; };
 		D052FB9319E44DA000077F9C /* gamePlatform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gamePlatform.h; sourceTree = "<group>"; };
+		D0549E8320ED4126009FF191 /* texture114.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture114.bmp; sourceTree = "<group>"; };
 		D05A90B517A1CF8100F40807 /* texture40.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture40.bmp; sourceTree = "<group>"; };
 		D05A90B717A1E3F400F40807 /* engine.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engine.wav; sourceTree = "<group>"; };
 		D05C28A71F9FEBC700BC2194 /* sphere_model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sphere_model.h; sourceTree = "<group>"; };
@@ -838,6 +841,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D0549E8320ED4126009FF191 /* texture114.bmp */,
 				D0290F3320A25BF2002935C3 /* texture113.bmp */,
 				D0290F3020A2445F002935C3 /* texture112.bmp */,
 				D09A5F3D208174EB009F9618 /* texture111.bmp */,
@@ -1145,6 +1149,7 @@
 				D02B8F1D1969E7AF00830369 /* texture72.bmp in Resources */,
 				D0C225F21CB93BC200A08AEB /* filelost.wav in Resources */,
 				D0AF470A18D7E2DD00081B81 /* texture60.bmp in Resources */,
+				D0549E8420ED4127009FF191 /* texture114.bmp in Resources */,
 				6DF655CE15D1E90F0015D5DF /* texture6.bmp in Resources */,
 				6DF655D015D1E9170015D5DF /* texture7.bmp in Resources */,
 				6DF655D415D1EA100015D5DF /* texture5.bmp in Resources */,
@@ -1418,6 +1423,7 @@
 				D0BCC97E2052EDC100094809 /* texture75.bmp in Resources */,
 				D0BCC97F2052EDC100094809 /* texture102.bmp in Resources */,
 				D0BCC9812052EDC100094809 /* texture106.bmp in Resources */,
+				D0549E8520ED412C009FF191 /* texture114.bmp in Resources */,
 				D0BCC9822052EDC100094809 /* texture56.bmp in Resources */,
 				D0BCC9832052EDC100094809 /* texture105.bmp in Resources */,
 				D0BCC9852052EDC100094809 /* texture66.bmp in Resources */,

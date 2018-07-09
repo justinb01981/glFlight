@@ -120,21 +120,34 @@ collision_actions_set_player_vuln()
     collision_actions[OBJ_BULLET][OBJ_PLAYER] = COLLISION_ACTION_DAMAGE;
 }
 
+inline static void collision_handling_remove_hook(WorldElem* pElem)
+{
+    if(pElem == gWorld->world_update_state.collision_recs_iterate_cur->elem)
+    {
+        gWorld->world_update_state.collision_recs_iterate_cur = NULL;
+    }
+}
+
 inline static void
 do_world_collision_handling(float tc)
 {
     // collisions
-    WorldElemListNode* pCollisionCur = gWorld->elements_collided.next;
+    //WorldElemListNode* pCollisionCur = gWorld->elements_collided.next;
     WorldElemListNode* pCollisionTmp;
+    world_update_state_t *state = &gWorld->world_update_state;
     
-    while(pCollisionCur && pCollisionCur->next)
+    state->collision_recs_iterate_cur = gWorld->elements_collided.next;
+    
+    gWorld->world_update_state.world_remove_hook = collision_handling_remove_hook;
+    
+    while(state->collision_recs_iterate_cur && state->collision_recs_iterate_cur->next)
     {
         // pairs of objects
         // elements_collided list does not add duplicates
         // element-moved at time of collision added first
         // TODO: if both elements are moving... who knows?
-        WorldElemListNode* pCollisionA = pCollisionCur;
-        WorldElemListNode* pCollisionB = pCollisionCur->next;
+        WorldElemListNode* pCollisionA = state->collision_recs_iterate_cur;
+        WorldElemListNode* pCollisionB =  state->collision_recs_iterate_cur->next;
         
         if(pCollisionB)
         {
@@ -518,20 +531,24 @@ do_world_collision_handling(float tc)
         }
         
     ignore_collision:
-        pCollisionCur = pCollisionCur->next->next;
+        state->collision_recs_iterate_cur = state->collision_recs_iterate_cur->next->next;
     }
+    
+    gWorld->world_update_state.world_remove_hook = NULL;
     
     /* HACK: remove elements marked for removal during collison handling
      * TODO: check if added to pending-free list at post-handling of above loop
      */
-    pCollisionCur = gWorld->elements_collided.next;
-    while(pCollisionCur)
+    state->collision_recs_iterate_cur = gWorld->elements_collided.next;
+    while(state->collision_recs_iterate_cur)
     {
-        WorldElemListNode* remove = pCollisionCur;
-        pCollisionCur = pCollisionCur->next;
+        WorldElemListNode* remove = state->collision_recs_iterate_cur;
+        state->collision_recs_iterate_cur = state->collision_recs_iterate_cur->next;
         if(remove->elem->collision_handle_remove)
         {
-            world_elem_list_add(remove->elem, &gWorld->elements_to_be_freed);
+            assert(0);
+            
+            //world_elem_list_add(remove->elem, &gWorld->elements_to_be_freed);
         }
     }
 }

@@ -563,6 +563,20 @@ calibrate_bail:
     }
 	glFrustumf(-xfrust, xfrust, -yfrust, yfrust, 2, drawDistanceFar);
     
+    
+    /*
+    glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
+    
+    glFogf(GL_FOG_MODE, GL_LINEAR);        // Fog Mode
+    GLfloat fogColor[4]= {0.5f, 0.5f, 0.5f, 1.0f};
+    glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
+    glFogf(GL_FOG_DENSITY, 1.0f);              // How Dense Will The Fog Be
+    glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
+    glFogf(GL_FOG_START, 50);             // Fog Start Depth
+    glFogf(GL_FOG_END, 150);               // Fog End Depth
+    glEnable(GL_FOG);
+     */
+    
     n_elements_out_of_order = 0;
     
     // sort elements by distance

@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/world_file.c"
-            timestampString = "550966353.137686"
+            timestampString = "552861524.28336"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "495"
@@ -42,7 +42,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/gameInterface.c"
-            timestampString = "552247722.497444"
+            timestampString = "552861524.2835"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "291"
@@ -58,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/maps.h"
-            timestampString = "551809219.537099"
+            timestampString = "552861524.283595"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "166"
-            endingLineNumber = "166"
+            startingLineNumber = "167"
+            endingLineNumber = "167"
             landmarkName = "unknown"
             landmarkType = "0">
          </BreakpointContent>
@@ -74,7 +74,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/gameGraphics.c"
-            timestampString = "552154264.297214"
+            timestampString = "552861524.283716"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "935"
@@ -165,32 +165,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Classes/gamePlay.c"
-            timestampString = "552247722.497622"
+            filePath = "Classes/gameAI.c"
+            timestampString = "552861524.283954"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1306"
-            endingLineNumber = "1306"
-            landmarkName = "game_handle_collision"
+            startingLineNumber = "731"
+            endingLineNumber = "731"
+            landmarkName = "game_ai_collision"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Classes/gameAI.c"
-            timestampString = "552247722.497685"
+            filePath = "Classes/gamePlay.c"
+            timestampString = "552861524.284098"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "753"
-            endingLineNumber = "753"
-            landmarkName = "game_ai_collision"
+            startingLineNumber = "1189"
+            endingLineNumber = "1189"
+            landmarkName = "game_handle_collision_powerup"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

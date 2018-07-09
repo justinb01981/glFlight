@@ -28,6 +28,15 @@
 
 extern float visible_distance;
 
+typedef struct {
+    WorldElemListNode* ptr_objects_moving;
+    WorldElemListNode* world_region_iterate_cur;
+    WorldElemListNode* collision_recs_iterate_cur;
+    
+    void (*world_remove_hook)(WorldElem* pElem);
+    void (*world_rgn_remove_hook)(WorldElem* pElem);
+} world_update_state_t;
+
 typedef struct
 {
     WorldElemListNode elements_list; // master list of all elements in existence
@@ -94,6 +103,8 @@ typedef struct
     float vis_regions_x, vis_regions_y, vis_regions_z;
     
     WorldElemListNode *elements_by_region;
+    
+    world_update_state_t world_update_state;
 	
 } world_t;
 

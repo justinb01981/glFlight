@@ -30,7 +30,7 @@ int n_elements_compared = 0;
 volatile float time_ms = 1;
 volatile float time_ms_wall = 1;
 
-float drawDistanceFar = 200;
+float drawDistanceFar = 400;
 
 const int console_write_append_thresh_ms = 1000;
 

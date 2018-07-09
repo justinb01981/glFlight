@@ -1307,8 +1307,6 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
     float M[] = {Ui, 0, Vi};
     float T[] = {0, 0};
     
-    float cam[] = {gameCamera_getX(), gameCamera_getY(), gameCamera_getZ()};
-    
     tess_begin(M, T, bgData->tess.S);
     
     Vi = Vb;
@@ -1332,6 +1330,8 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
         T[1] = Vi/Ve * Tk;
 
         tess_step_row(M, T, bgData->tess.S);
+        
+        // TODO: if a row is out-of-bounds, invalidate its triangle
         Mk *= -1;
     }
     

@@ -142,6 +142,8 @@ game_ai_find_target(WorldElem *pElem)
                     minId = pTarget->elem->elem_id;
                     minDist = dist;
                     wMin = w;
+                    
+                    pElem->stuff.u.enemy.fires = pTarget->elem->object_type != OBJ_POWERUP_GENERIC;
                 }
             }
         }
@@ -389,8 +391,6 @@ void
 object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem *elem, int target_objtype)
 {
     int fireBullet = 0;
-    int do_pitch = 1;
-    int do_yaw = 1;
     int skill = elem->stuff.u.enemy.intelligence;
     quaternion_t xq, yq, zq;
     float tc;
@@ -551,9 +551,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         elem->stuff.u.enemy.time_next_retarget = time_ms + 1000;
     }
     
-    // rate at which enemy rotates
-    float turn_r = (elem->stuff.u.enemy.max_turn) * tc;
-    
     float vdesired = pursuit_speed_for_object(elem);
     
     if(vdesired < MAX_SPEED) ai_debug("vdesired:", elem, vdesired);
@@ -563,9 +560,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     dist = sqrt(ax*ax + ay*ay + az*az);
     
-    float xdot = xq.x*(ax/dist) + xq.y*(ay/dist) + xq.z*(az/dist);
-    float ydot = yq.x*(ax/dist) + yq.y*(ay/dist) + yq.z*(az/dist);
-    
     if(elem->stuff.u.enemy.collided)
     {
         // force firing a bullet (in case of object-collision, run through)
@@ -574,22 +568,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         dist = 1;
         zdot = zdot_ikillyou;
         vdesired = 1.0;
-    }
-    
-    if(do_pitch)
-    {
-        float p = ydot < 0? turn_r: -turn_r;
-        
-        //quaternion_rotate_inplace(&yq, &xq, elem->stuff.u.enemy.rate_pitch);
-        //quaternion_rotate_inplace(&zq, &xq, elem->stuff.u.enemy.rate_pitch);
-    }
-
-    if(do_yaw)
-    {
-        float y = xdot > 0? turn_r: -turn_r;
-        
-        //quaternion_rotate_inplace(&xq, &yq, elem->stuff.u.enemy.rate_yaw);
-        //quaternion_rotate_inplace(&zq, &yq, elem->stuff.u.enemy.rate_yaw);
     }
      
     quaternion_t z1q;

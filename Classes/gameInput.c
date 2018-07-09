@@ -249,8 +249,6 @@ gameInput()
         gyroInputStableThresh += fabs(((devicePitch-gyroInputDeltaLast[0]) +
                                   (deviceYaw-gyroInputDeltaLast[1]) +
                                   (deviceRoll-gyroInputDeltaLast[2])) / 3) * 0.1;
-        
-        printf("gyroInputStableThresh:%f\n", gyroInputStableThresh);
     }
     else
     {

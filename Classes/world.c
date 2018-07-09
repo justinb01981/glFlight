@@ -56,14 +56,6 @@ static float check_bounding_box_overlap_result[6];
 
 models_shared_t models_shared;
 
-struct {
-    WorldElemListNode* ptr_objects_moving;
-    WorldElemListNode* world_region_iterate_cur;
-    
-    void (*world_remove_hook)(WorldElem* pElem);
-    void (*world_rgn_remove_hook)(WorldElem* pElem);
-} world_update_state = {NULL, NULL, NULL, NULL};
-
 static int
 world_add_object_core(Model type,
                       float x, float y, float z,
@@ -183,7 +175,8 @@ world_add_object_core(Model type,
             model_primitives_sizeof = sizeof(model_cube_primitives);
             model_primitives = model_cube_primitives;
             break;
-			
+        
+        case MODEL_SCENERY:
         case MODEL_SQUARE:
             model_coords = model_square;
             model_sizeof = sizeof(model_square);
@@ -507,6 +500,11 @@ world_add_object_core(Model type,
             pElem->destructible = 0;
             new_durability = 100;
             break;
+            
+        case MODEL_SCENERY:
+            pElem->renderInfo.visible = 1;
+            pElem->renderInfo.priority = 1;
+            break;
 
         default:
             break;
@@ -704,7 +702,6 @@ world_remove_object(int elem_id)
     WorldElem* pElem = NULL;
     
     if(gWorld->ignore_remove) return;
-    
     {
         WorldElemListNode* pRemoveNode;
         pRemoveNode = world_elem_list_find(elem_id, &gWorld->elements_list);
@@ -713,7 +710,7 @@ world_remove_object(int elem_id)
     
     if(pElem && !pElem->remove_pending)
     {
-        if(world_update_state.world_remove_hook) world_update_state.world_remove_hook(pElem);
+        if(gWorld->world_update_state.world_remove_hook) gWorld->world_update_state.world_remove_hook(pElem);
         
         remove_element_from_region(pElem);
         
@@ -1524,7 +1521,7 @@ add_element_to_region(WorldElem* pElem)
 void
 remove_element_from_region(WorldElem* pElem)
 {
-    if(world_update_state.world_rgn_remove_hook != NULL) world_update_state.world_rgn_remove_hook(pElem);
+    if(gWorld->world_update_state.world_rgn_remove_hook != NULL) gWorld->world_update_state.world_rgn_remove_hook(pElem);
     
     if(pElem->spans_regions)
     {
@@ -1559,19 +1556,19 @@ remove_element_from_region(WorldElem* pElem)
     }
 }
 
-
 void
 world_update_elem_removed_hook(WorldElem* pElem)
 {
-    if(world_update_state.world_region_iterate_cur && world_update_state.world_region_iterate_cur->elem == pElem)
+    world_update_state_t *state = &gWorld->world_update_state;
+    if(state->world_region_iterate_cur && state->world_region_iterate_cur->elem == pElem)
     {
         // our position in the list was invalidated
-        world_update_state.world_region_iterate_cur = world_update_state.world_region_iterate_cur->next;
+        state->world_region_iterate_cur = state->world_region_iterate_cur->next;
     }
     
-    if(world_update_state.ptr_objects_moving && world_update_state.ptr_objects_moving->elem == pElem)
+    if(state->ptr_objects_moving && state->ptr_objects_moving->elem == pElem)
     {
-        world_update_state.ptr_objects_moving = NULL;
+        state->ptr_objects_moving = NULL;
     }
 }
 
@@ -1590,18 +1587,18 @@ world_update(float tc)
     
     // TODO: first apply boundary enforcement, THEN iterate moving objects again and apply collision
     
-    world_update_state.world_remove_hook = world_update_elem_removed_hook;
+    gWorld->world_update_state.world_remove_hook = world_update_elem_removed_hook;
     
-    world_update_state.ptr_objects_moving = &gWorld->elements_moving;
-    while(world_update_state.ptr_objects_moving && world_update_state.ptr_objects_moving->next)
+    gWorld->world_update_state.ptr_objects_moving = &gWorld->elements_moving;
+    while(gWorld->world_update_state.ptr_objects_moving && gWorld->world_update_state.ptr_objects_moving->next)
     {
         WorldElem* pElem;
         
-        if(world_update_state.ptr_objects_moving) world_update_state.ptr_objects_moving = world_update_state.ptr_objects_moving->next;
+        if(gWorld->world_update_state.ptr_objects_moving) gWorld->world_update_state.ptr_objects_moving = gWorld->world_update_state.ptr_objects_moving->next;
         
-        remove_retry:
+        //remove_retry:
         
-        pElem = world_update_state.ptr_objects_moving->elem;
+        pElem = gWorld->world_update_state.ptr_objects_moving->elem;
         
         if(!pElem->head_elem) // not a child elem
         {
@@ -1629,11 +1626,11 @@ world_update(float tc)
                     pElem->physics.ptr->vz
                 };
                 
-                world_update_state.world_rgn_remove_hook = NULL;
+                gWorld->world_update_state.world_rgn_remove_hook = NULL;
                 
                 remove_element_from_region(pElem);
                 
-                world_update_state.world_rgn_remove_hook = world_update_elem_removed_hook;
+                gWorld->world_update_state.world_rgn_remove_hook = world_update_elem_removed_hook;
                 
                 if(do_sound_checks)
                 {
@@ -1735,11 +1732,11 @@ world_update(float tc)
                                     
                                     if(FRcollision <= 0) break;
                                     
-                                    world_update_state.world_region_iterate_cur = pRegionElemsHead->next;
+                                    gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead->next;
                                     
-                                    while(world_update_state.world_region_iterate_cur)
+                                    while(gWorld->world_update_state.world_region_iterate_cur)
                                     {
-                                        pRegionElem = world_update_state.world_region_iterate_cur->elem;
+                                        pRegionElem = gWorld->world_update_state.world_region_iterate_cur->elem;
                                         
                                         if(pRegionElem != pElem)
                                         {
@@ -1755,7 +1752,7 @@ world_update(float tc)
                                                    colact == COLLISION_ACTION_NONE
                                                    )
                                                 {
-                                                    world_update_state.world_region_iterate_cur = world_update_state.world_region_iterate_cur->next;
+                                                    gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;
                                                     continue;
                                                 }
                                                 
@@ -1812,13 +1809,13 @@ world_update(float tc)
                                         }
                                         
                                         // check if this was invalidated by the remove-callback
-                                        if(!world_update_state.world_region_iterate_cur)
+                                        if(!gWorld->world_update_state.world_region_iterate_cur)
                                         {
-                                            world_update_state.world_region_iterate_cur = pRegionElemsHead;
+                                            gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead;
                                             FRcollision -= collision_repulsion_coeff/FRdiv;
                                         }
                                         
-                                        world_update_state.world_region_iterate_cur = world_update_state.world_region_iterate_cur->next;
+                                        gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;
                                     }
                                 }
                             }
@@ -1840,13 +1837,9 @@ world_update(float tc)
                         world_elem_list_remove(pCurRemoveElem, &gWorld->elements_list);
                         world_elem_list_add(pCurRemoveElem, &gWorld->elements_to_be_freed);
                         
-                        if(world_update_state.ptr_objects_moving)
-                        {
-                            world_update_state.ptr_objects_moving = world_update_state.ptr_objects_moving->next;
-                        }
+                        gWorld->world_update_state.ptr_objects_moving = gWorld->world_update_state.ptr_objects_moving->next;
                         
                         world_elem_list_remove(pCurRemoveElem, &gWorld->elements_moving);
-                        goto remove_retry;
                     }
                 }
             }
@@ -1876,8 +1869,8 @@ world_update(float tc)
         pCur = pNext;
     }
     
-    world_update_state.world_remove_hook = NULL;
-    world_update_state.world_rgn_remove_hook = NULL;
+    gWorld->world_update_state.world_remove_hook = NULL;
+    gWorld->world_update_state.world_rgn_remove_hook = NULL;
 }
 
 void

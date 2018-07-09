@@ -204,6 +204,7 @@ struct
     int one_collect_at_a_time;
     
     float base_spawn_collect_m;
+    float base_spawn_collect_w;
     
     float log_event_camwatch[GAME_LOG_LAST];
     

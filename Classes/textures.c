@@ -211,6 +211,10 @@ int bindTextureRequest(int tex_id)
 {
     int load_count = 2;
     
+    if(tex_id == 114)
+    {
+    }
+    
     if(!texture_list_loaded[tex_id])
     {
         extern void console_clear();

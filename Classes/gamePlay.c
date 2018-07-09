@@ -808,6 +808,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
         gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
         gameStateSinglePlayer.base_spawn_collect_m = 0.9;
+        gameStateSinglePlayer.base_spawn_collect_w = 65535/4;
         gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/20;
@@ -1172,7 +1173,7 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
                     }
                     
                     elemA->stuff.towed_elem_id = elemB->elem_id;
-                    collect_sound = 1;
+                    //collect_sound = 1;
                 }
             }
             break;
@@ -1184,10 +1185,8 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
             break;
             
         default:
-            {
-                world_remove_object(elemB->elem_id);
-                collect_sound = 1;
-            }
+            world_remove_object(elemB->elem_id);
+            collect_sound = 1;
             break;
     }
     
@@ -1328,6 +1327,7 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                 elemB->stuff.u.spawnpoint.spawn_coeff += rand_in_range(-INT_MAX/2, INT_MAX) / (float) INT_MAX;
                 
                 gameStateSinglePlayer.collect_system_integrity -= 20;
+                gameStateSinglePlayer.base_spawn_collect_w *= 2.0;
                 
                 console_write(game_log_messages[GAME_LOG_FILELOST]);
                 gameDialogMessagePopup(game_log_messages[GAME_LOG_FILELOST]);
@@ -1599,11 +1599,11 @@ game_run()
                     
                 case OBJ_SPAWNPOINT_ENEMY:
                 {
-                    float rand_range = 65536;
+                    float rand_range = 10;
                     spawn_points_found++;
                     obj_id_enemy_spawn = pCur->elem->elem_id;
                     
-                    // mark: -- spawn enemies randomly
+                    // MARK: spawn enemies randomly
                     pCur->elem->stuff.u.spawnpoint.spawn_coeff += rand_in_range(-rand_range*0.5, rand_range) / (rand_range*100);
                     
                     if (gameStateSinglePlayer.counter_enemies_spawned > 0 &&
@@ -1615,7 +1615,7 @@ game_run()
                         pCur->elem->stuff.u.spawnpoint.spawn_coeff = 0;
                         gameStateSinglePlayer.counter_enemies_spawned--;
                         
-                        // TODO: spawn faster
+                        // MARK: spawn enemy intelligence increase
                         pCur->elem->stuff.u.spawnpoint.spawn_intelligence *= 1.1;
                         
                         if(spawn_rand > (rand_range/3) * 2)
@@ -1624,19 +1624,19 @@ game_run()
                                                         pCur->elem->physics.ptr->y,
                                                         pCur->elem->physics.ptr->z);
                             world_get_last_object()->stuff.u.enemy.intelligence =
-                            pCur->elem->stuff.u.spawnpoint.spawn_intelligence * 2;
+                                pCur->elem->stuff.u.spawnpoint.spawn_intelligence * 2;
                         }
                         else if(spawn_rand > (rand_range/3))
                         {
-                            game_add_turret(pCur->elem->physics.ptr->x, pCur->elem->physics.ptr->y, pCur->elem->physics.ptr->z);
+                            game_add_enemy(pCur->elem->physics.ptr->x,
+                                           pCur->elem->physics.ptr->y,
+                                           pCur->elem->physics.ptr->z);
                             world_get_last_object()->stuff.u.enemy.intelligence =
                             pCur->elem->stuff.u.spawnpoint.spawn_intelligence;
                         }
                         else
                         {
-                            game_add_enemy(pCur->elem->physics.ptr->x,
-                                           pCur->elem->physics.ptr->y,
-                                           pCur->elem->physics.ptr->z);
+                            game_add_turret(pCur->elem->physics.ptr->x, pCur->elem->physics.ptr->y, pCur->elem->physics.ptr->z);
                             world_get_last_object()->stuff.u.enemy.intelligence =
                             pCur->elem->stuff.u.spawnpoint.spawn_intelligence;
                         }
@@ -1760,7 +1760,7 @@ game_run()
             pCur = pCur->next;
         }
         
-        // once per second
+        // MARK: BEGIN game_run - once per second
         if(time_ms - gameStateSinglePlayer.last_run >= 1000)
         {
             gameStateSinglePlayer.last_run = time_ms;
@@ -1907,10 +1907,12 @@ game_run()
                      */
                 }
                 
-                // mark: -- spawn collect points randomly
+                // MARK: spawn collect points randomly
                 if(obj_id_base != WORLD_ELEM_ID_INVALID)
                 {
-                    gameStateSinglePlayer.base_spawn_collect_m += rand_in_range(-65535*0.8, 65535) / 65535;
+                    gameStateSinglePlayer.base_spawn_collect_m += rand_in_range(-gameStateSinglePlayer.base_spawn_collect_w/2, gameStateSinglePlayer.base_spawn_collect_w) / 65535;
+                    
+                    printf("base_spawn_collect_m %f\n", gameStateSinglePlayer.base_spawn_collect_m);
                     
                     if(gameStateSinglePlayer.base_spawn_collect_m >= 1.0)
                     {
@@ -2024,6 +2026,7 @@ game_run()
             
             score_total();
         }
+        // MARK: END game_run - once per second
         
         if(gameStateSinglePlayer.stats.score - score_last_checked > gameStateSinglePlayer.score_pop_threshold)
         {

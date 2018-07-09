@@ -105,6 +105,7 @@ enum
     TEXTURE_ID_DAMAGE_FLASH = 111,
     TEXTURE_ID_PRELOAD = 75,
     TEXTURE_ID_BUILDING2 = 112,
+    TEXTURE_ID_BACKGROUND_SCENERY = 114,
 };
 
 const static int texture_id_table[] =

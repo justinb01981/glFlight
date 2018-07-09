@@ -35,6 +35,7 @@
 #define MAPMODEL_SPHERE "17"
 #define MAPMODEL_ENEMYBASE "18"
 #define MAP_BASE_ALT "50"
+#define MAPMODEL_SPRITE_SCENERY "21"
 
 
 /*
@@ -535,6 +536,9 @@ const static char initial_map_collection[] = ""
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
 
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
+
+"add_object "MAPMODEL_SPRITE_SCENERY" -150 75 -150 1.6 0.78 -1.6 100 114\n"
+"object_set_info 16\n" // scenery
 
 // else
 //GREEN_TENDRILS_1

@@ -95,6 +95,7 @@ typedef enum {
     MODEL_ENEMY_BASE,
     MODEL_TBUILDING,
     MODEL_FLATTENED_CUBE,
+    MODEL_SCENERY,
     MODEL_LAST,
 } Model;
 
