@@ -67,7 +67,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.accelerator.visible = 1;
     
     gameInterfaceControls.trim.tex_id = 7;
-    gameInterfaceControls.trim.visible = 1;
+    gameInterfaceControls.trim.visible = 0;
     gameInterfaceControls.trim.x = screenWidth - (screenWidth*0.15);
     gameInterfaceControls.trim.y = screenHeight * 0.0;
     gameInterfaceControls.trim.xw = 0.15*screenWidth;
@@ -106,9 +106,9 @@ gameInterfaceInit(double screenWidth, double screenHeight)
      screenWidth * 0.0,
      screenHeight * 0.0};
      */
-    gameInterfaceControls.action = actionRect;
-    gameInterfaceControls.action.tex_id = 36;
-    gameInterfaceControls.action.visible = 1;
+    gameInterfaceControls.textMenuButton = actionRect;
+    gameInterfaceControls.textMenuButton.tex_id = TEXTURE_ID_CONTROLS_MENUBUTTON;
+    gameInterfaceControls.textMenuButton.visible = 0;
     
     gameInterfaceControls.accelIndicator = accelRect;
     gameInterfaceControls.accelIndicator.xw = 10;
@@ -235,7 +235,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.trim;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.fire;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.look;
-    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.action;
+    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.textMenuButton;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.accelIndicator;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.radar;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.menuControl;
@@ -350,8 +350,6 @@ gameInterfaceHandleTouchMove(float x, float y)
         return;
     }
     
-    gameDialogGraphicCancel();
-    
     // controls after this ignore move events
     if(!touchedControl || !touchedControl->touch_began) return;
     
@@ -381,7 +379,7 @@ gameInterfaceHandleTouchMove(float x, float y)
     {
         //fireAction = ACTION_FIRE_MISSLE;
     }
-    else if(touchedControl == &gameInterfaceControls.action)
+    else if(touchedControl == &gameInterfaceControls.textMenuButton)
     {
         gameInterfaceControls.textMenuControl.visible = !gameInterfaceControls.textMenuControl.visible;
     }
@@ -459,6 +457,8 @@ gameInterfaceHandleTouchBegin(float x, float y)
 {
     int rgnv = 0;
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
+    
+    gameDialogGraphicCancel();
     
     if(touchedControl)
     {
@@ -1189,4 +1189,11 @@ gameInterfaceSetInterfaceState(InterfaceMiscState state)
         default:
             break;
     }
+}
+
+void
+gameInterfaceCalibrateDone()
+{
+    gameInterfaceControls.textMenuButton.visible = 1;
+    gameInterfaceControls.trim.visible = 1;
 }

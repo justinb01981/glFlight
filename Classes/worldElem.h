@@ -104,10 +104,6 @@ struct WorldElem {
 
     int invisible:1;
     
-    int is_line:1;
-    
-    int elem_id_line_next;
-    
     int bounding_wrap:1;
     int bounding_remain:1;
     
@@ -139,8 +135,9 @@ struct WorldElem {
         {
             struct
             {
-                float spawn_coeff;
+                //float spawn_coeff;
                 float spawn_intelligence;
+                float spawn_last;
             } spawnpoint;
             
             struct
@@ -169,7 +166,7 @@ struct WorldElem {
                 float vthrust[3];
                 float tgt_x, tgt_y, tgt_z;
                 float speed, max_speed;
-                float max_turn;
+                float max_slerp;
                 float run_distance, pursue_distance, scan_distance;
                 float intelligence;
                 //float pitch_last, yaw_last;
@@ -191,8 +188,6 @@ struct WorldElem {
         } flags;
         
         int towed_elem_id;
-        
-        int line_id_last;
         
         void* btree_node[2];
         

@@ -44,6 +44,7 @@ object_is_static(Object o)
         case OBJ_UNKNOWN:
         case OBJ_BLOCK:
         case OBJ_WRECKAGE:
+        case OBJ_DISPLAYONLY:
             return 1;
             
         default:

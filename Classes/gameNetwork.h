@@ -131,6 +131,7 @@ struct gameNetworkMessageQueued {
     struct gameNetworkMessageQueued* next;
     gameNetworkMessage msg;
     gameNetworkAddress srcAddr;
+    game_timeval_t receive_time;
     int processed;
 };
 typedef struct gameNetworkMessageQueued gameNetworkMessageQueued;
@@ -355,6 +356,6 @@ void
 gameNetwork_action_handle(int action);
 
 void
-do_game_network_handle_msg(gameNetworkMessage *msg, gameNetworkAddress *srcAddr);
+do_game_network_handle_msg(gameNetworkMessage *msg, gameNetworkAddress *srcAddr, game_timeval_t received_at_time);
 
 #endif

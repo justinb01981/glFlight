@@ -47,7 +47,7 @@
 
 gameNetworkState_t gameNetworkState;
 
-static unsigned long update_frequency_ms = 20;
+static unsigned long update_frequency_ms = 1000 / (GAME_TICK_RATE / 2);
 static unsigned long update_time_last = 0;
 const static float euler_interp_range_max = (M_PI/8);
 const static float velo_interp_update_mult = 8;
@@ -67,6 +67,7 @@ void GameNetworkBonjourManagerSendMessageToPeer(uint8_t* msg_, int peer_id);
 extern int gameNetwork_onBonjourConnecting1(gameNetworkMessage*, gameNetworkAddress*);
 int gameNetwork_onDirectorySearch(gameNetworkMessage* msg, gameNetworkAddress* srcAddr);
 int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress* srcAddr);
+extern float get_time_ms_wall();
 
 static char* do_game_map_render();
 void send_bonjour_beacon_callback();
@@ -755,7 +756,7 @@ gameNetwork_send_player(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerIn
     
     msg->needs_stream = 0;
     
-    msg->timestamp = get_time_ms();
+    msg->timestamp = get_time_ms_wall();
     
     return gameNetwork_send_player_core(msg, playerInfoTarget);
 }
@@ -1039,7 +1040,7 @@ gameNetwork_addPlayerInfo(int player_id)
     if(!pInfo) return GAME_NETWORK_ERR_FAIL;
     
     memset(pInfo, 0, sizeof(gameNetworkPlayerInfo));
-    pInfo->time_last_update = get_time_ms();
+    pInfo->time_last_update = get_time_ms_wall();
     pInfo->elem_id = WORLD_ELEM_ID_INVALID;
     
     pInfo->player_id = player_id;
@@ -1224,7 +1225,7 @@ gameNetwork_alert(char* alert)
         
         gameNetwork_send(&msg);
         
-        do_game_network_handle_msg(&msg, &fakeAddress);
+        do_game_network_handle_msg(&msg, &fakeAddress, get_time_ms_wall());
         
         msg.cmd = GAME_NETWORK_MSG_ALERT_CONTINUE;
         p += l;
@@ -1232,7 +1233,7 @@ gameNetwork_alert(char* alert)
     
     msg.cmd = GAME_NETWORK_MSG_ALERT_END;
     gameNetwork_send(&msg);
-    do_game_network_handle_msg(&msg, &fakeAddress);
+    do_game_network_handle_msg(&msg, &fakeAddress, get_time_ms_wall());
 }
 
 static void
@@ -1240,7 +1241,7 @@ game_network_periodic_check()
 {
     const game_timeval_t time_out_ms = 1000*30;
     gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
-    game_timeval_t network_time_ms = get_time_ms();
+    game_timeval_t network_time_ms = get_time_ms_wall();
     int map_retransmit = 0;
     
     static game_timeval_t time_retransmit_map_last = 0;
@@ -1252,6 +1253,8 @@ game_network_periodic_check()
     
     while(pInfo)
     {
+        game_timeval_t network_time_ms = get_time_ms_wall();
+        
         if(pInfo->player_id != gameNetworkState.my_player_id)
         {
             if(network_time_ms - pInfo->time_last_update > time_out_ms)
@@ -1361,7 +1364,7 @@ game_network_periodic_check()
         gameNetworkState.msgUnackedRetransmitCount++;
     }
     
-    gameNetworkState.time_last_periodic_check = time_ms;
+    gameNetworkState.time_last_periodic_check = network_time_ms;
 }
 
 void
@@ -1371,19 +1374,20 @@ do_game_network_write()
     WorldElemListNode* pNode;
     static game_timeval_t network_objects_update_time_last = 0;
     static float net_obj_update_vel_ignore_min = 0.1;
+    float network_time_ms = get_time_ms_wall();
     
     if(!gameNetworkState.connected)
     {
         return;
     }
     
-    time_ms = get_time_ms();
+    //time_ms = get_time_ms();
     
     game_network_periodic_check();
     
-    if(time_ms - update_time_last >= update_frequency_ms)
+    if(network_time_ms - update_time_last >= update_frequency_ms)
     {
-        update_time_last = get_time_ms();
+        update_time_last = network_time_ms;
 
         memset(&netMsg, 0, sizeof(netMsg));
         netMsg.cmd = GAME_NETWORK_MSG_PLAYER_INFO;
@@ -1401,7 +1405,7 @@ do_game_network_write()
     // send info about AI/missles state here
     if(gameNetworkState.hostInfo.hosting /*&& time_ms - network_objects_update_time_last > update_frequency_ms*/)
     {
-        network_objects_update_time_last = time_ms;
+        network_objects_update_time_last = network_time_ms;
         
         pNode = gWorld->elements_moving.next;
         while(pNode)
@@ -1446,11 +1450,11 @@ do_game_network_write()
                 
                 // object velocity sufficient
                 if(pNode->elem->physics.ptr->velocity > net_obj_update_vel_ignore_min &&
-                   time_ms - pObjectInfo->update_time >= update_frequency_ms)
+                   network_time_ms - pObjectInfo->update_time >= update_frequency_ms)
                     net_obj_update = 1;
                 
                 // or time interval sufficient
-                if(time_ms - pObjectInfo->update_time >= 500)
+                if(network_time_ms - pObjectInfo->update_time >= 500)
                     net_obj_update = 1;
                 
                 if(net_obj_update)
@@ -1458,7 +1462,7 @@ do_game_network_write()
                     memset(&netMsg, 0, sizeof(netMsg));
                     netMsg.cmd = GAME_NETWORK_MSG_REPLACE_SERVER_OBJECT_WITH_ID;
                     get_world_elem_info(pNode->elem->elem_id, &netMsg);
-                    netMsg.params.f[16] = time_ms;
+                    netMsg.params.f[16] = network_time_ms;
                     netMsg.params.f[17] = pNode->elem->durability;
                     netMsg.params.f[18] = pNode->elem->stuff.affiliation;
                     netMsg.params.f[19] = pNode->elem->stuff.subtype;
@@ -1466,7 +1470,7 @@ do_game_network_write()
                     
                     gameNetwork_send(&netMsg);
                     
-                    pObjectInfo->update_time = time_ms;
+                    pObjectInfo->update_time = network_time_ms;
                 }
             }
             pNode = pNode->next;
@@ -1498,6 +1502,7 @@ do_game_network_world_update()
 {
     gameNetworkMessage netMsg;
     WorldElemListNode* pNode;
+    float network_time_ms = get_time_ms_wall();
     
     if(!gameNetworkState.connected)
     {
@@ -1506,7 +1511,7 @@ do_game_network_world_update()
     
     collision_actions_set_grab_powerup();
     
-    get_time_ms();
+    //get_time_ms_wall();
     
     /*
      * walk list of newly pending-added objects, do not do world_elem_remove here
@@ -1558,7 +1563,7 @@ do_game_network_world_update()
                     
                     if(gameNetworkState.hostInfo.hosting)
                     {
-                        do_game_network_handle_msg(&netMsg, &gameNetworkState.hostInfo.addr);
+                        do_game_network_handle_msg(&netMsg, &gameNetworkState.hostInfo.addr, network_time_ms);
                     }
                     
                     world_object_set_lifetime(pNode->elem->elem_id, 1);
@@ -1670,7 +1675,7 @@ do_game_network_world_update()
                                                    pElem->physics.ptr->vy,
                                                    pElem->physics.ptr->vz);
                 }
-                pInfo->euler_last_interp = time_ms;
+                pInfo->euler_last_interp = network_time_ms;
             }
         }
         pInfo = pInfo->next;
@@ -1684,11 +1689,12 @@ do_game_network_handle_directory_msg(gameNetworkMessage *msg, gameNetworkAddress
     char game_name[128];
     char msgBuf[128];
     int offset, offset_o;
+    float network_time_ms = get_time_ms_wall();
     
     pInfo = &gameNetworkState.gameDirectory.head;
     while(pInfo)
     {
-        if(pInfo->next && time_ms - pInfo->next->time_last_update > 30000)
+        if(pInfo->next && network_time_ms - pInfo->next->time_last_update > 30000)
         {
             // remove timed-out listing
             gameNetworkPlayerInfo* pFree = pInfo->next;
@@ -1710,12 +1716,14 @@ do_game_network_handle_directory_msg(gameNetworkMessage *msg, gameNetworkAddress
                 pInfo = &gameNetworkState.gameDirectory.head;
                 while(pInfo)
                 {
+                    float network_time_ms = get_time_ms_wall();
+                    
                     // found, refresh listing
                     if(pInfo->next)
                     {
                         if(!strncmp(pInfo->next->name, msg->params.directoryInfo.c, sizeof(msg->params.directoryInfo.c)))
                         {
-                            pInfo->next->time_last_update = time_ms;
+                            pInfo->next->time_last_update = network_time_ms;
                             break;
                         }
                     }
@@ -1756,7 +1764,7 @@ do_game_network_handle_directory_msg(gameNetworkMessage *msg, gameNetworkAddress
                                 }
                             }
                             
-                            pInfo->next->time_last_update = time_ms;
+                            pInfo->next->time_last_update = network_time_ms;
                         }
                         
                         if(pInfoNew)
@@ -1889,7 +1897,7 @@ do_game_network_handle_directory_msg(gameNetworkMessage *msg, gameNetworkAddress
 }
 
 void
-do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
+do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr, game_timeval_t network_time_ms)
 {
     gameNetworkPlayerInfo* playerInfo, *playerInfoFound, *playerInfoTarget;
     WorldElemListNode* pNode;
@@ -1897,7 +1905,6 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
     game_timeval_t t;
     int net_obj_id;
     int interp_velo = 1;
-    game_timeval_t network_time_ms = get_time_ms();
     
     if(gameNetworkState.gameNetworkHookOnMessage != NULL)
     {
@@ -1989,6 +1996,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
     
     while(1)
     {
+        //game_timeval_t network_time_ms = get_time_ms_wall();
         int object_target = WORLD_ELEM_ID_INVALID;
         
         switch(msg->cmd)
@@ -2500,7 +2508,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
                         break;
                     }
                     
-                    playerInfo->time_last_update = time_ms;
+                    playerInfo->time_last_update = get_time_ms_wall();
                     
                     msgOut.cmd = GAME_NETWORK_MSG_GET_MAP_SOME;
                     msgOut.player_id = gameNetworkState.my_player_id;
@@ -2626,6 +2634,7 @@ do_game_network_read_core()
             pMsgNew->next = NULL;
             pMsgNew->msg = msg;
             pMsgNew->srcAddr = srcAddr;
+            pMsgNew->receive_time = get_time_ms_wall();
             pMsgNew->processed = 0;
             
             gameNetworkMessageQueued* pTail = &gameNetworkState.msgQueue.head;
@@ -2679,7 +2688,7 @@ gameNetwork_sendHitBy(gameNetworkPlayerID killer, int object_type)
     
     if(gameNetworkState.hostInfo.hosting)
     {
-        do_game_network_handle_msg(&msg, &fakeAddress);
+        do_game_network_handle_msg(&msg, &fakeAddress, get_time_ms_wall());
     }
     else
     {
@@ -2716,7 +2725,7 @@ gameNetwork_sendKilledBy(gameNetworkPlayerID killer, int object_type)
     
     if(gameNetworkState.hostInfo.hosting)
     {
-        do_game_network_handle_msg(&msg, &fakeAddress);
+        do_game_network_handle_msg(&msg, &fakeAddress, get_time_ms_wall());
     }
     else
     {
@@ -2860,7 +2869,7 @@ gameNetwork_sendPing()
     pInfo = gameNetworkState.player_list_head.next;
     while(pInfo)
     {
-        pInfo->time_ping = time_ms;
+        pInfo->time_ping = get_time_ms_wall();
         pInfo = pInfo->next;
     }
     
@@ -2999,7 +3008,7 @@ int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress
     {
         if(pInfo->player_id == GAME_NETWORK_PLAYER_ID_HOST)
         {
-            pInfo->time_last_update = time_ms;
+            pInfo->time_last_update = get_time_ms_wall();
             break;
         }
         pInfo = pInfo->next;
@@ -3021,6 +3030,8 @@ int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress
             gameDialogConnectToGameSuccessful2();
         
             gameMapSetMap(gameNetworkState.server_map_data);
+            
+            game_start_network_guest();
         }
         else
         {

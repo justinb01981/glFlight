@@ -1048,6 +1048,19 @@ drawElem(WorldElem* pElem)
         gl_vertex_ptr_last = NULL;
         gl_texcoord_ptr_last = NULL;
     }
+//    else if(pElem->type == MODEL_CONTRAIL)
+//    {
+//        // TODO: probably hurting performance by committing a batch every time this model is drawn
+//        drawElemBatch();
+//
+//        drawLineBegin();
+//
+//        gl_vertex_ptr_last = NULL;
+//        gl_texcoord_ptr_last = NULL;
+//
+//        drawLineWithColorAndWidth(&pElem->coords[0], &pElem->coords[3], &pElem->texcoords[0], 2.0);
+//        drawLineEnd();
+//    }
     else
     {
         if(pElem->renderInfo.tex_adjust)

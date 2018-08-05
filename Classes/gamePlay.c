@@ -596,7 +596,6 @@ game_move_spawnpoint(WorldElem* pElem)
     float radius = 75;
     float orbit_origin[] = {0, atoi(MAP_BASE_ALT), 0};
     
-    if(1)
     {
         // orbit around center of world
         // orbit period
@@ -654,7 +653,6 @@ game_init_objects()
         switch(pCur->elem->object_type)
         {
             case OBJ_SPAWNPOINT_ENEMY:
-                pCur->elem->stuff.u.spawnpoint.spawn_coeff = 0;
                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence = 3 + gameStateSinglePlayer.difficulty;
                 break;
                 
@@ -746,7 +744,7 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.player_drops_powerup = 0;
     gameStateSinglePlayer.enemy1_ignore_player_pct = 0;
     gameStateSinglePlayer.score_pop_threshold = 10;
-    gameStateSinglePlayer.enemy_spawnpoint_interval = 1;
+    gameStateSinglePlayer.enemy_spawnpoint_interval = 0;
     
     gameStateSinglePlayer.collect_system_integrity = 100;
     
@@ -806,7 +804,7 @@ game_start(float difficulty, int type)
         //gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_POINTS;
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
-        gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
+        gameStateSinglePlayer.enemy_spawnpoint_interval = 10000;
         gameStateSinglePlayer.base_spawn_collect_m = 0.9;
         gameStateSinglePlayer.base_spawn_collect_w = 65535/4;
         gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
@@ -990,6 +988,12 @@ game_start(float difficulty, int type)
 }
 
 void
+game_start_network_guest()
+{
+    collision_actions_set_default();
+}
+
+void
 path_generate_random_with_delta(float cur[3], float vec[3], float mag, float delt)
 {
     float out[3];
@@ -1129,7 +1133,7 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
                 world_remove_object(elemB->elem_id);
                 gameStateSinglePlayer.stats.data_collected++;
                 collect_sound = 1;
-                camera_locked_frames = 120;
+                //camera_locked_frames = 120;
                 
                 // points-indicator
                 world_add_object(MODEL_CUBE2,
@@ -1324,7 +1328,6 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
             if(elemA->object_type == OBJ_POWERUP_GENERIC)
             {
                 elemA->stuff.u.spawnpoint.spawn_intelligence *= 1.5;
-                elemB->stuff.u.spawnpoint.spawn_coeff += rand_in_range(-INT_MAX/2, INT_MAX) / (float) INT_MAX;
                 
                 gameStateSinglePlayer.collect_system_integrity -= 20;
                 gameStateSinglePlayer.base_spawn_collect_w *= 2.0;
@@ -1368,9 +1371,6 @@ game_handle_destruction(WorldElem* elem)
     if(!gameStateSinglePlayer.started) return;
     int add_wreck = 0;
     int add_pow = 0;
-    int add_score = 1;
-    int score_snap = gameStateSinglePlayer.stats.score;
-    char score_buf[255];
     
     WorldElemListNode* myShipListNode = world_elem_list_find(my_ship_id, &gWorld->elements_moving);
     if(!myShipListNode) return;
@@ -1486,13 +1486,6 @@ game_handle_destruction(WorldElem* elem)
         world_get_last_object()->object_type = OBJ_WRECKAGE;
         world_object_set_lifetime(wreck_id, GAME_FRAME_RATE * 5);
         update_object_velocity(wreck_id, 0, 0, 0, 0);
-        
-        if(add_score)
-        {
-            score_total();
-            sprintf(score_buf, "%d", gameStateSinglePlayer.stats.score - score_snap);
-            world_object_set_nametag(wreck_id, score_buf);
-        }
     }
     
     if(elem->elem_id == gameStateSinglePlayer.defend_id)
@@ -1551,7 +1544,6 @@ game_run()
         float enemies_found = 0;
         int turrets_found = 0;
         int missles_found = 0;
-        int spawn_points_found = 0;
         int caps_found = 0;
         int caps_owned = 0;
         int collects_found = 0;
@@ -1599,20 +1591,22 @@ game_run()
                     
                 case OBJ_SPAWNPOINT_ENEMY:
                 {
-                    float rand_range = 10;
-                    spawn_points_found++;
+                    float rand_range = 20;
                     obj_id_enemy_spawn = pCur->elem->elem_id;
                     
-                    // MARK: spawn enemies randomly
-                    pCur->elem->stuff.u.spawnpoint.spawn_coeff += rand_in_range(-rand_range*0.5, rand_range) / (rand_range*100);
+                    // MARK: spawn enemies
                     
                     if (gameStateSinglePlayer.counter_enemies_spawned > 0 &&
                         enemies_found < floor(gameStateSinglePlayer.max_enemies) &&
-                        pCur->elem->stuff.u.spawnpoint.spawn_coeff > 1.0)
+                        time_ms - pCur->elem->stuff.u.spawnpoint.spawn_last >= gameStateSinglePlayer.enemy_spawnpoint_interval
+                        )
                     {
                         float spawn_rand = roundf(rand_in_range(0, rand_range));
                         
-                        pCur->elem->stuff.u.spawnpoint.spawn_coeff = 0;
+                        gameStateSinglePlayer.enemy_spawnpoint_interval = MAX(gameStateSinglePlayer.enemy_spawnpoint_interval*0.90, 1000);
+                        
+                        pCur->elem->stuff.u.spawnpoint.spawn_last = time_ms;
+                        
                         gameStateSinglePlayer.counter_enemies_spawned--;
                         
                         // MARK: spawn enemy intelligence increase
@@ -1626,7 +1620,7 @@ game_run()
                             world_get_last_object()->stuff.u.enemy.intelligence =
                                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence * 2;
                         }
-                        else if(spawn_rand > (rand_range/3))
+                        else if(spawn_rand > (rand_range/4))
                         {
                             game_add_enemy(pCur->elem->physics.ptr->x,
                                            pCur->elem->physics.ptr->y,
@@ -1795,7 +1789,7 @@ game_run()
                             {
                                 if(pMyShipNode->elem->stuff.towed_elem_id == WORLD_ELEM_ID_INVALID)
                                 {
-                                    if(time_ms - gameInterfaceControls.action.touch_end_last > 1000)
+                                    if(time_ms - gameInterfaceControls.textMenuButton.touch_end_last > 1000)
                                     {
                                         if(dist < objective_target_dist)
                                         {
@@ -1910,7 +1904,9 @@ game_run()
                 // MARK: spawn collect points randomly
                 if(obj_id_base != WORLD_ELEM_ID_INVALID)
                 {
-                    gameStateSinglePlayer.base_spawn_collect_m += rand_in_range(-gameStateSinglePlayer.base_spawn_collect_w/2, gameStateSinglePlayer.base_spawn_collect_w) / 65535;
+                    gameStateSinglePlayer.base_spawn_collect_m += rand_in_range(-gameStateSinglePlayer.base_spawn_collect_w/3, gameStateSinglePlayer.base_spawn_collect_w/2) / 65535;
+                    
+                    if(gameStateSinglePlayer.base_spawn_collect_m < 0) gameStateSinglePlayer.base_spawn_collect_m = 0;
                     
                     printf("base_spawn_collect_m %f\n", gameStateSinglePlayer.base_spawn_collect_m);
                     
@@ -2499,7 +2495,7 @@ fireBullet(int bulletAction)
 int
 firePoopedCube(WorldElem *elem)
 {
-    int use_drawline = 1;
+    int use_drawline = 0;
     quaternion_t qx, qy, qz;
     
     if(elem->physics.ptr->velocity <= 1) return WORLD_ELEM_ID_INVALID;
@@ -2508,11 +2504,11 @@ firePoopedCube(WorldElem *elem)
                                &qx, &qy, &qz);
     
     int texture_id = /*elem->texture_id*/ TEXTURE_ID_POOPED_CUBE_ENEMY;
-    int model = MODEL_CUBE;
+    int model = MODEL_CONTRAIL;
     
     if(elem->elem_id == my_ship_id)
     {
-        texture_id = TEXTURE_ID_POOPED_CUBE;
+        texture_id = TEXTURE_ID_COLORMAP;
         
         if(speedBoost > 0)
         {
@@ -2529,23 +2525,40 @@ firePoopedCube(WorldElem *elem)
         if(elem->durability <= DURABILITY_LOW) texture_id = TEXTURE_ID_POOPED_CUBE_SHIELDLOW;
     }
     
+    //static float lineColorMine[8] = {0.01, 0.99, 0.02, 0.99, 0.03, 0.99, 0.04, 0.99};
+    static float lineColorMine[8] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
+    static float lineColorEnemy[8] = {0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9};
+    static float lineColorEnemyAce[8] = {0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9};
+    int lineColorLen = 8;
+    float *lineColor = lineColorEnemy;
+    
+    if(elem->elem_id == my_ship_id) lineColor = lineColorMine;
+    if(elem->texture_id == TEXTURE_ID_ENEMYSHIP_ACE) lineColor = lineColorEnemyAce;
+    //if(elem->durability <= DURABILITY_LOW) lineColor = lineColorLowShield;
+    
     if(!use_drawline)
     {
+        int i;
+        
         int obj =
             world_add_object(model,
                              elem->physics.ptr->x + qz.x*1,
                              elem->physics.ptr->y + qz.y*1,
                              elem->physics.ptr->z + qz.z*1,
                              elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
-                             0.5,
+                             0.25,
                              texture_id);
-        world_get_last_object()->object_type = OBJ_POOPEDCUBE;
-        world_get_last_object()->renderInfo.priority = 1;
-        world_get_last_object()->destructible = 0;
-        world_get_last_object()->physics.ptr->friction = 1;
-        world_get_last_object()->is_line = 1;
-        world_get_last_object()->elem_id_line_next = elem->stuff.line_id_last;
-        elem->stuff.line_id_last = obj;
+        WorldElem* pElem = world_get_last_object();
+        
+        for(i = 0; i < pElem->n_texcoords; i += 2)
+        {
+            pElem->texcoords[i] = lineColor[(i % lineColorLen)];
+            pElem->texcoords[i+1] = lineColor[(i % lineColorLen) + 1];
+        }
+        pElem->object_type = OBJ_POOPEDCUBE;
+        pElem->renderInfo.priority = 1;
+        pElem->destructible = 0;
+        pElem->physics.ptr->friction = 1;
         world_object_set_lifetime(obj, pooped_cube_lifetime);
         
         /*
@@ -2569,15 +2582,6 @@ firePoopedCube(WorldElem *elem)
             lineA[2]-elem->physics.ptr->vz*m
         };
 
-        static float lineColorMine[3] = {0, 1, 0};
-        static float lineColorEnemy[3] = {1, 0, 0};
-        static float lineColorEnemyAce[3] = {0xde, 0, 0xff};
-        static float lineColorLowShield[3] = {1, 1, 0};
-        float *lineColor = lineColorEnemy;
-
-        if(elem->elem_id == my_ship_id) lineColor = lineColorMine;
-        if(elem->texture_id == TEXTURE_ID_ENEMYSHIP_ACE) lineColor = lineColorEnemyAce;
-        //if(elem->durability <= DURABILITY_LOW) lineColor = lineColorLowShield;
         
         world_add_drawline(lineA, lineB, lineColor, 240);
         

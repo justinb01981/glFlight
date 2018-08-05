@@ -261,7 +261,7 @@ get_time_ms_wall()
     game_timeval_t tvs = tv.tv_sec - tv_start.tv_sec;
     game_timeval_t tvus = tv.tv_usec / 1000;
      
-    return tvs * 1000 + tvus;
+    return roundf(tvs * 1000 + tvus);
 }
 
 void

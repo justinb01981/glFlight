@@ -35,7 +35,7 @@
 #define MAPMODEL_SPHERE "17"
 #define MAPMODEL_ENEMYBASE "18"
 #define MAP_BASE_ALT "50"
-#define MAPMODEL_SPRITE_SCENERY "21"
+#define MAPMODEL_SPRITE_SCENERY "22"
 
 
 /*
@@ -267,16 +267,17 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 
 #define BUILDING_1(x, y, z)                         \
 "set_vector "#x" "#y" "#z" 0 4 0\n"                 \
-"add_object 1 vecx_0 vecy_0 vecz_0 0 0 0 4 16\n"    \
-"add_object 1 vecx_0 vecy_1 vecz_0 0 0 0 4 16\n"    \
-"add_object 1 vecx_0 vecy_2 vecz_0 0 0 0 4 16\n"   \
-"add_object 1 vecx_0 vecy_3 vecz_0 0 0 0 4 16\n"   \
-"add_object 1 vecx_0 vecy_4 vecz_0 0 0 0 4 16\n"   \
-"add_object 1 vecx_0 vecy_5 vecz_0 0 0 0 4 16\n"   \
+"add_object 20 vecx_0 vecy_0 vecz_0 0 0 0 4 16\n"
+//"add_object 1 vecx_0 vecy_1 vecz_0 0 0 0 4 16\n"    \
+//"add_object 1 vecx_0 vecy_2 vecz_0 0 0 0 4 16\n"   \
+//"add_object 1 vecx_0 vecy_3 vecz_0 0 0 0 4 16\n"   \
+//"add_object 1 vecx_0 vecy_4 vecz_0 0 0 0 4 16\n"   \
+//"add_object 1 vecx_0 vecy_5 vecz_0 0 0 0 4 16\n"   \
 
 #define BUILDING_2(x, y, z)                          \
 "set_vector "#x" "#y" "#z" 0 4 0\n"                  \
 "add_object 19 vecx_0 vecy_0 vecz_0 0 0 0 4 112\n"   \
+/*
 "add_object 19 vecx_0 vecy_1 vecz_0 0 0 0 4 112\n"   \
 "add_object 19 vecx_0 vecy_2 vecz_0 0 0 0 4 112\n"   \
 "add_object 19 vecx_0 vecy_3 vecz_0 0 0 0 4 112\n"   \
@@ -284,6 +285,7 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 "add_object 19 vecx_0 vecy_5 vecz_0 0 0 0 4 112\n"   \
 "add_object 19 vecx_0 vecy_6 vecz_0 0 0 0 4 112\n"   \
 "add_object 19 vecx_0 vecy_6.75 vecz_0 0 0 0 2 112\n"
+*/
 
 #define FLOATING_ISLAND(x, y, z)             \
 "set_vector "#x" "#y" "#z" 1 1 1\n"    \
@@ -722,7 +724,7 @@ BASE_ENEMY_1
 // "core" that spits out data
 BASE_GENERIC(0, 0)
 
-"add_spawn 0 2 0 3.14 0 0\n"
+"add_spawn 0 2 0 1.6 1.6 -1.6\n"
 
 /*
 "register_params 1 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0\n"

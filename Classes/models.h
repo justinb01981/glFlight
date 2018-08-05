@@ -94,8 +94,10 @@ typedef enum {
     MODEL_SPHERE,
     MODEL_ENEMY_BASE,
     MODEL_TBUILDING,
+    MODEL_CBUILDING,
     MODEL_FLATTENED_CUBE,
     MODEL_SCENERY,
+    MODEL_CONTRAIL,
     MODEL_LAST,
 } Model;
 
@@ -231,40 +233,6 @@ static int model_ship1_primitives[] = {
      */
 };
 
-#if 0
-static model_texcoord_t model_ship1_texcoords[] = {
-    // diamond polygon cockpit
-    0.5, 1,
-    0.4, 0.75, //1
-    0.6, 0.75,
-    0.5, 0.5, //3
-    0.5, 0.75,
-    0.5, 0.25,
-    
-    // wing 1
-    0, 1-0.6, //6
-    0, 1-0.9,
-    
-    //wing 2
-    1, 1-0.6,
-    1, 1-0.9,
-    
-    // engine 1 pyramid
-    0.3, 1-1,
-    0.25, 1-0.7,
-    0.30, 1-0.75,
-    0.35, 1-0.7,
-    0.30, 1-0.75,
-    
-    // engine 2 pyramid
-    1-0.3, 1-1,
-    1-0.25, 1-0.7,
-    1-0.30, 1-0.75,
-    1-0.35, 1-0.7,
-    1-0.30, 1-0.75,
-    
-};
-#else
 static model_texcoord_t model_ship1_texcoords[] = {
     // diamond polygon cockpit
     0.5, 1,
@@ -297,7 +265,6 @@ static model_texcoord_t model_ship1_texcoords[] = {
     0.30, 0.25,
     
 };
-#endif
 
 /********************************************************/
 static model_coord_t model_turret1[] =
@@ -399,6 +366,77 @@ static int model_bullet_primitives[] =
 {
 };
 /********************************************************/
+
+static model_texcoord_t model_contrail_texcoords[] =
+{
+    0,0,
+    1,0,
+    0,0,
+    1,0,
+    
+    0,1,
+    1,1,
+    0,1,
+    1,1,
+    
+    0,0,
+    1,0,
+    1,1,
+    0,1,
+    
+    0,0,
+    1,0,
+    1,1,
+    0,1,
+};
+
+static model_coord_t model_contrail[] =
+{
+    //bottom
+    -0.06, -0.06, -0.5,
+    0.06, -0.06, -0.5,
+    0.06, -0.06, 0.5,
+    -0.06, -0.06, 0.5,
+    
+    // top
+    -0.06, 0.06, -0.5,
+    0.06, 0.06, -0.5,
+    0.06, 0.06, 0.5,
+    -0.06, 0.06, 0.5,
+    
+    //bottom2
+    -0.06, -0.06, -0.5,
+    0.06, -0.06, -0.5,
+    0.06, -0.06, 0.5,
+    -0.06, -0.06, 0.5,
+    
+    //top2
+    -0.06, 0.06, -0.5,
+    0.06, 0.06, -0.5,
+    0.06, 0.06, 0.5,
+    -0.06, 0.06, 0.5,
+};
+
+static model_index_t model_contrail_indices[] =
+{
+    // ordering: counter-clockwise for each face (2 triangles) looking inwards to cube
+    13,12,15, 14,13,15, // top
+    
+    0,3,7, 7,4,0,
+    
+    3,2,6, 6,7,3,
+    
+    2,1,5, 5,6,2,
+    
+    1,0,4, 4,5,1,
+    
+    11,8,9, 10,11,9, // bottom
+};
+
+static int model_contrail_primitives[] =
+{
+};
+/********************************************************/
 static model_texcoord_t model_cube_texcoords_alt[] =
 {
     0.0, 0.5,
@@ -443,6 +481,29 @@ static model_texcoord_t model_cube_texcoords[] =
     1,0,
     1,1,
     0,1,
+};
+
+static model_texcoord_t model_cube_texcoords4x[] =
+{
+    0,0,
+    1,0,
+    0,0,
+    1,0,
+    
+    0,4,
+    1,4,
+    0,4,
+    1,4,
+    
+    0,0,
+    1,0,
+    1,4,
+    0,4,
+    
+    0,0,
+    1,0,
+    1,4,
+    0,4,
 };
 
 static model_coord_t model_cube[] = 
@@ -502,6 +563,20 @@ static model_index_t model_cube_indices_inverted[] =
     4,0,1, 1,5,3,
     
     9,8,11, 9,11,10, // bottom
+};
+
+static model_index_t model_cube_indices_nobottom[] =
+{
+    // ordering: counter-clockwise for each face (2 triangles) looking inwards to cube
+    13,12,15, 14,13,15, // top
+    
+    0,3,7, 7,4,0,
+    
+    3,2,6, 6,7,3,
+    
+    2,1,5, 5,6,2,
+    
+    1,0,4, 4,5,1
 };
 
 static int model_cube_primitives[] = 

@@ -122,10 +122,10 @@ game_ai_find_target(WorldElem *pElem)
         
         if(priority > 0)
         {
-            if(pTarget->elem != pElem &&
-               !IS_LINKED_ELEM(pTarget->elem) &&
-               pTarget->elem->stuff.affiliation != pElem->stuff.affiliation &&
-               pTarget->elem->elem_id != pElem->stuff.towed_elem_id)
+            if(!IS_LINKED_ELEM(pTarget->elem) &&
+               pTarget->elem->elem_id != pElem->elem_id &&
+               pTarget->elem->elem_id != pElem->stuff.towed_elem_id &&
+               pTarget->elem->stuff.affiliation != pElem->stuff.affiliation)
             {
                 float vx = pTarget->elem->physics.ptr->x - pElem->physics.ptr->x;
                 float vy = pTarget->elem->physics.ptr->y - pElem->physics.ptr->y;
@@ -392,10 +392,11 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
 {
     int fireBullet = 0;
     int skill = elem->stuff.u.enemy.intelligence;
-    quaternion_t xq, yq, zq;
+    quaternion_t xq, yq, zq, z1q;
     float tc;
     float zdot_ikillyou = 0.5;
     float zdot_juke = 0.3;
+    int slerp_done = 0;
     
     tc = time_ms - elem->stuff.u.enemy.time_last_run;
     tc /= 1000.0;
@@ -417,7 +418,8 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     unsigned long prev_state = elem->stuff.u.enemy.enemy_state;
     
-    ai_debug("object_pursue state:", elem, elem->stuff.u.enemy.enemy_state);
+    ai_debug("object_pursue state: ", elem, elem->stuff.u.enemy.enemy_state);
+    ai_debug("object_pursue zdot: ", elem, zdot);
     
     if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PURSUE)
     {
@@ -450,14 +452,12 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         }
         
         // avoid collision
-        if(elem->stuff.u.enemy.run_distance > 0 &&
-           dist <= elem->stuff.u.enemy.run_distance /* - (run_distance*skill*diff_m) && zdot < 0 */ &&
+        if(dist <= elem->stuff.u.enemy.run_distance &&
            zdot > 0.2 &&
            target_avoid_collision(target_objtype))
         {
             elem->stuff.u.enemy.enemy_state = ENEMY_STATE_RUN;
             elem->stuff.u.enemy.time_next_retarget = time_ms + 3000;
-            ax = -ax; ay = -ay; az = -az;
         }
         
         //
@@ -504,8 +504,12 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     }
     else if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_RUN)
     {
-        // reverse vector, run away! Book it/flee/amscray
-        ax = -ax; ay = -ay; az = -az;
+        //
+        slerp(zq.w, zq.x, zq.y, zq.z,
+              yq.w, yq.x, yq.y, yq.z,
+              elem->stuff.u.enemy.max_slerp * tc,
+              &z1q.w, &z1q.x, &z1q.y, &z1q.z);
+        slerp_done = 1;
         
         // add unpredictable behavior by heading off on a tangent periodically for a short period
         if(time_ms >= elem->stuff.u.enemy.time_next_retarget &&
@@ -521,15 +525,17 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             }
         }
         
+#if 0
         if(dist >= (elem->stuff.u.enemy.pursue_distance - (elem->stuff.u.enemy.pursue_distance / (skill*diff_m)))
            /* || time_ms - elem->stuff.u.enemy.time_last_decision > 2000 */
-           || zdot <= 0)
+           || zdot <= 0.1)
         {
             if(fmod(rand_in_range(1, 100), 4) == 0)
             {
                 elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
             }
         }
+#endif
     }
     else if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_JUKE)
     {
@@ -553,12 +559,14 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     float vdesired = pursuit_speed_for_object(elem);
     
+    //if(zdot < 0) vdesired /= 2;
+    
     if(vdesired < MAX_SPEED) ai_debug("vdesired:", elem, vdesired);
     
     // accel/decel
     float v = vcur > vdesired? 0.1: vdesired;
     
-    dist = sqrt(ax*ax + ay*ay + az*az);
+    //dist = sqrt(ax*ax + ay*ay + az*az);
     
     if(elem->stuff.u.enemy.collided)
     {
@@ -569,9 +577,11 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         zdot = zdot_ikillyou;
         vdesired = 1.0;
     }
-     
-    quaternion_t z1q;
-    slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist, zdot < 0 ? -elem->stuff.u.enemy.max_turn : elem->stuff.u.enemy.max_turn-0.05, &z1q.w, &z1q.x, &z1q.y, &z1q.z);
+
+    if(!slerp_done)
+    {
+        slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist, zdot < 0 ? -elem->stuff.u.enemy.max_slerp*tc : (elem->stuff.u.enemy.max_slerp-0.05)*tc, &z1q.w, &z1q.x, &z1q.y, &z1q.z);
+    }
     
     xq.w = z1q.w-zq.w;
     xq.x += z1q.x-zq.x;
@@ -684,17 +694,13 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     // hit a boundary, find a new patrol location
     if(elemAI && !elemC)
     {
-        //if(elemAI->stuff.u.enemy.enemy_state != ENEMY_STATE_JUKE)
+        if(time_ms < elemAI->stuff.u.enemy.time_next_retarget)
         {
             game_ai_newheading(elemAI, juke_distance);
             elemAI->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
             
             elemAI->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
-            elemAI->stuff.u.enemy.time_next_retarget = time_ms + 2000;
-            
-            update_object_velocity(elemAI->elem_id, -elemAI->physics.ptr->vx,
-                                   -elemAI->physics.ptr->vy,
-                                   -elemAI->physics.ptr->vz, 0);
+            elemAI->stuff.u.enemy.time_next_retarget = time_ms + 3000;
             
             ai_debug("juke target set: ", elemAI, elemAI->physics.ptr->x - elemAI->stuff.u.enemy.tgt_x);
             ai_debug("juke target set: ", elemAI, elemAI->physics.ptr->y - elemAI->stuff.u.enemy.tgt_y);

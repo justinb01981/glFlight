@@ -12,6 +12,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+extern float get_time_ms_wall();
+
 // private subtypes
 
 typedef enum
@@ -477,6 +479,8 @@ static GameNetworkBonjourManager* instance;
             p_saddr->len = msg->srcAddr.len = sizeof(struct bonjour_addr_stuffed_in_sockaddr_in);
             p_saddr->sa_family = GAME_NETWORK_BONJOUR_ADDRFAMILY_HACK;
             p_saddr->peer_id = peerId;
+            
+            msg->receive_time = get_time_ms_wall();
             
             if (bytesRead <= 0) {
                 // Do nothing; we'll handle EOF and error in the

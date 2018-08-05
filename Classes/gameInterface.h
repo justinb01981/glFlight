@@ -43,7 +43,7 @@ typedef struct {
     controlRect trim;
     controlRect fire;
     controlRect look;
-    controlRect action;
+    controlRect textMenuButton;
     controlRect accelIndicator;
     controlRect radar;
     controlRect fireRect2;
@@ -156,5 +156,8 @@ gameInterfaceEditString(char *ptr);
 
 void
 gameInterfaceProcessAction();
+
+void
+gameInterfaceCalibrateDone();
 
 #endif

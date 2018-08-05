@@ -157,12 +157,12 @@ extern float game_variables_val[GAME_VARIABLES_MAX];
 const static float game_variables_default[] = {
     99999999,    // MAX_SPAWN_COUNT
     10,          // MAX_ALIVE_COUNT
-    4,           // ENEMY_SPAWN_MOVE_RATE
+    8,           // ENEMY_SPAWN_MOVE_RATE
     1,           // PHYSICS_FRICTION_C
     50,          // ENEMY1_FORGET_DISTANCE
     30,          // ENEMY1_PURSUE_DISTANCE
     MAX_SPEED,   // MAX_SPEED
-    /*1.2*/0.3,  // MAX_TURN_RADIANS
+    /*1.2*/1.2,  // MAX_TURN_RADIANS
     0,           // FIRES MISSLES
     1,           // FIRES LASERS
     1,           // CHANGES_TARGET
@@ -290,7 +290,7 @@ extern float game_ammo_bullets;
 extern float game_ammo_missle_recharge;
 extern float game_ammo_bullets_recharge;
 const static float GAME_BULLET_LIFETIME = (60*6);
-const static float GAME_MISSLE_LIFETIME = (60*6);
+const static float GAME_MISSLE_LIFETIME = (60*10);
 extern char *game_status_string;
 extern int model_my_ship;
 
@@ -305,6 +305,8 @@ void game_add_turret();
 void game_init();
 
 void game_start(float difficulty, int type);
+
+void game_start_network_guest();
 
 void game_run();
 
@@ -362,7 +364,7 @@ game_elem_setup_ship(WorldElem* elem, int skill)
     elem->stuff.u.enemy.fires = GAME_VARIABLE("ENEMY1_FIRES_LASERS");
     elem->stuff.u.enemy.patrols_no_target_jukes = GAME_VARIABLE("ENEMY1_PATROLS_NO_TARGET");
     elem->stuff.u.enemy.max_speed = GAME_VARIABLE("ENEMY1_SPEED_MAX");
-    elem->stuff.u.enemy.max_turn = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS")+ GAME_VARIABLE("ENEMY1_MAX_TURN_SKILL_SCALE")*skill;
+    elem->stuff.u.enemy.max_slerp = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS")+ GAME_VARIABLE("ENEMY1_MAX_TURN_SKILL_SCALE")*skill;
     elem->stuff.u.enemy.time_run_interval = GAME_VARIABLE("ENEMY1_RUN_INTERVAL_MS")
     //MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
     ;
@@ -372,6 +374,7 @@ game_elem_setup_ship(WorldElem* elem, int skill)
     elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE")
     //30 - (5 * skill);
     ;
+    elem->durability = gameStateSinglePlayer.enemy_durability;
     elem->stuff.u.enemy.ignore_collect = 0;
     elem->bounding_remain = 1;
 }
@@ -392,7 +395,7 @@ game_elem_setup_turret(WorldElem* elem, int skill)
     elem->stuff.u.enemy.fires_missles = 0;
     elem->stuff.u.enemy.patrols_no_target_jukes = 1;
     elem->stuff.u.enemy.max_speed = MAX_SPEED/2;
-    elem->stuff.u.enemy.max_turn = 0.3;
+    elem->stuff.u.enemy.max_slerp = 1.2;
     elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     elem->stuff.u.enemy.scan_distance = 1;
     elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE");
@@ -414,7 +417,7 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.u.enemy.time_last_run = time_ms;
     x->durability = DURABILITY_MISSLE;
     x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
-    x->stuff.u.enemy.max_turn = 0.8; // radians per second
+    x->stuff.u.enemy.max_slerp = 2.5; // radians per second
     x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     x->stuff.u.enemy.scan_distance = 50;
     x->stuff.u.enemy.pursue_distance = 30;

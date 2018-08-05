@@ -393,6 +393,8 @@ gameInput()
             trim_dz[2] = ((gameInputStats.max[2] - gameInputStats.min[2]) / div);
             
             controlsCalibrated = 1;
+            
+            gameInterfaceCalibrateDone();
         }
         
         roll_m = deviceRoll;

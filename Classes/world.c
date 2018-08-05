@@ -44,7 +44,7 @@ world_t *gWorld = NULL;
 game_lock_t gWorldLock;
 
 float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
-float C_FRICTION = /*0.04*/ 0.015; // higher values = more friction
+float C_FRICTION = /*0.04*/ 0.03; // higher values = more friction
 float GYRO_FEEDBACK = GYRO_FEEDBACK_DEFAULT;
 float GYRO_DC = GYRO_DC_DEFAULT;
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
@@ -343,6 +343,8 @@ world_add_object_core(Model type,
             break;
             
         case MODEL_TBUILDING:
+        {
+            /*
             model_coords = model_tbuilding_coords;
             model_sizeof = sizeof(model_tbuilding_coords);
             model_indices = model_tbuilding_indices;
@@ -351,7 +353,66 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_tbuilding_texcoords);
             model_primitives_sizeof = sizeof(model_tbuilding_primitives);
             model_primitives = model_tbuilding_primitives;
-            break;
+             */
+            float M2[] = {
+                1, 0, 0, 0,
+                0, 4.0, 0, 1.5,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+            };
+            MODEL_POLY_COMPONENTS_ADD(model_tbuilding_coords, model_tbuilding_texcoords, model_tbuilding_indices, M2);
+            
+            model_coords = poly_comp.model_coords_buffer;
+            model_sizeof = poly_comp.model_coords_buffer_len * 3 * sizeof(model_coord_t);
+            model_indices = poly_comp.model_indices_buffer;
+            model_indices_sizeof = poly_comp.model_faces_buffer_n * 3 * sizeof(model_index_t);
+            model_texcoords = poly_comp.model_texcoords_buffer;
+            model_texcoords_sizeof = poly_comp.model_coords_buffer_len * 2 * sizeof(model_texcoord_t);
+            
+            model_primitives = poly_comp.primitives;
+            model_primitives_sizeof = 0;
+        }
+        break;
+            
+        case MODEL_CBUILDING:
+        {
+            /*
+             model_coords = model_tbuilding_coords;
+             model_sizeof = sizeof(model_tbuilding_coords);
+             model_indices = model_tbuilding_indices;
+             model_indices_sizeof = sizeof(model_tbuilding_indices);
+             model_texcoords = model_tbuilding_texcoords;
+             model_texcoords_sizeof = sizeof(model_tbuilding_texcoords);
+             model_primitives_sizeof = sizeof(model_tbuilding_primitives);
+             model_primitives = model_tbuilding_primitives;
+             */
+            float M2[] = {
+                1, 0, 0, 0,
+                0, 4.0, 0, 1.5,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+            };
+            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords4x, model_cube_indices_nobottom, M2);
+            
+            float M3[] = {
+                0.75, 0, 0, 0,
+                0, 4.0, 0, 5.52,
+                0, 0, 0.75, 0,
+                0, 0, 0, 1
+            };
+            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords, model_cube_indices_nobottom, M3);
+            
+            model_coords = poly_comp.model_coords_buffer;
+            model_sizeof = poly_comp.model_coords_buffer_len * 3 * sizeof(model_coord_t);
+            model_indices = poly_comp.model_indices_buffer;
+            model_indices_sizeof = poly_comp.model_faces_buffer_n * 3 * sizeof(model_index_t);
+            model_texcoords = poly_comp.model_texcoords_buffer;
+            model_texcoords_sizeof = poly_comp.model_coords_buffer_len * 2 * sizeof(model_texcoord_t);
+            
+            model_primitives = poly_comp.primitives;
+            model_primitives_sizeof = 0;
+        }
+        break;
             
         case MODEL_ENEMY_BASE:
         {   
@@ -419,6 +480,19 @@ world_add_object_core(Model type,
         }
             break;
             
+        case MODEL_CONTRAIL:
+        {
+            model_coords = model_contrail;
+            model_sizeof = sizeof(model_contrail);
+            model_indices = model_contrail_indices;
+            model_indices_sizeof = sizeof(model_contrail_indices);
+            model_texcoords = model_contrail_texcoords;
+            model_texcoords_sizeof = sizeof(model_contrail_texcoords);
+            model_primitives_sizeof = sizeof(model_contrail_primitives);
+            model_primitives = model_contrail_primitives;
+        }
+            break;
+            
         default:
             assert(0);
             break;
@@ -479,6 +553,7 @@ world_add_object_core(Model type,
             break;
             
         case MODEL_TBUILDING:
+        case MODEL_CBUILDING:
             new_durability = DURABILITY_BLOCK;
             break;
             
@@ -502,6 +577,11 @@ world_add_object_core(Model type,
             break;
             
         case MODEL_SCENERY:
+            pElem->renderInfo.visible = 1;
+            pElem->renderInfo.priority = 1;
+            break;
+            
+        case MODEL_CONTRAIL:
             pElem->renderInfo.visible = 1;
             pElem->renderInfo.priority = 1;
             break;
@@ -702,11 +782,10 @@ world_remove_object(int elem_id)
     WorldElem* pElem = NULL;
     
     if(gWorld->ignore_remove) return;
-    {
-        WorldElemListNode* pRemoveNode;
-        pRemoveNode = world_elem_list_find(elem_id, &gWorld->elements_list);
-        if(pRemoveNode) pElem = pRemoveNode->elem;
-    }
+    
+    WorldElemListNode* pRemoveNode;
+    pRemoveNode = world_elem_list_find(elem_id, &gWorld->elements_list);
+    if(pRemoveNode) pElem = pRemoveNode->elem;
     
     if(pElem && !pElem->remove_pending)
     {
@@ -1770,19 +1849,6 @@ world_update(float tc)
 
                                                 // HACK: removed a hack that enforced elemA had higher velocity than B and swapped
                                                 
-                                                game_handle_collision(pElem, pElemCollided, colact);
-                                                gameNetwork_handle_collision(pElem, pElemCollided, colact);
-                                                game_ai_collision(pElem, pElemCollided, colact);
-                                                
-                                                if(pElem->elem_id == my_ship_id && !sound_played)
-                                                {
-                                                    sound_played = 1;
-                                                    gameAudioPlaySoundAtLocation("bump",
-                                                                                 pElem->physics.ptr->x,
-                                                                                 pElem->physics.ptr->y,
-                                                                                 pElem->physics.ptr->z);
-                                                }
-                                                
                                                 if(colact == COLLISION_ACTION_REPULSE)
                                                 {
                                                     world_repulse_elem(pElem, pElemCollided, tc, FRcollision);
@@ -1790,8 +1856,23 @@ world_update(float tc)
                                                     // re-start collision test at new (repulsed) coordinates
                                                     cl = 0;
                                                     FRcollision -= collision_repulsion_coeff/FRdiv;
+                                                    
+                                                    
+                                                    if(pElem->elem_id == my_ship_id && !sound_played)
+                                                    {
+                                                        sound_played = 1;
+                                                        gameAudioPlaySoundAtLocation("bump",
+                                                                                     pElem->physics.ptr->x,
+                                                                                     pElem->physics.ptr->y,
+                                                                                     pElem->physics.ptr->z);
+                                                    }
+                                                    
                                                     goto region_collision_retry;
                                                 }
+                                                
+                                                game_handle_collision(pElem, pElemCollided, colact);
+                                                gameNetwork_handle_collision(pElem, pElemCollided, colact);
+                                                game_ai_collision(pElem, pElemCollided, colact);
 
                                                 if(!world_elem_list_find_elem(pElem, &gWorld->elements_collided) &&
                                                    !world_elem_list_find_elem(pElemCollided, &gWorld->elements_collided))

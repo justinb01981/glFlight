@@ -275,7 +275,7 @@ calibrate_bail:
         gameNetworkMessageQueued* pNetworkMsgNext = pNetworkMsg->next;
         if(!pNetworkMsg->processed)
         {
-            do_game_network_handle_msg(&pNetworkMsg->msg, &pNetworkMsg->srcAddr);
+            do_game_network_handle_msg(&pNetworkMsg->msg, &pNetworkMsg->srcAddr, pNetworkMsg->receive_time);
         }
         pNetworkMsg->processed = 1;
         pNetworkMsg = pNetworkMsgNext;
