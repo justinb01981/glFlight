@@ -400,7 +400,7 @@ world_add_object_core(Model type,
                 0, 0, 0.75, 0,
                 0, 0, 0, 1
             };
-            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords, model_cube_indices_nobottom, M3);
+            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords4x, model_cube_indices_nobottom, M3);
             
             model_coords = poly_comp.model_coords_buffer;
             model_sizeof = poly_comp.model_coords_buffer_len * 3 * sizeof(model_coord_t);
