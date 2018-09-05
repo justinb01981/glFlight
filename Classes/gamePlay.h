@@ -215,9 +215,6 @@ struct
     
     float enemy_durability;
     
-    int spawn_powerup_lifetime;
-    int spawn_powerup_m;
-    
     int invuln_time_after_hit;
     
     float boost_charge;
@@ -330,151 +327,41 @@ void fireBullet(int bulletAction);
 
 int firePoopedCube(WorldElem *elem);
 
-static float
-game_variable_get(const char* name)
-{
-    int i = 0;
-    while(game_variables_name[i] != NULL && strcmp(game_variables_name[i], name) != 0)
-    {
-        i++;
-    }
-    assert(game_variables_name[i] != NULL);
-    return game_variables_val[i];
-}
+float
+game_variable_get(const char* name);
 
-static float
-game_variable_set(const char* name, float val)
-{
-    int i = 0;
-    while(game_variables_name[i] != NULL && strcmp(game_variables_name[i], name) != 0)
-    {
-        i++;
-    }
-    if(i < sizeof(game_variables_val)/sizeof(float)) game_variables_val[i] = val;
-    return val;
-}
+float
+game_variable_set(const char* name, float val);
 
-inline static void
-game_elem_setup_ship(WorldElem* elem, int skill)
-{
-    elem->stuff.u.enemy.intelligence = skill;
-    elem->stuff.u.enemy.leaves_trail = GAME_VARIABLE("ENEMY1_LEAVES_TRAIL");
-    elem->stuff.u.enemy.run_distance = rand_in_range(4, GAME_VARIABLE("ENEMY_RUN_DISTANCE"));
-    elem->stuff.u.enemy.changes_target = GAME_VARIABLE("ENEMY1_CHANGES_TARGET");
-    elem->stuff.u.enemy.fires = GAME_VARIABLE("ENEMY1_FIRES_LASERS");
-    elem->stuff.u.enemy.patrols_no_target_jukes = GAME_VARIABLE("ENEMY1_PATROLS_NO_TARGET");
-    elem->stuff.u.enemy.max_speed = GAME_VARIABLE("ENEMY1_SPEED_MAX");
-    elem->stuff.u.enemy.max_slerp = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS")+ GAME_VARIABLE("ENEMY1_MAX_TURN_SKILL_SCALE")*skill;
-    elem->stuff.u.enemy.time_run_interval = GAME_VARIABLE("ENEMY1_RUN_INTERVAL_MS")
-    //MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
-    ;
-    elem->stuff.u.enemy.scan_distance = /*GAME_VARIABLE("ENEMY1_FORGET_DISTANCE")*/ 1.0
-    //50 + (10 * skill);
-    ;
-    elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE")
-    //30 - (5 * skill);
-    ;
-    elem->durability = gameStateSinglePlayer.enemy_durability;
-    elem->stuff.u.enemy.ignore_collect = 0;
-    elem->bounding_remain = 1;
-}
+void
+game_elem_setup_ship(WorldElem* elem, int skill);
 
-inline static void
-game_elem_setup_turret(WorldElem* elem, int skill)
-{
-    elem->stuff.intelligent = 1;
-    elem->stuff.u.enemy.intelligence = skill;
-    elem->stuff.u.enemy.leaves_trail = 0;
-    elem->stuff.u.enemy.run_distance = 0;
-    elem->stuff.u.enemy.ignore_collect = 1;
-    elem->physics.ptr->gravity = 1;
-    elem->physics.ptr->friction = 0;
-    elem->bounding_remain = 1;
-    elem->stuff.u.enemy.changes_target = 1;
-    elem->stuff.u.enemy.fires = 1;
-    elem->stuff.u.enemy.fires_missles = 0;
-    elem->stuff.u.enemy.patrols_no_target_jukes = 1;
-    elem->stuff.u.enemy.max_speed = MAX_SPEED/2;
-    elem->stuff.u.enemy.max_slerp = 1.2;
-    elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
-    elem->stuff.u.enemy.scan_distance = 1;
-    elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE");
-}
+void
+game_elem_setup_turret(WorldElem* elem, int skill);
 
-inline static void
-game_elem_setup_missle(WorldElem* x)
-{
-    x->stuff.intelligent = 1;
-    x->stuff.u.enemy.intelligence = 1.0;
-    x->physics.ptr->friction = 1;
-    x->stuff.u.enemy.changes_target = 0;
-    x->stuff.u.enemy.patrols_no_target_jukes = 0;
-    x->stuff.u.enemy.leaves_trail = 0;
-    x->stuff.u.enemy.run_distance = 0;
-    x->stuff.u.enemy.ignore_collect = 1;
-    x->stuff.u.enemy.fires = 0;
-    x->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
-    x->stuff.u.enemy.time_last_run = time_ms;
-    x->durability = DURABILITY_MISSLE;
-    x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
-    x->stuff.u.enemy.max_slerp = 2.5; // radians per second
-    x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
-    x->stuff.u.enemy.scan_distance = 50;
-    x->stuff.u.enemy.pursue_distance = 30;
-}
+void
+game_elem_setup_missle(WorldElem* x);
 
-inline static void
-game_elem_setup_powerup(WorldElem* elem)
-{
-    elem->renderInfo.priority = 1;
-}
+void
+game_elem_setup_powerup(WorldElem* elem);
 
-inline static void
-game_elem_setup_collect(WorldElem* elem)
-{
-    world_get_last_object()->durability = 0;
-    world_get_last_object()->destructible = 1;
-    world_get_last_object()->object_type = OBJ_POWERUP_GENERIC;
-    world_get_last_object()->stuff.subtype = GAME_SUBTYPE_COLLECT;
-    world_get_last_object()->stuff.radar_visible = 0;
-    world_get_last_object()->stuff.affiliation = AFFILIATION_POWERUP;
-    world_get_last_object()->bounding_remain = 1;
-    world_get_last_object()->physics.ptr->friction = 1;
-    update_object_velocity(elem->elem_id, 0, 1, 0, 0);
-}
+void
+game_elem_setup_collect(WorldElem* elem);
 
-inline static void
-game_elem_setup_spawnpoint_enemy(WorldElem* elem)
-{
-    elem->renderInfo.priority = 1;
-    elem->bounding_remain = 1;
-    elem->physics.ptr->friction = 1;
-}
+void
+game_elem_setup_spawnpoint_enemy(WorldElem* elem);
 
-inline static void
-game_elem_setup_spawnpoint(WorldElem* elem)
-{
-    elem->renderInfo.priority = 1;
-}
+void
+game_elem_setup_spawnpoint(WorldElem* elem);
 
-inline static void
-game_elem_setup_base(WorldElem* elem)
-{
-    elem->renderInfo.priority = 1;
-}
+void
+game_elem_setup_base(WorldElem* elem);
 
-inline static void
-game_elem_identify(WorldElem* elem, char* name)
-{
-    if(strcmp(name, "collect") == 0)
-    {
-        game_elem_setup_collect(elem);
-    }
-    else if(strcmp(name, "turret") == 0)
-    {
-        game_elem_setup_turret(elem, gameStateSinglePlayer.difficulty);
-    }
-}
+void
+game_elem_identify(WorldElem* elem, char* name);
+
+void
+game_over();
 
 void
 game_configure_missle(WorldElem *elem);

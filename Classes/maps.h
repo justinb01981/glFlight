@@ -289,7 +289,7 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 
 #define FLOATING_ISLAND(x, y, z)             \
 "set_vector "#x" "#y" "#z" 1 1 1\n"    \
-"add_object 20 vecx_0 vecy_0 vecz_0 0 0 0 20 31\n"
+"add_object 21 vecx_0 vecy_0 vecz_0 0 0 0 20 31\n"
 
 #define WORLD_SCALED_FRAME_TURRET(x, tex, scale)                         \
 "register_params 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
@@ -980,7 +980,7 @@ FLOATING_ISLAND(-100, 100, -100)
 
 FLOATING_ISLAND(100, 50, -100)
 FLOATING_ISLAND(100, 100, -100)
-    
+
 ;
 
 const static char initial_map_survival[] = ""

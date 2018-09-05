@@ -9,6 +9,8 @@
 #ifndef gl_flight_collision_h
 #define gl_flight_collision_h
 
+#include <math.h>
+
 #include "object.h"
 #include "gamePlay.h"
 #include "action.h"
@@ -384,12 +386,12 @@ do_world_collision_handling(float tc)
                     int durability_b = pCollisionB->elem->durability;
                     
                     // HACK: expect A to point at faster object (missle/bullet)
-                    if(pCollisionA->elem->physics.ptr->velocity < pCollisionB->elem->physics.ptr->velocity)
-                    {
-                        WorldElemListNode* tmp = pCollisionA;
-                        pCollisionA = pCollisionB;
-                        pCollisionB = tmp;
-                    }
+//                    if(pCollisionA->elem->physics.ptr->velocity < pCollisionB->elem->physics.ptr->velocity)
+//                    {
+//                        WorldElemListNode* tmp = pCollisionA;
+//                        pCollisionA = pCollisionB;
+//                        pCollisionB = tmp;
+//                    }
                     
                     if(object_damage)
                     {
@@ -398,13 +400,22 @@ do_world_collision_handling(float tc)
                             pCollisionB->elem->physics.ptr->velocity > 0)
                         {
                             float bullet_vtransfer = 0.2 * pCollisionA->elem->durability;
-                            
+
                             update_object_velocity(pCollisionB->elem->elem_id,
                                                    pCollisionA->elem->physics.ptr->vx*bullet_vtransfer,
                                                    pCollisionA->elem->physics.ptr->vy*bullet_vtransfer,
                                                    pCollisionA->elem->physics.ptr->vz*bullet_vtransfer,
                                                    1);
                         }
+                    }
+
+                    if(isnan(pCollisionA->elem->physics.ptr->x))
+                    {
+                        printf("isNan: %ptr\n", pCollisionA->elem);
+                    }
+                    if(isnan(pCollisionB->elem->physics.ptr->x))
+                    {
+                        printf("isNan: %ptr\n", pCollisionB->elem);
                     }
                     
                     game_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
@@ -413,10 +424,24 @@ do_world_collision_handling(float tc)
                     
                     if(object_damage)
                     {
-                        int durability_tmp = pCollisionA->elem->durability;
+                        float durability_tmp = pCollisionA->elem->durability;
                         
                         pCollisionA->elem->durability -= pCollisionB->elem->durability;
                         pCollisionB->elem->durability -= durability_tmp;
+                        
+                        {
+                            WorldElem* ELEMS[] = {pCollisionB->elem, pCollisionA->elem, NULL};
+                            WorldElem **pElems = ELEMS;
+                            
+                            while(*pElems)
+                            {
+                                if((*pElems)->object_type == OBJ_SHIP)
+                                {
+                                    printf("collision with OBJ_SHIP durability: %f\n", (*pElems)->durability);
+                                }
+                                pElems += 1;
+                            }
+                        }
                         
                         // moving object destroyed
                         if(pCollisionA->elem->durability <= 0)

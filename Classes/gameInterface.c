@@ -456,6 +456,7 @@ void
 gameInterfaceHandleTouchBegin(float x, float y)
 {
     int rgnv = 0;
+    int i;
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
     
     gameDialogGraphicCancel();
@@ -627,8 +628,7 @@ gameInterfaceHandleTouchBegin(float x, float y)
     
     if(touchedControl == &gameInterfaceControls.fire)
     {
-        x_last[gameInterfaceControls.touchId-1] = -1;
-        y_last[gameInterfaceControls.touchId-1] = -1;
+        for(i = 0; i < TOUCHES_MAX; i++) x_last[i] = y_last[i] = -1;
         gameInterfaceHandleTouchMove(x, y);
     }
     
@@ -682,6 +682,7 @@ gameInterfaceMultiplayerConfigure(int action)
         case 2:
             if(action == ACTION_HOST_GAME_LAN)
             {
+                gameDialogClose();
                 gameNetworkState.hostInfo.bonjour_lan = 1;
                 GameNetworkBonjourManagerBrowseBegin();
                 glFlightDrawframeHook = gameDialogBrowseGamesCountdown;
@@ -690,16 +691,16 @@ gameInterfaceMultiplayerConfigure(int action)
             {
                 gameNetwork_connect("", load_map_and_host_game);
                 gameNetwork_directoryRegister(gameSettingGameTitle);
-                gameDialogStartNetworkGameWait();
             }
             else
             {
+                gameDialogClose();
                 glFlightDrawframeHook = gameDialogBrowseGamesCountdown;
                 gameNetwork_connect(gameSettingGameTitle, gameDialogBrowseGamesCountdown);
             }
             
             gameDialogState.networkGameNameEntered = 0;
-            gameDialogClose();
+            
             return 1;
             
         default:

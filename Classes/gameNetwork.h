@@ -214,6 +214,7 @@ typedef struct
         //int retransmitAcks;
         unsigned short port;
         gameNetworkAddress local_inet_addr;
+        game_timeval_t time_last_stats_alert;
     } hostInfo;
     
     gameNetworkObjectInfo game_object_list_head;
@@ -249,6 +250,9 @@ typedef struct
     } msgQueue;
     
     game_timeval_t time_last_periodic_check;
+    game_timeval_t time_last_name_send;
+    game_timeval_t time_last_unacked_send;
+    game_timeval_t time_game_remaining;
     
     gameNetworkMessage msgUnacked;
     int msgUnackedRetransmitCount;

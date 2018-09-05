@@ -174,6 +174,29 @@ gameDialogMenuCountdown()
 }
 
 static void
+gameDialogGameOverCountdown()
+{
+    static int passes = 200;
+    passes--;
+    
+    if(passes > 0)
+    {
+        return;
+    }
+    
+    game_over();
+    gameDialogWelcomeMenu();
+    glFlightDrawframeHook = NULL;
+}
+
+static void
+gameDialogGameOver()
+{
+    camera_locked_frames = 200;
+    glFlightDrawframeHook = gameDialogGameOverCountdown;
+}
+
+static void
 gameDialogWelcome()
 {
     if(/*gameSettingsLaunchCount % 2 == 1 && !gameSettingsRatingGiven*/ 0)
@@ -432,11 +455,11 @@ gameDialogStartNetworkGame2()
         return;
     }
     
+    gameDialogConnectToGameSuccessful2();
+    
     game_start(1, GAME_TYPE_DEATHMATCH);
     gameNetwork_startGame(300);
     gameStateSinglePlayer.max_enemies = gameDialogCounter;
-    
-    gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
     
     gameNetwork_alert("ALERT:game started!");
 }
@@ -537,6 +560,13 @@ gameDialogNetworkGameStatus()
     {
         console_write(gameNetworkState.gameStatsMessage);
     }
+}
+
+static void
+gameDialogNetworkGameEnded()
+{
+    gameDialogState.hideNetworkStatus = 0;
+    gameDialogNetworkGameStatus();
 }
 
 static void gameDialogCancelString();

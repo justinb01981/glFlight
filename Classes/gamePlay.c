@@ -68,6 +68,8 @@ float blr_last = 1;
 
 float game_variables_val[GAME_VARIABLES_MAX];
 
+static int object_id_portal = WORLD_ELEM_ID_INVALID;
+
 extern void random_heading_vector(float v[3]);
 
 int
@@ -239,8 +241,7 @@ score_kill(WorldElem* pElem)
     }
 }
 
-static void
-game_over()
+void game_over()
 {
     score_display();
     
@@ -249,7 +250,6 @@ game_over()
     game_reset_needed = /*1*/ 0;
     
     camera_locked_frames = 120;
-    gameInterfaceControls.mainMenu.visible = 1;
     gameInterfaceControls.textMenuControl.visible = 1;
     
     gameAudioPlaySoundAtLocation("vibrate",
@@ -469,7 +469,6 @@ game_add_enemy_core(float x, float y, float z, int model)
     world_get_last_object()->stuff.u.enemy.target_id = -1;
     world_get_last_object()->stuff.u.enemy.intelligence = gameStateSinglePlayer.enemy_intelligence;
     world_get_last_object()->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
-    world_get_last_object()->durability = gameStateSinglePlayer.enemy_durability;
     world_get_last_object()->stuff.intelligent = 1;
     world_get_last_object()->physics.ptr->friction = 1;
     game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
@@ -500,7 +499,7 @@ game_add_enemy_bountyhunter(float x, float y, float z)
     game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
     world_get_last_object()->texture_id = TEXTURE_ID_ENEMYSHIP_ACE;
     world_get_last_object()->stuff.u.enemy.fires_missles = 0;
-    world_get_last_object()->durability *= 4;
+    world_get_last_object()->durability *= 2;
     world_get_last_object()->stuff.u.enemy.ignore_collect = 1;
     console_write(game_log_messages[GAME_LOG_NEWENEMY2]);
     return obj_id;
@@ -587,8 +586,6 @@ game_add_spawnpoint(float x, float y, float z, char* game_name)
     return obj_id;
 }
 
-static int object_id_portal = WORLD_ELEM_ID_INVALID;
-
 void
 game_move_spawnpoint(WorldElem* pElem)
 {
@@ -654,6 +651,7 @@ game_init_objects()
         {
             case OBJ_SPAWNPOINT_ENEMY:
                 pCur->elem->stuff.u.spawnpoint.spawn_intelligence = 3 + gameStateSinglePlayer.difficulty;
+                pCur->elem->stuff.u.spawnpoint.spawn_last = time_ms;
                 break;
                 
             case OBJ_BASE:
@@ -713,6 +711,8 @@ game_start(float difficulty, int type)
     
     gameStateSinglePlayer.game_type = type;
     
+    gameStateSinglePlayer.end_time = 0;
+    
     gameStateSinglePlayer.delay_new_level = 0;
     
     gameStateSinglePlayer.defend_id = -1;
@@ -721,8 +721,6 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.rate_enemy_p_increase = 0;
     gameStateSinglePlayer.rate_point_increase = 0;
     gameStateSinglePlayer.one_collect_at_a_time = 0;
-    gameStateSinglePlayer.spawn_powerup_lifetime = 0;
-    gameStateSinglePlayer.spawn_powerup_m = 0;
     gameStateSinglePlayer.enemy_durability = DURABILITY_ENEMY_DEATHMATCH;
     gameStateSinglePlayer.max_enemies = 0;
     gameStateSinglePlayer.counter_enemies_spawned = 99999;
@@ -767,9 +765,6 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.n_asteroids = 0;
         
-        gameStateSinglePlayer.spawn_powerup_lifetime = 60*10;
-        gameStateSinglePlayer.spawn_powerup_m = 20;
-        
         gameStateSinglePlayer.object_types_towed[OBJ_TURRET] = 1;
 
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
@@ -779,6 +774,8 @@ game_start(float difficulty, int type)
         collision_actions_set_grab_powerup();
         
         gameStateSinglePlayer.player_drops_powerup = 1;
+        
+        gameStateSinglePlayer.end_time = time_ms + (300 * 1000); // 5 min
     }
     else if(gameStateSinglePlayer.game_type == GAME_TYPE_COLLECT)
     {
@@ -804,9 +801,9 @@ game_start(float difficulty, int type)
         //gameStateSinglePlayer.powerup_drop_chance[9] = GAME_SUBTYPE_POINTS;
         gameStateSinglePlayer.ship_destruction_change_alliance = 0;
         gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
-        gameStateSinglePlayer.enemy_spawnpoint_interval = 10000;
+        gameStateSinglePlayer.enemy_spawnpoint_interval = 7000;
         gameStateSinglePlayer.base_spawn_collect_m = 0.9;
-        gameStateSinglePlayer.base_spawn_collect_w = 65535/4;
+        gameStateSinglePlayer.base_spawn_collect_w = 65535/3;
         gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/20;
@@ -976,7 +973,6 @@ game_start(float difficulty, int type)
     gameAIState.started = 1;
     
     gameStateSinglePlayer.time_elapsed = 0;
-    gameStateSinglePlayer.end_time = time_ms + (300 * 1000); // 5 min
     
     console_write(gameStateSinglePlayer.game_help_message);
     //console_append("\n***high score this session: %d***",
@@ -1327,6 +1323,8 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
         case OBJ_SPAWNPOINT_ENEMY:
             if(elemA->object_type == OBJ_POWERUP_GENERIC)
             {
+                // MARK: enemy hacked your core
+                gameStateSinglePlayer.enemy_spawnpoint_interval = MAX(gameStateSinglePlayer.enemy_spawnpoint_interval*0.90, 1000);
                 elemA->stuff.u.spawnpoint.spawn_intelligence *= 1.5;
                 
                 gameStateSinglePlayer.collect_system_integrity -= 20;
@@ -1432,7 +1430,9 @@ game_handle_destruction(WorldElem* elem)
             if(gameStateSinglePlayer.game_type != GAME_TYPE_DEATHMATCH)
             {
                 console_write(game_log_messages[GAME_LOG_GAMEOVER_KILLED]);
-                game_over();
+                gameDialogGameOver();
+                
+                add_wreck = 1;
             }
             
             if(elem->stuff.flags.mask &= STUFF_FLAGS_TURRET)
@@ -1761,6 +1761,8 @@ game_run()
             
             game_target_objective_id = gameStateSinglePlayer.elem_id_spawnpoint;
             
+            printf("enemies_found:%f\n", enemies_found);
+            
             if(strncmp(gameSettingsPlayerName, "god", 3) == 0) pMyShipNode->elem->durability = 9999;
          
             if(gameStateSinglePlayer.started)
@@ -1809,18 +1811,6 @@ game_run()
             
                 gameStateSinglePlayer.caps_owned = caps_owned;
                 gameStateSinglePlayer.collects_found = collects_found;
-                
-                if(gameStateSinglePlayer.spawn_powerup_m &&
-                   rand_in_range(1, gameStateSinglePlayer.spawn_powerup_m) == 1)
-                {
-                    game_add_powerup(rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
-                                     rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
-                                     rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
-                                     GAME_SUBTYPE_LIFE, 0);
-                    
-                    world_object_set_lifetime(world_get_last_object()->elem_id,
-                                              gameStateSinglePlayer.spawn_powerup_lifetime);
-                }
                 
                 /*
                 if(caps_found < 4 && rand() % 10 == 0)
@@ -1949,7 +1939,7 @@ game_run()
                     
                     if(gameStateSinglePlayer.collect_system_integrity <= 0)
                     {
-                        game_over();
+                        gameDialogGameOver();
                     }
                 }
                 
@@ -1957,7 +1947,7 @@ game_run()
                 {
                     if(collects_found <= 0)
                     {
-                        game_over();
+                        gameDialogGameOver();
                     }
                 }
                 
@@ -2425,7 +2415,7 @@ fireBullet(int bulletAction)
     bullet_z_vec[1] = -bullet_z_vec[1];
     bullet_z_vec[2] = -bullet_z_vec[2];
     
-    bv = 2 * listNodeShip->elem->scale;
+    bv = (missle? 3.0 : 2.0) * listNodeShip->elem->scale;
     blr = missle? 0: 0.3 * listNodeShip->elem->scale;
     
     int shots = listNodeShip->elem->type == MODEL_SHIP3 && !missle? 2: 1;
@@ -2619,4 +2609,150 @@ game_ai_target_priority(WorldElem* pSearchElem, WorldElem* pTargetElem, float* d
         }
     }
     return 0;
+}
+
+float
+game_variable_get(const char* name)
+{
+    int i = 0;
+    while(game_variables_name[i] != NULL && strcmp(game_variables_name[i], name) != 0)
+    {
+        i++;
+    }
+    assert(game_variables_name[i] != NULL);
+    return game_variables_val[i];
+}
+
+float
+game_variable_set(const char* name, float val)
+{
+    int i = 0;
+    while(game_variables_name[i] != NULL && strcmp(game_variables_name[i], name) != 0)
+    {
+        i++;
+    }
+    if(i < sizeof(game_variables_val)/sizeof(float)) game_variables_val[i] = val;
+    return val;
+}
+
+void
+game_elem_setup_ship(WorldElem* elem, int skill)
+{
+    elem->stuff.u.enemy.intelligence = skill;
+    elem->stuff.u.enemy.leaves_trail = GAME_VARIABLE("ENEMY1_LEAVES_TRAIL");
+    elem->stuff.u.enemy.run_distance = rand_in_range(4, GAME_VARIABLE("ENEMY_RUN_DISTANCE"));
+    elem->stuff.u.enemy.changes_target = GAME_VARIABLE("ENEMY1_CHANGES_TARGET");
+    elem->stuff.u.enemy.fires = GAME_VARIABLE("ENEMY1_FIRES_LASERS");
+    elem->stuff.u.enemy.patrols_no_target_jukes = GAME_VARIABLE("ENEMY1_PATROLS_NO_TARGET");
+    elem->stuff.u.enemy.max_speed = GAME_VARIABLE("ENEMY1_SPEED_MAX");
+    elem->stuff.u.enemy.max_slerp = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS")+ GAME_VARIABLE("ENEMY1_MAX_TURN_SKILL_SCALE")*skill;
+    elem->stuff.u.enemy.time_run_interval = GAME_VARIABLE("ENEMY1_RUN_INTERVAL_MS")
+    //MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
+    ;
+    elem->stuff.u.enemy.scan_distance = /*GAME_VARIABLE("ENEMY1_FORGET_DISTANCE")*/ 1.0
+    //50 + (10 * skill);
+    ;
+    elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE")
+    //30 - (5 * skill);
+    ;
+    elem->durability = gameStateSinglePlayer.enemy_durability;
+    elem->stuff.u.enemy.ignore_collect = 0;
+    elem->bounding_remain = 1;
+}
+
+void
+game_elem_setup_turret(WorldElem* elem, int skill)
+{
+    elem->stuff.intelligent = 1;
+    elem->stuff.u.enemy.intelligence = skill;
+    elem->stuff.u.enemy.leaves_trail = 0;
+    elem->stuff.u.enemy.run_distance = 0;
+    elem->stuff.u.enemy.ignore_collect = 1;
+    elem->physics.ptr->gravity = 1;
+    elem->physics.ptr->friction = 0;
+    elem->bounding_remain = 1;
+    elem->stuff.u.enemy.changes_target = 1;
+    elem->stuff.u.enemy.fires = 1;
+    elem->stuff.u.enemy.fires_missles = 0;
+    elem->stuff.u.enemy.patrols_no_target_jukes = 0;
+    elem->stuff.u.enemy.max_speed = MAX_SPEED/2;
+    elem->stuff.u.enemy.max_slerp = 1.2;
+    elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
+    elem->stuff.u.enemy.scan_distance = 1;
+    elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE");
+}
+
+void
+game_elem_setup_missle(WorldElem* x)
+{
+    x->stuff.intelligent = 1;
+    x->stuff.u.enemy.intelligence = 1.0;
+    x->physics.ptr->friction = 1;
+    x->stuff.u.enemy.changes_target = 0;
+    x->stuff.u.enemy.patrols_no_target_jukes = 0;
+    x->stuff.u.enemy.leaves_trail = 0;
+    x->stuff.u.enemy.run_distance = 0;
+    x->stuff.u.enemy.ignore_collect = 1;
+    x->stuff.u.enemy.fires = 0;
+    x->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
+    x->stuff.u.enemy.time_last_run = time_ms;
+    x->durability = DURABILITY_MISSLE;
+    x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
+    x->stuff.u.enemy.max_slerp = 6.0; // radians per second
+    x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
+    x->stuff.u.enemy.scan_distance = 50;
+    x->stuff.u.enemy.pursue_distance = 30;
+}
+
+void
+game_elem_setup_powerup(WorldElem* elem)
+{
+    elem->renderInfo.priority = 1;
+}
+
+void
+game_elem_setup_collect(WorldElem* elem)
+{
+    world_get_last_object()->durability = 0;
+    world_get_last_object()->destructible = 1;
+    world_get_last_object()->object_type = OBJ_POWERUP_GENERIC;
+    world_get_last_object()->stuff.subtype = GAME_SUBTYPE_COLLECT;
+    world_get_last_object()->stuff.radar_visible = 0;
+    world_get_last_object()->stuff.affiliation = AFFILIATION_POWERUP;
+    world_get_last_object()->bounding_remain = 1;
+    world_get_last_object()->physics.ptr->friction = 1;
+    update_object_velocity(elem->elem_id, 0, 1, 0, 0);
+}
+
+void
+game_elem_setup_spawnpoint_enemy(WorldElem* elem)
+{
+    elem->renderInfo.priority = 1;
+    elem->bounding_remain = 1;
+    elem->physics.ptr->friction = 1;
+}
+
+void
+game_elem_setup_spawnpoint(WorldElem* elem)
+{
+    elem->renderInfo.priority = 1;
+}
+
+void
+game_elem_setup_base(WorldElem* elem)
+{
+    elem->renderInfo.priority = 1;
+}
+
+void
+game_elem_identify(WorldElem* elem, char* name)
+{
+    if(strcmp(name, "collect") == 0)
+    {
+        game_elem_setup_collect(elem);
+    }
+    else if(strcmp(name, "turret") == 0)
+    {
+        game_elem_setup_turret(elem, gameStateSinglePlayer.difficulty);
+    }
 }

@@ -410,38 +410,9 @@ gameInput()
         }
     }
 
-    if(needTrim)
+    if(needTrim && !needTrimLast)
     {
-        if(!needTrimLast) trimStartTime = tex_pass;
-#if 0
-        if(!needTrimLast)
-        {
-            // begin learning trim
-            trimStart[0] = deviceRoll;
-            trimStart[1] = devicePitch;
-            trimStart[2] = deviceYaw;
-            trim_dz[0] = trim_dz[1] = trim_dz[2] = 0;
-            trimStartTime = tex_pass;
-        }
-        else
-        {
-            double range;
-            
-            range = fabs(deviceRoll - trimStart[0]);
-            if(range > trim_dz[0]) trim_dz[0] = range;
-            range = fabs(devicePitch - trimStart[1]);
-            if(range > trim_dz[1]) trim_dz[1] = range;
-            range = fabs(deviceYaw - trimStart[2]);
-            if(range > trim_dz[2]) trim_dz[2] = range;
-        }
-        
-        yaw_m = deviceYaw;
-        pitch_m = devicePitch;
-        roll_m = deviceRoll;
-        
-        // uncomment this to cause holding trim button to not continue reading input
-        //needTrim = false;
-#endif
+        trimStartTime = tex_pass;
     }
     needTrimLast = needTrim;
     
@@ -617,7 +588,7 @@ gameInputStatsCollectStart()
 void
 gameInputStatsAppend(float ypr[3])
 {
-    unsigned int l = gameInputStats.samples * 3;
+    unsigned int l = (unsigned int) gameInputStats.samples * 3;
     
     gameInputStats.buf[(gameInputStats.x) % l] = ypr[0];
     gameInputStats.buf[(gameInputStats.x+1) % l] = ypr[1];
@@ -629,7 +600,7 @@ void
 gameInputStatsCalc()
 {
     int j;
-    unsigned int l = gameInputStats.samples * 3;
+    unsigned int l = (unsigned int) gameInputStats.samples * 3;
     
     if(gameInputStats.buf)
     {

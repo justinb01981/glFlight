@@ -396,6 +396,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     float tc;
     float zdot_ikillyou = 0.5;
     float zdot_juke = 0.3;
+    float dist_tooclose = 10.0;
     int slerp_done = 0;
     
     tc = time_ms - elem->stuff.u.enemy.time_last_run;
@@ -408,7 +409,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     float ay = elem->physics.ptr->y - y;
     float az = elem->physics.ptr->z - z;
 
-    float dist = sqrt(ax*ax + ay*ay + az*az);
+    float dist = MAX(0.5, sqrt(ax*ax + ay*ay + az*az));
     
     // find current object heading vector
     get_body_vectors_for_euler(elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
@@ -559,31 +560,29 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     float vdesired = pursuit_speed_for_object(elem);
     
-    //if(zdot < 0) vdesired /= 2;
+    if(zdot < 0.0 && elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PURSUE) vdesired /= 2;
     
     if(vdesired < MAX_SPEED) ai_debug("vdesired:", elem, vdesired);
     
     // accel/decel
     float v = vcur > vdesired? 0.1: vdesired;
     
-    //dist = sqrt(ax*ax + ay*ay + az*az);
-    
     if(elem->stuff.u.enemy.collided)
     {
+        elem->stuff.u.enemy.collided = 0;
         // force firing a bullet (in case of object-collision, run through)
         fireBullet = 1;
         //dist = 0;
         dist = 1;
         zdot = zdot_ikillyou;
-        vdesired = 1.0;
-    }
+        vdesired = 1.0;    }
 
     if(!slerp_done)
     {
         slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist, zdot < 0 ? -elem->stuff.u.enemy.max_slerp*tc : (elem->stuff.u.enemy.max_slerp-0.05)*tc, &z1q.w, &z1q.x, &z1q.y, &z1q.z);
     }
     
-    xq.w = z1q.w-zq.w;
+    xq.w += z1q.w-zq.w;
     xq.x += z1q.x-zq.x;
     xq.y += z1q.y-zq.y;
     xq.z += z1q.z-zq.z;
@@ -618,13 +617,11 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     elem->stuff.u.enemy.speed = v;
     for(int i = 0; i < 3; i++) elem->stuff.u.enemy.vthrust[i] = tv[i];
     
-    //update_object_velocity_with_friction(elem->elem_id, tv, C_THRUST, C_FRICTION);
-    
     if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PURSUE &&
        elem->stuff.u.enemy.fires &&
        (collision_actions[OBJ_BULLET][target_objtype] == COLLISION_ACTION_DAMAGE ||
         collision_actions[OBJ_MISSLE][target_objtype] == COLLISION_ACTION_DAMAGE) &&
-       zdot >= zdot_ikillyou)
+       (zdot >= zdot_ikillyou || dist < dist_tooclose))
     {
         fireBullet = 1;
     }
@@ -694,10 +691,10 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     // hit a boundary, find a new patrol location
     if(elemAI && !elemC)
     {
-        if(time_ms < elemAI->stuff.u.enemy.time_next_retarget)
+        if(time_ms > elemAI->stuff.u.enemy.time_next_retarget)
         {
             game_ai_newheading(elemAI, juke_distance);
-            elemAI->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
+            elemAI->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
             
             elemAI->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
             elemAI->stuff.u.enemy.time_next_retarget = time_ms + 3000;
@@ -741,17 +738,13 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
             
             float cPos[3] = {elemC->physics.ptr->x, elemC->physics.ptr->y, elemC->physics.ptr->z};
             float aiPos[3] = {elemAI->physics.ptr->x, elemAI->physics.ptr->y, elemAI->physics.ptr->z};
-            float uv[3];
-            float l = 20;
+            float l = 5.0;
             
-            unit_vector_ab(cPos, aiPos, uv);
-            
-            elemAI->stuff.u.enemy.tgt_x = uv[0] * l;
-            elemAI->stuff.u.enemy.tgt_y = uv[1] * l;
-            elemAI->stuff.u.enemy.tgt_z = uv[2] * l;
-            
+            elemAI->stuff.u.enemy.tgt_x = (aiPos[0] - cPos[0]) * l;
+            elemAI->stuff.u.enemy.tgt_y = (aiPos[1] - cPos[1]) * l;
+            elemAI->stuff.u.enemy.tgt_z = (aiPos[2] - cPos[2]) * l;
+    
             elemAI->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
-            elemAI->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
             elemAI->stuff.u.enemy.time_next_retarget = time_ms + 2000;
         }
     }
@@ -769,7 +762,7 @@ pursuit_speed_for_object(WorldElem* elem)
     {
         case OBJ_MISSLE:
             v = elem->stuff.u.enemy.max_speed;
-            s = 2.0;
+            //s = 2.0;
             break;
             
         default:

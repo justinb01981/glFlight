@@ -43,7 +43,8 @@
 #include "gameLock.h"
 #include "collision.h"
 #include "sounds.h"
-    
+
+#define REMAINING_TIME_STR "remaining time: "
 
 gameNetworkState_t gameNetworkState;
 
@@ -284,7 +285,7 @@ send_startgame()
     
     memset(&msg, 0, sizeof(msg));
     msg.cmd = GAME_NETWORK_MSG_STARTGAME;
-    strncpy(msg.params.c, gameNetworkState.my_player_name, sizeof(msg.params.c));
+    msg.params.f[0] = game_time_remaining();
     msg.player_id = gameNetworkState.my_player_id;
     
     gameNetwork_send(&msg);
@@ -294,6 +295,7 @@ void
 send_endgame()
 {
     gameNetworkMessage msg;
+    gameNetworkAddress fakeAddress;
     
     memset(&msg, 0, sizeof(msg));
     msg.cmd = GAME_NETWORK_MSG_ENDGAME;
@@ -301,6 +303,8 @@ send_endgame()
     msg.player_id = gameNetworkState.my_player_id;
     
     gameNetwork_send(&msg);
+    
+    do_game_network_handle_msg(&msg, &fakeAddress, get_time_ms_wall());
 }
 
 
@@ -1107,9 +1111,21 @@ gameNetwork_getPlayerInfoForElemID(int player_elem_id, gameNetworkPlayerInfo** i
 gameNetworkError
 gameNetwork_removePlayer(int player_id)
 {
+    game_timeval_t network_time_ms = get_time_ms_wall();
     gameNetworkPlayerInfo* pInfo = &gameNetworkState.player_list_head;
     while(pInfo->next)
     {
+        console_write("Player %s disconnected (%lu)", pInfo->next->name,
+                      network_time_ms - pInfo->next->time_last_update);
+        
+        if(pInfo->next->player_id == GAME_NETWORK_PLAYER_ID_HOST)
+        {
+            console_write("Lost connection to %s (host)", pInfo->name);
+            gameNetworkState.connected = 0;
+        }
+        
+        world_remove_object(pInfo->next->elem_id);
+        
         if(pInfo->next->player_id == player_id)
         {
             gameNetworkPlayerInfo* pFree = pInfo->next;
@@ -1245,10 +1261,18 @@ game_network_periodic_check()
     int map_retransmit = 0;
     
     static game_timeval_t time_retransmit_map_last = 0;
+    static game_timeval_t time_game_remaining_dec_last = 0;
+    
     if(network_time_ms - time_retransmit_map_last > 200 && !gameNetworkState.hostInfo.bonjour_lan)
     {
         time_retransmit_map_last = network_time_ms;
         map_retransmit = 1;
+    }
+    
+    if(gameNetworkState.connected && network_time_ms - time_game_remaining_dec_last > 1000)
+    {
+        time_game_remaining_dec_last = network_time_ms;
+        gameNetworkState.time_game_remaining -= 1;
     }
     
     while(pInfo)
@@ -1259,17 +1283,6 @@ game_network_periodic_check()
         {
             if(network_time_ms - pInfo->time_last_update > time_out_ms)
             {
-                console_write("Player %s disconnected (%lu)", pInfo->name,
-                              network_time_ms - pInfo->time_last_update);
-                
-                if(pInfo->player_id == GAME_NETWORK_PLAYER_ID_HOST)
-                {
-                    console_write("Lost connection to server");
-                    gameNetworkState.connected = 0;
-                }
-                
-                world_remove_object(pInfo->elem_id);
-                
                 gameNetwork_removePlayer(pInfo->player_id);
                 break;
             }
@@ -1322,17 +1335,16 @@ game_network_periodic_check()
         }
     }
     
-    static game_timeval_t time_last_stats_alert = 0;
     if(gameNetworkState.hostInfo.hosting)
     {
-        if(network_time_ms - time_last_stats_alert > 10000)
+        if(network_time_ms - gameNetworkState.hostInfo.time_last_stats_alert > 10000)
         {
             if(gameNetwork_getPlayerInfo(GAME_NETWORK_PLAYER_ID_HOST, &pInfo, 0) == GAME_NETWORK_ERR_NONE)
             {
                 pInfo->elem_id = my_ship_id;
             }
             
-            time_last_stats_alert = network_time_ms;
+            gameNetworkState.hostInfo.time_last_stats_alert = network_time_ms;
             gameNetwork_sendStatsAlert();
             
             gameNetwork_sendPing();
@@ -1342,10 +1354,9 @@ game_network_periodic_check()
         }
     }
     
-    static game_timeval_t time_last_name_send = 0;
-    if(network_time_ms - time_last_name_send > 5000)
+    if(network_time_ms - gameNetworkState.time_last_name_send > 5000)
     {
-        time_last_name_send = network_time_ms;
+        gameNetworkState.time_last_name_send = network_time_ms;
         
         gameNetworkMessage nameMsg;
         
@@ -1354,12 +1365,11 @@ game_network_periodic_check()
         gameNetwork_send(&nameMsg);
     }
     
-    static game_timeval_t time_last_unacked_send = 0;
-    if(network_time_ms - time_last_unacked_send > 200 &&
+    if(network_time_ms - gameNetworkState.time_last_unacked_send > 200 &&
        gameNetworkState.msgUnacked.cmd != GAME_NETWORK_MSG_NONE &&
        gameNetworkState.msgUnackedRetransmitCount < 10)
     {
-        time_last_unacked_send = network_time_ms;
+        gameNetworkState.time_last_unacked_send = network_time_ms;
         gameNetwork_send(&gameNetworkState.msgUnacked);
         gameNetworkState.msgUnackedRetransmitCount++;
     }
@@ -1403,7 +1413,7 @@ do_game_network_write()
     // JB: moved to do_game_network_world_update
 
     // send info about AI/missles state here
-    if(gameNetworkState.hostInfo.hosting /*&& time_ms - network_objects_update_time_last > update_frequency_ms*/)
+    if(gameNetworkState.hostInfo.hosting && network_time_ms - network_objects_update_time_last >= update_frequency_ms)
     {
         network_objects_update_time_last = network_time_ms;
         
@@ -1566,14 +1576,15 @@ do_game_network_world_update()
                         do_game_network_handle_msg(&netMsg, &gameNetworkState.hostInfo.addr, network_time_ms);
                     }
                     
+                    // make the original inert
                     world_object_set_lifetime(pNode->elem->elem_id, 1);
+                    pNode->elem->object_type = OBJ_DISPLAYONLY;
                 }
                 break;
                     
                 case OBJ_BULLET:
                 {
                     netMsg.cmd = GAME_NETWORK_MSG_FIRE_BULLET;
-                    netMsg.rebroadcasted = 0;
                     get_world_elem_info(pNode->elem->elem_id, &netMsg);
                     
                     // add bullet-action
@@ -1613,7 +1624,6 @@ do_game_network_world_update()
                 case OBJ_WRECKAGE:
                 {
                     netMsg.cmd = GAME_NETWORK_MSG_KILLED;
-                    netMsg.rebroadcasted = 0;
                     get_world_elem_info(pNode->elem->elem_id, &netMsg);
                     gameNetwork_send(&netMsg);
                 }
@@ -1623,7 +1633,6 @@ do_game_network_world_update()
                 if(gameNetworkState.hostInfo.hosting)
                 {
                     netMsg.cmd = GAME_NETWORK_MSG_ADD_OBJECT;
-                    netMsg.rebroadcasted = 0;
                     netMsg.player_id = gameNetworkState.my_player_id;
                     get_world_elem_info(pNode->elem->elem_id, &netMsg);
                     gameNetwork_send(&netMsg);
@@ -1652,7 +1661,7 @@ do_game_network_world_update()
             {
                 euler[i] = ((pInfo->euler_last[i][0] - pInfo->euler_last[i][1]) /
                             (pInfo->timestamp_last[0] - pInfo->timestamp_last[1])) *
-                    (time_ms - pInfo->euler_last_interp);
+                    (network_time_ms - pInfo->euler_last_interp);
             }
             
             WorldElemListNode* pElemNode = world_elem_list_find(pInfo->elem_id, &gWorld->elements_moving);
@@ -1905,6 +1914,9 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
     game_timeval_t t;
     int net_obj_id;
     int interp_velo = 1;
+    char* ptrStr;
+    
+    if(!gameNetworkState.connected) return;
     
     if(gameNetworkState.gameNetworkHookOnMessage != NULL)
     {
@@ -2395,6 +2407,11 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                 break;
                 
             case GAME_NETWORK_MSG_ALERT_END:
+                if((ptrStr = strstr(gameNetworkState.gameStatsMessage, REMAINING_TIME_STR)))
+                {
+                    sscanf(ptrStr + strlen(REMAINING_TIME_STR), "%f", &gameNetworkState.time_game_remaining);
+                }
+                
                 gameDialogNetworkGameStatus();
                 break;
                 
@@ -2472,8 +2489,16 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                 break;
                 
             case GAME_NETWORK_MSG_ENDGAME:
-                gameDialogNetworkGameStatus();
-                gameNetwork_disconnect();
+                {
+                    gameDialogNetworkGameEnded();
+                    
+                    //gameNetwork_disconnect();
+                    while(gameNetworkState.player_list_head.next)
+                    {
+                        gameNetwork_removePlayer(gameNetworkState.player_list_head.next->player_id);
+                    }
+                    gameNetwork_disconnect();
+                }
                 break;
                 
             case GAME_NETWORK_MSG_GET_MAP_REQUEST:
@@ -2659,6 +2684,10 @@ do_game_network_read()
     {
         do_game_network_read_core();
     }
+    else
+    {
+        usleep(100000000); // 100ms
+    }
 }
 
 void
@@ -2739,8 +2768,6 @@ gameNetwork_sendStatsAlert()
     gameNetworkPlayerInfo* pInfo;
     char str[4096];
     char tmp[128];
-    char nameBuf[32];
-    static int time_remaining_last = 1;
     int clear_stats = 0;
     const char* decor = "^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L\n";
     char *rows[] = {"NAME ","", "K^N   ", "D^M   ", "SHOTS", "PTS  ", "PING "};
@@ -2748,18 +2775,16 @@ gameNetwork_sendStatsAlert()
     char *pRowTop = NULL;
     static unsigned NAME_BREAK = 6;
     
-    if(game_time_remaining() <= 0 && time_remaining_last > 0)
+    if(gameStateSinglePlayer.started && game_time_remaining() <= 0)
     {
         clear_stats = 1;
-        send_endgame();
     }
-    time_remaining_last = game_time_remaining();
     
     str[0] = '\0';
     strncat(str, "ALERT:\n", sizeof(str)-1);
     
     strncat(str, decor, sizeof(str)-1);
-    sprintf(tmp, "remaining time: %f\n", game_time_remaining());
+    sprintf(tmp, "%s%lu\n", REMAINING_TIME_STR, (unsigned long) game_time_remaining());
     strncat(str, tmp, sizeof(str)-1);
     strncat(str, decor, sizeof(str)-1);
     
@@ -2852,6 +2877,11 @@ gameNetwork_sendStatsAlert()
     strncat(str, decor, sizeof(str)-1);
     
     gameNetwork_alert(str);
+    
+    if(clear_stats)
+    {
+        send_endgame();
+    }
     
     //console_clear();
     //console_write(str);

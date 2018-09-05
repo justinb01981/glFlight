@@ -1705,6 +1705,9 @@ world_update(float tc)
                     pElem->physics.ptr->vz
                 };
                 
+                // TODO: get rid of this it's expensive
+                pElem->physics.ptr->velocity = sqrt(vm[0]*vm[0] + vm[1]*vm[1] + vm[2]*vm[2]);
+                
                 gWorld->world_update_state.world_rgn_remove_hook = NULL;
                 
                 remove_element_from_region(pElem);
@@ -1776,9 +1779,6 @@ world_update(float tc)
                     {
                         // MARK: -- attempt to move along vm
                         move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
-                        
-                        // TODO: get rid of this it's expensive
-                        pElem->physics.ptr->velocity = sqrt(vm[0]*vm[0] + vm[1]*vm[1] + vm[2]*vm[2]);
                         
                         // MARK: -- resolve collisions with other objects
                         collision_action_table_t* collision_actions_table_list[] =
@@ -1857,7 +1857,6 @@ world_update(float tc)
                                                     cl = 0;
                                                     FRcollision -= collision_repulsion_coeff/FRdiv;
                                                     
-                                                    
                                                     if(pElem->elem_id == my_ship_id && !sound_played)
                                                     {
                                                         sound_played = 1;
@@ -1869,10 +1868,6 @@ world_update(float tc)
                                                     
                                                     goto region_collision_retry;
                                                 }
-                                                
-                                                game_handle_collision(pElem, pElemCollided, colact);
-                                                gameNetwork_handle_collision(pElem, pElemCollided, colact);
-                                                game_ai_collision(pElem, pElemCollided, colact);
 
                                                 if(!world_elem_list_find_elem(pElem, &gWorld->elements_collided) &&
                                                    !world_elem_list_find_elem(pElemCollided, &gWorld->elements_collided))
@@ -1885,6 +1880,10 @@ world_update(float tc)
                                                     
                                                     pNodeA->userarg = colact;
                                                     pNodeB->userarg = colact;
+                                                    
+                                                    //game_handle_collision(pElem, pElemCollided, colact);
+                                                    //gameNetwork_handle_collision(pElem, pElemCollided, colact);
+                                                    //game_ai_collision(pElem, pElemCollided, colact);
                                                 }
                                             }
                                         }
@@ -1912,6 +1911,7 @@ world_update(float tc)
                     else
                     {
                         WorldElem* pCurRemoveElem = pElem;
+
                         
                         // out of bounds
                         world_elem_list_remove(pCurRemoveElem, &gWorld->elements_expiring);

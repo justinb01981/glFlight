@@ -20,7 +20,8 @@ typedef enum
 {
     NOT_CONNECTED = 0,
     HALF_CONNECTED = 1,
-    FULLY_CONNECTED = 2
+    WAITING_EVENT = 2,
+    FULLY_CONNECTED = 3
 } GameNetworkPeerConnectionState;
 
 @interface GameNetworkPeer : NSObject
@@ -30,6 +31,8 @@ typedef enum
 @property (assign) GameNetworkPeerConnectionState connected;
 @property (assign) int peerId;
 @property (atomic, retain) NSData* address;
+@property (atomic, retain) NSData* pendingData;
+@property (atomic) int spaceIsAvailable;
 
 @property (atomic, retain) NSInputStream* inputStream;
 @property (atomic, retain) NSOutputStream* outputStream;
@@ -64,6 +67,8 @@ const int PEER_ID_INITIAL = 1001;
         service = nil;
         inputStream = nil;
         outputStream = nil;
+        _pendingData = nil;
+        _spaceIsAvailable = 0;
     }
     return self;
 }
@@ -77,6 +82,7 @@ const int PEER_ID_INITIAL = 1001;
         service = service;
         inputStream = nil;
         outputStream = nil;
+        _spaceIsAvailable = 0;
     }
     return self;
 }
@@ -134,6 +140,20 @@ const int PEER_ID_INITIAL = 1001;
 
 - (NSInteger) sendMsg:(gameNetworkMessage*)msg
 {
+    if(self.connected != FULLY_CONNECTED)
+    {
+        NSLog(@"sendMsg but not FULLY_CONNECTED, enqueuing");
+        
+        self.pendingData = [NSData dataWithBytes:msg length:sizeof(*msg)];
+        return sizeof(gameNetworkMessage);
+    }
+    
+    if(!self.spaceIsAvailable)
+    {
+        NSLog(@"sendMsg dropping data");
+        return sizeof(*msg);
+    }
+    
     NSInteger w = [outputStream write:(uint8_t*)msg maxLength:sizeof(*msg)];
     if(w != sizeof(*msg))
     {
@@ -148,6 +168,18 @@ const int PEER_ID_INITIAL = 1001;
 
 - (void) becameConnected
 {
+    if(self.connected < FULLY_CONNECTED) self.connected = FULLY_CONNECTED;
+    
+    if(self.pendingData)
+    {
+        NSLog(@"BONJOUR becameConnected\n");
+        
+        gameNetworkMessage* msg = (gameNetworkMessage*) [self.pendingData bytes];
+        
+        [self sendMsg:msg];
+        
+        self.pendingData = nil;
+    }
 }
 
 - (void) disconnect
@@ -452,14 +484,16 @@ static GameNetworkBonjourManager* instance;
     switch(eventCode) {
             
         case NSStreamEventOpenCompleted: {
-            peer.connected = peer.inputStream && peer.outputStream ? FULLY_CONNECTED : HALF_CONNECTED;
-            if(peer.connected == FULLY_CONNECTED)
+            peer.connected = peer.inputStream && peer.outputStream ? WAITING_EVENT : HALF_CONNECTED;
+            if(peer.connected == WAITING_EVENT)
             {
                 NSLog(@"BONJOUR connected\n");
             }
         } break;
             
         case NSStreamEventHasSpaceAvailable: {
+            NSLog(@"BONJOUR NSStreamEventHasSpaceAvailable\n");
+            peer.spaceIsAvailable = true;
             if([peer outputStream] == stream)
             {
                 [peer becameConnected];
@@ -467,6 +501,7 @@ static GameNetworkBonjourManager* instance;
         } break;
             
         case NSStreamEventHasBytesAvailable: {
+            NSLog(@"BONJOUR NSStreamEventHasBytesAvailable\n");
             NSInteger   bytesRead;
             gameNetworkMessageQueued* msg;
             

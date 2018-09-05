@@ -1558,7 +1558,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = d0gf1ght;
-				PROVISIONING_PROFILE = "a1560fb6-f668-4b30-b185-bb3fd1361ada";
 				PROVISIONING_PROFILE_SPECIFIER = "d0gfight2 Development";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7 arm7s";
@@ -1583,8 +1582,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = d0gf1ght;
-				PROVISIONING_PROFILE = "4f2d72cc-2578-4b54-8dca-f212ba08c3e4";
-				PROVISIONING_PROFILE_SPECIFIER = "d0gfight2 Development";
+				PROVISIONING_PROFILE_SPECIFIER = "d0gfight2 Distribution";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 arm7s arm64";
@@ -1594,8 +1592,8 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: JUSTIN Brady (75WG2NT9R8)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Justin Brady (FP3HEP75WZ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1617,8 +1615,8 @@
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Distribution: JUSTIN Brady (ZQVH66AQJ9)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: JUSTIN Brady (ZQVH66AQJ9)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = GAME_PLATFORM_IOS;
 				GCC_VERSION = "";
@@ -1659,8 +1657,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.spacecombat1995;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "0fb38577-a5a2-4383-a922-bad9b72c5386";
-				PROVISIONING_PROFILE_SPECIFIER = "spacecombat1995 Development";
+				PROVISIONING_PROFILE_SPECIFIER = "Space Combat 1995 - 8-5-2018";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7 arm7s";
 			};
@@ -1671,7 +1668,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = YES;
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
@@ -1690,8 +1687,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.spacecombat1995;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "0fb38577-a5a2-4383-a922-bad9b72c5386";
-				PROVISIONING_PROFILE_SPECIFIER = "spacecombat1995 Development";
+				PROVISIONING_PROFILE_SPECIFIER = "Space Combat 1995 - 8-5-2018";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 arm7s arm64";
