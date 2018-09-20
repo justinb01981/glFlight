@@ -572,10 +572,9 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         elem->stuff.u.enemy.collided = 0;
         // force firing a bullet (in case of object-collision, run through)
         fireBullet = 1;
-        //dist = 0;
-        dist = 1;
         zdot = zdot_ikillyou;
-        vdesired = 1.0;    }
+        vdesired = 1.0;
+    }
 
     if(!slerp_done)
     {

@@ -174,6 +174,7 @@
 		D0B4C4D11A325F1500F125D4 /* texture84.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CE1A325F1500F125D4 /* texture84.bmp */; };
 		D0B4C4D21A325F1500F125D4 /* texture85.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CF1A325F1500F125D4 /* texture85.bmp */; };
 		D0B4C4D41A32616B00F125D4 /* texture86.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4D31A32616B00F125D4 /* texture86.bmp */; };
+		D0B6A15621406F1000DB6E7D /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0B6A15521406F1000DB6E7D /* GameKit.framework */; };
 		D0B918F01F5BC27B0073ECD6 /* engineloop.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0B918EF1F5BC27B0073ECD6 /* engineloop.wav */; };
 		D0BCBFB1175FE67F00003168 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */; };
 		D0BCC8FD2052EDC100094809 /* texture50.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D07B356518527FE200900D60 /* texture50.bmp */; };
@@ -620,6 +621,7 @@
 		D0B4C4CE1A325F1500F125D4 /* texture84.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture84.bmp; sourceTree = "<group>"; };
 		D0B4C4CF1A325F1500F125D4 /* texture85.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture85.bmp; sourceTree = "<group>"; };
 		D0B4C4D31A32616B00F125D4 /* texture86.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture86.bmp; sourceTree = "<group>"; };
+		D0B6A15521406F1000DB6E7D /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		D0B918EF1F5BC27B0073ECD6 /* engineloop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engineloop.wav; sourceTree = "<group>"; };
 		D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		D0BCBFB3176136CF00003168 /* gameLock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameLock.h; sourceTree = "<group>"; };
@@ -698,6 +700,7 @@
 				D0BCC9C42052EDC100094809 /* CoreMotion.framework in Frameworks */,
 				D0BCC9C52052EDC100094809 /* AVFoundation.framework in Frameworks */,
 				D0BCC9C62052EDC100094809 /* AudioToolbox.framework in Frameworks */,
+				D0B6A15621406F1000DB6E7D /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1004,6 +1007,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D0B6A15521406F1000DB6E7D /* GameKit.framework */,
 				D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */,
 				D0AD4F6516D6F11600664895 /* AVFoundation.framework */,
 				D033788614D9FEFD00FD8A74 /* CoreMotion.framework */,
@@ -1091,6 +1095,11 @@
 					D0BCC8FB2052EDC100094809 = {
 						DevelopmentTeam = ZQVH66AQJ9;
 						ProvisioningStyle = Manual;
+						SystemCapabilities = {
+							com.apple.GameCenter.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -1599,6 +1608,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					DEBUG,
 					GAME_PLATFORM_IOS,
+					DEVICEMOTION_USE_GYRO_DATA,
 				);
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1618,7 +1628,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_PREPROCESSOR_DEFINITIONS = GAME_PLATFORM_IOS;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					GAME_PLATFORM_IOS,
+					DEVICEMOTION_USE_GYRO_DATA,
+				);
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -1657,6 +1670,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.spacecombat1995;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "e3be0a42-dc41-4851-888c-78f70981119f";
 				PROVISIONING_PROFILE_SPECIFIER = "Space Combat 1995 - 8-5-2018";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7 arm7s";
@@ -1687,7 +1701,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.spacecombat1995;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "Space Combat 1995 - 8-5-2018";
+				PROVISIONING_PROFILE_SPECIFIER = "spacecombat1995-9-5-2018";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 arm7s arm64";

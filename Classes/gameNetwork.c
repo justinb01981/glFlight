@@ -2077,6 +2077,15 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                         (msg->params.f[3] - pPlayerElem->physics.ptr->z) * (1000.0 / (t - playerInfo->timestamp_last[0]))
                     };
                     
+                    // adjust timing depending up or down depending on which is closer to new position
+                    float plottedMore[3], plottedLess[3], plottedCompare[3];
+                    for(int d = 0; d < 3; d++)
+                    {
+                        plottedMore[d] = predict_a1_at_b1_for_a_over_b(playerInfo->loc_last[d], playerInfo->timestamp_last, t+playerInfo->timestamp_adjust+1);
+                        plottedLess[d] = predict_a1_at_b1_for_a_over_b(playerInfo->loc_last[d], playerInfo->timestamp_last, t+playerInfo->timestamp_adjust-1);
+                        plottedCompare[d] = msg->params.f[1+d];
+                    }
+                    
                     // log location
                     for(int i = 2; i > 0; i--)
                     {
@@ -2101,6 +2110,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                         pPlayerElem->physics.ptr->y,
                         pPlayerElem->physics.ptr->z
                     };
+                    
                     float time_win = playerInfo->timestamp_last[0] - playerInfo->timestamp_last[2];
                     if(interp_velo && time_win < update_frequency_ms * velo_interp_update_mult && time_win > 0)
                     {
@@ -2110,15 +2120,21 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                         {
                             v1[d] = predict_a1_at_b1_for_a_over_b(playerInfo->loc_last[d],
                                                                   playerInfo->timestamp_last,
-                                                                  t + 1000);
+                                                                  t + 1000 + playerInfo->timestamp_adjust);
                             v[d] = v1[d] - v[d];
                         }
                         
-                        // calculate delta between predicted vel and sent-velocity
-                        playerInfo->vel_predict_delta = pPlayerElem->physics.ptr->velocity -
-                            sqrt(msg->params.f[7]*msg->params.f[7] +
-                                 msg->params.f[8]*msg->params.f[8] +
-                                 msg->params.f[9]*msg->params.f[9]);
+                        if(distance(plottedLess[0], plottedLess[1], plottedLess[2], plottedCompare[0], plottedCompare[1], plottedCompare[2]) <
+                           distance(plottedMore[0], plottedMore[1], plottedMore[2], plottedCompare[0], plottedCompare[1], plottedCompare[2]))
+                        {
+                            playerInfo->timestamp_adjust--;
+                        }
+                        else
+                        {
+                            playerInfo->timestamp_adjust++;
+                        }
+                        
+                        printf("playerInfo->timestamp_adjust:%f\n", playerInfo->timestamp_adjust);
                     }
                     else
                     {

@@ -152,6 +152,7 @@ struct gameNetworkPlayerInfo
     gameNetworkSocket stream_socket;
     game_timeval_t time_last_update;
     game_timeval_t timestamp_last[3];
+    game_timeval_t timestamp_adjust;
     game_timeval_t time_ping;
     game_timeval_t network_latency;
     game_timeval_t time_status_last;

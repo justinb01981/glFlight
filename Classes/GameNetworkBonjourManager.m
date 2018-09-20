@@ -492,7 +492,7 @@ static GameNetworkBonjourManager* instance;
         } break;
             
         case NSStreamEventHasSpaceAvailable: {
-            NSLog(@"BONJOUR NSStreamEventHasSpaceAvailable\n");
+            //NSLog(@"BONJOUR NSStreamEventHasSpaceAvailable\n");
             peer.spaceIsAvailable = true;
             if([peer outputStream] == stream)
             {
@@ -501,7 +501,7 @@ static GameNetworkBonjourManager* instance;
         } break;
             
         case NSStreamEventHasBytesAvailable: {
-            NSLog(@"BONJOUR NSStreamEventHasBytesAvailable\n");
+            //NSLog(@"BONJOUR NSStreamEventHasBytesAvailable\n");
             NSInteger   bytesRead;
             gameNetworkMessageQueued* msg;
             
