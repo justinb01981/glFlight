@@ -461,6 +461,23 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             elem->stuff.u.enemy.time_next_retarget = time_ms + 3000;
         }
         
+        // avoid boundaries
+        {
+            float S = 5.0;
+            float dest[3] = {elem->physics.ptr->x + zq.x*S, elem->physics.ptr->y + zq.y*S, elem->physics.ptr->z + zq.z*S};
+            float result[3];
+            if(world_bounding_violations(dest, result) && zdot < 0.7)
+            {
+                elem->stuff.u.enemy.tgt_x = elem->physics.ptr->x + S*2*result[0];
+                elem->stuff.u.enemy.tgt_y = elem->physics.ptr->y + S*2*result[1];
+                elem->stuff.u.enemy.tgt_z = elem->physics.ptr->z + S*2*result[2];
+                
+                elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
+                elem->stuff.u.enemy.scan_distance = 1;
+                elem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
+            }
+        }
+        
         //
         if(time_ms >= elem->stuff.u.enemy.time_next_retarget &&
            zdot < zdot_juke &&

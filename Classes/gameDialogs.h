@@ -168,9 +168,10 @@ gameDialogMenuCountdown()
         return;
     }
     
+    glFlightDrawframeHook = NULL;
+    
     gameDialogWelcomeMenu();
     gameDialogGraphicCancel();
-    glFlightDrawframeHook = NULL;
 }
 
 static void
@@ -199,20 +200,21 @@ gameDialogGameOver()
 static void
 gameDialogWelcome()
 {
-    if(/*gameSettingsLaunchCount % 2 == 1 && !gameSettingsRatingGiven*/ 0)
+    gameInterfaceControls.calibrateRect.visible = 0;
+    
+    if(/*gameSettingsLaunchCount % 2 == 1 &&  */ !gameSettingsRatingGiven)
     {
         gameInterfaceModalDialog(WELCOMESTR
-                                 "Please rate d0gf1ght\n"
-                                 "to get new jets/levels!\n",
+                                 "Please rate d0gf1ght!\n"
+                                 "Unlock new vehicles in multiplayer!\n",
                                  "Sure", "No way",
-                                 gameDialogWelcomeRating, gameDialogWelcomeNoRating);
+                                 gameDialogWelcomeRating, /*gameDialogWelcomeNoRating*/ gameDialogWelcomeMenu);
     }
     else
     {
         glFlightDrawframeHook = gameDialogMenuCountdown;
+        gameDialogClose();
     }
-    
-    gameDialogClose();
 }
 
 static void
@@ -227,6 +229,7 @@ gameDialogCalibrate()
     gameInterfaceModalDialogDequeue();
     
     gameInputInit();
+    /*
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
                              "^C                             ^C\n"
@@ -237,6 +240,8 @@ gameDialogCalibrate()
                              "^C                             ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
                              "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
+     */
+    gameInterfaceControls.calibrateRect.visible = 1;
 }
 
 static void

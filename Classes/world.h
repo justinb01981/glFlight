@@ -151,6 +151,8 @@ void world_move_elem(WorldElem* pElem, float x, float y, float z, int relative);
 
 void world_repulse_elem(WorldElem* pCollisionFast, WorldElem* pCollisionSlow, float tc, float Frepulse);
 
+int world_bounding_violations(float location[3], float vnormal[3]);
+
 void
 world_add_mesh(float x, float y, float z,
                float dx_r, float dy_r, float dz_r,

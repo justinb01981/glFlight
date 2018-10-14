@@ -25,7 +25,9 @@ enum
     COLLISION_ACTION_REPULSE = 2,
     COLLISION_ACTION_FLAG = 3,
     COLLISION_ACTION_SPAWNPOINT_TELEPORT = 4,
-    COLLISION_ACTION_POWERUP_GRAB = 5
+    COLLISION_ACTION_POWERUP_GRAB = 5,
+    COLLISION_ACTION_POWERUP_CAPTURE = 6,
+    COLLISION_ACTION_NEXTLEVEL = 7
 };
 
 typedef unsigned int collision_action_t;
@@ -36,21 +38,21 @@ const static collision_action_t
 collision_actions_default[OBJ_LAST][OBJ_LAST] =
 {
     {0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0,       2, 0, 0, 0, 0, 0, 2, 0, 0}, // unknown
-    {2, 2, 2, 0, 2, 2, 1, 0, 0, 0, 0,       3, 1, 0, 0, 0, 0, 1, 0, 0}, // ship
-    {2, 2, 2, 3, 2, 2, 1, 4, 3, 0, 0, /*3*/ 5, 1, 0, 1, 0, 0, 0, 0, 0}, // player
+    {2, 2, 2, 0, 2, 2, 1, 0, 0, 0, 0,       5, 1, 0, 0, 0, 0, 1, 0, 0}, // ship
+    {2, 2, 2, 3, 2, 2, 1, 4, 7, 0, 0, /*3*/ 5, 1, 0, 1, 0, 0, 0, 0, 0}, // player
     {0, 0, 2, 2, 0, 2, 1, 0, 0, 0, 0,       0, 0, 1, 0, 0, 0, 0, 0, 0}, // turret
     {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // block_moving
     {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // block
     {1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,       0, 1, 0, 0, 0, 0, 0, 0, 0}, // bullet
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // portal
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // spawnpoint
+    {0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // spawnpoint
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // poopedcube
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // wreckage
-    {2, 3, 5, 0, 2, 2, 0, 0, 3, 0, 0,       0, 0, 0, 0, 3, 0, 0, 0, 0}, // powerup generic
+    {2, 5, 5, 0, 2, 2, 0, 0, 3, 0, 0,       0, 0, 0, 0, 6, 0, 0, 0, 0}, // powerup generic
     {0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // capture
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // base
     {1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,       0, 1, 0, 0, 0, 0, 0, 0, 0}, // missle
-    {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // spawnpoint enemy
+    {0, 0, 3, 0, 0, 0, 0, 0, 3, 0, 0,       6, 0, 0, 0, 0, 0, 0, 0, 0}, // spawnpoint enemy
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // DISPLAYONLY
     {2, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // BALL
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // reserved
@@ -66,22 +68,13 @@ extern collision_action_t collision_actions[OBJ_LAST][OBJ_LAST];
 extern char collidedPortalNametagLast[256];
 
 inline static void
-collision_actions_set_stage1()
-{
-    collision_actions_stage1[OBJ_SPAWNPOINT][OBJ_POWERUP_GENERIC] = COLLISION_ACTION_DAMAGE;
-    collision_actions_stage1[OBJ_POWERUP_GENERIC][OBJ_SPAWNPOINT] = COLLISION_ACTION_DAMAGE;
-    collision_actions_stage1[OBJ_SPAWNPOINT_ENEMY][OBJ_POWERUP_GENERIC] = COLLISION_ACTION_DAMAGE;
-    collision_actions_stage1[OBJ_POWERUP_GENERIC][OBJ_SPAWNPOINT_ENEMY] = COLLISION_ACTION_DAMAGE;
-}
-
-inline static void
 collision_actions_set_default()
 {
     for(int r = 0; r < OBJ_LAST; r++)
         for(int c = 0; c < OBJ_LAST; c++)
         {
             collision_actions[r][c] = collision_actions_default[r][c];
-            collision_actions_stage1[r][c] = COLLISION_ACTION_NONE;
+            collision_actions[c][r] = collision_actions_default[c][r];
         }
     
     // check that both actions agree
@@ -90,8 +83,6 @@ collision_actions_set_default()
         {
             DBPRINTF(("Warning: collision_actions_default row/column mismatch: r=%d c=%d\n", r, c));
         }
-    
-    collision_actions_set_stage1();
 }
 
 inline static void
@@ -186,18 +177,13 @@ do_world_collision_handling(float tc)
             case COLLISION_ACTION_NONE:
                 break;
                     
-            case COLLISION_ACTION_POWERUP_GRAB:
-                // swap if necessary
-                if(pCollisionA->elem->object_type == OBJ_POWERUP_GENERIC)
-                {
-                    pCollisionTmp = pCollisionA;
-                    pCollisionA = pCollisionB;
-                    pCollisionB = pCollisionTmp;
-                }
-                    
             case COLLISION_ACTION_FLAG:
                 pCollisionA->elem->stuff.flags.mask |= pCollisionB->elem->stuff.flags.mask;
                 // continue to normal damage handling
+                    
+            case COLLISION_ACTION_POWERUP_CAPTURE:
+                    
+            case COLLISION_ACTION_POWERUP_GRAB:
                     
             case COLLISION_ACTION_DAMAGE:
                 // bullet placing object?

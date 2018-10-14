@@ -66,7 +66,6 @@ int resumeCountDown = 0;
         return;
     }
     
-#if DEVICEMOTION_USE_GYRO_DATA
     if(!refMotion || gameInputTrimPending())
     {
         //if(refMotion) [refMotion release];
@@ -82,13 +81,10 @@ int resumeCountDown = 0;
         
         gameInputGyro([attitude roll], [attitude pitch], [attitude yaw]);
     }
-#else
+
     CMRotationRate r = [motion rotationRate];
     
-    motionRoll += r.y*0.01;
-    motionPitch += r.x*0.01;
-    motionYaw += r.z*0.01;
-#endif
+    gameInputMotion(r.z, r.x, r.y);
 }
 
 -(cocoaGyroManager*) initialize

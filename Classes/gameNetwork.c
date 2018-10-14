@@ -2127,11 +2127,11 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                         if(distance(plottedLess[0], plottedLess[1], plottedLess[2], plottedCompare[0], plottedCompare[1], plottedCompare[2]) <
                            distance(plottedMore[0], plottedMore[1], plottedMore[2], plottedCompare[0], plottedCompare[1], plottedCompare[2]))
                         {
-                            playerInfo->timestamp_adjust--;
+                            if(playerInfo->timestamp_adjust > update_frequency_ms*2) playerInfo->timestamp_adjust--;
                         }
                         else
                         {
-                            playerInfo->timestamp_adjust++;
+                            if(playerInfo->timestamp_adjust < update_frequency_ms*2) playerInfo->timestamp_adjust++;
                         }
                         
                         printf("playerInfo->timestamp_adjust:%f\n", playerInfo->timestamp_adjust);
@@ -2973,7 +2973,7 @@ gameNetwork_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_a
     {
         if(collision_action == COLLISION_ACTION_POWERUP_GRAB)
         {
-            gameNetwork_getPlayerInfo(elemA->stuff.affiliation, &pInfo, 0);
+            gameNetwork_getPlayerInfo(elemB->stuff.affiliation, &pInfo, 0);
             
             if(pInfo)
             {

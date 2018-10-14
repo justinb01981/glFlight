@@ -20,6 +20,7 @@ typedef struct
     int tex_id;
     int touch_began;
     int visible;
+    int ignore_touch;
     int hide_frames;
     int blinking;
     double touch_rx, touch_ry;
@@ -61,6 +62,7 @@ typedef struct {
     controlRect consoleTextRect;
     controlRect statsTextRect;
     controlRect keyboardEntry;
+    controlRect calibrateRect;
     
     controlRect dialogRectDefault;
     
@@ -86,6 +88,8 @@ typedef struct {
     
     float touchUnmappedX, touchUnmappedY;
     float touchUnmapped;
+    
+    controlRect* pTouchedLastControl;
 
 } controls;
 

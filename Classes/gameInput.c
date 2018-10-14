@@ -83,11 +83,13 @@ float inputAvg[3][AVG_INPUTS_LENGTH];
 int inputAvg_i = 0;
 int initialized = 0;
 double motionRoll, motionPitch, motionYaw;
+double motionRollMotion, motionPitchMotion, motionYawMotion;
 double roll_m, pitch_m, yaw_m;
 int trimCount = 0;
 int trimCountLast = 0;
 unsigned int gyroInputCount = 0;
 int gyroStableCount = 0;
+int gyroStableCountThresh = (GYRO_SAMPLE_RATE*4);
 float gyroInputDeltaLast[3] = {0, 0, 0};
 float fcr = 0.0, fcp = 0.0, fcy = 0.0;
 float gyroInputStableThresh = 0.01;
@@ -190,18 +192,39 @@ gameInputGyro2(float roll, float pitch, float yaw, float c)
 }
 
 void
+gameInputMotion(float roll, float pitch, float yaw)
+{
+    motionRollMotion = roll;
+    motionPitchMotion = pitch;
+    motionYawMotion = yaw;
+}
+
+void
 gyro_calibrate_log(float pct)
 {
+    char buf[1024];
+    
     console_clear();
-    console_write("calibrating: ^2^2");
+
+    sprintf(buf, "calibrating: ");
+    char *p = buf + strlen(buf);
+    
     int s = 0;
     float width = (24.0 * pct) / 100;
     for(s = 0; s < width && s <= 24; s++)
     {
-        console_append("^I");
+        *p++ = '^';
+        *p++ = 'I';
     }
-    while(s < 24) { console_append("^J"); s++; }
-    console_append("^1^1 \n");
+    while(s < 24)
+    {
+        *p++ = '^';
+        *p++ = 'J';
+        s++;
+    }
+    
+    *p++ = '\0';
+    console_write(buf);
     console_flush();
 }
 
@@ -230,7 +253,6 @@ gameInput()
 #endif
     
     float s[3] = {deviceRoll, devicePitch, deviceYaw};
-    
     
     if(!initialized)
     {
@@ -282,7 +304,7 @@ gameInput()
             
             gyro_calibrate_log((float) gyroStableCount / (float) (GYRO_SAMPLE_RATE*4) * 100);
             
-            if(gyroStableCount >= (GYRO_SAMPLE_RATE*4))
+            if(gyroStableCount >= gyroStableCountThresh)
             {
                 console_append("\ndone\n");
                 needTrim = 0;

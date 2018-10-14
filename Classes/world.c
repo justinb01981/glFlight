@@ -1739,6 +1739,7 @@ world_update(float tc)
                 {
                     int bounding_enforced = 0;
                     int i;
+
                     for(i = 0; i < gWorld->boundingRegion->nVectorsInited; i++)
                     {
                         float U[] = {vm[0]*tc, vm[1]*tc, vm[2]*tc};
@@ -1783,7 +1784,6 @@ world_update(float tc)
                         // MARK: -- resolve collisions with other objects
                         collision_action_table_t* collision_actions_table_list[] =
                         {
-                            &collision_actions_stage1,
                             &collision_actions,
                             NULL
                         };
@@ -1869,21 +1869,65 @@ world_update(float tc)
                                                     goto region_collision_retry;
                                                 }
 
-                                                if(!world_elem_list_find_elem(pElem, &gWorld->elements_collided) &&
-                                                   !world_elem_list_find_elem(pElemCollided, &gWorld->elements_collided))
+                                            collision_list_add_retry:
                                                 {
-                                                    WorldElemListNode* pNodeA =
-                                                    world_elem_list_add(pElem, &gWorld->elements_collided);
+                                                    WorldElemListNode *nA, *nB;
                                                     
-                                                    WorldElemListNode* pNodeB =
-                                                    world_elem_list_add(pElemCollided, &gWorld->elements_collided);
+                                                    nA = world_elem_list_find_elem(pElem, &gWorld->elements_collided);
+                                                    nB = world_elem_list_find_elem(pElemCollided, &gWorld->elements_collided);
                                                     
-                                                    pNodeA->userarg = colact;
-                                                    pNodeB->userarg = colact;
-                                                    
-                                                    //game_handle_collision(pElem, pElemCollided, colact);
-                                                    //gameNetwork_handle_collision(pElem, pElemCollided, colact);
-                                                    //game_ai_collision(pElem, pElemCollided, colact);
+                                                    if(!nA && !nB)
+                                                    {
+                                                        WorldElemListNode* pNodeA, *pNodeB;
+                                                        
+                                                        // HACK: order by durability to make collision-list parsing simpler (list is LIFO)
+                                                        if(pElem->durability <= pElemCollided->durability)
+                                                        {
+                                                            pNodeB = world_elem_list_add(pElemCollided, &gWorld->elements_collided);
+                                                        }
+                                                        else
+                                                        {
+                                                            pNodeA = world_elem_list_add(pElem, &gWorld->elements_collided);
+                                                        }
+                                                        
+                                                        if(pElem->durability <= pElemCollided->durability)
+                                                        {
+                                                            pNodeA = world_elem_list_add(pElem, &gWorld->elements_collided);
+                                                        }
+                                                        else
+                                                        {
+                                                            pNodeB = world_elem_list_add(pElemCollided, &gWorld->elements_collided);
+                                                        }
+                                                        
+                                                        pNodeA->elem_collided = pNodeB->elem;
+                                                        pNodeB->elem_collided = pNodeA->elem;
+                                                        pNodeA->userarg = colact;
+                                                        pNodeB->userarg = colact;
+                                                        
+                                                        //game_handle_collision(pElem, pElemCollided, colact);
+                                                        //gameNetwork_handle_collision(pElem, pElemCollided, colact);
+                                                        //game_ai_collision(pElem, pElemCollided, colact);
+                                                    }
+                                                    else
+                                                    {
+                                                        if((nA && nA->userarg < colact) ||
+                                                           (nB && nB->userarg < colact))
+                                                        {
+                                                            if(nA)
+                                                            {
+                                                                if(nA->elem_collided) world_elem_list_remove(nA->elem_collided, &gWorld->elements_collided);
+                                                                world_elem_list_remove(nA->elem, &gWorld->elements_collided);
+                                                            }
+                                                            
+                                                            if(nB)
+                                                            {
+                                                                if(nB->elem_collided) world_elem_list_remove(nB->elem_collided, &gWorld->elements_collided);
+                                                                world_elem_list_remove(nB->elem, &gWorld->elements_collided);
+                                                            }
+                                                            
+                                                            goto collision_list_add_retry;
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -2260,4 +2304,35 @@ world_build_run_program(float x, float y, float z)
                 world_add_object(MODEL_ICOSAHEDRON, x + c[0], y + c[1], z + c[2], 0, 0, 0, 2, TEXTURE_ID_BALL);
         }
     }
+}
+
+int
+world_bounding_violations(float location[3], float vnormal[3])
+{
+    int i;
+    for(i = 0; i < gWorld->boundingRegion->nVectorsInited; i++)
+    {
+        float U[] = {location[0], location[1], location[2]};
+        // normal unit vector
+        float V[] = {gWorld->boundingRegion->v[i].f[3], gWorld->boundingRegion->v[i].f[4], gWorld->boundingRegion->v[i].f[5]};
+        float P[3];
+        
+        P[0] = gWorld->boundingRegion->v[i].f[0] + U[0];
+        P[1] = gWorld->boundingRegion->v[i].f[1] + U[1];
+        P[2] = gWorld->boundingRegion->v[i].f[2] + U[2];
+        
+        float dot = dot2(V, P);
+        
+        if(dot < 0.001)
+        {
+            for(i = 0; i < 3; i++)
+            {
+                // return 1 and the normal vector that was in conflict
+                vnormal[i] = V[i];
+                return 1;
+            }
+        }
+    }
+    
+    return 0;
 }

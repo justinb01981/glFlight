@@ -11,8 +11,6 @@
 #import "quaternions.h"
 #include "gameInput.h"
 
-#define DEVICEMOTION_USE_GYRO_DATA 1
-
 @interface cocoaGyroManager : CMMotionManager {
 
 	bool initialized;

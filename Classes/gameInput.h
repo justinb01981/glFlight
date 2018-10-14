@@ -39,6 +39,9 @@ void
 gameInputGyro2(float roll, float pitch, float yaw, float c);
 
 void
+gameInputMotion(float roll, float pitch, float yaw);
+
+void
 gameInput();
 
 int

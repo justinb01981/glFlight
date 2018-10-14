@@ -224,6 +224,7 @@ typedef enum
 
 struct WorldElemListNode {
     WorldElem* elem;
+    WorldElem* elem_collided;
     struct WorldElemListNode* next;
     unsigned int type:8, userarg:8;
     simple_hash_table_t* hash_ptr;

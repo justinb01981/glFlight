@@ -812,6 +812,22 @@ void drawControls()
                     gameInterfaceModalDialogDequeue();
                 }
             }
+            else if(controls[i] == &gameInterfaceControls.calibrateRect)
+            {
+                if(bindTexture(TEXTURE_ID_CALIBRATE_CURSOR))
+                {
+                    extern double motionRollMotion, motionPitchMotion, motionYawMotion, roll_m, pitch_m, yaw_m;
+                    extern int gyroStableCount, gyroStableCountThresh;
+                    float S = 0.2;
+                    float g1 = gyroStableCount, g2 = gyroStableCountThresh;
+                    subElements[0].tex_id = TEXTURE_ID_CALIBRATE_CURSOR;
+                    subElements[0].x = 0.5 - S/2 + ((motionRollMotion) / M_PI)*(1.0 - ((float) 1.0/g2) * (float) g1);
+                    subElements[0].y = 0.5 - S/2 + ((motionPitchMotion) / M_PI)*(1.0 - ((float) 1.0/g2) * (float) g1);
+                    subElements[0].xw = S;
+                    subElements[0].yw = S;
+                    subElementsN++;
+                }
+            }
             
             // HACK: to flip instead of glRotatef
             r.y = screenHeight - r.y-r.yw;

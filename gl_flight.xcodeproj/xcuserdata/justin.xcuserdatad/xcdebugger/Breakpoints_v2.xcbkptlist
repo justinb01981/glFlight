@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/world_file.c"
-            timestampString = "557702196.845951"
+            timestampString = "560672012.4771971"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "495"
@@ -38,22 +38,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/gameInterface.c"
-            timestampString = "557858597.191117"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "291"
-            endingLineNumber = "291"
-            landmarkName = "gameInterfaceFindControl"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -74,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/gameGraphics.c"
-            timestampString = "557608134.123306"
+            timestampString = "561168629.427668"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "935"
-            endingLineNumber = "935"
+            startingLineNumber = "951"
+            endingLineNumber = "951"
             landmarkName = "drawControls"
             landmarkType = "9">
          </BreakpointContent>
@@ -89,76 +73,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Classes/gameDialogs.h"
-            timestampString = "557364098.032939"
+            filePath = "Classes/collision.h"
+            timestampString = "560764505.907069"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "48"
-            endingLineNumber = "48"
-            landmarkName = "gameDialogGraphicCancel()"
-            landmarkType = "9">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "gameDialogGraphicCancel"
-                  moduleName = "Space Combat 95"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
-                  timestampString = "543777762.382776"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "40"
-                  endingLineNumber = "40"
-                  offsetFromSymbolStart = "8">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "gameDialogGraphicCancel"
-                  moduleName = "Space Combat 95"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
-                  timestampString = "543777762.385663"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "40"
-                  endingLineNumber = "40"
-                  offsetFromSymbolStart = "8">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "gameDialogGraphicCancel"
-                  moduleName = "Space Combat 95"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
-                  timestampString = "543777762.387992"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "40"
-                  endingLineNumber = "40"
-                  offsetFromSymbolStart = "8">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/gamePlay.c"
-            timestampString = "557858597.191328"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1189"
-            endingLineNumber = "1189"
-            landmarkName = "game_handle_collision_powerup"
+            startingLineNumber = "190"
+            endingLineNumber = "190"
+            landmarkName = "do_world_collision_handling(float tc)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

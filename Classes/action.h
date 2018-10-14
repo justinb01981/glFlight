@@ -213,11 +213,11 @@ static void actions_display_menu(char *dest)
     
     sprintf(dest,
             "%s %s %s %s %s\n",
-            (actions_sub_cur == 0? "*MAIN*": "MAIN"),
-            (actions_sub_cur == 1? "*NET*": "NET"),
-            (actions_sub_cur == 2? "*GAME*": "GAME"),
-            (actions_sub_cur == 3? "*BUILD*": "BUILD"),
-            (actions_sub_cur == 4? "*SETTINGS*": "SETTINGS"));
+            (actions_sub_cur == 0? ">MAIN<": "MAIN"),
+            (actions_sub_cur == 1? ">NET<": "NET"),
+            (actions_sub_cur == 2? ">GAME<": "GAME"),
+            (actions_sub_cur == 3? ">BUILD<": "BUILD"),
+            (actions_sub_cur == 4? ">SETTINGS<": "SETTINGS"));
     int dlen = strlen(dest);
     while(dlen > 0 ) { strcat(dest, "-"); dlen--; }
     strcat(dest, "\n");

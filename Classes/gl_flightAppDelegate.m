@@ -103,7 +103,8 @@ void glFlightInit(gl_flightViewController* viewController)
     
     console_write("Welcome to d0gf1ght %s\n"
                   "http://www.domain17.net/d0gf1ght\n"
-                  "^D^Dnow with bluetooth local play!^D^D\n",
+                  "^D^Dnow with bluetooth local play!^D^D\n"
+                  "^D^DUnlock new vehicles in Multiplayer^D^D\n",
                   [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"] UTF8String]);
     
     gameInterfaceInit(viewWidth, viewHeight);

@@ -34,8 +34,6 @@ int texture_id_block = TEXTURE_ID_BLOCK;
 const char *charMap = "abcdefghijklmnopqrstuvwxyz0123456789. _-@!$%^&*";
 
 static unsigned int TOUCHES_MAX = 4;
-static float x_last[] = {-1, -1, -1, -1};
-static float y_last[] = {-1, -1, -1, -1};
 
 // variables scoped for fireAction menu handling
 unsigned int maps_list_idx = 0;
@@ -57,8 +55,8 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.interfaceHeight = screenHeight;
     gameInterfaceControls.interfaceWidth = screenWidth;
     
-    gameInterfaceControls.textWidth = screenWidth / 148;
-    gameInterfaceControls.textHeight = gameInterfaceControls.textWidth * 2.2 * (screenWidth/screenHeight);
+    gameInterfaceControls.textWidth = ceil(screenWidth / 148);
+    gameInterfaceControls.textHeight = ceil(gameInterfaceControls.textWidth * 2.2 * (screenWidth/screenHeight));
     
     // origin (in non-landscape mode) is upper left
     controlRect accelRect = {0, 0, screenWidth-(screenWidth*0.15), (screenHeight * 0.4507)/4};
@@ -229,6 +227,11 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.altControl.tex_id = TEXTURE_ID_CONTROLS_ROLL;
     gameInterfaceControls.altControl.visible = 0;
     
+    gameInterfaceControls.calibrateRect = gameInterfaceControls.dialogRectDefault;
+    gameInterfaceControls.calibrateRect.tex_id = TEXTURE_ID_CONTROLS_RADAR;
+    gameInterfaceControls.calibrateRect.visible = 0;
+    gameInterfaceControls.calibrateRect.ignore_touch  = 1;
+    
     i = 0;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.mainMenu;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.accelerator;
@@ -252,6 +255,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.statsTextRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.altControl;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.keyboardEntry;
+    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.calibrateRect;
     gameInterfaceControls.controlArray[i++] = NULL;
     
     i = 0;
@@ -290,7 +294,7 @@ gameInterfaceFindControl(float x, float y)
     
     for(int i = 0; controlSet[i] != NULL; i++)
     {
-        if(controlSet[i]->visible && controlSet[i] != &gameInterfaceControls.mainMenu &&
+        if(!controlSet[i]->ignore_touch && controlSet[i]->visible && controlSet[i] != &gameInterfaceControls.mainMenu &&
            x >= controlSet[i]->x && x < controlSet[i]->x+controlSet[i]->xw)
         {
             if(y >= controlSet[i]->y && y < controlSet[i]->y+controlSet[i]->yw)
@@ -314,8 +318,6 @@ gameInterfaceFindControl(float x, float y)
 void
 gameInterfaceHandleTouchMove(float x, float y)
 {
-    const float move_thresh = gameInterfaceControls.interfaceHeight/30;
-    
     if(gameInterfaceControls.touchId-1 >= TOUCHES_MAX) return;
     
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
@@ -342,19 +344,15 @@ gameInterfaceHandleTouchMove(float x, float y)
         gameInterfaceControls.touchUnmapped = 1;
     }
     
-    
-    if(fabs(x-x_last[gameInterfaceControls.touchId-1]) < move_thresh &&
-       fabs(y-y_last[gameInterfaceControls.touchId-1]) < move_thresh &&
-       touchedControl != &gameInterfaceControls.fire)
+    if(gameInterfaceControls.pTouchedLastControl == touchedControl &&
+       touchedControl != &gameInterfaceControls.accelerator)
     {
         return;
     }
+    gameInterfaceControls.pTouchedLastControl = touchedControl;
     
     // controls after this ignore move events
     if(!touchedControl || !touchedControl->touch_began) return;
-    
-    x_last[gameInterfaceControls.touchId-1] = x;
-    y_last[gameInterfaceControls.touchId-1] = y;
     
     if(touchedControl == &gameInterfaceControls.radar)
     {
@@ -456,7 +454,6 @@ void
 gameInterfaceHandleTouchBegin(float x, float y)
 {
     int rgnv = 0;
-    int i;
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
     
     gameDialogGraphicCancel();
@@ -628,7 +625,6 @@ gameInterfaceHandleTouchBegin(float x, float y)
     
     if(touchedControl == &gameInterfaceControls.fire)
     {
-        for(i = 0; i < TOUCHES_MAX; i++) x_last[i] = y_last[i] = -1;
         gameInterfaceHandleTouchMove(x, y);
     }
     
@@ -899,26 +895,22 @@ void gameInterfaceProcessAction()
             {
                 int model_new = MODEL_SHIP1;
                 
-                if(!gameSettingsRatingGiven)
-                {
-                    gameDialogRating();
-                    break;
-                }
-                
                 switch(model_my_ship)
                 {
                     case MODEL_SHIP1:
                         model_new = MODEL_SHIP2;
+                        console_write("respawn: virus-fighter");
                         break;
                     case MODEL_SHIP2:
                         model_new = MODEL_SHIP3;
+                        console_write("respawn: heavy-fighter");
                         break;
                     default:
                         model_new = MODEL_SHIP1;
+                        console_write("respawn: defense-fighter");
                         break;
                 }
                 model_my_ship = model_new;
-                console_write("model %d (on next respawn)", model_my_ship);
                 
                 appWriteSettings();
             }
@@ -1047,9 +1039,6 @@ void
 gameInterfaceHandleTouchEnd(float x, float y)
 {
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
-    int i;
-    
-    for(i = 0; i < TOUCHES_MAX; i++) x_last[i] = y_last[i] = -1;
     
     if(touchedControl)
     {
@@ -1067,6 +1056,8 @@ gameInterfaceHandleTouchEnd(float x, float y)
     gameInterfaceControls.touchUnmappedX = gameInterfaceControls.touchUnmappedY = -1;
     
     gameInterfaceControls.touchCount--;
+    
+    gameInterfaceControls.pTouchedLastControl = NULL;
 }
 
 void
