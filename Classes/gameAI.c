@@ -397,6 +397,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     float zdot_ikillyou = 0.5;
     float zdot_juke = 0.3;
     float dist_tooclose = 10.0;
+    float boundary_avoid_distance = 5.0;
     int slerp_done = 0;
     
     tc = time_ms - elem->stuff.u.enemy.time_last_run;
@@ -461,23 +462,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             elem->stuff.u.enemy.time_next_retarget = time_ms + 3000;
         }
         
-        // avoid boundaries
-        {
-            float S = 5.0;
-            float dest[3] = {elem->physics.ptr->x + zq.x*S, elem->physics.ptr->y + zq.y*S, elem->physics.ptr->z + zq.z*S};
-            float result[3];
-            if(world_bounding_violations(dest, result) && zdot < 0.7)
-            {
-                elem->stuff.u.enemy.tgt_x = elem->physics.ptr->x + S*2*result[0];
-                elem->stuff.u.enemy.tgt_y = elem->physics.ptr->y + S*2*result[1];
-                elem->stuff.u.enemy.tgt_z = elem->physics.ptr->z + S*2*result[2];
-                
-                elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
-                elem->stuff.u.enemy.scan_distance = 1;
-                elem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
-            }
-        }
-        
         //
         if(time_ms >= elem->stuff.u.enemy.time_next_retarget &&
            zdot < zdot_juke &&
@@ -527,6 +511,11 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
               yq.w, yq.x, yq.y, yq.z,
               elem->stuff.u.enemy.max_slerp * tc,
               &z1q.w, &z1q.x, &z1q.y, &z1q.z);
+        if(isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
+        {
+            z1q = zq;
+        }
+        
         slerp_done = 1;
         
         // add unpredictable behavior by heading off on a tangent periodically for a short period
@@ -569,6 +558,31 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         assert(0);
     }
     
+    // avoid boundaries
+    if(elem->stuff.u.enemy.run_distance > 0)
+    {
+        float S = boundary_avoid_distance;
+        float dest[3] = {
+            elem->physics.ptr->x + zq.x*S,
+            elem->physics.ptr->y + zq.y*S,
+            elem->physics.ptr->z + zq.z*S
+        };
+        float result[3];
+        if(world_bounding_violations(dest, result) /*&& zdot < 0.7*/)
+        {
+            if(time_ms > elem->stuff.u.enemy.time_next_retarget)
+            {
+                elem->stuff.u.enemy.tgt_x = elem->physics.ptr->x + zq.x*S*2;
+                elem->stuff.u.enemy.tgt_y = elem->physics.ptr->y + zq.y*S*2;
+                elem->stuff.u.enemy.tgt_z = elem->physics.ptr->z + zq.z*S*2;
+                
+                elem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
+                elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
+                elem->stuff.u.enemy.time_next_retarget = time_ms + 3000;
+            }
+        }
+    }
+    
     // on state change, default to 1s between decision
     if(elem->stuff.u.enemy.enemy_state != prev_state && time_ms > elem->stuff.u.enemy.time_next_retarget)
     {
@@ -596,6 +610,10 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     if(!slerp_done)
     {
         slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist, zdot < 0 ? -elem->stuff.u.enemy.max_slerp*tc : (elem->stuff.u.enemy.max_slerp-0.05)*tc, &z1q.w, &z1q.x, &z1q.y, &z1q.z);
+        if(isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
+        {
+            z1q = zq;
+        }
     }
     
     xq.w += z1q.w-zq.w;
@@ -669,7 +687,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             elem->stuff.u.enemy.time_last_bullet += 3000; // fire missles less frequently
             
             game_add_bullet(bulletPos, bulletEuler, bulletVel, bv, 0, elem->stuff.u.enemy.target_id, elem->stuff.affiliation);
-            
         }
         else
         {

@@ -168,6 +168,7 @@ score_display()
     float enemies_killed = enemies_killed1 + enemies_killed2;
     
     char scoreStr[255];
+    float accur = shots_fired / enemies_killed;
     sprintf(scoreStr, "%sScore:** %d **\n"
             "^D saved/lost: %.0f/%.0f (%.0fpct)\n"
             "bot kills:%d\n"
@@ -186,7 +187,7 @@ score_display()
             gameStateSinglePlayer.stats.enemies_killed,
             gameStateSinglePlayer.stats.enemies_bh_killed,
             gameStateSinglePlayer.stats.turrets_killed,
-            shots_fired / enemies_killed,
+            isnan(accur) ? 0 : accur,
             game_time_elapsed(),
             *high_score
             /* ,*high_score_session */
@@ -803,7 +804,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
         gameStateSinglePlayer.enemy_spawnpoint_interval = 7000;
         gameStateSinglePlayer.base_spawn_collect_m = 0.9;
-        gameStateSinglePlayer.base_spawn_collect_w = 65535/3;
+        gameStateSinglePlayer.base_spawn_collect_w = 65535/2;
         gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/20;

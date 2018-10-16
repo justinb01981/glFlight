@@ -7,7 +7,7 @@ gridsize = 64
 grid = [ [0 for i in range(gridsize)] for i in range(gridsize) ]
 map_command_format = '    BUILDING_N(X, Y, Z) \\'
 map_command_prefix = '#define MAP_GENERATED_MACRO \\\n'
-floor_y = 2.0
+floor_y = 85
 
 class RInt:
     def __init__(self, rrange):

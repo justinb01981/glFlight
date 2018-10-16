@@ -51,7 +51,7 @@ gameNetworkState_t gameNetworkState;
 static unsigned long update_frequency_ms = 1000 / (GAME_TICK_RATE / 2);
 static unsigned long update_time_last = 0;
 const static float euler_interp_range_max = (M_PI/8);
-const static float velo_interp_update_mult = 8;
+const static float velo_interp_update_mult = 4;
 const static char *map_eom = "\nmap_eom\n";
 
 static char *gameKillVerbs[] = {"slaughtered", "evicerated", "de-rezzed", "shot-down", "ended", "terminated"};
@@ -2120,10 +2120,12 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                         {
                             v1[d] = predict_a1_at_b1_for_a_over_b(playerInfo->loc_last[d],
                                                                   playerInfo->timestamp_last,
-                                                                  t + 1000 + playerInfo->timestamp_adjust);
+                                                                  t + 1000
+                                                                  /*+ playerInfo->timestamp_adjust*/);
                             v[d] = v1[d] - v[d];
                         }
                         
+                        // TODO: calculate timestamp compensation (and use it)
                         if(distance(plottedLess[0], plottedLess[1], plottedLess[2], plottedCompare[0], plottedCompare[1], plottedCompare[2]) <
                            distance(plottedMore[0], plottedMore[1], plottedMore[2], plottedCompare[0], plottedCompare[1], plottedCompare[2]))
                         {
@@ -2134,19 +2136,22 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                             if(playerInfo->timestamp_adjust < update_frequency_ms*2) playerInfo->timestamp_adjust++;
                         }
                         
-                        printf("playerInfo->timestamp_adjust:%f\n", playerInfo->timestamp_adjust);
+                        gameNetwork_updatePlayerObject(playerInfo,
+                                                       pPlayerElem->physics.ptr->x, pPlayerElem->physics.ptr->y, pPlayerElem->physics.ptr->z,
+                                                       msg->params.f[4], msg->params.f[5], msg->params.f[6],
+                                                       v[0], v[1], v[2]);
                     }
                     else
                     {
                         v[0] = pPlayerElem->physics.ptr->vx;
                         v[1] = pPlayerElem->physics.ptr->vy;
                         v[2] = pPlayerElem->physics.ptr->vz;
+                        
+                        gameNetwork_updatePlayerObject(playerInfo,
+                                                       msg->params.f[1], msg->params.f[2], msg->params.f[3],
+                                                       msg->params.f[4], msg->params.f[5], msg->params.f[6],
+                                                       v[0], v[1], v[2]);
                     }
-                    
-                    gameNetwork_updatePlayerObject(playerInfo,
-                                                   msg->params.f[1], msg->params.f[2], msg->params.f[3],
-                                                   msg->params.f[4], msg->params.f[5], msg->params.f[6],
-                                                   v[0], v[1], v[2]);
 
                     //pPlayerElem->stuff.player.player_id = playerInfo->player_id;
                     pPlayerElem->stuff.affiliation = pPlayerElem->stuff.game_object_id = playerInfo->player_id;
@@ -2853,31 +2858,31 @@ gameNetwork_sendStatsAlert()
                     break;
                     
                 case 2:
-                    sprintf(tmp, "%d", pInfo->stats.killer);
+                    sprintf(tmp, "%03d", pInfo->stats.killer);
                     strncat(str, tmp, sizeof(str)-1);
                     if(clear_stats) pInfo->stats.killer = 0;
                     break;
                     
                 case 3:
-                    sprintf(tmp, "%d", pInfo->stats.killed);
+                    sprintf(tmp, "%03d", pInfo->stats.killed);
                     strncat(str, tmp, sizeof(str)-1);
                     if(clear_stats) pInfo->stats.killed = 0;
                     break;
                     
                 case 4:
-                    sprintf(tmp, "%d", pInfo->stats.shots_fired);
+                    sprintf(tmp, "%03d", pInfo->stats.shots_fired);
                     strncat(str, tmp, sizeof(str)-1);
                     if(clear_stats) pInfo->stats.shots_fired = 0;
                     break;
                     
                 case 5:
-                    sprintf(tmp, "%d", pInfo->stats.points);
+                    sprintf(tmp, "%03d", pInfo->stats.points);
                     strncat(str, tmp, sizeof(str)-1);
                     if(clear_stats) pInfo->stats.points = 0;
                     break;
                     
                 case 6:
-                    sprintf(tmp, "%.0f", pInfo->network_latency);
+                    sprintf(tmp, "%03.3f", pInfo->network_latency);
                     strncat(str, tmp, sizeof(str)-1);
                     if(clear_stats) pInfo->stats.score_calculated = 0;
                     break;

@@ -276,7 +276,7 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 
 #define BUILDING_2(x, y, z)                          \
 "set_vector "#x" "#y" "#z" 0 4 0\n"                  \
-"add_object 19 vecx_0 vecy_0 vecz_0 0 0 0 4 112\n"   \
+"add_object 19 vecx_0 vecy_0 vecz_0 0 0 0 4 112\n"
 /*
 "add_object 19 vecx_0 vecy_1 vecz_0 0 0 0 4 112\n"   \
 "add_object 19 vecx_0 vecy_2 vecz_0 0 0 0 4 112\n"   \
@@ -286,6 +286,9 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 "add_object 19 vecx_0 vecy_6 vecz_0 0 0 0 4 112\n"   \
 "add_object 19 vecx_0 vecy_6.75 vecz_0 0 0 0 2 112\n"
 */
+
+#define FLOATING_CUBE1(x, y, z)                      \
+"add_object 1 "#x" "#y" "#z" 0 0 0 4 28\n"
 
 #define FLOATING_ISLAND(x, y, z)             \
 "set_vector "#x" "#y" "#z" 1 1 1\n"    \
@@ -549,6 +552,8 @@ WORLD_SCALED_FRAME(1, /*57*/28, 4)
 
 // buildings
 MAP_GENERATED_MACRO
+
+MAP_GENERATED_MACRO2
 
 /*
 BUILDING_1(rndx, 2, rndz)
