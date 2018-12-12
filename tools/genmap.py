@@ -2,38 +2,42 @@ import sys
 import math
 import random
 
-radius = 100
-gridsize = 64
-grid = [ [0 for i in range(gridsize)] for i in range(gridsize) ]
+radius = 160
+min_distance = 64
 map_command_format = '    BUILDING_N(X, Y, Z) \\'
 map_command_prefix = '#define MAP_GENERATED_MACRO \\\n'
-floor_y = 85
+floor_y = 2
+
 
 class RInt:
     def __init__(self, rrange):
         self.random_int = int(math.floor(random.random()*rrange*rrange) % rrange)
 
-l = 0
-while l < gridsize / 3:
-    x = RInt(gridsize).random_int
-    y = RInt(gridsize).random_int
-    grid[x][y] = RInt(2).random_int+1
-    l += 1
+
+def find_locations(rangeX, rangeY, rangeZ, max_proximity, add_location_function):
+    R = (rangeX[1]-rangeX[0], rangeY[1]-rangeY[0], rangeZ[1]-rangeZ[0])
+
+    if R[0] <= max_proximity or R[1] <= max_proximity or R[2] <= max_proximity:
+        x = rangeX[0]+RInt(R[0]).random_int
+        y = floor_y
+        z = rangeZ[0]+RInt(R[2]).random_int
+        add_location_function(x, y, z)
+        return
+
+    find_locations((rangeX[0], rangeX[1]-R[0]/2), rangeY, (rangeZ[0], rangeZ[1]-R[2]/2), max_proximity, add_location_function)
+    find_locations((rangeX[0], rangeX[1]-R[0]/2), rangeY, (rangeZ[0]+R[2]/2, rangeZ[1]), max_proximity, add_location_function)
+    find_locations((rangeX[0]+R[0]/2, rangeX[1]), rangeY, (rangeZ[0], rangeZ[1]-R[2]/2), max_proximity, add_location_function)
+    find_locations((rangeX[0]+R[0]/2, rangeX[1]), rangeY, (rangeZ[0]+R[2]/2, rangeZ[1]), max_proximity, add_location_function)
+    return
 
 
-for y in range(gridsize):
-    sys.stdout.write('//')
-    for x in range(gridsize):
-        sys.stdout.write(' ')
-        sys.stdout.write(str(grid[x][y]))
-    sys.stdout.write('\n')
+def add_building(x, y, z):
+    N = 1+RInt(3).random_int
+    sys.stdout.write('BUILDING_'+str(N)+'('+str(x)+', '+str(y)+', '+str(z)+') \\\n')
 
 sys.stdout.write(map_command_prefix)
-for y in range(gridsize):
-    for x in range(gridsize):
-        if grid[x][y] != 0:
-            U = radius*2 / gridsize
-            map_cmd = map_command_format.replace('X', str(-radius + U * x)).replace('Y', str(floor_y)).replace('Z', str(-radius + U * y)).replace('_N', '_'+str(grid[x][y]))
-            sys.stdout.write(map_cmd)
-            sys.stdout.write('\n')
+
+find_locations((-radius, radius), (-radius, radius), (-radius, radius), min_distance, add_building)
+
+sys.stdout.write('#endif\n')
 sys.stdout.write('\n')

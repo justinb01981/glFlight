@@ -10,6 +10,7 @@
 #define gl_flight_gameNetwork_h
 
 #include "gameUtils.h"
+#include "gameLock.h"
 
 #define GAME_NETWORK_MAX_PLAYERS 64
 #define GAME_NETWORK_MAX_STRING_LEN 128
@@ -25,8 +26,10 @@
 #define GAME_NETWORK_ADDRESS_INADDR(x) (((struct sockaddr_in6*) (x)->storage)->sin6_addr)
 #define GAME_NETWORK_ADDRESS_PORT(x) (((struct sockaddr_in6*) (x)->storage)->sin6_port)
 #define GAME_NETWORK_ADDRESS_LEN_CORRECT(x) ((x)->len == sizeof(struct sockaddr_in6))
+#define GAME_NETWORK_ADDRESS_ISEQUAL(x, y) (memcmp((x)->storage, (y)->storage, (x)->len) == 0)
 #define GAME_NETWORK_BONJOUR_ADDRFAMILY_HACK 0x09
 #define GAME_NETWORK_MAP_REQUEST_WINDOW_LEN (GAME_NETWORK_MAX_MAP_STRING_LEN * 1)
+#define GAME_NETWORK_HOST_PORTAL_NAME "*host*"
 
 //const static char *GAME_NETWORK_LAN_GAME_NAME = "d0gf1ght_lan";
 
@@ -66,13 +69,13 @@ typedef enum
     GAME_NETWORK_MSG_PLAYER_STATUS,
     GAME_NETWORK_MSG_HITME,
     
-    GAME_NETWORK_MSG_DIRECTORY_ADD, /* 29 */
-    GAME_NETWORK_MSG_DIRECTORY_REMOVE,
-    GAME_NETWORK_MSG_DIRECTORY_QUERY,
-    GAME_NETWORK_MSG_DIRECTORY_QUERY_RANDOM,
-    GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET,
-    GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET_RESPONSE,
-    GAME_NETWORK_MSG_DIRECTORY_RESPONSE,
+    //GAME_NETWORK_MSG_DIRECTORY_ADD, /* 29 */
+    //GAME_NETWORK_MSG_DIRECTORY_REMOVE,
+    //GAME_NETWORK_MSG_DIRECTORY_QUERY,
+    //GAME_NETWORK_MSG_DIRECTORY_QUERY_RANDOM,
+    //GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET,
+    //GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET_RESPONSE,
+    //GAME_NETWORK_MSG_DIRECTORY_RESPONSE,
     GAME_NETWORK_MSG_STARTGAME,
     GAME_NETWORK_MSG_ENDGAME,
     GAME_NETWORK_MSG_LAST
@@ -247,7 +250,7 @@ typedef struct
     struct
     {
         gameNetworkMessageQueued head;
-        volatile int cleanup, cleanupWaiting;
+        game_lock_t lock;
     } msgQueue;
     
     game_timeval_t time_last_periodic_check;
@@ -263,6 +266,8 @@ typedef struct
     unsigned int msg_seq_acked_last;
     
     int (*gameNetworkHookOnMessage)(gameNetworkMessage*, gameNetworkAddress*);
+    
+    void (*gameNetworkHookGameDiscovered)(char*);
     
     char gameStatsMessage[1024];
     
@@ -289,6 +294,12 @@ gameNetwork_resume();
 
 int
 gameNetwork_connect(char* server_name, void (*callback_becomehost)());
+
+int
+gameNetwork_host(char* server_name, void (*callback_becamehost)());
+
+int
+gameNetwork_eagerConnectInit();
 
 void
 gameNetwork_worldInit();

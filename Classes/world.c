@@ -355,9 +355,9 @@ world_add_object_core(Model type,
             model_primitives = model_tbuilding_primitives;
              */
             float M2[] = {
-                1, 0, 0, 0,
+                2.0, 0, 0, 0,
                 0, 4.0, 0, 1.5,
-                0, 0, 1, 0,
+                0, 0, 1.5, 0,
                 0, 0, 0, 1
             };
             MODEL_POLY_COMPONENTS_ADD(model_tbuilding_coords, model_tbuilding_texcoords, model_tbuilding_indices, M2);
@@ -503,6 +503,7 @@ world_add_object_core(Model type,
     switch(type)
     {
         case MODEL_ICOSAHEDRON:
+            pElem->renderInfo.priority = 1;
             new_durability = DURABILITY_ASTEROID;
             break;
           
@@ -554,6 +555,7 @@ world_add_object_core(Model type,
             
         case MODEL_TBUILDING:
         case MODEL_CBUILDING:
+            pElem->renderInfo.priority = 1;
             new_durability = DURABILITY_BLOCK;
             break;
             
@@ -564,6 +566,7 @@ world_add_object_core(Model type,
             
         case MODEL_FLATTENED_CUBE:
             pElem->renderInfo.concavepoly = 1;
+            pElem->renderInfo.priority = 1;
             new_durability = DURABILITY_BLOCK;
             break;
             
@@ -1050,8 +1053,9 @@ world_random_spawn_location(float loc[6], int affiliation)
     loc[1] = rand_in_range(1, gWorld->bound_radius/2);
     loc[2] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
     
-    loc[4] = loc[3] = 0;
-    loc[5] = rand_in_range(0, M_PI*2 * 100) / 100;
+    loc[3] = M_PI/2;
+    loc[4] = rand_in_range(-M_PI+0.1, M_PI-0.1);
+    loc[5] = -M_PI/2;
 }
 
 void world_free()
@@ -1425,6 +1429,12 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, flo
     for(i = 0; i < 3; i++) if(dmin == i) *(p[i]) = 0;
 
     move_elem_relative(pCollisionA, mv[0], mv[1], mv[2]);
+    
+    if(isnan(pCollisionA->physics.ptr->x) || isnan(pCollisionA->physics.ptr->y) || isnan(pCollisionA->physics.ptr->z))
+    {
+        
+        printf("world_repulse_elem/isNan\n");
+    }
 }
 
 inline static void
@@ -1661,6 +1671,7 @@ world_update(float tc)
     float FRcollision = collision_repulsion_coeff;
     // HACK: -- apply min velocity "wobble back/forth"
     float Fmin = 0.01 * (tex_pass % 2) - 1;
+    int iF;
     
     WorldElemListNode* pCur = gWorld->elements_moving.next;
     
@@ -1681,6 +1692,21 @@ world_update(float tc)
         
         if(!pElem->head_elem) // not a child elem
         {
+            
+            float* pFloatCheckIsNan[] = {
+                &pElem->physics.ptr->vx,
+                &pElem->physics.ptr->vy,
+                &pElem->physics.ptr->vz
+            };
+            for(iF = 0; iF < sizeof(pFloatCheckIsNan)/sizeof(float*); iF++)
+            {
+                if(isnan(*pFloatCheckIsNan[iF]))
+                {
+                    *pFloatCheckIsNan[iF] = 0;
+                    printf("isnan: %p\n", pElem);
+                }
+            }
+            
             if(pElem->physics.ptr->vx != 0 || pElem->physics.ptr->vy+Fmin != 0 || pElem->physics.ptr->vz != 0 || pElem->physics.ptr->gravity)
             {
                 int out_of_bounds_remove = 0;
@@ -1759,6 +1785,14 @@ world_update(float tc)
                                 pElem->physics.ptr->vx += V[0]*maxAccelDecel*-dot;
                                 pElem->physics.ptr->vy += V[1]*maxAccelDecel*-dot;
                                 pElem->physics.ptr->vz += V[2]*maxAccelDecel*-dot;
+                                
+                                bounding_enforced = 1;
+                            }
+                            else if(pElem->bounding_reflect)
+                            {
+                                if(V[0] / pElem->physics.ptr->vx < 0.0) pElem->physics.ptr->vx = -pElem->physics.ptr->vx;
+                                if(V[1] / pElem->physics.ptr->vy < 0.0) pElem->physics.ptr->vy = -pElem->physics.ptr->vy;
+                                if(V[2] / pElem->physics.ptr->vz < 0.0) pElem->physics.ptr->vz = -pElem->physics.ptr->vz;
                                 
                                 bounding_enforced = 1;
                             }
@@ -1988,7 +2022,6 @@ world_update(float tc)
             remove_element_from_region(pCurRemoveElem);
             
             world_elem_list_add(pCurRemoveElem, &gWorld->elements_to_be_freed);
-            
         }
         
         pCur = pNext;
@@ -2309,26 +2342,31 @@ world_build_run_program(float x, float y, float z)
 int
 world_bounding_violations(float location[3], float vnormal[3])
 {
-    int i;
+    int i, d;
     for(i = 0; i < gWorld->boundingRegion->nVectorsInited; i++)
     {
-        float U[] = {location[0], location[1], location[2]};
         // normal unit vector
-        float V[] = {gWorld->boundingRegion->v[i].f[3], gWorld->boundingRegion->v[i].f[4], gWorld->boundingRegion->v[i].f[5]};
+        float V[3];
         float P[3];
         
-        P[0] = gWorld->boundingRegion->v[i].f[0] + U[0];
-        P[1] = gWorld->boundingRegion->v[i].f[1] + U[1];
-        P[2] = gWorld->boundingRegion->v[i].f[2] + U[2];
+        for(d = 0; d < 3; d++) V[d] = gWorld->boundingRegion->v[i].f[3+d];
+        
+        P[0] = location[0] - gWorld->boundingRegion->v[i].f[0];
+        P[1] = location[1] - gWorld->boundingRegion->v[i].f[1];
+        P[2] = location[2] - gWorld->boundingRegion->v[i].f[2];
+        
+        float di = distance(P[0], P[1], P[2], 0, 0, 0);
+        
+        for(d = 0; d < 3; d++) P[d] /= di;
         
         float dot = dot2(V, P);
         
         if(dot < 0.001)
         {
-            for(i = 0; i < 3; i++)
+            for(d = 0; d < 3; d++)
             {
                 // return 1 and the normal vector that was in conflict
-                vnormal[i] = V[i];
+                vnormal[d] = V[d];
                 return 1;
             }
         }

@@ -30,10 +30,11 @@ typedef enum
     ACTION_HELP, /**/
     ACTION_OPEN_RATING_URL,
     
-    ACTION_HOST_GAME_LAN,
-    ACTION_HOST_GAME,
+    ACTION_HOST_GAME_OR_COMMIT,
     ACTION_CONNECT_TO_GAME,
+    ACTION_HOST_GAME_LAN,
     ACTION_NETWORK_GAME_SCORE,  /**/
+    ACTION_NETWORK_DISCONNECT,
     
     ACTION_FIRE_BULLET,
     ACTION_FIRE_MISSLE,
@@ -73,15 +74,15 @@ typedef enum
 static int actions_sub[][ACTION_LAST] =
 {
     // main
-    {1,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {1,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // net
-    {0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // game
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // build
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // settings
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 };
 
 extern int *actions_enabled;
@@ -102,10 +103,11 @@ static const char* action_strings[ACTION_LAST] =
     "High Scores",
     "help/about",
     "rate d0gf1ght",
-    "host/join (local)",
     "host game (internet)",
-    "join game (internet)",
-    "scores",
+    "multiplayer internet game",
+    "multiplayer local game",
+    "multiplayer scores",
+    "disconnect",
     "shoot",
     "shoot missle",
     "<empty>",
@@ -121,7 +123,7 @@ static const char* action_strings[ACTION_LAST] =
     "edit: change object",
     "map: regenerate",
     "player name",
-    "game server name",
+    "multiplayer game title",
     "ship type",
     "camera mode",
     "input sensitivity",

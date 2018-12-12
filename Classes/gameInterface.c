@@ -28,6 +28,7 @@
 
 extern void appWriteSettings();
 extern void GameNetworkBonjourManagerBrowseBegin();
+extern void game_add_network_portal(char* name);
 
 int texture_id_block = TEXTURE_ID_BLOCK;
 
@@ -59,7 +60,8 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.textHeight = ceil(gameInterfaceControls.textWidth * 2.2 * (screenWidth/screenHeight));
     
     // origin (in non-landscape mode) is upper left
-    controlRect accelRect = {0, 0, screenWidth-(screenWidth*0.15), (screenHeight * 0.4507)/4};
+    // (in landscape mode, screenWidth = Y-axis, screenHeight = X-axis
+    controlRect accelRect = {0, 0, screenWidth-(screenWidth*0.30), (screenHeight * 0.4507)/4};
     gameInterfaceControls.accelerator = accelRect;
     gameInterfaceControls.accelerator.tex_id = /*37*/ 5;
     gameInterfaceControls.accelerator.visible = 1;
@@ -71,12 +73,11 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.trim.xw = 0.15*screenWidth;
     gameInterfaceControls.trim.yw = 0.15*screenHeight;
     
-    tmpRect = (controlRect) {
-        0,
-        screenHeight-(screenHeight*0.15),
-        screenWidth * 0.15,
-        screenHeight * 0.15};
-    gameInterfaceControls.fire = tmpRect;
+    gameInterfaceControls.fire = (controlRect) {
+        screenWidth * 0.0,
+        screenHeight-(screenHeight*0.20),
+        screenWidth * 0.20,
+        screenHeight * 0.20};
     gameInterfaceControls.fire.tex_id = TEXTURE_ID_CONTROLS_FIRE;
     gameInterfaceControls.fire.visible = 1;
     
@@ -192,7 +193,12 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.fireRect2.x += gameInterfaceControls.fireRect2.xw;
     gameInterfaceControls.fireRect2.visible = 0;
     
-    gameInterfaceControls.fireRectMissle = gameInterfaceControls.fireRect2;
+    gameInterfaceControls.fireRectMissle = (controlRect) {
+        screenWidth*0.20,
+        screenHeight-(screenHeight*0.15),
+        screenWidth*0.15,
+        screenHeight*0.15
+    };
     gameInterfaceControls.fireRectMissle.tex_id = TEXTURE_ID_CONTROLS_MISSLE;
     gameInterfaceControls.fireRectMissle.visible = 1;
     
@@ -242,6 +248,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.accelIndicator;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.radar;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.menuControl;
+    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.statsTextRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.fireRect2;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.fireRectBoost;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.fireRectMisc;
@@ -252,7 +259,6 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.graphicDialog;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.graphicDialogHelp;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.consoleTextRect;
-    gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.statsTextRect;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.altControl;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.keyboardEntry;
     gameInterfaceControls.controlArray[i++] = &gameInterfaceControls.calibrateRect;
@@ -644,11 +650,30 @@ gameInterfaceHandleTouchBegin(float x, float y)
     gameInterfaceControls.touchCount++;
 }
 
-void
-gameInterfaceGameSearchTimedOut()
+static void
+gameInterfaceBrowseFoundGame(char* name)
 {
-    console_write("no game named \"%s\" was found\n", gameSettingGameTitle, gameSettingGameTitle);
-    gameNetwork_disconnect();
+    extern void load_map_and_host_game();
+    
+    if(gameNetworkState.hostInfo.bonjour_lan)
+    {
+        glFlightDrawframeHook = NULL;
+        gameNetworkState.gameNetworkHookGameDiscovered = NULL;
+        gameNetwork_connect(name, load_map_and_host_game);
+    }
+    else
+    {
+        if(glFlightDrawframeHook)
+        {
+            // add a portal which hosts a new game anyway
+            console_write("To host new game enter *HOST* portal\n");
+            game_add_network_portal(GAME_NETWORK_HOST_PORTAL_NAME);
+            // cancel countdown
+            glFlightDrawframeHook = NULL;
+        }
+        
+        game_add_network_portal(name);
+    }
 }
 
 static int
@@ -656,10 +681,62 @@ gameInterfaceMultiplayerConfigure(int action)
 {
     extern void load_map_and_host_game();
     
+    switch(action)
+    {
+        case ACTION_CONNECT_TO_GAME:
+        case ACTION_HOST_GAME_LAN:
+        {
+            gameNetwork_disconnect();
+            gameMapSetMap(map_portal_lobby);
+            
+            glFlightDrawframeHook = gameDialogNetworkCountdownEnded;
+            gameNetworkState.gameNetworkHookGameDiscovered = gameInterfaceBrowseFoundGame;
+            
+            if(action == ACTION_HOST_GAME_LAN)
+            {
+                gameNetworkState.hostInfo.bonjour_lan = 1;
+                GameNetworkBonjourManagerBrowseBegin();
+                
+                return 1;
+            }
+            else
+            {
+                // browse directory
+                gameNetwork_connect(gameSettingGameTitle, load_map_and_host_game);
+            }
+            return 1;
+        }
+        break;
+        
+        case ACTION_HOST_GAME_OR_COMMIT:
+        {
+            gameNetwork_host(gameSettingGameTitle, load_map_and_host_game);
+            
+            if(action == ACTION_HOST_GAME_OR_COMMIT)
+            {
+                // find an available port and register
+                glFlightDrawframeHook = gameDialogNetworkHostRegister;
+            }
+        }
+        break;
+    }
+    
+    /*
     switch(gameDialogState.networkGameNameEntered)
     {
             // pop dialog
         case 0:
+            if(action == ACTION_CONNECT_TO_GAME)
+            {
+                gameNetwork_disconnect();
+                gameMapSetMap(map_portal_lobby);
+                glFlightDrawframeHook = gameDialogBrowseGamesCountdown;
+                extern void game_add_network_portal(char* name);
+                gameNetworkState.gameNetworkHookGameDiscovered = game_add_network_portal;
+                gameNetwork_connect("SEARCHING", gameDialogBrowseGamesCountdown);
+                return 1;
+            }
+            
             gameDialogState.networkGameNameEntered++;
             gameDialogEnterGameName(action);
             return 0;
@@ -687,6 +764,7 @@ gameInterfaceMultiplayerConfigure(int action)
             {
                 gameNetwork_connect("", load_map_and_host_game);
                 gameNetwork_directoryRegister(gameSettingGameTitle);
+                glFlightDrawframeHook = gameDialogRegisterGameCountdown;
             }
             else
             {
@@ -702,6 +780,9 @@ gameInterfaceMultiplayerConfigure(int action)
         default:
             return 0;
     }
+     */
+    
+    return 0;
 }
 
 void gameInterfaceProcessAction()
@@ -752,36 +833,19 @@ void gameInterfaceProcessAction()
         
         case ACTION_HOST_GAME_LAN:
         case ACTION_CONNECT_TO_GAME:
-        case ACTION_HOST_GAME:
+        case ACTION_HOST_GAME_OR_COMMIT:
         {
             if(gameInterfaceMultiplayerConfigure(fireAction))
             {
+                gameInterfaceControls.mainMenu.visible = gameInterfaceControls.textMenuControl.visible = 0;
             }
             break;
         }
             
-//        case ACTION_HOST_GAME:
-//            if(!gameDialogState.networkGameNameEntered && fireAction != ACTION_HOST_GAME_LAN)
-//            {
-//                gameDialogState.networkGameNameEntered = 1;
-//                fireActionQueued = fireAction;
-//                console_clear();
-//                console_write("Enter a host game-ID:\n(share this with guests)");
-//                goto fire_action_setting_game_name;
-//            }
-//
-//            gameInterfaceControls.mainMenu.visible = 0;
-//            gameNetwork_disconnect();
-//            if(gameNetwork_connect((char *) pGameConnectName) == GAME_NETWORK_ERR_NONE)
-//            {
-//                actions_menu_reset();
-//                gameStateSinglePlayer.started = 0;
-//                save_map = 0;
-//                console_write("Hosting game: %s\nWaiting for guests...",
-//                              gameNetworkState.hostInfo.name);
-//                if(!game_map_custom_loaded) gameMapSetMap(initial_map_deathmatch);
-//            }
-//            break;
+        case ACTION_NETWORK_DISCONNECT:
+            gameNetwork_disconnect();
+            gameMapSetMap(initial_map);
+            break;
             
         case ACTION_DISPLAY_SCORES:
             if(gameNetworkState.connected)

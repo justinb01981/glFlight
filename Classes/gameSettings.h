@@ -31,7 +31,7 @@ typedef struct
 } glFlightPrefs;
 
 // TODO:bump this every time settings change
-const static int settings_version = 36;
+const static int settings_version = 37;
 
 // HACK: externs built in .m files
 extern double dz_roll, dz_pitch, dz_yaw;
@@ -48,9 +48,11 @@ extern int gameSettingsPortNumber;
 extern char gameSettingsLocalIPOverride[255];
 extern int gameSettingsSimpleControls;
 extern char gameSettingsVersionStr[255];
+extern char gameSettingsKillHistory[4096];
 static char gameSettingsDirectoryServerNameREMOVED[255];
 
 static char* nullableStrings[] = {
+    gameSettingsKillHistory,
     gameSettingsPlayerName,
     gameSettingsMapName,
     gameSettingGameTitle,
@@ -94,6 +96,7 @@ gameSettingsDefaults()
     strcpy(gameSettingsMapName, "MAP1");
     strcpy(gameSettingGameTitle, "dogfight1");
     strcpy(gameSettingsLocalIPOverride, "0.0.0.0");
+    strcpy(gameSettingsKillHistory, "");
     gameSettingsNetworkFrequency = 50;
     gameSettingsPortNumber = 52000;
     gameStateSinglePlayer.lifetime_credits = 0;
@@ -145,6 +148,7 @@ gameSettingsWrite(const char *filename)
         fprintf(fp, "%lu\n", gameStateSinglePlayer.lifetime_credits);
         fprintf(fp, "%d\n", gameSettingsSimpleControls);
         fprintf(fp, "%s\n", GAME_VERSION_STR);
+        fprintf(fp, "%s\n", gameSettingsKillHistory);
         
         fclose(fp);
     }
@@ -183,6 +187,10 @@ gameSettingsRead(const char *filename)
         {
             gameSettingsSimpleControls = 0;
         }
+        else if(settings_version == 37 && settings_ver == 36)
+        {
+            strcpy(gameSettingsKillHistory, "");
+        }
         else
         // settings are from old binary, force defaults
         if(settings_ver != settings_version) break;
@@ -217,6 +225,7 @@ gameSettingsRead(const char *filename)
         if(fscanf(fp, "%lu", &gameStateSinglePlayer.lifetime_credits) < 1) break;
         if(fscanf(fp, "%d", &gameSettingsSimpleControls) < 1) break;
         if(fscanf(fp, "%s", gameSettingsVersionStr) < 1) break;
+        if(fscanf(fp, "%s", gameSettingsKillHistory) < 1) break;
         
         fclose(fp);
         

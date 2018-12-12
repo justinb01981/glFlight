@@ -17,8 +17,8 @@
 
 enum {
     DURABILITY_PLAYER = 10,
-    DURABILITY_BLOCK = 5,
-    DURABILITY_ASTEROID = 5,
+    DURABILITY_BLOCK = 20,
+    DURABILITY_ASTEROID = 250,
     DURABILITY_LOW = 5,
     DURABILITY_ENEMY = 10,
     DURABILITY_ENEMY_DEATHMATCH = 10,
@@ -95,11 +95,11 @@ extern int fireActionQueuedAfterEdit;
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "1.4.3_core";
+const static char* GAME_VERSION_STR = "1.4.4_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 
-const static float MAX_SPEED_MISSLE = (MAX_SPEED * 4);
+const static float MAX_SPEED_MISSLE = (MAX_SPEED * 3);
 const static float SPEED_BOOST_FRAMES = 60 * 5;
 extern float C_THRUST;
 extern float C_FRICTION;

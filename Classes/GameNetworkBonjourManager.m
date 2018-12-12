@@ -31,8 +31,9 @@ typedef enum
 @property (assign) GameNetworkPeerConnectionState connected;
 @property (assign) int peerId;
 @property (atomic, retain) NSData* address;
-@property (atomic, retain) NSData* pendingData;
+@property (atomic, retain) NSMutableArray<NSData*>* pendingData;
 @property (atomic) int spaceIsAvailable;
+@property (atomic) int threadDone;
 
 @property (atomic, retain) NSInputStream* inputStream;
 @property (atomic, retain) NSOutputStream* outputStream;
@@ -67,8 +68,9 @@ const int PEER_ID_INITIAL = 1001;
         service = nil;
         inputStream = nil;
         outputStream = nil;
-        _pendingData = nil;
+        _pendingData = [[NSMutableArray alloc] init];
         _spaceIsAvailable = 0;
+        _threadDone = 0;
     }
     return self;
 }
@@ -82,7 +84,9 @@ const int PEER_ID_INITIAL = 1001;
         service = service;
         inputStream = nil;
         outputStream = nil;
+        _pendingData = [[NSMutableArray alloc] init];
         _spaceIsAvailable = 0;
+        _threadDone = 0;
     }
     return self;
 }
@@ -98,14 +102,24 @@ const int PEER_ID_INITIAL = 1001;
     if((inputStream != nil && outputStream != nil) ||
         [service getInputStream:&inputStream outputStream:&outputStream])
     {
-        [inputStream setDelegate:delegate];
-        [inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-        
-        [outputStream setDelegate:delegate];
-        [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-
-        [inputStream open];
-        [outputStream open];
+        NSThread* t = [[NSThread alloc] initWithBlock:^{
+            [inputStream setDelegate:delegate];
+            [inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+            
+            [outputStream setDelegate:delegate];
+            [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+            
+            [inputStream open];
+            [outputStream open];
+            
+            while(!_threadDone &&
+                  [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:1]])
+            {
+            }
+            
+            NSLog(@"acceptConnection runLoop exiting");
+        }];
+        [t start];
         
         return 1;
     }
@@ -144,7 +158,7 @@ const int PEER_ID_INITIAL = 1001;
     {
         NSLog(@"sendMsg but not FULLY_CONNECTED, enqueuing");
         
-        self.pendingData = [NSData dataWithBytes:msg length:sizeof(*msg)];
+        [self.pendingData addObject: [NSData dataWithBytes:msg length:sizeof(*msg)]];
         return sizeof(gameNetworkMessage);
     }
     
@@ -170,20 +184,22 @@ const int PEER_ID_INITIAL = 1001;
 {
     if(self.connected < FULLY_CONNECTED) self.connected = FULLY_CONNECTED;
     
-    if(self.pendingData)
+    if([self.pendingData count] > 0)
     {
         NSLog(@"BONJOUR becameConnected\n");
         
-        gameNetworkMessage* msg = (gameNetworkMessage*) [self.pendingData bytes];
+        gameNetworkMessage* msg = (gameNetworkMessage*) [[self.pendingData firstObject] bytes];
         
         [self sendMsg:msg];
         
-        self.pendingData = nil;
+        [self.pendingData removeObjectAtIndex: 0];
     }
 }
 
 - (void) disconnect
 {
+    _threadDone = 1;
+    
     if(self.connected == NOT_CONNECTED) return;
     self.connected = NOT_CONNECTED;
     
@@ -302,16 +318,16 @@ static GameNetworkBonjourManager* instance;
 - (int) connectToServer:(NSNetService*) serviceFound
 {
     __block int peerIdAdded = -1;
-    
+
     /*
     [[self.browsedServices allKeys] enumerateObjectsUsingBlock:^(NSData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSNetService* service = browsedServices[obj];
-        
+     
         if([service.name isEqualToString:[NSString stringWithUTF8String:name]] &&
            service.includesPeerToPeer)
         {
             serviceFound = service;
-            
+     
             *stop = YES;
         }
     }];
@@ -328,7 +344,17 @@ static GameNetworkBonjourManager* instance;
         
         [serviceFound setDelegate:self];
         
-        [p connectToService:serviceFound withDelegate:self];
+        NSThread* thread = [[NSThread alloc] initWithBlock:^{
+            [p connectToService:serviceFound withDelegate:self];
+            
+            while(!p.threadDone &&
+                  [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:1]])
+            {
+            }
+            
+            NSLog(@"connectToServer runLoop exiting");
+        }];
+        [thread start];
     }
     
     return peerIdAdded;
@@ -374,7 +400,8 @@ static GameNetworkBonjourManager* instance;
     [peers enumerateObjectsUsingBlock:^(GameNetworkPeer * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if(obj.peerId == peer_id)
         {
-            [obj sendMsg:msg_];
+            //[obj.pendingData addObject:[NSData dataWithBytes:msg length:sizeof(gameNetworkMessage)]];
+            [obj sendMsg:(gameNetworkMessage*) msg];
             *stop = YES;
         }
     }];
@@ -406,7 +433,7 @@ static GameNetworkBonjourManager* instance;
 - (void)netServiceDidPublish:(NSNetService *)sender
 {
     NSLog(@"netServiceDidPublish in domain %@", [sender domain]);
-    
+ 
     [sender scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [sender startMonitoring];
     
@@ -533,9 +560,7 @@ static GameNetworkBonjourManager* instance;
                 }
                 else
                 {
-                    gameNetworkState.msgQueue.cleanupWaiting = 1;
-                    while(gameNetworkState.msgQueue.cleanup) { int i; i++; }
-                    gameNetworkState.msgQueue.cleanupWaiting = 0;
+                    game_lock_lock(&gameNetworkState.msgQueue.lock);
                     
                     gameNetworkMessageQueued* cur = &gameNetworkState.msgQueue.head;
                     while(cur->next != NULL)
@@ -543,6 +568,8 @@ static GameNetworkBonjourManager* instance;
                         cur = cur->next;
                     }
                     cur->next = msg;
+                    
+                    game_lock_unlock(&gameNetworkState.msgQueue.lock);
                     
                     extern void do_game_network_read_bonjour();
                     do_game_network_read_bonjour();
@@ -567,6 +594,7 @@ static GameNetworkBonjourManager* instance;
             // the above call will disconnect/remove
             //[peer disconnect];
             //[peers removeObject: peer];
+
         } break;
     }
 }
@@ -596,6 +624,8 @@ static GameNetworkBonjourManager* instance;
     }];
     
     [servicesResolving removeObject:sender];
+    
+    if(gameNetworkState.gameNetworkHookGameDiscovered != NULL) gameNetworkState.gameNetworkHookGameDiscovered(sender.hostName.UTF8String);
 }
 
 - (void) netService:(NSNetService *)sender didNotResolve:(NSDictionary<NSString *,NSNumber *> *)errorDict

@@ -53,10 +53,14 @@ void glFlightInit(gl_flightViewController* viewController)
     
     rand_seed(time_ms);
     
+    NSString* baseDeviceName = [[UIDevice currentDevice] name];
+    baseDeviceName = [baseDeviceName componentsSeparatedByString:@" "][0];
+    baseDeviceName = [baseDeviceName componentsSeparatedByString:@"’"][0];
+    
     NSString *defaultPlayerName = [NSString stringWithFormat:@"player_%@",
-                                   [[[UIDevice currentDevice] name] componentsSeparatedByString:@" "][0]];
+                                   baseDeviceName];
     NSString *defaultServerName = [NSString stringWithFormat:@"game_%@",
-                                   [[[UIDevice currentDevice] name] componentsSeparatedByString:@" "][0]];
+                                   baseDeviceName];
     
     gameSettingsPlatformInit([defaultPlayerName UTF8String], [defaultServerName UTF8String]);
     
@@ -92,14 +96,8 @@ void glFlightInit(gl_flightViewController* viewController)
     game_terminated_gracefully = 0;
     appWriteSettings();
     
-    if(!reset_map)
-    {
-        gameMapSetMap(maps_list[0]);
-    }
-    else
-    {
-        gameMapSetMap(maps_list[0]);
-    };
+
+    gameMapSetMap(initial_map);
     
     console_write("Welcome to d0gf1ght %s\n"
                   "http://www.domain17.net/d0gf1ght\n"
@@ -135,6 +133,8 @@ void glFlightResume(time_t time_last_suspend)
     [NSThread detachNewThreadSelector:@selector(applicationBackgroundWorker) toTarget:self withObject:NULL];
     
     [NSThread detachNewThreadSelector:@selector(applicationBackgroundWorkerTimer) toTarget:self withObject:NULL];
+    
+    [NSThread detachNewThreadSelector:@selector(applicationBackgroundInitOnce) toTarget:self withObject:NULL];
     
     time_last_suspend = 0;
     
@@ -231,6 +231,11 @@ void glFlightResume(time_t time_last_suspend)
     }
 }
 
+- (void) applicationBackgroundInitOnce
+{
+    gameNetwork_eagerConnectInit();
+}
+
 - (void)dealloc
 {
     [viewController release];
@@ -253,4 +258,10 @@ void
 AppDelegateOpenURL(const char* url)
 {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:url]]];
+}
+
+int
+AppDelegateIsMultiplayerEager()
+{
+    return [[NSBundle.mainBundle bundleIdentifier] isEqualToString:@"com.domain17.spacecombat1995"];
 }

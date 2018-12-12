@@ -56,9 +56,6 @@ const static char *map_eom = "\nmap_eom\n";
 
 static char *gameKillVerbs[] = {"slaughtered", "evicerated", "de-rezzed", "shot-down", "ended", "terminated"};
 
-static int
-gameNetwork_directoryListOffset(int offset);
-
 extern int GameNetworkBonjourManagerHost(const char* name, int* sock_out);
 extern int GameNetworkBonjourManagerBrowseBegin();
 extern int GameNetworkBonjourManagerBrowseEnd(gameNetworkAddress* address_returned);
@@ -66,7 +63,7 @@ extern int GameNetworkBonjourManagerDisconnect();
 extern int GameNetworkBonjourManagerDisconnectPeer(int peer_id);
 void GameNetworkBonjourManagerSendMessageToPeer(uint8_t* msg_, int peer_id);
 extern int gameNetwork_onBonjourConnecting1(gameNetworkMessage*, gameNetworkAddress*);
-int gameNetwork_onDirectorySearch(gameNetworkMessage* msg, gameNetworkAddress* srcAddr);
+extern int gameNetwork_onDirectoryRegister1(gameNetworkMessage*, gameNetworkAddress*);
 int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress* srcAddr);
 extern float get_time_ms_wall();
 
@@ -229,6 +226,17 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
         printf("sendto: %ld - errno:%s\n", r, strerror(errno));
     }
 }
+
+static void gameNetworkAddress_incrementPort(gameNetworkAddress* address)
+{
+    struct sockaddr_in6 sa;
+    
+    memcpy(&sa, address->storage, address->len);
+    
+    sa.sin6_port = htons(ntohs(sa.sin6_port)+1);
+    
+    memcpy(address, &sa, address->len);
+}
     
 static unsigned long strcksum(const char* str)
 {
@@ -331,7 +339,7 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
 #endif
         memcpy(&sa->sin_addr, he->h_addr_list[0],
                sizeof(sa->sin_addr));
-        console_write("DNS resolved: %s", inet_ntoa(sa->sin_addr));
+        console_write("server DNS resolved: %s", inet_ntoa(sa->sin_addr));
         
         // convert to ipv6
         sprintf(buf, "::FFFF:%s", inet_ntoa(sa->sin_addr));
@@ -418,6 +426,8 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
     gameNetworkState.msg_seq_acked_last = 0;
     gameNetworkState.msg_seq_next = rand();
     
+    game_lock_init(&gameNetworkState.msgQueue.lock);
+    
     return GAME_NETWORK_ERR_NONE;
 }
 
@@ -429,7 +439,7 @@ gameNetwork_resume()
 }
 
 int
-gameNetwork_connect(char* server_name, void (*callback_becamehost)())
+gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becamehost)())
 {
     int retries = 0;
     gameNetworkAddress gameAddress;
@@ -440,6 +450,7 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
     int directory_search_retries = 1;
     unsigned short server_port_resolved = gameNetworkState.hostInfo.port;
     int retries_udp = 1;
+    int server_ports = 10;
     char strtmp[256];
     
     gameAddress.len = 0;
@@ -460,8 +471,7 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
     gameNetworkState.player_list_head.next = NULL;
     gameNetworkState.player_list_head.next_store = NULL;
     
-    // blank to host an IP game
-    if(strlen(server_name) == 0 || !strcmp(server_name, "host"))
+    if(hosting && !gameNetworkState.hostInfo.bonjour_lan)
     {
         strcpy(gameNetworkState.hostInfo.name, "0.0.0.0");
         directory_search_retries = 0;
@@ -470,13 +480,8 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
         gameNetworkState.my_player_id = GAME_NETWORK_PLAYER_ID_HOST;
         if(server_name != gameNetworkState.hostInfo.name)
         {
-            strcpy(gameNetworkState.hostInfo.name, gameSettingGameTitle);
+            strcpy(gameNetworkState.hostInfo.name, server_name);
         }
-        
-        console_clear();
-        console_write("Hosting game %s\non port %d\n",
-                      gameNetworkState.hostInfo.name,
-                      gameNetworkState.hostInfo.port);
         
         // add self to player list
         gameNetwork_getPlayerInfo(gameNetworkState.my_player_id, &playerInfo, 1);
@@ -504,11 +509,9 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
     else if(!gameNetworkState.hostInfo.bonjour_lan)
     {
         // try directory
-        // register with directory
         if(gameNetwork_getDNSAddress(gameNetworkState.gameDirectory.directory_name,
                                      &gameNetworkState.gameDirectory.directory_address) == GAME_NETWORK_ERR_NONE)
         {
-            //TODO: add a check for a successful directory response
             gameAddress = gameNetworkState.gameDirectory.directory_address;
         }
         else
@@ -523,7 +526,7 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
 
     if(gameNetworkState.hostInfo.hosting)
     {
-
+        // registering with directory happens after gameNetwork_connect
     }
     else
     {
@@ -548,7 +551,6 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
                 
                 gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting1;
 
-                // TODO: for some reason we don't see a beacon response?
                 send_beacon(&gameAddress, server_name);
                 goto gameNetwork_connect_done;
             }
@@ -584,10 +586,20 @@ gameNetwork_connect(char* server_name, void (*callback_becamehost)())
                 retries = retries_udp;
                 while(retries > 0)
                 {
-                    send_connect(&gameAddress);
+                    strcpy(gameNetworkState.hostInfo.name, server_name);
                     
-                    console_write("\rconnecting to game...");
+                    while(server_ports > 0)
+                    {
+                        send_beacon(&gameAddress, server_name);
+                        gameNetworkAddress_incrementPort(&gameAddress);
+                        server_ports--;
+                    }
                     
+                    //send_connect(&gameAddress);
+                    
+                    console_write("searching for game...");
+                    
+                    // TODO: time out and remove callback
                     gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting1;
                     
                     retries--;
@@ -602,6 +614,18 @@ gameNetwork_connect_done:
 }
 
 int
+gameNetwork_host(char* server_name, void (*callback_becamehost)())
+{
+    return gameNetwork_connect_core(1, server_name, callback_becamehost);
+}
+
+int
+gameNetwork_connect(char* server_name, void (*callback_becamehost)())
+{
+    return gameNetwork_connect_core(0, server_name, callback_becamehost);
+}
+
+int
 gameNetwork_directoryRegister(const char* roomName)
 {
     // register with directory
@@ -611,8 +635,22 @@ gameNetwork_directoryRegister(const char* roomName)
     {
         strcpy(gameNetworkState.hostInfo.name, roomName);
         send_beacon(&gameNetworkState.gameDirectory.directory_address, roomName);
+        
+        gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onDirectoryRegister1;
         return GAME_NETWORK_ERR_NONE;
     }
+    return GAME_NETWORK_ERR_FAIL;
+}
+
+int
+gameNetwork_eagerConnectInit()
+{
+    if(gameNetwork_getDNSAddress(gameNetworkState.gameDirectory.directory_name,
+                                 &gameNetworkState.gameDirectory.directory_address) == GAME_NETWORK_ERR_NONE)
+    {
+        return GAME_NETWORK_ERR_NONE;
+    }
+    
     return GAME_NETWORK_ERR_FAIL;
 }
 
@@ -667,9 +705,11 @@ gameNetwork_disconnect()
     
     GameNetworkBonjourManagerDisconnect();
     gameNetworkState.hostInfo.bonjour_lan = 0;
+    gameNetworkState.hostInfo.hosting = 0;
     gameNetworkState.map_downloaded = 0;
     
     gameNetworkState.gameNetworkHookOnMessage = NULL;
+    gameNetworkState.gameNetworkHookGameDiscovered = NULL;
 }
 
 int
@@ -734,6 +774,10 @@ gameNetwork_send_player_core(gameNetworkMessage* msg, gameNetworkPlayerInfo* pla
                     {
                         s = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg), 0,
                                    (struct sockaddr*) (playerInfo->address.storage), playerInfo->address.len);
+                        if(s <= 0)
+                        {
+                            printf("sendto: %d (errno: %s)\n", (int) s, strerror(errno));
+                        }
                     }
                 }
                 
@@ -859,12 +903,8 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
         
         if(gameNetworkState.hostInfo.hosting)
         {
-            if(msg->cmd >= GAME_NETWORK_MSG_DIRECTORY_ADD &&
-               msg->cmd <= GAME_NETWORK_MSG_DIRECTORY_RESPONSE)
-            {
-            }
-            else if(msg->cmd >= GAME_NETWORK_MSG_BEACON &&
-                    msg->cmd <= GAME_NETWORK_MSG_BEACON_RESP)
+            if(msg->cmd >= GAME_NETWORK_MSG_BEACON &&
+                msg->cmd <= GAME_NETWORK_MSG_BEACON_RESP)
             {
             }
             else if(msg->player_id == gameNetworkState.my_player_id)
@@ -1055,6 +1095,14 @@ gameNetwork_addPlayerInfo(int player_id)
     }
     pInfoTail->next = pInfo;
     
+    pInfoTail = gameNetworkState.player_list_head.next_store;
+    while(pInfoTail)
+    {
+        if(pInfoTail->player_id == player_id) return GAME_NETWORK_ERR_NONE;
+        
+        pInfoTail = pInfoTail->next_store;
+    }
+    
     pInfo->next_store = gameNetworkState.player_list_head.next_store;
     gameNetworkState.player_list_head.next_store = pInfo;
     
@@ -1115,8 +1163,10 @@ gameNetwork_removePlayer(int player_id)
     gameNetworkPlayerInfo* pInfo = &gameNetworkState.player_list_head;
     while(pInfo->next)
     {
-        console_write("Player %s disconnected (%lu)", pInfo->next->name,
-                      network_time_ms - pInfo->next->time_last_update);
+        if(pInfo->next->player_id != player_id)
+        {
+            goto removePlayer_retry;
+        }
         
         if(pInfo->next->player_id == GAME_NETWORK_PLAYER_ID_HOST)
         {
@@ -1124,32 +1174,34 @@ gameNetwork_removePlayer(int player_id)
             gameNetworkState.connected = 0;
         }
         
+        console_write("Player %s disconnected (%lu)", pInfo->next->name,
+                      network_time_ms - pInfo->next->time_last_update);
+        
         world_remove_object(pInfo->next->elem_id);
         
-        if(pInfo->next->player_id == player_id)
+        gameNetworkPlayerInfo* pFree = pInfo->next;
+        pInfo->next = pFree->next;
+        if(pFree->stream_socket.s > 0)
         {
-            gameNetworkPlayerInfo* pFree = pInfo->next;
-            pInfo->next = pFree->next;
-            if(pFree->stream_socket.s > 0)
-            {
-                close(pFree->stream_socket.s);
-            }
-            
-            if(gameNetworkState.hostInfo.bonjour_lan)
-            {
-                GameNetworkBonjourManagerDisconnectPeer(pFree->player_id);
-            }
-            
-            if(pFree->map_data)
-            {
-                free(pFree->map_data);
-                pFree->map_data = NULL;
-            }
-            
-            // do not deallocate, the next_store linked list must retain
-            //free(pFree);
-            continue;
+            close(pFree->stream_socket.s);
         }
+        
+        if(gameNetworkState.hostInfo.bonjour_lan)
+        {
+            GameNetworkBonjourManagerDisconnectPeer(pFree->player_id);
+        }
+        
+        if(pFree->map_data)
+        {
+            free(pFree->map_data);
+            pFree->map_data = NULL;
+        }
+        
+        // do not deallocate, the next_store linked list must retain
+        //free(pFree);
+        break;
+
+    removePlayer_retry:
         pInfo = pInfo->next;
     }
     
@@ -1692,220 +1744,6 @@ do_game_network_world_update()
 }
 
 void
-do_game_network_handle_directory_msg(gameNetworkMessage *msg, gameNetworkAddress *srcAddr)
-{
-    gameNetworkPlayerInfo* pInfo;
-    char game_name[128];
-    char msgBuf[128];
-    int offset, offset_o;
-    float network_time_ms = get_time_ms_wall();
-    
-    pInfo = &gameNetworkState.gameDirectory.head;
-    while(pInfo)
-    {
-        if(pInfo->next && network_time_ms - pInfo->next->time_last_update > 30000)
-        {
-            // remove timed-out listing
-            gameNetworkPlayerInfo* pFree = pInfo->next;
-            pInfo->next = pInfo->next->next;
-            
-            free(pFree);
-        }
-        pInfo = pInfo->next;
-    }
-    
-    switch(msg->cmd)
-    {
-        case GAME_NETWORK_MSG_DIRECTORY_ADD:
-            if(gameNetworkState.hostInfo.hosting)
-            {
-                gameNetworkPlayerInfo* pInfoNew = NULL;
-                
-                msg->params.directoryInfo.c[sizeof(msg->params.directoryInfo.c)-1] = '\0';
-                pInfo = &gameNetworkState.gameDirectory.head;
-                while(pInfo)
-                {
-                    float network_time_ms = get_time_ms_wall();
-                    
-                    // found, refresh listing
-                    if(pInfo->next)
-                    {
-                        if(!strncmp(pInfo->next->name, msg->params.directoryInfo.c, sizeof(msg->params.directoryInfo.c)))
-                        {
-                            pInfo->next->time_last_update = network_time_ms;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        // not found, add new listing
-                        pInfoNew = malloc(sizeof(gameNetworkPlayerInfo));
-                        
-                        if(pInfoNew)
-                        {
-                            pInfo->next = pInfoNew;
-                            
-                            memset(pInfoNew, 0, sizeof(gameNetworkPlayerInfo));
-                            strncpy(pInfoNew->name, msg->params.directoryInfo.c, sizeof(msg->params.directoryInfo.c));
-                            
-                            pInfoNew->address = *srcAddr;
-                            
-                            // allow msg to override address
-                            if(GAME_NETWORK_ADDRESS_LEN_CORRECT(&msg->params.directoryInfo.addr))
-                            {
-                                // if IP is non-zero, use it instead of srcAddr
-                                if(!IN6_ARE_ADDR_EQUAL(&in6addr_any, &(GAME_NETWORK_ADDRESS_INADDR(&msg->params.directoryInfo.addr))))
-                                {
-                                    GAME_NETWORK_ADDRESS_INADDR(&pInfoNew->address) =
-                                        GAME_NETWORK_ADDRESS_INADDR(&msg->params.directoryInfo.addr);
-                                }
-                                else
-                                {
-                                    GAME_NETWORK_ADDRESS_INADDR(&pInfoNew->address) =
-                                        GAME_NETWORK_ADDRESS_INADDR(srcAddr);
-                                }
-                                
-                                // if msg port is non-zero, use that port
-                                if(GAME_NETWORK_ADDRESS_PORT(&msg->params.directoryInfo.addr) != 0)
-                                {
-                                    GAME_NETWORK_ADDRESS_PORT(&pInfoNew->address) =
-                                        GAME_NETWORK_ADDRESS_PORT(&msg->params.directoryInfo.addr);
-                                }
-                            }
-                            
-                            pInfo->next->time_last_update = network_time_ms;
-                        }
-                        
-                        if(pInfoNew)
-                        {
-                            inet_ntop(AF_INET6, &(GAME_NETWORK_ADDRESS_INADDR(&pInfoNew->address)), msgBuf, sizeof(msgBuf));
-                            
-                            console_write("Registered game:%s/%s:%d", pInfoNew->name,
-                                          msgBuf,
-                                          ntohs(GAME_NETWORK_ADDRESS_PORT(&pInfoNew->address)));
-                        }
-                        break;
-                    }
-                    
-                    pInfo = pInfo->next;
-                }
-            }
-            break;
-            
-        case GAME_NETWORK_MSG_DIRECTORY_QUERY:
-            pInfo = &gameNetworkState.gameDirectory.head;
-            while(pInfo)
-            {
-                if(pInfo->next)
-                {
-                    game_name[sizeof(game_name)-1] = '\0';
-                    strncpy(game_name, msg->params.c, sizeof(msg->params.c));
-                    
-                    if(strncmp(pInfo->next->name, msg->params.c, sizeof(msg->params.c)) == 0)
-                    {
-                        gameNetworkMessage queryResponseMsg;
-                        char buf[128], bufsrc[128];
-                        
-                        memset(&queryResponseMsg, 0, sizeof(queryResponseMsg));
-                        queryResponseMsg.cmd = GAME_NETWORK_MSG_DIRECTORY_RESPONSE;
-                        
-                        struct sockaddr_in6* addr6 = (void*) pInfo->next->address.storage;
-                        if(inet_ntop(AF_INET6, &addr6->sin6_addr, buf, sizeof(struct sockaddr_in6)))
-                        {
-                            console_write("QUERY (%s): found game %s at\n%s:%u", inet_ntop(AF_INET6,
-                                                                                           &((struct sockaddr_in6*) srcAddr->storage)->sin6_addr, bufsrc, sizeof(bufsrc)),
-                                          game_name,
-                                                                                           buf, ntohs(addr6->sin6_port));
-                            snprintf(queryResponseMsg.params.c, sizeof(queryResponseMsg.params.c), "%s:%u", buf, ntohs(addr6->sin6_port));
-                        }
-                        
-                        send_to_address_udp(&queryResponseMsg, srcAddr);
-                    }
-                }
-                
-                pInfo = pInfo->next;
-            }
-            break;
-            
-        case GAME_NETWORK_MSG_DIRECTORY_QUERY_RANDOM:
-            break;
-            
-        case GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET:
-            offset = msg->params.f[1];
-            offset_o = offset;
-            pInfo = gameNetworkState.gameDirectory.head.next;
-            while(pInfo)
-            {
-                if(offset == 0)
-                {
-                    if(pInfo)
-                    {
-                        gameNetworkMessage queryResponseMsg;
-                        
-                        memset(&queryResponseMsg, 0, sizeof(queryResponseMsg));
-                        queryResponseMsg.cmd = GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET_RESPONSE;
-                        struct sockaddr_in* sin_ptr = (struct sockaddr_in*) pInfo->address.storage;
-                        if(inet_ntoa(sin_ptr->sin_addr))
-                        {
-                            console_write("QUERY: found game %s at\n%s\noffset:%d(srcAddr=%s)",
-                                          pInfo->name, inet_ntoa(sin_ptr->sin_addr), offset_o,
-                                          inet_ntop(AF_INET6, &(GAME_NETWORK_ADDRESS_INADDR(srcAddr)), msgBuf, sizeof(msgBuf)));
-                            /*
-                            strcpy(queryResponseMsg.params.c, inet_ntoa(sin_ptr->sin_addr));
-                             */
-                            strcpy(queryResponseMsg.params.c, pInfo->name);
-                        }
-                        send_to_address_udp(&queryResponseMsg, srcAddr);
-                    }
-                    break;
-                }
-                
-                if(!pInfo)
-                {
-                    // respond that no game exists at this offset
-                    gameNetworkMessage queryResponseMsg;
-                    
-                    memset(&queryResponseMsg, 0, sizeof(queryResponseMsg));
-                    queryResponseMsg.cmd = GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET_RESPONSE;
-                    //send_to_address_udp(&queryResponseMsg, srcAddr);
-                }
-                
-                offset--;
-                pInfo = pInfo->next;
-            }
-            break;
-            
-        case GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET_RESPONSE:
-            // add portal
-            msg->params.c[sizeof(msg->params.c)-1] = '\0';
-            game_add_spawnpoint(rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
-                                rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
-                                rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
-                                msg->params.c);
-            
-            world_object_set_nametag(world_get_last_object()->elem_id, msg->params.c);
-            
-            // query for next game in list
-            console_write("\nadded portal %d to %s",
-                           gameNetworkState.gameDirectory.query_offset,
-                           msg->params.c);
-            gameNetworkState.gameDirectory.query_offset++;
-            gameNetwork_directoryListOffset(gameNetworkState.gameDirectory.query_offset);
-            break;
-            
-        case GAME_NETWORK_MSG_DIRECTORY_RESPONSE:
-            // this is going to happen inside gameNetwork_connect()            
-            break;
-            
-        case GAME_NETWORK_MSG_DIRECTORY_REMOVE:
-            break;
-            
-        default:
-            break;
-    }
-}
-
-void
 do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr, game_timeval_t network_time_ms)
 {
     gameNetworkPlayerInfo* playerInfo, *playerInfoFound, *playerInfoTarget;
@@ -1951,13 +1789,11 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
     
     if(msg->cmd == GAME_NETWORK_MSG_BEACON && gameNetworkState.hostInfo.hosting)
     {
-        if(strncmp(msg->params.c, gameNetworkState.hostInfo.name, sizeof(msg->params.c)) == 0)
-        {
-            msg->cmd = GAME_NETWORK_MSG_BEACON_RESP;
-            msg->player_id = gameNetworkState.my_player_id;
-            //send_lan_broadcast(&msg);
-            send_to_address_udp(msg, srcAddr);
-        }
+        msg->cmd = GAME_NETWORK_MSG_BEACON_RESP;
+        msg->player_id = gameNetworkState.my_player_id;
+        strncpy(msg->params.c, gameNetworkState.hostInfo.name, sizeof(msg->params.c));
+        //send_lan_broadcast(&msg);
+        send_to_address_udp(msg, srcAddr);
         return;
     }
     
@@ -1975,7 +1811,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
         }
         else if(msg->cmd == GAME_NETWORK_MSG_PLAYER_INFO)
         {
-            add_player = 1;
+            //add_player = 1;
         }
         
         if(add_player)
@@ -2015,6 +1851,8 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
         {
             case GAME_NETWORK_MSG_CONNECT:
                 strncpy(playerInfo->name, msg->params.c, sizeof(msg->params.c));
+                // send back message with our player-name
+                send_connect(&playerInfo->address);
                 break;
                 
             case GAME_NETWORK_MSG_DISCONNECT:
@@ -2051,7 +1889,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                     }
                     
                     if(!pNode ||
-                       playerInfo->elem_id < 0)
+                       playerInfo->elem_id == WORLD_ELEM_ID_INVALID)
                     {
                         //respawn
                         playerInfo->elem_id = world_add_object(msg->params.f[0], 0, 0, 0, 0, 0, 0,
@@ -2062,6 +1900,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                         pNode->elem->durability = DURABILITY_PLAYER;
                         pNode->elem->stuff.affiliation = playerInfo->player_id;
                         pNode->elem->stuff.game_object_id = playerInfo->player_id;
+                        pNode->elem->bounding_remain = 1;
                         pNode->elem->stuff.network_created = 1;
                         world_object_set_nametag(playerInfo->elem_id, playerInfo->name);
                         
@@ -2093,8 +1932,19 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                         {
                             playerInfo->loc_last[d][i] = playerInfo->loc_last[d][i-1];
                             playerInfo->euler_last[d][i] = playerInfo->euler_last[d][i-1];
+                            
+                            if(!interp_velo)
+                            {
+                                playerInfo->loc_last[d][i] = msg->params.f[1+d];
+                                playerInfo->euler_last[d][i] = msg->params.f[4+d];
+                            }
                         }
                         playerInfo->timestamp_last[i] = playerInfo->timestamp_last[i-1];
+                        
+                        if(!interp_velo)
+                        {
+                            playerInfo->timestamp_last[i] = 0;
+                        }
                     }
                     playerInfo->loc_last[0][0] = msg->params.f[1];
                     playerInfo->loc_last[1][0] = msg->params.f[2];
@@ -2440,14 +2290,19 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                 break;
                 
             case GAME_NETWORK_MSG_KILLEDME:
-                if(gameNetworkState.hostInfo.hosting)
                 {
                     char deathMsg[255];
                     
-                    playerInfo->stats.killed++;
-                    
                     if(gameNetwork_getPlayerInfo(msg->params.i[0], &playerInfoFound, 0) == GAME_NETWORK_ERR_NONE)
                     {
+                        if(!gameNetworkState.hostInfo.hosting && msg->params.i[0] == gameNetworkState.my_player_id)
+                        {
+                            strncat(gameSettingsKillHistory, playerInfo->name, sizeof(gameSettingsKillHistory)-1);
+                            strncat(gameSettingsKillHistory, ",", sizeof(gameSettingsKillHistory)-1);
+                            break;
+                        }
+                        
+                        playerInfo->stats.killed++;
                         playerInfoFound->stats.killer++;
                         
                         // choose a random "death-verb" ;-)
@@ -2512,13 +2367,6 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
             case GAME_NETWORK_MSG_ENDGAME:
                 {
                     gameDialogNetworkGameEnded();
-                    
-                    //gameNetwork_disconnect();
-                    while(gameNetworkState.player_list_head.next)
-                    {
-                        gameNetwork_removePlayer(gameNetworkState.player_list_head.next->player_id);
-                    }
-                    gameNetwork_disconnect();
                 }
                 break;
                 
@@ -2624,12 +2472,10 @@ do_game_network_read_core()
             // messages that don't require synchronizing with rendering/game thread
             if(msg.cmd == GAME_NETWORK_MSG_BEACON && gameNetworkState.hostInfo.hosting)
             {
-                if(strncmp(msg.params.c, gameNetworkState.hostInfo.name, sizeof(msg.params.c)) == 0)
-                {
-                    msg.cmd = GAME_NETWORK_MSG_BEACON_RESP;
-                    msg.player_id = gameNetworkState.my_player_id;
-                    send_to_address_udp(&msg, &srcAddr);
-                }
+                msg.cmd = GAME_NETWORK_MSG_BEACON_RESP;
+                msg.player_id = gameNetworkState.my_player_id;
+                strncpy(msg.params.c, gameNetworkState.hostInfo.name, sizeof(msg.params.c));
+                send_to_address_udp(&msg, &srcAddr);
                 continue;
             }
             /*
@@ -2644,21 +2490,13 @@ do_game_network_read_core()
                 continue;
             }
              */
-            else if(msg.cmd >= GAME_NETWORK_MSG_DIRECTORY_ADD && msg.cmd < GAME_NETWORK_MSG_DIRECTORY_RESPONSE)
-            {
-                //do_game_network_handle_directory_msg(&msg, &srcAddr);
-                continue;
-            }
             
             // add to queue
             pMsgNew = (gameNetworkMessageQueued*) malloc(sizeof(gameNetworkMessageQueued));
         }
 
         // clean up processed messages
-        gameNetworkState.msgQueue.cleanup = 1;
-        // barrier_sync
-        while(!gameNetworkState.msgQueue.cleanupWaiting &&
-              !gameNetworkState.hostInfo.bonjour_lan) { int i; i++; }
+        game_lock_lock(&gameNetworkState.msgQueue.lock);
         
         gameNetworkMessageQueued* pMsgCur = &gameNetworkState.msgQueue.head;
         gameNetworkMessageQueued* pMsgProcessed = NULL;
@@ -2687,7 +2525,8 @@ do_game_network_read_core()
             while(pTail->next) pTail = pTail->next;
             pTail->next = pMsgNew;
         }
-        gameNetworkState.msgQueue.cleanup = 0;
+        
+        game_lock_unlock(&gameNetworkState.msgQueue.lock);
         
         retries--;
     }
@@ -2791,23 +2630,31 @@ gameNetwork_sendStatsAlert()
     char tmp[128];
     int clear_stats = 0;
     const char* decor = "^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L\n";
-    char *rows[] = {"NAME ","", "K^N   ", "D^M   ", "SHOTS", "PTS  ", "PING "};
+    char *rows[] = {"NAME   ","", "K^N   ", "D^M   ", "SHOTS", "PTS  ", "PING "};
     char *cSep = "|";
     char *pRowTop = NULL;
     static unsigned NAME_BREAK = 6;
     
-    if(gameStateSinglePlayer.started && game_time_remaining() <= 0)
+    str[0] = '\0';
+    
+    if(gameStateSinglePlayer.started)
     {
-        clear_stats = 1;
+        if(game_time_remaining() <= 0) clear_stats = 1;
+    }
+    else
+    {
+        strncat(str, "ALERT:\nWaiting for host\n", sizeof(str)-1);
     }
     
-    str[0] = '\0';
     strncat(str, "ALERT:\n", sizeof(str)-1);
     
     strncat(str, decor, sizeof(str)-1);
     sprintf(tmp, "%s%lu\n", REMAINING_TIME_STR, (unsigned long) game_time_remaining());
-    strncat(str, tmp, sizeof(str)-1);
-    strncat(str, decor, sizeof(str)-1);
+    if(gameStateSinglePlayer.started)
+    {
+        strncat(str, tmp, sizeof(str)-1);
+        strncat(str, decor, sizeof(str)-1);
+    }
     
     int row = 0;
     while(row < sizeof(rows)/sizeof(char*))
@@ -2823,13 +2670,13 @@ gameNetwork_sendStatsAlert()
         
         while(pInfo && strlen(str) < sizeof(str)-64)
         {
-            while(row > 0 && *pLastSep && *pLastSep != cSep[0])
+            while(row > 0 && *(pLastSep) && *(pLastSep) && *(pLastSep) != cSep[0])
             {
                 strncat(str, " ", sizeof(str)-1);
                 pLastSep++;
             }
             
-            pLastSep++;
+            if(row == 1) pLastSep++;
             
             switch(row)
             {
@@ -2882,11 +2729,13 @@ gameNetwork_sendStatsAlert()
                     break;
                     
                 case 6:
-                    sprintf(tmp, "%03.3f", pInfo->network_latency);
+                    sprintf(tmp, "%03d", (int) pInfo->network_latency);
                     strncat(str, tmp, sizeof(str)-1);
                     if(clear_stats) pInfo->stats.score_calculated = 0;
                     break;
             }
+            
+            if(row > 1) pLastSep += 3;
             
             pInfo = pInfo->next_store;
             col++;
@@ -2925,34 +2774,6 @@ gameNetwork_sendPing()
     }
     
     gameNetwork_send(&msg);
-}
-
-int
-gameNetwork_directoryList()
-{
-    gameNetwork_getDNSAddress(gameNetworkState.gameDirectory.directory_name,
-                              &gameNetworkState.gameDirectory.directory_address);
-    
-    gameNetworkState.connected = 1;
-    
-    gameNetworkState.gameDirectory.query_offset = 0;
-    gameNetwork_directoryListOffset(gameNetworkState.gameDirectory.query_offset);
-    
-    return GAME_NETWORK_ERR_NONE;
-}
-
-static int
-gameNetwork_directoryListOffset(int offset)
-{
-    gameNetworkMessage msg;
-    
-    memset(&msg, 0, sizeof(msg));
-    msg.cmd = GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET;
-    msg.params.f[1] = offset;
-    
-    send_to_address_udp(&msg, &gameNetworkState.gameDirectory.directory_address);
-    
-    return GAME_NETWORK_ERR_NONE;
 }
 
 void
@@ -3157,8 +2978,6 @@ int gameNetwork_onBonjourConnecting2(gameNetworkMessage* msg, gameNetworkAddress
         gameNetworkState.server_map_data = gameNetworkState.server_map_data_end = malloc(GAME_NETWORK_MAP_REQUEST_WINDOW_LEN);
         *gameNetworkState.server_map_data = '\0';
         
-        gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting3;
-        gameNetworkState.map_downloaded = 1;
         
         memset(&downloadMsg, 0, sizeof(downloadMsg));
         downloadMsg.cmd = GAME_NETWORK_MSG_GET_MAP_REQUEST;
@@ -3174,54 +2993,58 @@ int gameNetwork_onBonjourConnecting2(gameNetworkMessage* msg, gameNetworkAddress
         
         return 1;
     }
+    else if(msg->cmd == GAME_NETWORK_MSG_GET_MAP_BEGIN)
+    {
+        gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting3;
+        gameNetworkState.map_downloaded = 1; // ??
+        
+        return gameNetwork_onBonjourConnecting3(msg, srcAddr);
+    }
     
     return 0;
 }
-    
+
 int gameNetwork_onBonjourConnecting1(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
 {
     if(msg->cmd == GAME_NETWORK_MSG_BEACON_RESP)
     {
-        gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting2;
-
-        send_connect(srcAddr);
+        if(gameNetworkState.gameNetworkHookGameDiscovered)
+        {
+            console_write("GAME FOUND\nOpening portal to %s\n", msg->params.c);
+            gameNetworkState.gameNetworkHookGameDiscovered(msg->params.c);
+            return 1;
+        }
+        
+        if(strncmp(msg->params.c, gameNetworkState.hostInfo.name, sizeof(msg->params.c)) == 0 ||
+           gameNetworkState.hostInfo.bonjour_lan)
+        {
+            gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting2;
+            send_connect(srcAddr);
+        }
+        else
+        {
+            gameNetworkAddress_incrementPort(&gameNetworkState.gameDirectory.directory_address);
+            send_beacon(&gameNetworkState.gameDirectory.directory_address, gameNetworkState.hostInfo.name);
+        }
         
         return 1;
-    }
-    else if(msg->cmd == GAME_NETWORK_MSG_CONNECT)
-    {
-        return gameNetwork_onBonjourConnecting2(msg, srcAddr);
     }
     return 0;
 }
-    
-int gameNetwork_onDirectorySearch(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
-{
-    gameNetworkAddress searchResultAddr;
-    struct sockaddr_in6* addr6 = (void*) searchResultAddr.storage;
-    unsigned int s16port = 0;
-    
-    msg->params.c[sizeof(msg->params.c)-1] = '\0';
-    
-    char *psep = strrchr(msg->params.c, ':');
-    if(!psep) return 0;
-    
-    *psep = '\0';
-    psep++;
-    s16port = atoi(psep);
 
-    if(msg->cmd == GAME_NETWORK_MSG_DIRECTORY_RESPONSE && inet_pton(AF_INET6, msg->params.c, &addr6->sin6_addr) == 1)
+int gameNetwork_onDirectoryRegister1(gameNetworkMessage* msg, gameNetworkAddress* srcAddr)
+{
+    if(msg->cmd == GAME_NETWORK_MSG_BEACON_RESP && strncmp(msg->params.c, gameNetworkState.hostInfo.name, sizeof(msg->params.c)) != 0)
     {
-        searchResultAddr.len = addr6->sin6_len = sizeof(struct sockaddr_in6);
-        addr6->sin6_family = AF_INET6;
-        addr6->sin6_port = htons(s16port);
-        console_write("GAME_NETWORK_MSG_DIRECTORY_RESPONSE: %s", msg->params.c);
-        
-        send_connect(&searchResultAddr);
-        
-        gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting2;
+        // port in use, increment and try again
+        console_append("server port %d in use by game\n%s, retrying\n",
+                       ntohs(GAME_NETWORK_ADDRESS_PORT(&gameNetworkState.gameDirectory.directory_address)),
+                       msg->params.c);
+        gameNetworkAddress_incrementPort(&gameNetworkState.gameDirectory.directory_address);
+        send_beacon(&gameNetworkState.gameDirectory.directory_address, gameNetworkState.hostInfo.name);
         return 1;
     }
+    
     return 0;
 }
     
@@ -3232,6 +3055,13 @@ void load_map_and_host_game()
     console_write("Hosting game: %s\nWaiting for guests...",
                   gameNetworkState.hostInfo.name);
     if(!game_map_custom_loaded) gameMapSetMap(initial_map_deathmatch);
+    
+    gameNetworkState.gameNetworkHookGameDiscovered = NULL;
+    
+    if(!gameNetworkState.hostInfo.bonjour_lan)
+    {
+        gameNetwork_directoryRegister(gameSettingGameTitle);
+    }
     
     gameDialogStartNetworkGameWait();
 }

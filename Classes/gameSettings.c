@@ -22,3 +22,4 @@ int gameSettingsNetworkFrequency;
 int gameSettingsPortNumber;
 int gameSettingsSimpleControls;
 char gameSettingsVersionStr[255];
+char gameSettingsKillHistory[4096];

@@ -427,7 +427,11 @@ game_add_asteroid(float x, float y, float z, float dx, float dy, float dz)
     spawn[1] = y;
     spawn[2] = z;
     
-    spawn[3] = spawn[4] = spawn[5] = (rand() % 628)/100.0;
+    float R = M_PI-0.1;
+    
+    spawn[3] = rand_in_range(-R, R);
+    spawn[4] = rand_in_range(-R, R);
+    spawn[5] = rand_in_range(-R, R);
     
     int obj_id =
     world_add_object(MODEL_ICOSAHEDRON,
@@ -554,39 +558,6 @@ game_add_turret(float x, float y, float z)
     update_object_velocity(obj_id, 0, -0.1, -0.1, -0.1);
 }
 
-int
-game_add_spawnpoint(float x, float y, float z, char* game_name)
-{
-    float spawn[6];
-    float scale = 8;
-    
-    spawn[0] = x;
-    spawn[1] = y;
-    spawn[2] = z;
-    
-    spawn[3] = spawn[4] = spawn[5] = 0;
-    
-    int obj_id =
-    world_add_object(MODEL_SPRITE,
-                     spawn[0], spawn[1], spawn[2],
-                     spawn[3], spawn[4], spawn[5],
-                     scale, TEXTURE_ID_ENEMY_SPAWNPOINT);
-    
-    world_get_last_object()->durability = 0;
-    world_get_last_object()->destructible = 1;
-    world_get_last_object()->object_type = OBJ_SPAWNPOINT_ENEMY;
-    world_get_last_object()->stuff.radar_visible = 1;
-    update_object_velocity(obj_id, 0, 0, 0, 0);
-    
-    if(game_name)
-    {
-        world_object_set_nametag(world_get_last_object()->elem_id, game_name);
-        world_get_last_object()->object_type = OBJ_PORTAL;
-    }
-    
-    return obj_id;
-}
-
 void
 game_move_spawnpoint(WorldElem* pElem)
 {
@@ -625,6 +596,22 @@ game_move_spawnpoint(WorldElem* pElem)
 }
 
 void
+game_add_network_portal(char* name)
+{
+    float R[3];
+    float M = 10;
+    
+    random_heading_vector(R);
+    
+    int portal_object = world_add_object(MODEL_SPHERE, R[0]*M, R[1]*M + M, R[2]*M, 0, 0, 0, 3.0, TEXTURE_ID_ANIMATED_STATIC);
+    if(portal_object > 0) {
+        update_object_velocity(portal_object, 0, 0, 0, 0);
+        world_elem_set_nametag(world_get_last_object(), name);
+        world_get_last_object()->object_type = OBJ_PORTAL;
+    }
+}
+
+void
 game_reset()
 {
     WorldElemListNode* pCur = gWorld->elements_moving.next;
@@ -645,6 +632,9 @@ game_reset()
 void
 game_init_objects()
 {
+    float rV[3];
+    float rVel;
+    
     WorldElemListNode* pCur = gWorld->elements_moving.next;
     while(pCur)
     {
@@ -660,9 +650,13 @@ game_init_objects()
                 break;
                 
             case OBJ_BLOCK_MOVING:
-                pCur->elem->stuff.u.orbiter.radius = rand_in_range(12, 75);
-                pCur->elem->stuff.u.orbiter.period = rand_in_range(4, 16);
-                pCur->elem->stuff.u.orbiter.theta = rand_in_range(0, 628) / 100.0;
+//                pCur->elem->stuff.u.orbiter.radius = rand_in_range(12, 75);
+//                pCur->elem->stuff.u.orbiter.period = rand_in_range(4, 16);
+//                pCur->elem->stuff.u.orbiter.theta = rand_in_range(0, 628) / 100.0;
+                pCur->elem->bounding_reflect = 1;
+                rVel = rand_in_range(20.0, 5.0);
+                random_heading_vector(rV);
+                update_object_velocity(pCur->elem->elem_id, rV[0]*rVel, rV[1]*rVel, rV[2]*rVel, 0);
                 break;
                 
             default:
@@ -1665,14 +1659,14 @@ game_run()
                         asteroids_found++;
                     }
                     
-                    if(pCur->elem->object_type == OBJ_BLOCK_MOVING)
-                    {
-                        float orbit_origin[] = {0, atof(MAP_BASE_ALT), 0};
-                        
-                        orbit_around(pCur->elem, orbit_origin, pCur->elem->stuff.u.orbiter.theta, pCur->elem->stuff.u.orbiter.radius);
-                        
-                        pCur->elem->stuff.u.orbiter.theta += M_PI / (pCur->elem->stuff.u.orbiter.period * GAME_FRAME_RATE);
-                    }
+//                    if(pCur->elem->object_type == OBJ_BLOCK_MOVING)
+//                    {
+//                        float orbit_origin[] = {0, atof(MAP_BASE_ALT), 0};
+//
+//                        orbit_around(pCur->elem, orbit_origin, pCur->elem->stuff.u.orbiter.theta, pCur->elem->stuff.u.orbiter.radius);
+//
+//                        pCur->elem->stuff.u.orbiter.theta += M_PI / (pCur->elem->stuff.u.orbiter.period * GAME_FRAME_RATE);
+//                    }
                     break;
                     
                 case OBJ_BULLET:
@@ -2422,7 +2416,7 @@ fireBullet(int bulletAction)
     bullet_z_vec[1] = -bullet_z_vec[1];
     bullet_z_vec[2] = -bullet_z_vec[2];
     
-    bv = (missle? 3.0 : 2.0) * listNodeShip->elem->scale;
+    bv = (missle? 4.0 : 2.0) * listNodeShip->elem->scale;
     blr = missle? 0: 0.3 * listNodeShip->elem->scale;
     
     int shots = listNodeShip->elem->type == MODEL_SHIP3 && !missle? 2: 1;
@@ -2440,49 +2434,6 @@ fireBullet(int bulletAction)
         blr_last = -blr_last;
         
         gameShip_getEuler(&bullet_euler[0], &bullet_euler[1], &bullet_euler[2]);
-        
-        /*
-        int obj = world_add_object(missle? MODEL_MISSLE: MODEL_BULLET, bullet_x, bullet_y, bullet_z,
-                                   bullet_alpha, bullet_beta, bullet_gamma, 1, 2);
-        if(obj >= 0)
-        {
-            world_get_last_object()->object_type = missle? OBJ_MISSLE: OBJ_BULLET;
-            update_object_velocity(obj,
-                                   bullet_z_vec[0]*bulletVel,
-                                   bullet_z_vec[1]*bulletVel,
-                                   bullet_z_vec[2]*bulletVel,
-                                   0);
-            
-            world_get_last_object()->stuff.affiliation = listNodeShip->elem->stuff.affiliation;
-            world_get_last_object()->stuff.bullet.action = bulletAction;
-            world_get_last_object()->durability = DURABILITY_BULLET;
-            
-            if(missle)
-            {
-                game_elem_setup_missle(world_get_last_object());
-                // TODO: improve find_target to take obj_type to target
-                // and choose target by vector dot product OR proximity
-            
-                world_get_last_object()->stuff.u.enemy.target_id = game_target_missle_id;
-                world_get_last_object()->texture_id = TEXTURE_ID_MISSLE;
-                world_object_set_lifetime(obj, GAME_MISSLE_LIFETIME);
-                
-                if(!sound_played)
-                {
-                    gameAudioPlaySoundAtLocation("missle", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
-                    sound_played = 1;
-                }
-            }
-            else
-            {
-                if(!sound_played)
-                {
-                    gameAudioPlaySoundAtLocation("shoot", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
-                    sound_played = 1;
-                }
-            }
-        }
-         */
         
         game_add_bullet(bullet_pos, bullet_euler, missle? MAX_SPEED_MISSLE: bulletVel, bv, bulletAction,
                         missle? game_target_missle_id: -1, listNodeShip->elem->stuff.affiliation);
@@ -2702,11 +2653,11 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.u.enemy.ignore_collect = 1;
     x->stuff.u.enemy.fires = 0;
     x->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
-    x->stuff.u.enemy.time_last_run = time_ms;
     x->durability = DURABILITY_MISSLE;
     x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
-    x->stuff.u.enemy.max_slerp = 6.0; // radians per second
+    x->stuff.u.enemy.max_slerp = 5.0; // radians per second
     x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
+    x->stuff.u.enemy.time_last_run = time_ms + GAME_AI_UPDATE_INTERVAL_MS;
     x->stuff.u.enemy.scan_distance = 50;
     x->stuff.u.enemy.pursue_distance = 30;
 }

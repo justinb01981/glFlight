@@ -24,10 +24,11 @@ enum
     COLLISION_ACTION_DAMAGE = 1,
     COLLISION_ACTION_REPULSE = 2,
     COLLISION_ACTION_FLAG = 3,
-    COLLISION_ACTION_SPAWNPOINT_TELEPORT = 4,
+    COLLISION_ACTION_PORTAL_TELEPORT = 4,
     COLLISION_ACTION_POWERUP_GRAB = 5,
     COLLISION_ACTION_POWERUP_CAPTURE = 6,
-    COLLISION_ACTION_NEXTLEVEL = 7
+    COLLISION_ACTION_NEXTLEVEL = 7,
+    COLLISION_ACTION_REFLECT = 8
 };
 
 typedef unsigned int collision_action_t;
@@ -41,10 +42,10 @@ collision_actions_default[OBJ_LAST][OBJ_LAST] =
     {2, 2, 2, 0, 2, 2, 1, 0, 0, 0, 0,       5, 1, 0, 0, 0, 0, 1, 0, 0}, // ship
     {2, 2, 2, 3, 2, 2, 1, 4, 7, 0, 0, /*3*/ 5, 1, 0, 1, 0, 0, 0, 0, 0}, // player
     {0, 0, 2, 2, 0, 2, 1, 0, 0, 0, 0,       0, 0, 1, 0, 0, 0, 0, 0, 0}, // turret
-    {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // block_moving
+    {0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // block_moving
     {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // block
     {1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,       0, 1, 0, 0, 0, 0, 0, 0, 0}, // bullet
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // portal
+    {0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // portal
     {0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // spawnpoint
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // poopedcube
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // wreckage
@@ -61,6 +62,8 @@ collision_actions_default[OBJ_LAST][OBJ_LAST] =
 
 extern collision_action_t collision_actions[OBJ_LAST][OBJ_LAST];
 extern collision_action_t collision_actions_stage1[OBJ_LAST][OBJ_LAST];
+
+extern void load_map_and_host_game();
 
 // TODO: make this an array of callback-lists
 extern collision_action_t collision_actions[OBJ_LAST][OBJ_LAST];
@@ -397,11 +400,11 @@ do_world_collision_handling(float tc)
 
                     if(isnan(pCollisionA->elem->physics.ptr->x))
                     {
-                        printf("isNan: %ptr\n", pCollisionA->elem);
+                        printf("collision_handling: isNan: %ptr\n", pCollisionA->elem);
                     }
                     if(isnan(pCollisionB->elem->physics.ptr->x))
                     {
-                        printf("isNan: %ptr\n", pCollisionB->elem);
+                        printf("collision_handling: isNan: %ptr\n", pCollisionB->elem);
                     }
                     
                     game_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
@@ -414,20 +417,6 @@ do_world_collision_handling(float tc)
                         
                         pCollisionA->elem->durability -= pCollisionB->elem->durability;
                         pCollisionB->elem->durability -= durability_tmp;
-                        
-                        {
-                            WorldElem* ELEMS[] = {pCollisionB->elem, pCollisionA->elem, NULL};
-                            WorldElem **pElems = ELEMS;
-                            
-                            while(*pElems)
-                            {
-                                if((*pElems)->object_type == OBJ_SHIP)
-                                {
-                                    printf("collision with OBJ_SHIP durability: %f\n", (*pElems)->durability);
-                                }
-                                pElems += 1;
-                            }
-                        }
                         
                         // moving object destroyed
                         if(pCollisionA->elem->durability <= 0)
@@ -530,16 +519,18 @@ do_world_collision_handling(float tc)
                 }
                 break;
                     
-            case COLLISION_ACTION_SPAWNPOINT_TELEPORT:
-                gameNetwork_disconnect();
-                if(strcmp(/*gameNetworkState.hostInfo.name*/collidedPortalNametagLast, pCollisionB->elem->stuff.nametag) != 0)
-                {
-                    strcpy(collidedPortalNametagLast, pCollisionB->elem->stuff.nametag);
-                    gameDialogPortalToGame("");
-                }
-                strcpy(gameNetworkState.hostInfo.name, pCollisionB->elem->stuff.nametag);
+            case COLLISION_ACTION_PORTAL_TELEPORT:
                 console_clear();
-                console_write("Portal selected\nconnect to Inet game\nto join %s", gameNetworkState.hostInfo.name);
+                gameNetwork_disconnect();
+                if(strcmp(pCollisionA->elem->stuff.nametag, GAME_NETWORK_HOST_PORTAL_NAME) == 0)
+                {
+                    gameNetwork_host(gameSettingGameTitle, load_map_and_host_game);
+                }
+                else
+                {
+                     gameNetwork_connect(pCollisionA->elem->stuff.nametag, NULL);
+                }
+                world_remove_object(pCollisionA->elem->elem_id);
                 break;
             }
         }

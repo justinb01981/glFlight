@@ -549,7 +549,7 @@ void map_render(char *map_buf)
                         last_object_id =
                         world_add_object(MODEL_CUBE, map_cmd.params[0], map_cmd.params[1], map_cmd.params[2],
                                          map_cmd.params[3], map_cmd.params[4], map_cmd.params[5],
-                                         10, TEXTURE_ID_ANIMATED_STATIC);
+                                         6, TEXTURE_ID_ANIMATED_STATIC);
                         world_get_last_object()->object_type = OBJ_SPAWNPOINT;
                         world_object_set_lifetime(last_object_id, 300);
                         break;

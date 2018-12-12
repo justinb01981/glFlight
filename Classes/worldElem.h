@@ -75,7 +75,6 @@ struct WorldElem {
         char wireframe;
         char tex_adjust;
         char tex_phase;
-        int fade_in_count;
 	} renderInfo;
     
     struct 
@@ -106,6 +105,7 @@ struct WorldElem {
     
     int bounding_wrap:1;
     int bounding_remain:1;
+    int bounding_reflect:1;
     
     int in_visible_list:1;
     int visible_list_by_region_sorted:1;

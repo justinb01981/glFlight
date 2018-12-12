@@ -1097,12 +1097,6 @@ drawElem(WorldElem* pElem)
         
         int texture_id = pElem->texture_id;
         
-        if(pElem->renderInfo.fade_in_count)
-        {
-            texture_id = pElem->renderInfo.fade_in_count % 3 == 0 ? 0 : texture_id;
-            pElem->renderInfo.fade_in_count--;
-        }
-        
         int texture_id_animated = texture_animated(texture_id, drawElemAnimationIdx);
         
         if(drawn_texture_last != texture_id_animated)

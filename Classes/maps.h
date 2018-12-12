@@ -265,10 +265,10 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0) \
 ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0) \
 ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 
-#define BUILDING_1(x, y, z)                         \
-"set_vector "#x" "#y" "#z" 0 4 0\n"                 \
+#define BUILDING_1(x, y, z)                          \
+"set_vector "#x" "#y" "#z" 0 4 0\n"                  \
 "add_object 20 vecx_0 vecy_0 vecz_0 0 0 0 4 16\n"
-//"add_object 1 vecx_0 vecy_1 vecz_0 0 0 0 4 16\n"    \
+//"add_object 1 vecx_0 vecy_1 vecz_0 0 0 0 4 16\n"   \
 //"add_object 1 vecx_0 vecy_2 vecz_0 0 0 0 4 16\n"   \
 //"add_object 1 vecx_0 vecy_3 vecz_0 0 0 0 4 16\n"   \
 //"add_object 1 vecx_0 vecy_4 vecz_0 0 0 0 4 16\n"   \
@@ -286,6 +286,9 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 "add_object 19 vecx_0 vecy_6 vecz_0 0 0 0 4 112\n"   \
 "add_object 19 vecx_0 vecy_6.75 vecz_0 0 0 0 2 112\n"
 */
+
+#define BUILDING_3(x, y, z)                          \
+"add_object 1 "#x" "#y" "#z" 0 0 0 4 28\n"
 
 #define FLOATING_CUBE1(x, y, z)                      \
 "add_object 1 "#x" "#y" "#z" 0 0 0 4 28\n"
@@ -553,173 +556,65 @@ WORLD_SCALED_FRAME(1, /*57*/28, 4)
 // buildings
 MAP_GENERATED_MACRO
 
-MAP_GENERATED_MACRO2
-
-/*
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-FLOATING_ISLAND(rndx, rndy, rndz)
-*/
-
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" 100 20 100 0 0 0 2 14\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" 100 20 100 0 0 0 1 14\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" 100 20 100 0 0 0 4 14\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" 100 20 100 0 0 0 2 14\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 
@@ -745,6 +640,7 @@ BASE_GENERIC(0, 0)
  */
 ;
 
+// MARK: -- map - turret
 const static char initial_map_turret[] = ""
 
 //"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
@@ -756,15 +652,6 @@ WORLD_SCALED_FRAME_TURRET(1, 57, 4)
 
 // else
 GREEN_TENDRILS_1
-
-COIN_LINE_1_4X
-COIN_LINE_1_4X
-COIN_LINE_1_4X
-COIN_LINE_1_4X
-COIN_LINE_1_4X
-COIN_LINE_1_4X
-COIN_LINE_1_4X
-COIN_LINE_1_4X
 
 /////////////
 
@@ -899,78 +786,49 @@ const static char initial_map_deathmatch[] = ""
 ///WORLD_SCALED_FRAME_TERRAIN(-10, 28, 4)
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
 
+// drifting asteroid example
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+// drifting asteroid example
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 4 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+// drifting asteroid example
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 4 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+// drifting asteroid example
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 8 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+// drifting asteroid example
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 8 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+// drifting asteroid example
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 4 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+// drifting asteroid example
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 16 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+// drifting asteroid example
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 8 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+// drifting asteroid example
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 8 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+// drifting asteroid example
+"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"object_set_info 4\n" // moving block
+"object_set_velocity 0 0.5 0\n"
+
 // buildings
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-BUILDING_1(rndx, 2, rndz)
-
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
-BUILDING_2(rndx, 2, rndz)
+//MAP_GENERATED_MACRO
 
 FLOATING_ISLAND(0, 75, 0)
 
@@ -988,6 +846,7 @@ FLOATING_ISLAND(100, 100, -100)
 
 ;
 
+// MARK: -- map - survival
 const static char initial_map_survival[] = ""
 
 WORLD_SCALED_FRAME(1, 28, 4)
@@ -1332,6 +1191,7 @@ BASE_ENEMY_1
  */
 ;
 
+// MARK: -- map - flat2
 const static char map_400x100x400[] = ""
 
 "set_world_size 400\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
@@ -1366,6 +1226,7 @@ const static char map_400x100x400[] = ""
 
 ;
 
+// MARK: -- map - flat
 const static char map_400x100x400_flat[] = ""
 
 "set_world_size 400\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
@@ -1407,11 +1268,10 @@ RANDOM_FLOATING_BLOCKS_1
 
 ;
 
+// MARK: -- map - lobby
 const static char map_portal_lobby[] = ""
 "set_world_size 50\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
-"mesh_manip_add wx-0.1 " "4" " wz-0.1" " 4 0 0" " 0 0 4" " 10 10\n"
-"mesh_manip_complete 1 19 1 4\n"
 ;
 
 const static char pokeball_map[] = ""
@@ -1521,6 +1381,14 @@ const static char* maps_list_names[] =
     "speedrun",
     NULL
 };
+
+const static char* initial_map = ""                         \
+"set_background_info "BACKGROUND_TEXTURE_STR"\n" \
+WORLD_SCALED_FRAME(1, /*57*/28, 4) \
+MAP_GENERATED_MACRO \
+WORLD_ADD_OBJECT(12, -2, 5, -4, 0, 0, 0, 1.0 , 24)          \
+WORLD_ADD_OBJECT(14, 2, 5, -4, 0, 0, 0, 1.0 , 71)           \
+"";
 
 
 #endif

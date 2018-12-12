@@ -23,7 +23,6 @@
 struct gameDialogStateStruct
 {
     char gameDialogPortalToGameLast[255];
-    int networkGameNameEntered;
     int hideNetworkStatus;
     
     char displayStringBuf[1024][16];
@@ -35,6 +34,8 @@ extern struct gameDialogStateStruct gameDialogState;
 extern int gameDialogCounter;
 
 extern void AppDelegateOpenURL(const char* url);
+
+extern void gameDialogStartNetworkGame();
 
 static void
 gameDialogCancel(void)
@@ -154,6 +155,7 @@ gameDialogVisitHomepage()
 static void
 gameDialogMenuCountdown()
 {
+    extern int AppDelegateIsMultiplayerEager();
     static int passes = 200;
     passes--;
     
@@ -170,7 +172,14 @@ gameDialogMenuCountdown()
     
     glFlightDrawframeHook = NULL;
     
+    if(AppDelegateIsMultiplayerEager())
+    {
+        //actions_menu_set(ACTION_CONNECT_TO_GAME);
+        //fireAction = ACTION_CONNECT_TO_GAME;
+    }
+
     gameDialogWelcomeMenu();
+    
     gameDialogGraphicCancel();
 }
 
@@ -202,13 +211,13 @@ gameDialogWelcome()
 {
     gameInterfaceControls.calibrateRect.visible = 0;
     
-    if(/*gameSettingsLaunchCount % 2 == 1 &&  */ !gameSettingsRatingGiven)
+    if(/*gameSettingsLaunchCount % 2 == 1 &&  */ !gameSettingsRatingGiven && gameSettingsLaunchCount >= 2)
     {
         gameInterfaceModalDialog(WELCOMESTR
                                  "Please rate d0gf1ght!\n"
                                  "Unlock new vehicles in multiplayer!\n",
                                  "Sure", "No way",
-                                 gameDialogWelcomeRating, /*gameDialogWelcomeNoRating*/ gameDialogWelcomeMenu);
+                                 gameDialogRating, /*gameDialogWelcomeNoRating*/ gameDialogWelcomeMenu);
     }
     else
     {
@@ -353,43 +362,37 @@ gameDialogBrowseGames()
 }
 
 static void
-gameDialogBrowseGamesCountdown()
+gameDialogNetworkHostRegister()
 {
-    static int passes = 240;
+    const int timeout = GAME_FRAME_RATE * 4;
+    static int passes = timeout;
+    
     passes--;
     if(passes <= 0)
     {
-        extern void gameInterfaceGameSearchTimedOut();
-        extern void load_map_and_host_game();
-        
-        if(gameNetworkState.hostInfo.bonjour_lan)
-        {
-            if(gameNetwork_connect(gameSettingGameTitle, load_map_and_host_game) == GAME_NETWORK_ERR_NONE)
-            {
-            }
-            else
-            {
-                console_write("Connection failed to %s", gameSettingGameTitle);
-            }
-        }
-        else
-        if(!gameNetworkState.map_downloaded)
-        {
-            gameInterfaceGameSearchTimedOut();
-            /*
-            strcpy(gameSettingGameTitle, "host");
-            if(gameNetwork_connect(gameSettingGameTitle, load_map_and_host_game) == GAME_NETWORK_ERR_NONE)
-            {
-            }
-            else
-            {
-                console_write("Connection failed to %s", gameSettingGameTitle);
-            }
-             */
-        }
-        
         glFlightDrawframeHook = NULL;
-        passes = 240;
+        gameNetworkState.gameNetworkHookOnMessage = NULL;
+        
+        passes = timeout;
+    }
+}
+
+static void
+gameDialogNetworkCountdownEnded()
+{
+    const int timeout = GAME_FRAME_RATE * 4;
+    static int passes = timeout;
+    
+    passes--;
+    if(passes <= 0)
+    {
+        console_write("NO games found - hosting\n");
+        glFlightDrawframeHook = NULL;
+        gameNetworkState.gameNetworkHookOnMessage = NULL;
+        
+        fireAction = ACTION_HOST_GAME_OR_COMMIT;
+        gameInterfaceProcessAction();
+        passes = timeout;
     }
 }
 
@@ -472,11 +475,9 @@ gameDialogStartNetworkGame2()
 static void
 gameDialogStartNetworkGameWait()
 {
-    gameInterfaceModalDialog("Waiting for guests\nTap when everyone has\njoined, and 5 min round\nwill start...", "", "",
+    gameInterfaceModalDialog("Waiting for guests\nTap when everyone has\njoined, and 5 min game\nwill start...", "", "",
                              gameDialogStartNetworkGame2, gameDialogStartNetworkGame2);
 }
-
-static void gameDialogStartNetworkGame();
 
 static void
 gameDialogStartNetworkGameNewMap()
@@ -522,17 +523,14 @@ static void
 gameDialogEnterGameName(int action)
 {
     const char* msg = ""
-    "^D^D^Dmultiplayer howto^D^D^D\n"
-    "^D^D^Don the next screen^D^D^D\n"
-    "^Blocal games:\n"
-    "^A to host - enter any room-name\n"
-    "^A guest - enter host room-name\n"
-    "^Binternet games:\n"
-    "^A to host - enter any room name\n"
-    "^A or blank to host a public game\n"
-    "^A guest - enter d0gf1ght.domain17.net\n"
-    "  for public game\n"
-    "  or IP address of host\n"
+    "^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D\n"
+    "^D^D^DOn next screen  ^D^D^D\n"
+    "^D^D^D                ^D^D^D\n"
+    "^D^D^DHost: type name ^D^D^D\n"
+    "^D^D^D                ^D^D^D\n"
+    "^D^D^DGuest: type name^D^D^D\n"
+    "^D^D^Dof host         ^D^D^D\n"
+    "^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D\n"
     ;
     fireActionQueuedAfterEdit = action;
     if(action == ACTION_HOST_GAME_LAN)
@@ -568,10 +566,25 @@ gameDialogNetworkGameStatus()
 }
 
 static void
+gameDialogDisconnectAndDequeue()
+{
+    gameNetwork_disconnect();
+    gameDialogClose();
+    gameInterfaceModalDialogDequeue();
+}
+
+static void
 gameDialogNetworkGameEnded()
 {
+    const char* msg = "(game over)\ndisconnecting from host...";
     gameDialogState.hideNetworkStatus = 0;
     gameDialogNetworkGameStatus();
+    
+    controlRect* peek = gameInterfaceModalDialogPeek();
+    if(strncmp(peek->text, msg, sizeof(peek->text)) == 0) return;
+    
+    gameInterfaceModalDialog(msg, "OK", "OK", gameDialogDisconnectAndDequeue, gameDialogDisconnectAndDequeue);
+    
 }
 
 static void gameDialogCancelString();

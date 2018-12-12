@@ -234,7 +234,7 @@ calibrate_bail:
             int sound_idx = 0;
             float rate = 0.25 + 2.0*(speed/maxSpeed);
             
-            char* sndName = engine_sounds[sound_idx];
+            const char* sndName = engine_sounds[sound_idx];
             
             /*
             if(speed/maxSpeed < 0.33)
@@ -265,12 +265,10 @@ calibrate_bail:
     // TODO: this is being called at most once every 1/60th of a second (16ms)
     do_game_network_world_update();
     
-    gameNetworkState.msgQueue.cleanupWaiting = 1;
-    while(gameNetworkState.msgQueue.cleanup) { int i; i++; }
-    gameNetworkState.msgQueue.cleanupWaiting = 0;
+    game_lock_lock(&gameNetworkState.msgQueue.lock);
     
     gameNetworkMessageQueued* pNetworkMsg = gameNetworkState.msgQueue.head.next;
-    while(pNetworkMsg && gameNetworkState.msgQueue.cleanup == 0)
+    while(pNetworkMsg)
     {
         gameNetworkMessageQueued* pNetworkMsgNext = pNetworkMsg->next;
         if(!pNetworkMsg->processed)
@@ -280,6 +278,8 @@ calibrate_bail:
         pNetworkMsg->processed = 1;
         pNetworkMsg = pNetworkMsgNext;
     }
+    
+    game_lock_unlock(&gameNetworkState.msgQueue.lock);
     
     do_game_network_write();
     
@@ -362,7 +362,6 @@ calibrate_bail:
         speed = 6;
         update_object_velocity(my_ship_id, ship_z_vec[0]*speed, ship_z_vec[1]*speed, ship_z_vec[2]*speed, 0);
         world_get_last_object()->bounding_remain = 1;
-        world_get_last_object()->renderInfo.fade_in_count = 300;
         world_get_last_object()->durability = ship_durability;
         
         gameCamera_init(my_ship_x, my_ship_y, my_ship_z,
@@ -608,7 +607,7 @@ calibrate_bail:
     }
     
     // walk part of the list and add some potentially-visible elements
-    unsigned int btreeVisibleTestCount = 400;
+    unsigned int btreeVisibleTestCount = 400; // TODO: saw a crash when reducing to 120
     unsigned int btreeVisIdx = (visibleBtreeRootBuilding == &visibleBtreeRootStorage1 ? 0 : 1);
     while(btreeVisibleTest && btreeVisibleTestCount > 0)
     {

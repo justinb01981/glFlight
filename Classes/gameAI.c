@@ -398,7 +398,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     float zdot_juke = 0.3;
     float dist_tooclose = 10.0;
     float boundary_avoid_distance = 5.0;
-    int slerp_done = 0;
+    int iF;
     
     tc = time_ms - elem->stuff.u.enemy.time_last_run;
     tc /= 1000.0;
@@ -506,17 +506,8 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     }
     else if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_RUN)
     {
-        //
-        slerp(zq.w, zq.x, zq.y, zq.z,
-              yq.w, yq.x, yq.y, yq.z,
-              elem->stuff.u.enemy.max_slerp * tc,
-              &z1q.w, &z1q.x, &z1q.y, &z1q.z);
-        if(isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
-        {
-            z1q = zq;
-        }
-        
-        slerp_done = 1;
+        // pull up
+        zdot = -1;
         
         // add unpredictable behavior by heading off on a tangent periodically for a short period
         if(time_ms >= elem->stuff.u.enemy.time_next_retarget &&
@@ -562,23 +553,24 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     if(elem->stuff.u.enemy.run_distance > 0)
     {
         float S = boundary_avoid_distance;
-        float dest[3] = {
-            elem->physics.ptr->x + zq.x*S,
-            elem->physics.ptr->y + zq.y*S,
-            elem->physics.ptr->z + zq.z*S
-        };
+        float dest[3];
+        dest[0] = elem->physics.ptr->x + zq.x*S;
+        dest[1] = elem->physics.ptr->y + zq.y*S;
+        dest[2] = elem->physics.ptr->z + zq.z*S;
         float result[3];
+             
         if(world_bounding_violations(dest, result) /*&& zdot < 0.7*/)
         {
-            if(time_ms > elem->stuff.u.enemy.time_next_retarget)
+            if(elem->stuff.u.enemy.enemy_state != ENEMY_STATE_JUKE)
             {
-                elem->stuff.u.enemy.tgt_x = elem->physics.ptr->x + zq.x*S*2;
-                elem->stuff.u.enemy.tgt_y = elem->physics.ptr->y + zq.y*S*2;
-                elem->stuff.u.enemy.tgt_z = elem->physics.ptr->z + zq.z*S*2;
+                elem->stuff.u.enemy.tgt_x = dest[0] + result[0] * S * 4;
+                elem->stuff.u.enemy.tgt_y = dest[1] + result[1] * S * 4;
+                elem->stuff.u.enemy.tgt_z = dest[1] + result[2] * S * 4;
                 
                 elem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
-                elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
-                elem->stuff.u.enemy.time_next_retarget = time_ms + 3000;
+                elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
+                elem->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
+                elem->stuff.u.enemy.time_next_retarget = time_ms + 4000;
             }
         }
     }
@@ -607,24 +599,29 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         vdesired = 1.0;
     }
 
-    if(!slerp_done)
+    if(zdot < 0)
     {
-        slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist, zdot < 0 ? -elem->stuff.u.enemy.max_slerp*tc : (elem->stuff.u.enemy.max_slerp-0.05)*tc, &z1q.w, &z1q.x, &z1q.y, &z1q.z);
-        if(isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
-        {
-            z1q = zq;
-        }
+        quaternion_rotate_inplace(&zq, &xq, elem->stuff.u.enemy.max_slerp*tc);
+        quaternion_rotate_inplace(&yq, &xq, elem->stuff.u.enemy.max_slerp*tc);
+    }
+    else
+    {
+        slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist, elem->stuff.u.enemy.max_slerp*tc, &z1q.w, &z1q.x, &z1q.y, &z1q.z);
+        xq.w += z1q.w-zq.w;
+        xq.x += z1q.x-zq.x;
+        xq.y += z1q.y-zq.y;
+        xq.z += z1q.z-zq.z;
+        yq.w += z1q.w-zq.w;
+        yq.x += z1q.x-zq.x;
+        yq.y += z1q.y-zq.y;
+        yq.z += z1q.z-zq.z;
+        zq = z1q;
     }
     
-    xq.w += z1q.w-zq.w;
-    xq.x += z1q.x-zq.x;
-    xq.y += z1q.y-zq.y;
-    xq.z += z1q.z-zq.z;
-    yq.w += z1q.w-zq.w;
-    yq.x += z1q.x-zq.x;
-    yq.y += z1q.y-zq.y;
-    yq.z += z1q.z-zq.z;
-    zq = z1q;
+    if(isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
+    {
+        z1q = zq;
+    }
     
     // convert new heading vector back
     /*
@@ -635,6 +632,26 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     float alpha, beta, gamma;
     get_euler_from_body_vectors(&xq, &yq, &zq, &alpha, &beta, &gamma);
+    
+    float* pFloatCheckIsNan[] = {
+        &alpha,
+        &beta,
+        &gamma
+    };
+    float* pFloatCheckIsNanR[] = {
+        &elem->physics.ptr->alpha,
+        &elem->physics.ptr->beta,
+        &elem->physics.ptr->gamma
+    };
+    for(iF = 0; iF < sizeof(pFloatCheckIsNan)/sizeof(float*); iF++)
+    {
+        if(isnan(*pFloatCheckIsNan[iF]))
+        {
+            //*pFloatCheckIsNan[iF] = 0;
+            *pFloatCheckIsNan[iF] = *pFloatCheckIsNanR[iF];
+            printf("isnan: %p\n", elem);
+        }
+    }
     
     world_replace_object(elem->elem_id, elem->type,
                          elem->physics.ptr->x, elem->physics.ptr->y, elem->physics.ptr->z,
