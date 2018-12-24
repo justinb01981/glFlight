@@ -476,7 +476,7 @@ static void
 gameDialogStartNetworkGameWait()
 {
     gameInterfaceModalDialog("Waiting for guests\nTap when everyone has\njoined, and 5 min game\nwill start...", "", "",
-                             gameDialogStartNetworkGame2, gameDialogStartNetworkGame2);
+                             gameDialogStartNetworkGame2, gameDialogCancel);
 }
 
 static void

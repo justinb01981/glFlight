@@ -178,7 +178,7 @@ const static float game_variables_default[] = {
     0            // END
 };
 
-struct
+typedef struct
 {
     int started;
     int delay_new_level;
@@ -280,7 +280,9 @@ struct
     
     int map_use_current;
 
-} gameStateSinglePlayer;
+} GameStateSinglePlayer;
+
+extern GameStateSinglePlayer gameStateSinglePlayer;
 
 extern float game_ammo_missles;
 extern float game_ammo_bullets;

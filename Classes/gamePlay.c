@@ -70,6 +70,8 @@ float game_variables_val[GAME_VARIABLES_MAX];
 
 static int object_id_portal = WORLD_ELEM_ID_INVALID;
 
+GameStateSinglePlayer gameStateSinglePlayer;
+
 extern void random_heading_vector(float v[3]);
 
 int
@@ -86,6 +88,7 @@ score_total()
 {
     int *high_score;
     int *high_score_session;
+    char buf[256];
     
     float m = gameStateSinglePlayer.difficulty;
     
@@ -116,6 +119,9 @@ score_total()
             gameAudioPlaySoundAtLocation("highscore", my_ship_x, my_ship_y, my_ship_z);
         }
     }
+    
+    snprintf(buf, sizeof(buf)-1, "%u\n", gameStateSinglePlayer.stats.score);
+    strncat(gameSettingsKillHistory, buf, sizeof(gameSettingsKillHistory)-1);
 }
 
 static void
@@ -675,6 +681,8 @@ game_init()
     gameStateSinglePlayer.map_use_current = 0;
     
     for(i = 0; i < GAME_VARIABLES_MAX; i++) game_variables_val[i] = game_variables_default[i];
+    
+    collision_actions_set_default();
 }
 
 void
@@ -1911,7 +1919,7 @@ game_run()
                         if(pElemNodeSpawn)
                         {
                             float v[3];
-                            float vel = rand_in_range(gWorld->bound_radius / 100 * 20, gWorld->bound_radius / 2);
+                            float vel = rand_in_range(gWorld->bound_radius / 100 * 20, gWorld->bound_radius);
                             
                             int collect_elem_new_id =
                                 game_add_powerup(pElemNodeSpawn->elem->physics.ptr->x,

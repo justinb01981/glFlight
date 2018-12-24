@@ -1314,6 +1314,7 @@ game_network_periodic_check()
     
     static game_timeval_t time_retransmit_map_last = 0;
     static game_timeval_t time_game_remaining_dec_last = 0;
+    static game_timeval_t time_game_start_alert_last = 0;
     
     if(network_time_ms - time_retransmit_map_last > 200 && !gameNetworkState.hostInfo.bonjour_lan)
     {
@@ -1325,6 +1326,13 @@ game_network_periodic_check()
     {
         time_game_remaining_dec_last = network_time_ms;
         gameNetworkState.time_game_remaining -= 1;
+    }
+    
+    if(gameNetworkState.connected && gameNetworkState.hostInfo.hosting && !gameStateSinglePlayer.started
+       && network_time_ms - time_game_start_alert_last > 10000)
+    {
+        time_game_start_alert_last = network_time_ms;
+        gameDialogStartNetworkGameWait();
     }
     
     while(pInfo)

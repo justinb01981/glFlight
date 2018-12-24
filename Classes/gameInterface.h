@@ -93,7 +93,7 @@ typedef struct {
 
 } controls;
 
-controls gameInterfaceControls;
+extern controls gameInterfaceControls;
 
 extern int texture_id_block;
 

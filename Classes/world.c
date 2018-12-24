@@ -1195,18 +1195,19 @@ void world_init(float radius)
     
     // build spherical bounding
     float Ty, Tx;
-    float i = WORLD_BOUNDING_SPHERE_STEPS;
+    float I = WORLD_BOUNDING_SPHERE_STEPS;
     float R = M_PI*2;
-    float Rad = (2*M_PI * gWorld->bound_radius)/i;
+    float Rad = gWorld->bound_radius;
+    float RL = (R/I);
     quaternion_t Qx, Qy, Qz;
     
-    boundingRegion* br = boundingRegionInit(i * i + 1);
+    boundingRegion* br = boundingRegionInit(I * I + 1);
     
     Qx.w = Qy.w = Qz.w = 1.0;
     Qx.x = Qy.y = Qz.z = 1.0;
     Qx.y = Qx.z = Qy.x = Qy.z = Qz.x = Qz.y = 0.0;
-    
-    for(Ty = 0; Ty < R; Ty += R/i)
+
+    for(Ty = 0; Ty < R; Ty += RL)
     {
         quaternion_t U, V;
         
@@ -1217,8 +1218,9 @@ void world_init(float radius)
         quaternion_rotate_inplace(&V, &Qy, Ty);
         
         // bounding vectors only for top hemisphere
-        for(Tx = 0; Tx < R/2; Tx += R/i)
+        for(Tx = 0; Tx < R/2; Tx += R/I)
         {
+            int d;
             float P[] = {
                 U.x * Rad,
                 U.y * Rad,
@@ -1239,27 +1241,27 @@ void world_init(float radius)
                     0, 0, 0
                 };
                 float L1[3], L2[3], L3[3], L4[3];
-                int d;
                 
                 vector_cross_product(&UVcross[0], &UVcross[3], &(UVcross[9]));
                 vector_cross_product(&UVcross[0], &UVcross[6], &(UVcross[12]));
+                
+                float L = tan(RL/2)*Rad * 2;
                 
                 for(d = 0; d < 3; d++)
                 {
                     int i;
                     float *LClamp[] = { L1, L2, L3, L4 };
                     
-                    L1[d] = P[d] + UVcross[d+9] * Rad/2.4;
-                    L2[d] = P[d] + UVcross[d+9] * -Rad/2.4;
-                    L3[d] = P[d] + UVcross[d+12] * Rad/2.4;
-                    L4[d] = P[d] + UVcross[d+12] * -Rad/2.4;
+                    L1[d] = P[d] + (UVcross[d+9]) * (L / 2);
+                    L2[d] = P[d] + (UVcross[d+9]) * (L / -2);
+                    L3[d] = P[d] + (UVcross[d+12]) * (L / 2);
+                    L4[d] = P[d] + (UVcross[d+12]) * (L / -2);
                     
                     for(i = 0; i < sizeof(LClamp)/sizeof(float*); i++)
                     {
                         if(LClamp[i][1] < 0) LClamp[i][1] = 0;
                     }
                 }
-                
                 
                 float LColor[] = {
                     0, 0xff, 0
@@ -1270,7 +1272,7 @@ void world_init(float radius)
                 world_add_drawline(L3, L4, LColor, 999999);
             }
             
-            quaternion_rotate_inplace(&U, &V, R/i);
+            quaternion_rotate_inplace(&U, &V, R/I);
         }
     }
     

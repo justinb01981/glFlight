@@ -46,6 +46,7 @@ static const char* gameSoundNames[] = {
     "teleport",
     "filelost",
     "enemydead",
+    "menubeep",
     NULL
 };
 

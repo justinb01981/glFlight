@@ -30,6 +30,8 @@ extern void appWriteSettings();
 extern void GameNetworkBonjourManagerBrowseBegin();
 extern void game_add_network_portal(char* name);
 
+controls gameInterfaceControls;
+
 int texture_id_block = TEXTURE_ID_BLOCK;
 
 const char *charMap = "abcdefghijklmnopqrstuvwxyz0123456789. _-@!$%^&*";
@@ -584,18 +586,23 @@ gameInterfaceHandleTouchBegin(float x, float y)
             case 0:
                 break;
             case 1:
+                gameAudioPlaySoundAtLocation("menubeep", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
                 action_prev();
                 break;
             case 2:
+                gameAudioPlaySoundAtLocation("menubeep", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
                 action_sub_next();
                 break;
             case 3:
+                gameAudioPlaySoundAtLocation("menubeep", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
                 action_sub_prev();
                 break;
             case 4:
+                gameAudioPlaySoundAtLocation("menubeep", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
                 action_next();
                 break;
             case 5:
+                gameAudioPlaySoundAtLocation("menubeep", gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());
                 gameInterfaceProcessAction();
                 break;
                 
