@@ -185,7 +185,7 @@ glFlightFrameStage1()
 //        gameDialogInitialCountdown();
 //    }
 
-    extern void update_time_ms_frame_tick();
+    extern void update_time_ms_frame_tick(void);
     update_time_ms_frame_tick();
     
 calibrate_bail:
@@ -358,7 +358,7 @@ calibrate_bail:
                              my_ship_alpha, my_ship_beta, my_ship_gamma,
                              1, texture_id_playership);
         world_get_last_object()->object_type = OBJ_PLAYER;
-        targetSpeed = minSpeed;
+        targetSpeed = minSpeed + 1.0;
         speed = 6;
         update_object_velocity(my_ship_id, ship_z_vec[0]*speed, ship_z_vec[1]*speed, ship_z_vec[2]*speed, 0);
         world_get_last_object()->bounding_remain = 1;
@@ -542,8 +542,9 @@ calibrate_bail:
          glDisable(GL_CULL_FACE);
          glCullFace(GL_BACK);
      }
-     //glDepthFunc(GL_GREATER);
-     glDisable(GL_DEPTH_TEST);
+    
+     glDepthFunc(GL_LESS);
+     glEnable(GL_DEPTH_TEST);
      glFrontFace(GL_CCW);
     
     drawBackground();
@@ -561,7 +562,6 @@ calibrate_bail:
         xfrust = yfrust * (viewWidth/viewHeight);
     }
 	glFrustumf(-xfrust, xfrust, -yfrust, yfrust, 2, drawDistanceFar);
-    
     
     /*
     glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
@@ -636,6 +636,7 @@ calibrate_bail:
         btreeVisibleTest = btreeVisibleTest->next;
         btreeVisibleTestCount--;
     }
+    printf("btreeVisibleTestCount=%d\n", btreeVisibleTestCount);
     
     // partially sort current visible subset
     world_elem_list_sort_1(&gWorld->elements_visible, element_dist_compare, 0, INT_MAX);
@@ -906,6 +907,6 @@ draw_btree_elements(WorldElem* pElem, float priority)
     }
     else
     {
-        //world_elem_btree_walk_should_abort = 1;
+        drawElem(pElem);
     }
 }
