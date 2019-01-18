@@ -33,7 +33,8 @@ def find_locations(rangeX, rangeY, rangeZ, max_proximity, add_location_function)
 
 def add_building(x, y, z):
     N = 1+RInt(3).random_int
-    sys.stdout.write('BUILDING_'+str(N)+'('+str(x)+', '+str(y)+', '+str(z)+') \\\n')
+    h = float(random.random() * 314159) / 100000
+    sys.stdout.write('BUILDING_'+str(N)+'('+str(x)+', '+str(y)+', '+str(z)+', '+str(h)+') \\\n')
 
 sys.stdout.write(map_command_prefix)
 

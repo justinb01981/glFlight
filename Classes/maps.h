@@ -31,6 +31,7 @@
 #define MAPMODEL_MISSLE "13"
 #define MAPMODEL_SHIP3 "14"
 #define MAPMODEL_ICOSAHEDRON "15"
+#define MAPMODEL_PYRAMID "3"
 #define MAPMODEL_CUBE_INVERTED "16"
 #define MAPMODEL_SPHERE "17"
 #define MAPMODEL_ENEMYBASE "18"
@@ -265,18 +266,18 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0) \
 ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0) \
 ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 
-#define BUILDING_1(x, y, z)                          \
+#define BUILDING_1(x, y, z, h)                       \
 "set_vector "#x" "#y" "#z" 0 4 0\n"                  \
-"add_object 20 vecx_0 vecy_0 vecz_0 0 0 0 4 16\n"
+"add_object 20 vecx_0 vecy_0 vecz_0 1.57 "#h" -1.57 4 16\n"
 //"add_object 1 vecx_0 vecy_1 vecz_0 0 0 0 4 16\n"   \
 //"add_object 1 vecx_0 vecy_2 vecz_0 0 0 0 4 16\n"   \
 //"add_object 1 vecx_0 vecy_3 vecz_0 0 0 0 4 16\n"   \
 //"add_object 1 vecx_0 vecy_4 vecz_0 0 0 0 4 16\n"   \
 //"add_object 1 vecx_0 vecy_5 vecz_0 0 0 0 4 16\n"   \
 
-#define BUILDING_2(x, y, z)                          \
+#define BUILDING_2(x, y, z, h)                       \
 "set_vector "#x" "#y" "#z" 0 4 0\n"                  \
-"add_object 19 vecx_0 vecy_0 vecz_0 0 0 0 4 112\n"
+"add_object 19 vecx_0 vecy_0 vecz_0 1.57 "#h" -1.57 4 112\n"
 /*
 "add_object 19 vecx_0 vecy_1 vecz_0 0 0 0 4 112\n"   \
 "add_object 19 vecx_0 vecy_2 vecz_0 0 0 0 4 112\n"   \
@@ -287,8 +288,8 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 "add_object 19 vecx_0 vecy_6.75 vecz_0 0 0 0 2 112\n"
 */
 
-#define BUILDING_3(x, y, z)                          \
-"add_object 1 "#x" "#y" "#z" 0 0 0 4 28\n"
+#define BUILDING_3(x, y, z, h)                       \
+"add_object 1 "#x" "#y" "#z" 1.57 "#h" -1.57 4 28\n"
 
 #define FLOATING_CUBE1(x, y, z)                      \
 "add_object 1 "#x" "#y" "#z" 0 0 0 4 28\n"
@@ -545,7 +546,7 @@ const static char initial_map_collection[] = ""
 
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
 
-"add_object "MAPMODEL_SPRITE_SCENERY" -150 75 -150 1.6 0.78 -1.6 100 114\n"
+"add_object "MAPMODEL_SPRITE_SCENERY" -150 75 -150 1.6 0.78 -1.6 100 "/*"114"*/"88""\n"
 "object_set_info 16\n" // scenery
 
 // else
@@ -656,12 +657,12 @@ GREEN_TENDRILS_1
 /////////////
 
 // buildings
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
-BUILDING_1(rndx, 8, rndz)
+BUILDING_1(rndx, 8, rndz, 0)
+BUILDING_1(rndx, 8, rndz, 0)
+BUILDING_1(rndx, 8, rndz, 0)
+BUILDING_1(rndx, 8, rndz, 0)
+BUILDING_1(rndx, 8, rndz, 0)
+BUILDING_1(rndx, 8, rndz, 0)
 
 // drifting asteroid example
 /*
@@ -828,7 +829,7 @@ const static char initial_map_deathmatch[] = ""
 "object_set_velocity 0 0.5 0\n"
 
 // buildings
-//MAP_GENERATED_MACRO
+MAP_GENERATED_MACRO
 
 FLOATING_ISLAND(0, 75, 0)
 
@@ -1342,12 +1343,12 @@ COIN_LINE_1_4X
 /////////////
 
 // buildings
-BUILDING_1(rndx, 0, rndz)
-BUILDING_1(rndx, 0, rndz)
-BUILDING_1(rndx, 0, rndz)
-BUILDING_1(rndx, 0, rndz)
-BUILDING_1(rndx, 0, rndz)
-BUILDING_1(rndx, 0, rndz)
+BUILDING_1(rndx, 0, rndz, 0)
+BUILDING_1(rndx, 0, rndz, 0)
+BUILDING_1(rndx, 0, rndz, 0)
+BUILDING_1(rndx, 0, rndz, 0)
+BUILDING_1(rndx, 0, rndz, 0)
+BUILDING_1(rndx, 0, rndz, 0)
 ; // map_trench
 
 
