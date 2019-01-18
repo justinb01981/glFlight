@@ -81,7 +81,9 @@ sort_elem_coordinates_furthest_first(WorldElem* pElem, model_coord_t coords_sort
     int max_i = 0;
     int sorted = 0;
     float inval_dist = -1000;
-    int skip[MAX_ELEM] = {FALSE};
+    int skip[MAX_ELEM];
+    
+    for(int i = 0; i < MAX_ELEM; i++) skip[i] = FALSE;
     
     while(sorted < pElem->n_coords)
     {
@@ -112,26 +114,9 @@ sort_elem_coordinates_furthest_first(WorldElem* pElem, model_coord_t coords_sort
 BOOL
 element_visible(WorldElem* pElem, float visibleDistance, float min_dot)
 {
-    int do_visibility_test = 0;
-    
     if(pElem->invisible) return FALSE;
     
     if(pElem->renderInfo.priority > 0) return TRUE;
-    
-    float cam_x = gameCamera_getX();
-    float cam_y = gameCamera_getY();
-    float cam_z = gameCamera_getZ();
-    
-    // distance test
-    /*
-    pElem->renderInfo.distance =
-        distance(cam_x,
-                 cam_y,
-                 cam_z,
-                 pElem->physics.ptr->x,
-                 pElem->physics.ptr->y,
-                 pElem->physics.ptr->z);
-     */
     
     if(pElem->renderInfo.distance > visibleDistance)
     {
@@ -144,34 +129,35 @@ element_visible(WorldElem* pElem, float visibleDistance, float min_dot)
      * so for now a problem exists where large objects may disappear
      * from view even though the object is partially visible
      */
-    if(do_visibility_test)
-    {   
-        // visibility test
-        // Skip drawing elements behind us:
-        // find dot product of body-z vector and object
-        float vec_x = (pElem->physics.ptr->x - (cam_x));
-        float vec_y = (pElem->physics.ptr->y - (cam_y));
-        float vec_z = (pElem->physics.ptr->z - (cam_z));
-        
-        if(min_dot > 0) // more complex test
-        {
-            // convert vec to a unit-vector
-            vec_x = vec_x / pElem->renderInfo.distance;
-            vec_y = vec_y / pElem->renderInfo.distance;
-            vec_z = vec_z / pElem->renderInfo.distance;
-        }
-        
-        float vec_zview[3];
-        gameCamera_getZVector(vec_zview);
-        
-        // TODO: convert vec_x to unit-vector if you want to do this..
-        float dot = vec_x*vec_zview[0] + vec_y*vec_zview[1] + vec_z*vec_zview[2];
-        
-        if(dot < min_dot)
-        {
-            return FALSE;
-        }
+    
+    /*
+   
+    // visibility test
+    // Skip drawing elements behind us:
+    // find dot product of body-z vector and object
+    float vec_x = (pElem->physics.ptr->x - (cam_x));
+    float vec_y = (pElem->physics.ptr->y - (cam_y));
+    float vec_z = (pElem->physics.ptr->z - (cam_z));
+    
+    if(min_dot > 0) // more complex test
+    {
+        // convert vec to a unit-vector
+        vec_x = vec_x / pElem->renderInfo.distance;
+        vec_y = vec_y / pElem->renderInfo.distance;
+        vec_z = vec_z / pElem->renderInfo.distance;
     }
+    
+    float vec_zview[3];
+    gameCamera_getZVector(vec_zview);
+    
+    // TODO: convert vec_x to unit-vector if you want to do this..
+    float dot = vec_x*vec_zview[0] + vec_y*vec_zview[1] + vec_z*vec_zview[2];
+    
+    if(dot < min_dot)
+    {
+        return FALSE;
+    }
+     */
     
     return TRUE;
 }
@@ -443,6 +429,7 @@ console_write(char* fmt, ...)
     else if((pAlert = strstr(fmt, "ALERT:")))
     {
         gameDialogDisplayString(&pAlert[7]);
+        return;
     }
     else
     {

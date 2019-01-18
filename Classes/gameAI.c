@@ -61,7 +61,7 @@ target_priority(WorldElem* pSearchElem, WorldElem* pTargetElem, float* dist_igno
 static int
 target_avoid_collision(int object_type)
 {
-    if(object_type == OBJ_PLAYER || object_type == OBJ_SHIP) return 1;
+    if(object_type == OBJ_PLAYER /* || object_type == OBJ_SHIP*/) return 1;
     return 0;
 }
 
@@ -552,7 +552,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     // avoid boundaries
     if(elem->stuff.u.enemy.run_distance > 0)
     {
-        float S = boundary_avoid_distance;
+        float S = boundary_avoid_distance * 2;
         float dest[3];
         dest[0] = elem->physics.ptr->x + zq.x*S;
         dest[1] = elem->physics.ptr->y + zq.y*S;
