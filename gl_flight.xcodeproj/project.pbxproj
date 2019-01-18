@@ -573,6 +573,7 @@
 		D0549E8320ED4126009FF191 /* texture114.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture114.bmp; sourceTree = "<group>"; };
 		D05A90B517A1CF8100F40807 /* texture40.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture40.bmp; sourceTree = "<group>"; };
 		D05A90B717A1E3F400F40807 /* engine.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engine.wav; sourceTree = "<group>"; };
+		D05AED6621F138DE00692833 /* building2_model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = building2_model.h; sourceTree = "<group>"; };
 		D05C28A71F9FEBC700BC2194 /* sphere_model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sphere_model.h; sourceTree = "<group>"; };
 		D062ED5816E0278F00CA4374 /* glFlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glFlight.h; sourceTree = "<group>"; };
 		D062ED5916E0279B00CA4374 /* glFlight.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glFlight.c; sourceTree = "<group>"; };
@@ -722,6 +723,7 @@
 				D02B8F151964D67700830369 /* cocoaGameInput.h */,
 				D02B8F161964D67700830369 /* cocoaGameInput.m */,
 				6D512E1915EC21860064DF49 /* models.h */,
+				D05AED6621F138DE00692833 /* building2_model.h */,
 				D05C28A71F9FEBC700BC2194 /* sphere_model.h */,
 				D0CF62B514A919D600E08151 /* object.h */,
 				D015A3F620AA3D2600CB1C31 /* world_motion.h */,
@@ -1741,7 +1743,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Justin Brady (ZQVH66AQJ9)";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = YES;
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
@@ -1760,7 +1762,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.spacecombat1995;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "spacecombat1995-9-5-2018";
+				PROVISIONING_PROFILE_SPECIFIER = "spacecombat1995-distribution-cert-12-11-2019";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 arm7s arm64";
