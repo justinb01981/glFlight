@@ -2303,7 +2303,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                     
                     if(gameNetwork_getPlayerInfo(msg->params.i[0], &playerInfoFound, 0) == GAME_NETWORK_ERR_NONE)
                     {
-                        if(!gameNetworkState.hostInfo.hosting && msg->params.i[0] == gameNetworkState.my_player_id)
+                        if(msg->params.i[0] == gameNetworkState.my_player_id)
                         {
                             strncat(gameSettingsKillHistory, playerInfo->name, sizeof(gameSettingsKillHistory)-1);
                             strncat(gameSettingsKillHistory, ",", sizeof(gameSettingsKillHistory)-1);
@@ -2464,6 +2464,7 @@ do_game_network_read_core()
     
     if(!gameNetworkState.connected)
     {
+        usleep(10000000);
         return;
     }
     

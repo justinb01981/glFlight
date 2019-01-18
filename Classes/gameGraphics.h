@@ -18,6 +18,8 @@ extern float viewWidth;
 extern float viewHeight;
 extern int radar_mode;
 
+const static int TERRAIN_BG_MULT = 2;
+
 typedef struct
 {
     model_coord_t *coords;
@@ -29,9 +31,9 @@ typedef struct
     struct {
         struct tess_storage_t* S;
         struct tess_storage_t S_;
-        model_coord_t coords[6000];
-        model_texcoord_t texcoords[3000];
-        model_index_t indices[6000];
+        model_coord_t *coords;
+        model_texcoord_t *texcoords;
+        model_index_t *indices;
     } tess;
     
 } DrawBackgroundData;

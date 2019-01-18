@@ -39,6 +39,11 @@ typedef struct
 #define MODEL_POLY_COMPONENTS_INIT() \
     poly_comp.model_faces_buffer_n = poly_comp.model_coords_buffer_len = poly_comp.primitives[0] = 0;
 
+#define MODEL_EXTENDED_MEMORY(modeltype) (\
+    modeltype == MODEL_SPHERE ||          \
+    modeltype == MODEL_ENEMY_BASE ||      \
+    modeltype == MODEL_CBUILDING)
+
 /* static array of coordinates, texture-coordinates, triangle-faces, matrix */
 #define MODEL_POLY_COMPONENTS_ADD(Ac, At, Af, M)    \
     {   \
@@ -71,6 +76,7 @@ typedef struct
     }
 
 #include "sphere_model.h"
+#include "building2_model.h"
 
 typedef enum {
     MODEL_FIRST = 0,

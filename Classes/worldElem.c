@@ -622,18 +622,27 @@ world_elem_btree_insert(world_elem_btree_node* root, WorldElem* elem, float orde
     }
 }
 
-unsigned int world_elem_btree_walk_should_abort = 0;
+struct world_elem_btree_walk_core_state
+{
+    void ((*walk_func)(WorldElem* elem, float order));
+          
+} g_world_elem_btree_walk_core_state;
+
+void
+world_elem_btree_walk_core(world_elem_btree_node* root)
+{
+    if(root->left) world_elem_btree_walk_core(root->left);
+    //if(root->elem && (root->elem->btree_node[0] == NULL && root->elem->btree_node[1] == NULL)) assert(0);
+    
+    if(root->elem) g_world_elem_btree_walk_core_state.walk_func(root->elem, root->order);
+    if(root->right) world_elem_btree_walk_core(root->right);
+}
 
 void
 world_elem_btree_walk(world_elem_btree_node* root, void ((*walk_func)(WorldElem* elem, float order)))
 {
-    if(world_elem_btree_walk_should_abort) return;
-    
-    if(root->left) world_elem_btree_walk(root->left, walk_func);
-    //if(root->elem && (root->elem->btree_node[0] == NULL && root->elem->btree_node[1] == NULL)) assert(0);
-    
-    if(root->elem) walk_func(root->elem, root->order);
-    if(root->right) world_elem_btree_walk(root->right, walk_func);
+    g_world_elem_btree_walk_core_state.walk_func = walk_func;
+    world_elem_btree_walk_core(root);
 }
 
 void

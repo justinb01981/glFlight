@@ -35,12 +35,22 @@ extern int gameDialogCounter;
 
 extern void AppDelegateOpenURL(const char* url);
 
-extern void gameDialogStartNetworkGame();
+extern void gameDialogStartNetworkGame(void);
 
 static void
 gameDialogCancel(void)
 {
     fireActionQueuedAfterEdit = ACTION_INVALID;
+}
+
+static void gameDialogCancelNetworkWaiting()
+{
+    gameDialogCancel();
+    while(gameInterfaceModalDialogPeek())
+    {
+        gameInterfaceControls.dialogRect.visible = 0;
+        gameInterfaceModalDialogDequeue();
+    }
 }
 
 static void
@@ -164,11 +174,11 @@ gameDialogMenuCountdown()
         passes = 0;
     }
     
-    if(passes > 0)
-    {
-        gameInterfaceControls.graphicDialogHelp.visible = 1;
-        return;
-    }
+//    if(passes > 0)
+//    {
+//        gameInterfaceControls.graphicDialogHelp.visible = 1;
+//        return;
+//    }
     
     glFlightDrawframeHook = NULL;
     
@@ -476,7 +486,7 @@ static void
 gameDialogStartNetworkGameWait()
 {
     gameInterfaceModalDialog("Waiting for guests\nTap when everyone has\njoined, and 5 min game\nwill start...", "", "",
-                             gameDialogStartNetworkGame2, gameDialogCancel);
+                             gameDialogStartNetworkGame2, gameDialogCancelNetworkWaiting);
 }
 
 static void

@@ -88,7 +88,6 @@ score_total()
 {
     int *high_score;
     int *high_score_session;
-    char buf[256];
     
     float m = gameStateSinglePlayer.difficulty;
     
@@ -119,9 +118,6 @@ score_total()
             gameAudioPlaySoundAtLocation("highscore", my_ship_x, my_ship_y, my_ship_z);
         }
     }
-    
-    snprintf(buf, sizeof(buf)-1, "%u\n", gameStateSinglePlayer.stats.score);
-    strncat(gameSettingsKillHistory, buf, sizeof(gameSettingsKillHistory)-1);
 }
 
 static void
@@ -1094,6 +1090,32 @@ game_setup()
         world_get_last_object()->stuff.u.enemy.deploys_collect = 1;
         world_get_last_object()->durability = 999999;
          */
+    }
+    
+    int clusterSize;
+    int clusterCount = 32;
+    
+    while(clusterCount > 0)
+    {
+        clusterSize = 16;
+        float sc = 2;
+        float c[] = {
+            rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+            rand_in_range(gWorld->bound_radius/4, (gWorld->bound_radius/4) * 3),
+            rand_in_range(-gWorld->bound_radius, gWorld->bound_radius)
+        };
+        
+        while(clusterSize > 0)
+        {
+            if(world_get_object_n_at_loc(0, c[0], c[1], c[2], sc/2) == NULL)
+            {
+                world_add_object(MODEL_CUBE2, c[0], c[1], c[2], 0, 0, 0, sc, TEXTURE_ID_FLOATING_BLOCKS);
+            }
+            c[(int) rand_in_range(0, 3)] += rand_in_range(-1, 1)*sc;
+            
+            clusterSize--;
+        }
+        clusterCount--;
     }
 }
 

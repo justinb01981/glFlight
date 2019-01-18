@@ -107,8 +107,7 @@ world_add_object_core(Model type,
     }
     else
     {
-        if(type == MODEL_SPHERE ||
-           type == MODEL_ENEMY_BASE)
+        if(MODEL_EXTENDED_MEMORY(type))
         {
             pElem = world_elem_alloc_extended_model();
         }
@@ -376,6 +375,15 @@ world_add_object_core(Model type,
             
         case MODEL_CBUILDING:
         {
+#if 1
+            model_coords = model_2building_coords;
+            model_sizeof = sizeof(model_2building_coords);
+            model_texcoords = model_2building_texcoords;
+            model_texcoords_sizeof = sizeof(model_2building_texcoords);
+            model_indices = model_2building_indices;
+            model_indices_sizeof = sizeof(model_2building_indices);
+            
+#else
             /*
              model_coords = model_tbuilding_coords;
              model_sizeof = sizeof(model_tbuilding_coords);
@@ -386,6 +394,15 @@ world_add_object_core(Model type,
              model_primitives_sizeof = sizeof(model_tbuilding_primitives);
              model_primitives = model_tbuilding_primitives;
              */
+            
+            float M3[] = {
+                0.75, 0, 0, 0.01,
+                0, 4.0, 0, 5.51,
+                0, 0, 0.75, 0.01,
+                0, 0, 0, 1
+            };
+            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords4x, model_cube_indices_nobottom, M3);
+            
             float M2[] = {
                 1, 0, 0, 0,
                 0, 4.0, 0, 1.5,
@@ -394,20 +411,13 @@ world_add_object_core(Model type,
             };
             MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords4x, model_cube_indices_nobottom, M2);
             
-            float M3[] = {
-                0.75, 0, 0, 0,
-                0, 4.0, 0, 5.52,
-                0, 0, 0.75, 0,
-                0, 0, 0, 1
-            };
-            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords4x, model_cube_indices_nobottom, M3);
-            
             model_coords = poly_comp.model_coords_buffer;
             model_sizeof = poly_comp.model_coords_buffer_len * 3 * sizeof(model_coord_t);
             model_indices = poly_comp.model_indices_buffer;
             model_indices_sizeof = poly_comp.model_faces_buffer_n * 3 * sizeof(model_index_t);
             model_texcoords = poly_comp.model_texcoords_buffer;
             model_texcoords_sizeof = poly_comp.model_coords_buffer_len * 2 * sizeof(model_texcoord_t);
+#endif
             
             model_primitives = poly_comp.primitives;
             model_primitives_sizeof = 0;
@@ -509,6 +519,10 @@ world_add_object_core(Model type,
           
         case MODEL_CUBE:
     	case MODEL_CUBE2:
+            new_durability = DURABILITY_BLOCK;
+            break;
+            
+        case MODEL_PYRAMID:
             new_durability = DURABILITY_BLOCK;
             break;
             
@@ -2369,8 +2383,8 @@ world_bounding_violations(float location[3], float vnormal[3])
             {
                 // return 1 and the normal vector that was in conflict
                 vnormal[d] = V[d];
-                return 1;
             }
+            return 1;
         }
     }
     

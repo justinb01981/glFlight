@@ -636,7 +636,6 @@ calibrate_bail:
         btreeVisibleTest = btreeVisibleTest->next;
         btreeVisibleTestCount--;
     }
-    printf("btreeVisibleTestCount=%d\n", btreeVisibleTestCount);
     
     // partially sort current visible subset
     world_elem_list_sort_1(&gWorld->elements_visible, element_dist_compare, 0, INT_MAX);
@@ -766,7 +765,6 @@ calibrate_bail:
     // actual drawing (happens asynchronouly)
     drawElemStart(pDrawCur);
     visibleBtreeDrawn = 0;
-    world_elem_btree_walk_should_abort = 0;
     world_elem_btree_walk(visibleBtreeRoot, draw_btree_elements);
     drawElemEnd();
     count_elems_last = visibleBtreeDrawn;

@@ -48,6 +48,8 @@ void* gl_texcoord_ptr_last = 0;
 int texture_id_playership;
 int texture_id_background = BACKGROUND_TEXTURE;
 
+int background_init_needed = 1;
+
 /*
 model_coord_t overlay_coords[12];
 model_texcoord_t overlay_texcoords[8];
@@ -1125,7 +1127,7 @@ drawElem(WorldElem* pElem)
             const int coord_inval = -1;
 
             int *coord_table = malloc(pElemIndicesCount * 4 * sizeof(int));
-            if(!coord_table) return;
+            if(!coord_table) return; 
             
             model_index_t** face_table = malloc((pElemIndicesCount) * sizeof(model_index_t*));
             if(!face_table)
@@ -1160,15 +1162,15 @@ drawElem(WorldElem* pElem)
                     model_coord_t *Cb = &pElem->coords[*Tb * coord_size];
                     
                     model_coord_t a[] = {
-                        Ca[0],
-                        Ca[1],
-                        Ca[2]
+                        Ca[0] + (Ca[3]-Ca[0])*0.5 + (Ca[6]-Ca[0])*0.5,
+                        Ca[1] + (Ca[4]-Ca[1])*0.5 + (Ca[7]-Ca[1])*0.5,
+                        Ca[2] + (Ca[5]-Ca[2])*0.5 + (Ca[8]-Ca[2])*0.5
                     };
                     
                     model_coord_t b[] = {
-                        Cb[0],
-                        Cb[1],
-                        Cb[2]
+                        Cb[0] + (Cb[3]-Cb[0])*0.5 + (Cb[6]-Cb[0])*0.5,
+                        Cb[1] + (Cb[4]-Cb[1])*0.5 + (Cb[7]-Cb[1])*0.5,
+                        Cb[2] + (Cb[5]-Cb[2])*0.5 + (Cb[8]-Cb[2])*0.5
                     };
                     
                     if(cam_distance(a[0], a[1], a[2]) < cam_distance(b[0], b[1], b[2]))
@@ -1311,52 +1313,95 @@ visible_list_remove(WorldElem* elem, unsigned int* n_visible, WorldElemListNode*
 static void
 drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
 {
-    // tesselate - init
-    bgData->tess.S = &bgData->tess.S_;
-    bgData->tess.S->Icur = bgData->tess.S->Is = bgData->tess.indices;
-    bgData->tess.S->Mcur = bgData->tess.S->Ms = bgData->tess.coords;
-    bgData->tess.S->Tcur = bgData->tess.S->Ts = bgData->tess.texcoords;
-    
-    float Mk = 25; // model - step size
-    float Tk = 8; // texture - step-size multiplier
+    float I_Mk = 25; // model - step size
+    float Mk = I_Mk;
+    float Tk = 8 / (25/Mk); // texture - step-size multiplier
+    float terrain_height_y = 0;
     
     float Ub = -gWorld->bound_radius;
     float Vb = -gWorld->bound_radius;
     float Ue = gWorld->bound_radius;
     float Ve = gWorld->bound_radius;
-    float Vi = Vb;
-    float Ui = Ub;
     
-    float M[] = {Ui, 0, Vi};
-    float T[] = {0, 0};
+    int allocated = 0;
+    size_t n_coords = 0;
+    size_t n_indices = 0;
+    size_t n_tcoords = 0;
+    size_t n_indices_last;
     
-    tess_begin(M, T, bgData->tess.S);
     
-    Vi = Vb;
-    while(Vi <= Ve)
-    {
-        while(Ui+Mk >= Ub && Ui+Mk <= Ue)
+    
+    do{
+        float Vi = Vb;
+        float Ui = Ub;
+        
+        float M[] = {Ui, 0, Vi};
+        float T[] = {0, 0};
+        
+        n_indices_last = n_indices;
+        
+        if(allocated)
         {
-            Ui += Mk;
-            M[0] = Ui;
-            M[2] = Vi;
-            T[0] = Ui/Ue * Tk;
-            T[1] = Vi/Ve * Tk;
-            
-            tess_step(M, T, bgData->tess.S);
+            tess_begin(M, T, bgData->tess.S);
         }
         
-        Vi += fabs(Mk);
-        M[0] = Ui;
-        M[2] = Vi;
-        T[0] = Ui/Ue * Tk;
-        T[1] = Vi/Ve * Tk;
+        while(Vi <= Ve)
+        {
+            while(Ui+Mk >= Ub && Ui+Mk <= Ue)
+            {
+                Ui += Mk;
 
-        tess_step_row(M, T, bgData->tess.S);
+                if(allocated)
+                {
+                    M[0] = Ui;
+                    M[1] = terrain_height_y;
+                    M[2] = Vi;
+                    T[0] = Ui/Ue * Tk;
+                    T[1] = Vi/Ve * Tk;
+                    
+                    //terrain_height_y += ((int)floor(rand_in_range(0, 100)) % 2 == 0) ? 0.5: -0.5;
+                    
+                    tess_step(M, T, bgData->tess.S);
+                }
+                else
+                {
+                    n_coords += 3 * 2;
+                    n_tcoords += 2 * 2;
+                    n_indices += 3 * 2;
+                }
+            }
+            
+            Vi += fabs(Mk);
+            if(allocated)
+            {
+                M[0] = Ui;
+                M[2] = Vi;
+                T[0] = Ui/Ue * Tk;
+                T[1] = Vi/Ve * Tk;
+
+                tess_step_row(M, T, bgData->tess.S);
+            }
+            
+            // TODO: if a row is out-of-bounds, invalidate its triangle
+            Mk *= -1;
+        }
         
-        // TODO: if a row is out-of-bounds, invalidate its triangle
-        Mk *= -1;
-    }
+        if(!allocated)
+        {
+            allocated = 1;
+            bgData->tess.coords = malloc(sizeof(model_coord_t) * n_coords);
+            bgData->tess.indices = malloc(sizeof(model_index_t) * n_indices);
+            bgData->tess.texcoords = malloc(sizeof(model_texcoord_t) * n_tcoords);
+            
+            // tesselate - init
+            bgData->tess.S = &bgData->tess.S_;
+            bgData->tess.S->Icur = bgData->tess.S->Is = bgData->tess.indices;
+            bgData->tess.S->Mcur = bgData->tess.S->Ms = bgData->tess.coords;
+            bgData->tess.S->Tcur = bgData->tess.S->Ts = bgData->tess.texcoords;
+            
+            Mk = I_Mk;
+        }
+    } while(n_indices != n_indices_last);
     
     tess_end(bgData->tess.S);
     
@@ -1450,6 +1495,9 @@ drawBackgroundUninit()
         if(bgData->coords) free(bgData->coords);
         if(bgData->indices) free(bgData->indices);
         if(bgData->texcoords) free(bgData->texcoords);
+        if(bgData->tess.coords) free(bgData->tess.coords);
+        if(bgData->tess.indices) free(bgData->tess.indices);
+        if(bgData->tess.texcoords) free(bgData->tess.texcoords);
         free(bgData);
         bgData = NULL;
     }
@@ -1506,8 +1554,12 @@ drawBackgroundCore()
 
 void drawBackground()
 {
-    drawBackgroundUninit();
-    drawBackgroundInit(texture_id_background, 0, 0, 0, 100, BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
+    if(background_init_needed)
+    {
+        drawBackgroundUninit();
+        drawBackgroundInit(texture_id_background, 0, 0, 0, 100, BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
+        background_init_needed = 0;
+    }
     drawBackgroundCore();
 }
 
@@ -1909,4 +1961,6 @@ gameGraphicsUninit()
     for(i = 0; i < 3; i++) { if(*(freeBuffers[i])) { free(*(freeBuffers[i])); *freeBuffers[i] = NULL; } }
     
     drawBackgroundUninit();
+    
+    background_init_needed = 1;
 }

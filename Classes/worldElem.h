@@ -352,7 +352,6 @@ unsigned int world_elem_btree_ptr_idx_set(unsigned int i);
 
 void world_elem_btree_insert(world_elem_btree_node* root, WorldElem* elem, float order);
 
-extern unsigned int world_elem_btree_walk_should_abort;
 void world_elem_btree_walk(world_elem_btree_node* root, void ((*walk_func)(WorldElem* elem, float order)));
 
 void world_elem_btree_destroy(world_elem_btree_node* root);
