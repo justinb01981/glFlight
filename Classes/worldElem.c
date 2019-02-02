@@ -17,6 +17,7 @@
 static void hack_remove_elem_from_all(WorldElem* pElem);
 
 volatile WorldElemListNode* world_elem_list_remove_watch_elem = NULL;
+volatile extern WorldElemListNode* btreeVisibleTest;
 
 void
 world_elem_adjust_geometry_pointers(WorldElem* pElem)
@@ -287,6 +288,8 @@ world_elem_list_remove(WorldElem* pElem, WorldElemListNode* pHeadNode)
         if(pCur->elem == pElem)
         {
             WorldElemListNode* pFree = pCur;
+            
+            if(pCur == btreeVisibleTest) btreeVisibleTest = btreeVisibleTest->next;
             
             if(world_elem_list_remove_watch_elem == pFree) world_elem_list_remove_watch_elem = NULL;
             

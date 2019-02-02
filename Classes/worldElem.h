@@ -241,10 +241,10 @@ world_elem_list_init(WorldElemListNode* pHeadNode)
 }
 
 WorldElem*
-world_elem_alloc();
+world_elem_alloc(void);
 
 WorldElem*
-world_elem_alloc_extended_model();
+world_elem_alloc_extended_model(void);
 
 void
 world_elem_adjust_geometry_pointers(WorldElem* pElem);

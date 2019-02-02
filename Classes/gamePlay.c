@@ -1953,6 +1953,7 @@ game_run()
                             random_heading_vector(v);
                             v[0] *= vel; v[1] *= vel; v[2] *= vel;
                             update_object_velocity(world_get_last_object()->elem_id, v[0], v[1], v[2], 0);
+                            world_object_set_lifetime(world_get_last_object()->elem_id, game_variable_get("COLLECT_POINT_LIFETIME"));
                             
                             console_write(game_log_messages[GAME_LOG_NEWDATA]);
                             
@@ -2499,13 +2500,12 @@ firePoopedCube(WorldElem *elem)
     }
     else
     {
-        texture_id = TEXTURE_ID_POOPED_CUBE_ENEMY;
-        if(elem->durability <= DURABILITY_LOW) texture_id = TEXTURE_ID_POOPED_CUBE_SHIELDLOW;
+        texture_id = TEXTURE_ID_COLORMAP;
     }
     
     //static float lineColorMine[8] = {0.01, 0.99, 0.02, 0.99, 0.03, 0.99, 0.04, 0.99};
     static float lineColorMine[8] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
-    static float lineColorEnemy[8] = {0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9};
+    static float lineColorEnemy[8] = {1.0, 0.5, 0.95, 0.52, 0.95, 0.52, 1.0, 0.5};
     static float lineColorEnemyAce[8] = {0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9};
     int lineColorLen = 8;
     float *lineColor = lineColorEnemy;
@@ -2685,7 +2685,7 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
     x->durability = DURABILITY_MISSLE;
     x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
-    x->stuff.u.enemy.max_slerp = 5.0; // radians per second
+    x->stuff.u.enemy.max_slerp = 4.0; // radians per second
     x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     x->stuff.u.enemy.time_last_run = time_ms + GAME_AI_UPDATE_INTERVAL_MS;
     x->stuff.u.enemy.scan_distance = 50;

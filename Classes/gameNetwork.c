@@ -739,6 +739,9 @@ gameNetwork_startGame(unsigned int sec)
     }
     
     send_startgame();
+    
+    world_remove_object(my_ship_id);
+    my_ship_id = WORLD_ELEM_ID_INVALID;
 }
     
 gameNetworkError
@@ -2462,6 +2465,9 @@ do_game_network_read_core()
     int retries = 10;
     gameNetworkMessageQueued* pMsgNew;
     
+    if(!world_inited) return;
+
+    
     if(!gameNetworkState.connected)
     {
         usleep(10000000);
@@ -2507,18 +2513,10 @@ do_game_network_read_core()
         // clean up processed messages
         game_lock_lock(&gameNetworkState.msgQueue.lock);
         
-        gameNetworkMessageQueued* pMsgCur = &gameNetworkState.msgQueue.head;
-        gameNetworkMessageQueued* pMsgProcessed = NULL;
-        while(pMsgCur->next && pMsgCur->next->processed)
+        while(gameNetworkState.msgQueue.head.next && gameNetworkState.msgQueue.head.next->processed)
         {
-            if(!pMsgProcessed) pMsgProcessed = pMsgCur->next;
-            pMsgCur->next = pMsgCur->next->next;
-        }
-        while(pMsgProcessed && pMsgProcessed->processed)
-        {
-            gameNetworkMessageQueued* pMsgFree = pMsgProcessed;
-            pMsgProcessed = pMsgProcessed->next;
-            pMsgFree->next = NULL;
+            gameNetworkMessageQueued* pMsgFree = gameNetworkState.msgQueue.head.next;
+            gameNetworkState.msgQueue.head.next = pMsgFree->next;
             free(pMsgFree);
         }
         

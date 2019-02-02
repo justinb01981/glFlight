@@ -3,7 +3,7 @@ import math
 import random
 
 radius = 160
-min_distance = 64
+min_distance = 79
 map_command_format = '    BUILDING_N(X, Y, Z) \\'
 map_command_prefix = '#define MAP_GENERATED_MACRO \\\n'
 floor_y = 2

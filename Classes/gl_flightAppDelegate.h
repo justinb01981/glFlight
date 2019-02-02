@@ -9,17 +9,15 @@
 #import <UIKit/UIKit.h>
 #include <time.h>
 
-@class gl_flightViewController;
+@class glFlightGLKViewController;
 
 @interface gl_flightAppDelegate : NSObject <UIApplicationDelegate> {
     UIWindow *window;
-    gl_flightViewController *viewController;
     
     time_t time_last_suspend;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
-@property (nonatomic, retain) IBOutlet gl_flightViewController *viewController;
 
 @end
 

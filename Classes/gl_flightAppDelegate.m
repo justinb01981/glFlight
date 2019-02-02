@@ -7,7 +7,7 @@
 //
 
 #import "gl_flightAppDelegate.h"
-#import "gl_flightViewController.h"
+#import "glFlightGLKViewController.h"
 #import "cocoaGameInput.h"
 #import "cocoaNetworkThread.h"
 #import "cocoaAudioThread.h"
@@ -30,7 +30,6 @@
 @implementation gl_flightAppDelegate
 
 @synthesize window;
-@synthesize viewController;
 
 void appWriteSettings()
 {
@@ -43,7 +42,7 @@ NSString* get_docs_prefix()
             [NSString stringWithFormat:@"Documents"]];
 }
 
-void glFlightInit(gl_flightViewController* viewController)
+void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
 {
     int reset_map = 1;
     
@@ -71,8 +70,8 @@ void glFlightInit(gl_flightViewController* viewController)
     
     initTextures([[NSString stringWithFormat:@"%@/", [[NSBundle mainBundle] resourcePath]] UTF8String]);
     
-    viewWidth = [viewController.view bounds].size.width;
-    viewHeight = [viewController.view bounds].size.height;
+    viewWidth = viewSize.width;
+    viewHeight = viewSize.height;
     
     gameCamera_init(0, 0, 0, 0, 0, 0);
     game_init();
@@ -124,9 +123,11 @@ void glFlightResume(time_t time_last_suspend)
 {
     [application setIdleTimerDisabled:TRUE];
     
-    [self.window addSubview:self.viewController.view];
-    
-    [self performSelectorOnMainThread:@selector(applicationInit) withObject:NULL waitUntilDone:true];
+    [(glFlightGLKViewController*) UIApplication.sharedApplication.keyWindow.rootViewController viewInitialized: ^(CGSize size){
+        glFlightGLKViewController* vc = (glFlightGLKViewController*) UIApplication.sharedApplication.keyWindow.rootViewController;
+        glFlightInit(vc, vc.view.frame.size);
+        [vc startAnimation];
+    }];
     
     [NSThread detachNewThreadSelector:@selector(run) toTarget:[[cocoaAudioThread alloc] init] withObject:NULL];
 
@@ -147,19 +148,20 @@ void glFlightResume(time_t time_last_suspend)
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
-    [self.viewController stopAnimation];
+    glFlightGLKViewController* vc = (glFlightGLKViewController*) UIApplication.sharedApplication.keyWindow.rootViewController;
+    [vc stopAnimation];
     appWriteSettings();
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     [[cocoaGyroManager instance] startUpdates];
-    [self.viewController startAnimation];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
-    [self.viewController stopAnimation];
+    glFlightGLKViewController* vc = (glFlightGLKViewController*) UIApplication.sharedApplication.keyWindow.rootViewController;
+    [vc stopAnimation];
     
     gameNetwork_disconnect();
     
@@ -188,13 +190,6 @@ void glFlightResume(time_t time_last_suspend)
 {
     // Handle any foreground procedures not related to animation here.
     glFlightResume(time_last_suspend);
-}
-
-- (void) applicationInit
-{
-    glFlightInit(self.viewController);
-    
-    [self.viewController startAnimation];
 }
 
 - (void) applicationBackgroundWorker
@@ -238,9 +233,6 @@ void glFlightResume(time_t time_last_suspend)
 
 - (void)dealloc
 {
-    [viewController release];
-    [window release];
-    
     [super dealloc];
 }
 

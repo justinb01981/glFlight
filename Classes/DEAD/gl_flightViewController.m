@@ -87,7 +87,7 @@ enum {
 {
     [super awakeFromNib];
     
-    EAGLContext *aContext = [[EAGLContext alloc] initWithAPI:/*kEAGLRenderingAPIOpenGLES2*/ kEAGLRenderingAPIOpenGLES1];
+    EAGLContext *aContext = [[EAGLContext alloc] initWithAPI: kEAGLRenderingAPIOpenGLES2];
     
     if (!aContext)
     {
@@ -103,6 +103,7 @@ enum {
 	[aContext release];
 	
     EAGLView* glView = (EAGLView*) self.view;
+    //[glView setContentScaleFactor:2.0];
     
     // shrink inside of safe-area insets (iphone x)
     if (@available(iOS 11.0, *))
@@ -126,7 +127,11 @@ enum {
     if ([context API] == kEAGLRenderingAPIOpenGLES2)
     {
         [self loadShaders];
+        
+        [self validateProgram: program];
     }
+    
+    assert(glGetError() == GL_NO_ERROR);
     
     animating = FALSE;
     animationFrameInterval = 1;
@@ -241,6 +246,11 @@ enum {
     if (animating)
     {
         [(EAGLView *)self.view setFramebuffer];
+        
+        if([context API] == kEAGLRenderingAPIOpenGLES2)
+        {
+            glUseProgram(program);
+        }
         
         gameInput();
         
@@ -379,7 +389,7 @@ enum {
     // Bind attribute locations.
     // This needs to be done prior to linking.
     glBindAttribLocation(program, ATTRIB_VERTEX, "position");
-    glBindAttribLocation(program, ATTRIB_COLOR, "color");
+    //glBindAttribLocation(program, ATTRIB_COLOR, "color");
     
     // Link program.
     if (![self linkProgram:program])

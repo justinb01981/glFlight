@@ -120,14 +120,7 @@ inline static void collision_handling_remove_hook(WorldElem* pElem)
 {
     if(pElem == gWorld->world_update_state.collision_recs_iterate_cur->elem)
     {
-        if(gWorld->world_update_state.collision_recs_iterate_cur->next)
-        {
-            gWorld->world_update_state.collision_recs_iterate_cur = gWorld->world_update_state.collision_recs_iterate_cur->next;
-        }
-        else
-        {
-            gWorld->world_update_state.collision_recs_iterate_cur = NULL;
-        }
+        gWorld->world_update_state.collision_recs_iterate_cur = gWorld->world_update_state.collision_recs_iterate_cur->next;
     }
 }
 

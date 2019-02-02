@@ -268,7 +268,7 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 
 #define BUILDING_1(x, y, z, h)                       \
 "set_vector "#x" "#y" "#z" 0 4 0\n"                  \
-"add_object 20 vecx_0 vecy_0 vecz_0 1.57 "#h" -1.57 4 16\n"
+"add_object 20 vecx_0 vecy_0 vecz_0 1.57 "#h" -1.57 4 112\n"
 //"add_object 1 vecx_0 vecy_1 vecz_0 0 0 0 4 16\n"   \
 //"add_object 1 vecx_0 vecy_2 vecz_0 0 0 0 4 16\n"   \
 //"add_object 1 vecx_0 vecy_3 vecz_0 0 0 0 4 16\n"   \
@@ -277,7 +277,7 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 
 #define BUILDING_2(x, y, z, h)                       \
 "set_vector "#x" "#y" "#z" 0 4 0\n"                  \
-"add_object 19 vecx_0 vecy_0 vecz_0 1.57 "#h" -1.57 4 112\n"
+"add_object 19 vecx_0 vecy_0 vecz_0 1.57 "#h" -1.57 4 16\n"
 /*
 "add_object 19 vecx_0 vecy_1 vecz_0 0 0 0 4 112\n"   \
 "add_object 19 vecx_0 vecy_2 vecz_0 0 0 0 4 112\n"   \
@@ -546,7 +546,7 @@ const static char initial_map_collection[] = ""
 
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
 
-"add_object "MAPMODEL_SPRITE_SCENERY" -150 75 -150 1.6 0.78 -1.6 100 "/*"114"*/"88""\n"
+"add_object "MAPMODEL_SPRITE_SCENERY" -175 75 -175 1.6 0.78 -1.6 100 ""114""\n"
 "object_set_info 16\n" // scenery
 
 // else
@@ -558,66 +558,9 @@ WORLD_SCALED_FRAME(1, /*57*/28, 4)
 MAP_GENERATED_MACRO
 
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
+//"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+//"object_set_info 4\n" // moving block
+//"object_set_velocity 0 0.5 0\n"
 
 // enemy base
 BASE_ENEMY_1

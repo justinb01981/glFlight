@@ -14,9 +14,6 @@
 		2514C27B10084DCA00A42282 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 2514C27910084DCA00A42282 /* Shader.fsh */; };
 		2514C27C10084DCA00A42282 /* Shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 2514C27A10084DCA00A42282 /* Shader.vsh */; };
 		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
-		28EC4C5911D54ECE0027AA9F /* gl_flightViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28EC4C5711D54ECE0027AA9F /* gl_flightViewController.m */; };
-		28EC4C5A11D54ECE0027AA9F /* gl_flightViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28EC4C5811D54ECE0027AA9F /* gl_flightViewController.xib */; };
-		28FD14FE0DC6FC130079059D /* EAGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FD14FD0DC6FC130079059D /* EAGLView.m */; };
 		28FD15000DC6FC520079059D /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD14FF0DC6FC520079059D /* OpenGLES.framework */; };
 		28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD15070DC6FC5B0079059D /* QuartzCore.framework */; };
 		6D07DE3D15F7FCA00048129B /* gameShip.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D07DE3C15F7FCA00048129B /* gameShip.c */; };
@@ -130,6 +127,9 @@
 		D0549E8520ED412C009FF191 /* texture114.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0549E8320ED4126009FF191 /* texture114.bmp */; };
 		D05A90B617A1CF8100F40807 /* texture40.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D05A90B517A1CF8100F40807 /* texture40.bmp */; };
 		D05A90B817A1E3F400F40807 /* engine.wav in Resources */ = {isa = PBXBuildFile; fileRef = D05A90B717A1E3F400F40807 /* engine.wav */; };
+		D05AEDA221FD5DE300692833 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D05AEDA121FD5DE300692833 /* GLKit.framework */; };
+		D05AEDA521FD5F4800692833 /* glFlightGLKViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05AEDA421FD5F4800692833 /* glFlightGLKViewController.m */; };
+		D05AEDA621FD5F4800692833 /* glFlightGLKViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05AEDA421FD5F4800692833 /* glFlightGLKViewController.m */; };
 		D062ED5A16E0279B00CA4374 /* glFlight.c in Sources */ = {isa = PBXBuildFile; fileRef = D062ED5916E0279B00CA4374 /* glFlight.c */; };
 		D062ED5D16E0295500CA4374 /* gameGraphics.c in Sources */ = {isa = PBXBuildFile; fileRef = D062ED5C16E0295500CA4374 /* gameGraphics.c */; };
 		D062FE181FEAF7DC00ABE435 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D062FE171FEAF7DC00ABE435 /* LaunchScreen.xib */; };
@@ -176,14 +176,12 @@
 		D0B4C4D11A325F1500F125D4 /* texture84.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CE1A325F1500F125D4 /* texture84.bmp */; };
 		D0B4C4D21A325F1500F125D4 /* texture85.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CF1A325F1500F125D4 /* texture85.bmp */; };
 		D0B4C4D41A32616B00F125D4 /* texture86.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4D31A32616B00F125D4 /* texture86.bmp */; };
-		D0B6A15621406F1000DB6E7D /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0B6A15521406F1000DB6E7D /* GameKit.framework */; };
 		D0B918F01F5BC27B0073ECD6 /* engineloop.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0B918EF1F5BC27B0073ECD6 /* engineloop.wav */; };
 		D0BCBFB1175FE67F00003168 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */; };
 		D0BCC8FD2052EDC100094809 /* texture50.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D07B356518527FE200900D60 /* texture50.bmp */; };
 		D0BCC8FE2052EDC100094809 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 2514C27910084DCA00A42282 /* Shader.fsh */; };
 		D0BCC8FF2052EDC100094809 /* Shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 2514C27A10084DCA00A42282 /* Shader.vsh */; };
 		D0BCC9002052EDC100094809 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
-		D0BCC9012052EDC100094809 /* gl_flightViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28EC4C5811D54ECE0027AA9F /* gl_flightViewController.xib */; };
 		D0BCC9022052EDC100094809 /* texture88.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02071721BF282D4000AC2BA /* texture88.bmp */; };
 		D0BCC9032052EDC100094809 /* texture55.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0FE6D0C1859C871007D67CF /* texture55.bmp */; };
 		D0BCC9042052EDC100094809 /* texture83.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CD1A325F1500F125D4 /* texture83.bmp */; };
@@ -333,10 +331,8 @@
 		D0BCC99C2052EDC100094809 /* app_icon72x72.png in Resources */ = {isa = PBXBuildFile; fileRef = D0DA47B318186F2600BD4DC2 /* app_icon72x72.png */; };
 		D0BCC99F2052EDC100094809 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		D0BCC9A02052EDC100094809 /* gl_flightAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* gl_flightAppDelegate.m */; };
-		D0BCC9A12052EDC100094809 /* EAGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FD14FD0DC6FC130079059D /* EAGLView.m */; };
 		D0BCC9A22052EDC100094809 /* cocoaGameInput.m in Sources */ = {isa = PBXBuildFile; fileRef = D02B8F161964D67700830369 /* cocoaGameInput.m */; };
 		D0BCC9A32052EDC100094809 /* textures.c in Sources */ = {isa = PBXBuildFile; fileRef = D0C3743D193EC5FC000C2915 /* textures.c */; };
-		D0BCC9A42052EDC100094809 /* gl_flightViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28EC4C5711D54ECE0027AA9F /* gl_flightViewController.m */; };
 		D0BCC9A52052EDC100094809 /* object.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CF62B614A919D600E08151 /* object.m */; };
 		D0BCC9A62052EDC100094809 /* quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = D077557C152588C800DF2E0B /* quaternions.c */; };
 		D0BCC9A72052EDC100094809 /* gameInput.c in Sources */ = {isa = PBXBuildFile; fileRef = D02B8F191964D7D700830369 /* gameInput.c */; };
@@ -424,11 +420,11 @@
 		2514C27910084DCA00A42282 /* Shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = Shader.fsh; path = Shaders/Shader.fsh; sourceTree = "<group>"; };
 		2514C27A10084DCA00A42282 /* Shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = Shader.vsh; path = Shaders/Shader.vsh; sourceTree = "<group>"; };
 		28AD733E0D9D9553002E5188 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
-		28EC4C5611D54ECE0027AA9F /* gl_flightViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gl_flightViewController.h; sourceTree = "<group>"; };
+		28EC4C5611D54ECE0027AA9F /* gl_flightViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gl_flightViewController.h; path = "../New Group/gl_flightViewController.h"; sourceTree = "<group>"; };
 		28EC4C5711D54ECE0027AA9F /* gl_flightViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = gl_flightViewController.m; sourceTree = "<group>"; };
 		28EC4C5811D54ECE0027AA9F /* gl_flightViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = gl_flightViewController.xib; sourceTree = "<group>"; };
 		28FD14FC0DC6FC130079059D /* EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
-		28FD14FD0DC6FC130079059D /* EAGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAGLView.m; sourceTree = "<group>"; };
+		28FD14FD0DC6FC130079059D /* EAGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EAGLView.m; path = ../../../../../../../../../Users/justin/workspace/glFlight/Classes/EAGLView.m; sourceTree = SDKROOT; };
 		28FD14FF0DC6FC520079059D /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		28FD15070DC6FC5B0079059D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -574,6 +570,9 @@
 		D05A90B517A1CF8100F40807 /* texture40.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture40.bmp; sourceTree = "<group>"; };
 		D05A90B717A1E3F400F40807 /* engine.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engine.wav; sourceTree = "<group>"; };
 		D05AED6621F138DE00692833 /* building2_model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = building2_model.h; sourceTree = "<group>"; };
+		D05AEDA121FD5DE300692833 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		D05AEDA321FD5F4800692833 /* glFlightGLKViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glFlightGLKViewController.h; sourceTree = "<group>"; };
+		D05AEDA421FD5F4800692833 /* glFlightGLKViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = glFlightGLKViewController.m; sourceTree = "<group>"; };
 		D05C28A71F9FEBC700BC2194 /* sphere_model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sphere_model.h; sourceTree = "<group>"; };
 		D062ED5816E0278F00CA4374 /* glFlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glFlight.h; sourceTree = "<group>"; };
 		D062ED5916E0279B00CA4374 /* glFlight.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glFlight.c; sourceTree = "<group>"; };
@@ -625,7 +624,6 @@
 		D0B4C4CE1A325F1500F125D4 /* texture84.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture84.bmp; sourceTree = "<group>"; };
 		D0B4C4CF1A325F1500F125D4 /* texture85.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture85.bmp; sourceTree = "<group>"; };
 		D0B4C4D31A32616B00F125D4 /* texture86.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture86.bmp; sourceTree = "<group>"; };
-		D0B6A15521406F1000DB6E7D /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		D0B918EF1F5BC27B0073ECD6 /* engineloop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engineloop.wav; sourceTree = "<group>"; };
 		D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		D0BCBFB3176136CF00003168 /* gameLock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameLock.h; sourceTree = "<group>"; };
@@ -697,6 +695,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D05AEDA221FD5DE300692833 /* GLKit.framework in Frameworks */,
 				D0BCC9C02052EDC100094809 /* Foundation.framework in Frameworks */,
 				D0BCC9C12052EDC100094809 /* UIKit.framework in Frameworks */,
 				D0BCC9C22052EDC100094809 /* OpenGLES.framework in Frameworks */,
@@ -704,7 +703,6 @@
 				D0BCC9C42052EDC100094809 /* CoreMotion.framework in Frameworks */,
 				D0BCC9C52052EDC100094809 /* AVFoundation.framework in Frameworks */,
 				D0BCC9C62052EDC100094809 /* AudioToolbox.framework in Frameworks */,
-				D0B6A15621406F1000DB6E7D /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -714,12 +712,11 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				28FD14FC0DC6FC130079059D /* EAGLView.h */,
-				28FD14FD0DC6FC130079059D /* EAGLView.m */,
+				D05AEDAB2201230300692833 /* DEAD */,
 				1D3623240D0F684500981E51 /* gl_flightAppDelegate.h */,
 				1D3623250D0F684500981E51 /* gl_flightAppDelegate.m */,
-				28EC4C5611D54ECE0027AA9F /* gl_flightViewController.h */,
-				28EC4C5711D54ECE0027AA9F /* gl_flightViewController.m */,
+				D05AEDA321FD5F4800692833 /* glFlightGLKViewController.h */,
+				D05AEDA421FD5F4800692833 /* glFlightGLKViewController.m */,
 				D02B8F151964D67700830369 /* cocoaGameInput.h */,
 				D02B8F161964D67700830369 /* cocoaGameInput.m */,
 				6D512E1915EC21860064DF49 /* models.h */,
@@ -999,7 +996,6 @@
 				6D53C4DA1696D30B009D6C3C /* dead.wav */,
 				D02DAC0D17C72E9700035601 /* engine2.wav */,
 				D00D78C919FB18EC00E701B9 /* flyby.wav */,
-				28EC4C5811D54ECE0027AA9F /* gl_flightViewController.xib */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				D062FE171FEAF7DC00ABE435 /* LaunchScreen.xib */,
 				D0BD22ED2055734F00D4AEE3 /* spacecombat */,
@@ -1013,7 +1009,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D0B6A15521406F1000DB6E7D /* GameKit.framework */,
+				D05AEDA121FD5DE300692833 /* GLKit.framework */,
 				D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */,
 				D0AD4F6516D6F11600664895 /* AVFoundation.framework */,
 				D033788614D9FEFD00FD8A74 /* CoreMotion.framework */,
@@ -1031,6 +1027,18 @@
 				D02B8F14195DF47A00830369 /* glFlightAndroid.h */,
 			);
 			name = Android;
+			sourceTree = "<group>";
+		};
+		D05AEDAB2201230300692833 /* DEAD */ = {
+			isa = PBXGroup;
+			children = (
+				28EC4C5811D54ECE0027AA9F /* gl_flightViewController.xib */,
+				28FD14FC0DC6FC130079059D /* EAGLView.h */,
+				28EC4C5611D54ECE0027AA9F /* gl_flightViewController.h */,
+				28EC4C5711D54ECE0027AA9F /* gl_flightViewController.m */,
+				28FD14FD0DC6FC130079059D /* EAGLView.m */,
+			);
+			path = DEAD;
 			sourceTree = "<group>";
 		};
 		D0BD22ED2055734F00D4AEE3 /* spacecombat */ = {
@@ -1140,7 +1148,6 @@
 				D09A5F3B208172D9009F9618 /* texture110.bmp in Resources */,
 				2514C27C10084DCA00A42282 /* Shader.vsh in Resources */,
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
-				28EC4C5A11D54ECE0027AA9F /* gl_flightViewController.xib in Resources */,
 				D02071731BF282D4000AC2BA /* texture88.bmp in Resources */,
 				D0FE6D0D1859C871007D67CF /* texture55.bmp in Resources */,
 				D0B4C4D01A325F1500F125D4 /* texture83.bmp in Resources */,
@@ -1312,7 +1319,6 @@
 				D0BCC8FE2052EDC100094809 /* Shader.fsh in Resources */,
 				D0BCC8FF2052EDC100094809 /* Shader.vsh in Resources */,
 				D0BCC9002052EDC100094809 /* MainWindow.xib in Resources */,
-				D0BCC9012052EDC100094809 /* gl_flightViewController.xib in Resources */,
 				D0BCC9022052EDC100094809 /* texture88.bmp in Resources */,
 				D0BCC9032052EDC100094809 /* texture55.bmp in Resources */,
 				D0BCC9042052EDC100094809 /* texture83.bmp in Resources */,
@@ -1481,10 +1487,9 @@
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* gl_flightAppDelegate.m in Sources */,
-				28FD14FE0DC6FC130079059D /* EAGLView.m in Sources */,
 				D02B8F171964D67700830369 /* cocoaGameInput.m in Sources */,
+				D05AEDA521FD5F4800692833 /* glFlightGLKViewController.m in Sources */,
 				D0C3743E193EC5FC000C2915 /* textures.c in Sources */,
-				28EC4C5911D54ECE0027AA9F /* gl_flightViewController.m in Sources */,
 				D0CF62B714A919D600E08151 /* object.m in Sources */,
 				D077557E152588C800DF2E0B /* quaternions.c in Sources */,
 				D02B8F1A1964D7D700830369 /* gameInput.c in Sources */,
@@ -1520,10 +1525,9 @@
 			files = (
 				D0BCC99F2052EDC100094809 /* main.m in Sources */,
 				D0BCC9A02052EDC100094809 /* gl_flightAppDelegate.m in Sources */,
-				D0BCC9A12052EDC100094809 /* EAGLView.m in Sources */,
 				D0BCC9A22052EDC100094809 /* cocoaGameInput.m in Sources */,
+				D05AEDA621FD5F4800692833 /* glFlightGLKViewController.m in Sources */,
 				D0BCC9A32052EDC100094809 /* textures.c in Sources */,
-				D0BCC9A42052EDC100094809 /* gl_flightViewController.m in Sources */,
 				D0BCC9A52052EDC100094809 /* object.m in Sources */,
 				D0BCC9A62052EDC100094809 /* quaternions.c in Sources */,
 				D0BCC9A72052EDC100094809 /* gameInput.c in Sources */,
@@ -1568,7 +1572,8 @@
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)\"",
+					"$(SRCROOT)",
+					"$(SDKROOT)/../iPhoneOS.sdk/System/Library/Frameworks",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1596,7 +1601,8 @@
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)\"",
+					"$(SRCROOT)",
+					"$(SDKROOT)/../iPhoneOS.sdk/System/Library/Frameworks",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = gl_flight_Prefix.pch;
@@ -1715,7 +1721,8 @@
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)\"",
+					"$(SRCROOT)",
+					"$(SDKROOT)/../iPhoneOS.sdk/System/Library/Frameworks",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1749,7 +1756,8 @@
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)\"",
+					"$(SRCROOT)",
+					"$(SDKROOT)/../iPhoneOS.sdk/System/Library/Frameworks",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = gl_flight_Prefix.pch;

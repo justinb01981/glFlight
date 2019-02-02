@@ -58,7 +58,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.interfaceHeight = screenHeight;
     gameInterfaceControls.interfaceWidth = screenWidth;
     
-    gameInterfaceControls.textWidth = ceil(screenWidth / 148);
+    gameInterfaceControls.textWidth = ceil(screenWidth / 164);
     gameInterfaceControls.textHeight = ceil(gameInterfaceControls.textWidth * 2.2 * (screenWidth/screenHeight));
     
     // origin (in non-landscape mode) is upper left
@@ -223,7 +223,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.consoleTextRect.tex_id = -1;
     gameInterfaceControls.consoleTextRect.text_align_topleft = 1;
     
-    gameInterfaceControls.statsTextRect.x = screenWidth * 0.1;
+    gameInterfaceControls.statsTextRect.x = screenWidth * 0.15;
     gameInterfaceControls.statsTextRect.y = screenHeight * 0.15;
     gameInterfaceControls.statsTextRect.xw = 0.05*screenWidth;
     gameInterfaceControls.statsTextRect.yw = screenHeight/3;

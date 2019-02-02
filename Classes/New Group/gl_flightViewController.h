@@ -14,9 +14,10 @@
 #import <OpenGLES/ES1/glext.h>
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
+#import <GLKit/GLKit.h>
 #import "gameGlobals.h"
 
-@interface gl_flightViewController : UIViewController
+@interface gl_flightViewController : GLKViewController
 {
     EAGLContext *context;
     GLuint program;

@@ -370,6 +370,7 @@ gameInput()
         
         if(tex_pass - trimStartTime == samp_min)
         {
+            gameInterfaceControls.calibrateRect.visible = 1;
             gyro_calibrate_log(0);
         }
         else if(tex_pass - trimStartTime < tex_pass_initial_sample &&
@@ -385,6 +386,7 @@ gameInput()
     
     if(!needTrim && needTrimLast)
     {
+        gameInterfaceControls.calibrateRect.visible = 0;
         // short trim-length means few input values to calculate range, ignore
         if(tex_pass - trimStartTime >= tex_pass_initial_sample ||
            !controlsCalibrated)

@@ -607,7 +607,7 @@ calibrate_bail:
     }
     
     // walk part of the list and add some potentially-visible elements
-    unsigned int btreeVisibleTestCount = 400; // TODO: saw a crash when reducing to 120
+    unsigned int btreeVisibleTestCount = /*400*/64; // TODO: saw a crash when reducing to 120
     unsigned int btreeVisIdx = (visibleBtreeRootBuilding == &visibleBtreeRootStorage1 ? 0 : 1);
     while(btreeVisibleTest && btreeVisibleTestCount > 0)
     {
@@ -812,6 +812,7 @@ draw_bail:
     world_elem_list_remove_watch_elem = NULL;
     pVisCheckPtr = NULL;
     pVisCheckPtrHead = NULL;
+    btreeVisibleTest = NULL;
     clear_world_pending_removals();
     return;
 }
@@ -854,13 +855,13 @@ clear_vis_btree_removed(WorldElem* headElem)
 {
     while(headElem)
     {
-        if (btreeVisibleTest && btreeVisibleTest->elem == headElem)
-        {
-            btreeVisibleTest = NULL;
-        }
+//        if (btreeVisibleTest && btreeVisibleTest->elem == headElem)
+//        {
+//            btreeVisibleTest = btreeVisibleTest->next;
+//        }
         world_elem_btree_remove_all(NULL, headElem, headElem->renderInfo.distance);
         
-        break;
+        headElem = headElem->linked_elem;
     }
 }
 

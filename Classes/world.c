@@ -40,6 +40,8 @@ static void world_pack_geometry();
 void world_build_visibility_data();
 void world_update(float tc);
 
+extern volatile WorldElemListNode* btreeVisibleTest;
+
 world_t *gWorld = NULL;
 game_lock_t gWorldLock;
 
@@ -375,52 +377,12 @@ world_add_object_core(Model type,
             
         case MODEL_CBUILDING:
         {
-#if 1
             model_coords = model_2building_coords;
             model_sizeof = sizeof(model_2building_coords);
             model_texcoords = model_2building_texcoords;
             model_texcoords_sizeof = sizeof(model_2building_texcoords);
             model_indices = model_2building_indices;
             model_indices_sizeof = sizeof(model_2building_indices);
-            
-#else
-            /*
-             model_coords = model_tbuilding_coords;
-             model_sizeof = sizeof(model_tbuilding_coords);
-             model_indices = model_tbuilding_indices;
-             model_indices_sizeof = sizeof(model_tbuilding_indices);
-             model_texcoords = model_tbuilding_texcoords;
-             model_texcoords_sizeof = sizeof(model_tbuilding_texcoords);
-             model_primitives_sizeof = sizeof(model_tbuilding_primitives);
-             model_primitives = model_tbuilding_primitives;
-             */
-            
-            float M3[] = {
-                0.75, 0, 0, 0.01,
-                0, 4.0, 0, 5.51,
-                0, 0, 0.75, 0.01,
-                0, 0, 0, 1
-            };
-            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords4x, model_cube_indices_nobottom, M3);
-            
-            float M2[] = {
-                1, 0, 0, 0,
-                0, 4.0, 0, 1.5,
-                0, 0, 1, 0,
-                0, 0, 0, 1
-            };
-            MODEL_POLY_COMPONENTS_ADD(model_cube, model_cube_texcoords4x, model_cube_indices_nobottom, M2);
-            
-            model_coords = poly_comp.model_coords_buffer;
-            model_sizeof = poly_comp.model_coords_buffer_len * 3 * sizeof(model_coord_t);
-            model_indices = poly_comp.model_indices_buffer;
-            model_indices_sizeof = poly_comp.model_faces_buffer_n * 3 * sizeof(model_index_t);
-            model_texcoords = poly_comp.model_texcoords_buffer;
-            model_texcoords_sizeof = poly_comp.model_coords_buffer_len * 2 * sizeof(model_texcoord_t);
-#endif
-            
-            model_primitives = poly_comp.primitives;
-            model_primitives_sizeof = 0;
         }
         break;
             
@@ -1076,7 +1038,10 @@ void world_free()
 {
 	if(gWorld)
 	{
+        btreeVisibleTest = NULL;
+        
         gWorld->elements_list.hash_ptr = NULL;
+
         if(gWorld->element_id_hash) simple_hash_table_destroy(gWorld->element_id_hash);
         
         // TODO: release all objects and lists
@@ -1448,7 +1413,6 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, flo
     
     if(isnan(pCollisionA->physics.ptr->x) || isnan(pCollisionA->physics.ptr->y) || isnan(pCollisionA->physics.ptr->z))
     {
-        
         printf("world_repulse_elem/isNan\n");
     }
 }
@@ -1708,7 +1672,6 @@ world_update(float tc)
         
         if(!pElem->head_elem) // not a child elem
         {
-            
             float* pFloatCheckIsNan[] = {
                 &pElem->physics.ptr->vx,
                 &pElem->physics.ptr->vy,
@@ -1718,6 +1681,7 @@ world_update(float tc)
             {
                 if(isnan(*pFloatCheckIsNan[iF]))
                 {
+                    // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
                     *pFloatCheckIsNan[iF] = 0;
                     printf("isnan: %p\n", pElem);
                 }
@@ -2035,6 +1999,7 @@ world_update(float tc)
             world_elem_list_remove(pCurRemoveElem, &gWorld->elements_expiring);
             world_elem_list_remove(pCurRemoveElem, &gWorld->elements_moving);
             world_elem_list_remove(pCurRemoveElem, &gWorld->elements_list);
+            
             remove_element_from_region(pCurRemoveElem);
             
             world_elem_list_add(pCurRemoveElem, &gWorld->elements_to_be_freed);

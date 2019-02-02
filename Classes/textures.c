@@ -225,7 +225,11 @@ int bindTextureRequest(int tex_id)
         
         while(n_textures <= tex_id && load_count > 0)
         {
-            if(read_bitmap_to_gltexture(n_textures) != 0) return 0;
+            if(read_bitmap_to_gltexture(n_textures) != 0)
+            {
+                printf("failed to load texture: %d\n", n_textures);
+                return 0;
+            }
             n_textures++;
             load_count--;
         }

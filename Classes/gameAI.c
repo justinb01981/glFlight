@@ -29,6 +29,7 @@ float tow_v_scale = /*0.5*/ 1.2;
 float min_patrol_distance = 20;
 float collect_deploy_distance = -2.5;
 float change_target_frequency = 10000;
+float zdot_infront = 0.5;
 
 float juke_distance = 20.0, juke_distance_patrol = 50.0;
 
@@ -432,7 +433,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         // if not firing, intercept course
         if(!elem->stuff.u.enemy.fires)
         {
-            leadVel = vcur;
+            leadVel = elem->stuff.u.enemy.max_speed;
             fm = 1.0;
         }
         
@@ -583,7 +584,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     float vdesired = pursuit_speed_for_object(elem);
     
-    if(zdot < 0.0 && elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PURSUE) vdesired /= 2;
+    if(zdot < zdot_infront && elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PURSUE) vdesired /= 2;
     
     if(vdesired < MAX_SPEED) ai_debug("vdesired:", elem, vdesired);
     
@@ -620,13 +621,17 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     if(isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
     {
+        // never happens
         z1q = zq;
+        assert(0);
     }
+    
+    // test that conversion to euler is possible
     
     // convert new heading vector back
     /*
     float alpha = atan2(zq.x, -zq.y);
-	float beta = acos(zq.z);
+    float beta = acos(zq.z);
     float gamma = atan2(zq.z, yq.z);
      */
     

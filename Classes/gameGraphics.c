@@ -1126,6 +1126,7 @@ drawElem(WorldElem* pElem)
             
             const int coord_inval = -1;
 
+            // TODO: CRASH HERE in malloc
             int *coord_table = malloc(pElemIndicesCount * 4 * sizeof(int));
             if(!coord_table) return; 
             
@@ -1149,42 +1150,40 @@ drawElem(WorldElem* pElem)
             }
             
             // TODO: only sort faces on "complex" objects
-            while(pElem->renderInfo.priority ||
-                  pElem->renderInfo.concavepoly)
+            if(pElem->renderInfo.priority ||
+               pElem->renderInfo.concavepoly)
             {
-                int swapped = 0;
+                int sorted = 0;
                 
-                for(iFace = 0; iFace+1 < pElemIndicesCount/3; iFace++)
+                while(sorted < (pElemIndicesCount/3))
                 {
-                    model_index_t *Ta = face_table[iFace];
-                    model_index_t *Tb = face_table[iFace+1];
-                    model_coord_t *Ca = &pElem->coords[*Ta * coord_size];
-                    model_coord_t *Cb = &pElem->coords[*Tb * coord_size];
-                    
-                    model_coord_t a[] = {
-                        Ca[0] + (Ca[3]-Ca[0])*0.5 + (Ca[6]-Ca[0])*0.5,
-                        Ca[1] + (Ca[4]-Ca[1])*0.5 + (Ca[7]-Ca[1])*0.5,
-                        Ca[2] + (Ca[5]-Ca[2])*0.5 + (Ca[8]-Ca[2])*0.5
-                    };
-                    
-                    model_coord_t b[] = {
-                        Cb[0] + (Cb[3]-Cb[0])*0.5 + (Cb[6]-Cb[0])*0.5,
-                        Cb[1] + (Cb[4]-Cb[1])*0.5 + (Cb[7]-Cb[1])*0.5,
-                        Cb[2] + (Cb[5]-Cb[2])*0.5 + (Cb[8]-Cb[2])*0.5
-                    };
-                    
-                    if(cam_distance(a[0], a[1], a[2]) < cam_distance(b[0], b[1], b[2]))
+                    iFace = sorted+1;
+                    int iMin = sorted;
+                    while(iFace < pElemIndicesCount/3)
                     {
-                        model_index_t* tmp = face_table[iFace];
-                        face_table[iFace] = face_table[iFace+1];
-                        face_table[iFace+1] = tmp;
-                        swapped = 1;
+                        model_index_t *Ta = face_table[iFace];
+                        model_coord_t *Ca = &pElem->coords[*Ta * coord_size];
+                        model_index_t *Tb = face_table[iMin];
+                        model_coord_t *Cb = &pElem->coords[*Tb * coord_size];
+                        
+                        model_coord_t a[] = {
+                            Ca[0]+(Ca[3]-Ca[0])*0.5, Ca[1]+(Ca[4]-Ca[1])*0.5, Ca[2]+(Ca[5]-Ca[2])*0.5
+                        };
+                        model_coord_t b[] = {
+                            Cb[0]+(Cb[3]-Cb[0])*0.5, Cb[1]+(Cb[4]-Cb[1])*0.5, Cb[2]+(Cb[5]-Cb[2])*0.5
+                        };
+                        if(cam_distance(a[0], a[1], a[2]) > cam_distance(b[0], b[1], b[2]))
+                        {
+                            iMin = iFace;
+                        }
+                        
+                        iFace++;
                     }
-                }
-                
-                if(!swapped)
-                {
-                    break;
+                    
+                    model_index_t* tmp = face_table[sorted];
+                    face_table[sorted] = face_table[iMin];
+                    face_table[iMin] = tmp;
+                    sorted ++;
                 }
             }
 
@@ -1318,10 +1317,10 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
     float Tk = 8 / (25/Mk); // texture - step-size multiplier
     float terrain_height_y = 0;
     
-    float Ub = -gWorld->bound_radius;
-    float Vb = -gWorld->bound_radius;
-    float Ue = gWorld->bound_radius;
-    float Ve = gWorld->bound_radius;
+    float Ub = -gWorld->bound_radius*1.5;
+    float Vb = -gWorld->bound_radius*1.5;
+    float Ue = gWorld->bound_radius*1.5;
+    float Ve = gWorld->bound_radius*1.5;
     
     int allocated = 0;
     size_t n_coords = 0;
