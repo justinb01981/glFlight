@@ -37,7 +37,7 @@ gameAIState_t gameAIState;
 
 
 static float
-pursuit_speed_for_object(WorldElem* elem);
+pursuit_speed_for_object(WorldElem* elem, float zdot);
 
 void
 ai_debug(char* msg, WorldElem* elem, float f)
@@ -456,11 +456,21 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         
         // avoid collision
         if(dist <= elem->stuff.u.enemy.run_distance &&
-           zdot > 0.2 &&
+           //zdot > 0.0 &&
            target_avoid_collision(target_objtype))
         {
-            elem->stuff.u.enemy.enemy_state = ENEMY_STATE_RUN;
-            elem->stuff.u.enemy.time_next_retarget = time_ms + 3000;
+            elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
+            elem->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
+            elem->stuff.u.enemy.time_next_retarget = time_ms + 4000;
+            
+            // head away from target
+            ax = ax * -2;
+            ay = ay * -2;
+            az = az * -2;
+            
+            elem->stuff.u.enemy.tgt_x = ax;
+            elem->stuff.u.enemy.tgt_y = ay;
+            elem->stuff.u.enemy.tgt_z = az;
         }
         
         //
@@ -505,14 +515,19 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
              */
         }
     }
+    /*
     else if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_RUN)
     {
-        // pull up
-        zdot = -1;
+        ai_debug("object_pursue: RUNNING from %d", elem, elem->stuff.u.enemy.target_id);
+        
+        // head away from target
+        ax = ax * -2;
+        ay = ay * -2;
+        az = az * -2;
         
         // add unpredictable behavior by heading off on a tangent periodically for a short period
         if(time_ms >= elem->stuff.u.enemy.time_next_retarget &&
-           /* zdot < zdot_juke && */
+            zdot < zdot_juke &&
            elem->stuff.u.enemy.enemy_state != ENEMY_STATE_JUKE)
         {
             if (rand_in_range(1, 100) <= game_variable_get("ENEMY1_JUKE_PCT"))
@@ -521,28 +536,27 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
                 
                 game_ai_newheading(elem, juke_distance);
                 elem->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
+                elem->stuff.u.enemy.time_next_retarget = time_ms + 2000;
             }
-        }
-        
-#if 0
-        if(dist >= (elem->stuff.u.enemy.pursue_distance - (elem->stuff.u.enemy.pursue_distance / (skill*diff_m)))
-           /* || time_ms - elem->stuff.u.enemy.time_last_decision > 2000 */
-           || zdot <= 0.1)
-        {
-            if(fmod(rand_in_range(1, 100), 4) == 0)
+            else
             {
+                // running done start pursuing again
                 elem->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
+                elem->stuff.u.enemy.time_next_retarget = time_ms + 3000;
             }
         }
-#endif
     }
+     */
     else if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_JUKE)
     {
         if(time_ms > elem->stuff.u.enemy.time_next_retarget)
         {
+            // restore last state prior to JUKE
             ai_debug("JUKE->", elem, elem->stuff.u.enemy.last_state);
             
             elem->stuff.u.enemy.enemy_state = elem->stuff.u.enemy.last_state;
+            
+            elem->stuff.u.enemy.tgt_x = elem->stuff.u.enemy.tgt_y = elem->stuff.u.enemy.tgt_z = 0;
         }   
     }
     else
@@ -582,9 +596,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         elem->stuff.u.enemy.time_next_retarget = time_ms + 1000;
     }
     
-    float vdesired = pursuit_speed_for_object(elem);
-    
-    if(zdot < zdot_infront && elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PURSUE) vdesired /= 2;
+    float vdesired = pursuit_speed_for_object(elem, zdot);
     
     if(vdesired < MAX_SPEED) ai_debug("vdesired:", elem, vdesired);
     
@@ -594,6 +606,16 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     if(elem->stuff.u.enemy.collided)
     {
         elem->stuff.u.enemy.collided = 0;
+        
+        if(elem->stuff.u.enemy.enemy_state != ENEMY_STATE_JUKE)
+        {
+            elem->stuff.u.enemy.last_state = ENEMY_STATE_PATROL;
+            
+            elem->stuff.u.enemy.tgt_x = ax = zq.x * juke_distance;
+            elem->stuff.u.enemy.tgt_y = ay = zq.y * juke_distance;
+            elem->stuff.u.enemy.tgt_z = az = zq.z * juke_distance;
+        }
+        
         // force firing a bullet (in case of object-collision, run through)
         fireBullet = 1;
         zdot = zdot_ikillyou;
@@ -621,9 +643,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     if(isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
     {
-        // never happens
         z1q = zq;
-        assert(0);
     }
     
     // test that conversion to euler is possible
@@ -806,7 +826,7 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
 }
 
 static float
-pursuit_speed_for_object(WorldElem* elem)
+pursuit_speed_for_object(WorldElem* elem, float zdot)
 {
     float v = 0;
     float s = 1.0;
@@ -821,13 +841,20 @@ pursuit_speed_for_object(WorldElem* elem)
             break;
             
         default:
-            v = (elem->stuff.u.enemy.enemy_state == ENEMY_STATE_RUN ||
-                 elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PATROL ||
-                 elem->stuff.u.enemy.enemy_state == ENEMY_STATE_JUKE) ?
-                    // not pursuing
-                 elem->stuff.u.enemy.max_speed:
-                    // pursue
-                 elem->stuff.u.enemy.max_speed;
+            
+            switch(elem->stuff.u.enemy.enemy_state)
+            {
+                case ENEMY_STATE_PATROL:
+                    v = elem->stuff.u.enemy.max_speed/2;
+                    if(zdot < zdot_infront) v /= 2;
+                    break;
+                    
+                default:
+                    v = elem->stuff.u.enemy.max_speed;
+                    //if(zdot < zdot_infront) v /= 2;
+                    break;
+            }
+            
             break;
     }
     

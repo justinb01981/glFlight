@@ -607,7 +607,7 @@ calibrate_bail:
     }
     
     // walk part of the list and add some potentially-visible elements
-    unsigned int btreeVisibleTestCount = /*400*/64; // TODO: saw a crash when reducing to 120
+    unsigned int btreeVisibleTestCount = 200;
     unsigned int btreeVisIdx = (visibleBtreeRootBuilding == &visibleBtreeRootStorage1 ? 0 : 1);
     while(btreeVisibleTest && btreeVisibleTestCount > 0)
     {
@@ -855,6 +855,7 @@ clear_vis_btree_removed(WorldElem* headElem)
 {
     while(headElem)
     {
+        
 //        if (btreeVisibleTest && btreeVisibleTest->elem == headElem)
 //        {
 //            btreeVisibleTest = btreeVisibleTest->next;
