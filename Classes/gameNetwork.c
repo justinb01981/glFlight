@@ -392,7 +392,7 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
     
     if(gameNetworkState.inited)
     {
-        gameNetwork_disconnect();
+        gameNetwork_disconnectSignal();
     }
     
     update_frequency_ms = update_ms;
@@ -439,7 +439,7 @@ gameNetwork_resume()
 }
 
 int
-gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becamehost)())
+gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becamehost)(void))
 {
     int retries = 0;
     gameNetworkAddress gameAddress;
@@ -454,6 +454,10 @@ gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becameh
     char strtmp[256];
     
     gameAddress.len = 0;
+    
+    gameNetwork_disconnectSignal();
+    
+    game_lock_lock(&gameNetworkState.msgQueue.lock);
     
     assert(sizeof(gameAddress.storage) >= sizeof(struct sockaddr_storage));
     
@@ -610,6 +614,7 @@ gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becameh
     
 gameNetwork_connect_done:
     gameNetworkState.connected = 1;
+    game_lock_unlock(&gameNetworkState.msgQueue.lock);
     return GAME_NETWORK_ERR_NONE;
 }
 
@@ -677,13 +682,29 @@ gameNetwork_sendPlayersDisconnect()
 }
 
 void
+gameNetwork_disconnectSignal()
+{
+    gameNetworkState.connected_ending = 1;
+    int waiting = 1;
+    
+    do
+    {
+        usleep(GAME_NETWORK_READ_THREAD_IDLE_USLEEP_INTERVAL);
+        game_lock_lock(&gameNetworkState.msgQueue.lock);
+        if(!gameNetworkState.connected_ending) waiting = 0;
+        game_lock_unlock(&gameNetworkState.msgQueue.lock);
+    } while (waiting);
+}
+
+void
 gameNetwork_disconnect()
 {
+    // synchronize with network background-thread
+    game_lock_lock(&gameNetworkState.msgQueue.lock);
+    
     if(gameNetworkState.connected)
     {
         gameNetwork_sendPlayersDisconnect();
-        
-        gameNetworkState.connected = 0;
     }
 
     int* sock_set[] = {&gameNetworkState.hostInfo.socket.s,
@@ -710,6 +731,18 @@ gameNetwork_disconnect()
     
     gameNetworkState.gameNetworkHookOnMessage = NULL;
     gameNetworkState.gameNetworkHookGameDiscovered = NULL;
+    
+    while(gameNetworkState.msgQueue.head.next)
+    {
+        struct gameNetworkMessageQueued* pFree = gameNetworkState.msgQueue.head.next->next;
+        
+        gameNetworkState.msgQueue.head.next = gameNetworkState.msgQueue.head.next->next;
+        free(pFree);
+    }
+    
+    game_lock_unlock(&gameNetworkState.msgQueue.lock);
+    
+    gameNetworkState.connected = 0;
 }
 
 int
@@ -1453,8 +1486,6 @@ do_game_network_write()
     {
         return;
     }
-    
-    //time_ms = get_time_ms();
     
     game_network_periodic_check();
     
@@ -2465,12 +2496,10 @@ do_game_network_read_core()
     int retries = 10;
     gameNetworkMessageQueued* pMsgNew;
     
-    if(!world_inited) return;
-
     
     if(!gameNetworkState.connected)
     {
-        usleep(10000000);
+        usleep(GAME_NETWORK_READ_THREAD_IDLE_USLEEP_INTERVAL);
         return;
     }
     
@@ -2547,13 +2576,20 @@ do_game_network_read_core()
 void
 do_game_network_read()
 {
+    if(gameNetworkState.connected_ending)
+    {
+        if(gameNetworkState.connected) gameNetwork_disconnect();
+        gameNetworkState.connected_ending = 0;
+        return;
+    }
+    
     if(!gameNetworkState.hostInfo.bonjour_lan)
     {
         do_game_network_read_core();
     }
     else
     {
-        usleep(100000000); // 100ms
+        usleep(GAME_NETWORK_READ_THREAD_IDLE_USLEEP_INTERVAL); // 100ms
     }
 }
 

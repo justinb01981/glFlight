@@ -30,6 +30,7 @@
 #define GAME_NETWORK_BONJOUR_ADDRFAMILY_HACK 0x09
 #define GAME_NETWORK_MAP_REQUEST_WINDOW_LEN (GAME_NETWORK_MAX_MAP_STRING_LEN * 1)
 #define GAME_NETWORK_HOST_PORTAL_NAME "*host*"
+#define GAME_NETWORK_READ_THREAD_IDLE_USLEEP_INTERVAL (100000)
 
 //const static char *GAME_NETWORK_LAN_GAME_NAME = "d0gf1ght_lan";
 
@@ -230,6 +231,7 @@ typedef struct
     
     int inited;
     int connected;
+    int connected_ending;
     int map_downloaded;
     unsigned int server_msg_id_next;
     
@@ -309,6 +311,9 @@ gameNetwork_directoryList();
 
 int
 gameNetwork_directoryRegister(const char* roomName);
+
+void
+gameNetwork_disconnectSignal();
 
 void
 gameNetwork_disconnect();

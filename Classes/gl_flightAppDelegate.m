@@ -9,7 +9,6 @@
 #import "gl_flightAppDelegate.h"
 #import "glFlightGLKViewController.h"
 #import "cocoaGameInput.h"
-#import "cocoaNetworkThread.h"
 #import "cocoaAudioThread.h"
 #import "GameNetworkBonjourManager.h"
 
@@ -183,7 +182,7 @@ void glFlightResume(time_t time_last_suspend)
     // Handle any background procedures not related to animation here.
     time_last_suspend = time(NULL);
     game_paused = 1;
-    gameNetwork_disconnect();
+    gameNetwork_disconnectSignal();
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application

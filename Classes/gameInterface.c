@@ -693,7 +693,8 @@ gameInterfaceMultiplayerConfigure(int action)
         case ACTION_CONNECT_TO_GAME:
         case ACTION_HOST_GAME_LAN:
         {
-            gameNetwork_disconnect();
+            gameNetwork_disconnectSignal();
+            
             gameMapSetMap(map_portal_lobby);
             
             glFlightDrawframeHook = gameDialogNetworkCountdownEnded;
@@ -735,7 +736,7 @@ gameInterfaceMultiplayerConfigure(int action)
         case 0:
             if(action == ACTION_CONNECT_TO_GAME)
             {
-                gameNetwork_disconnect();
+                gameNetwork_disconnectSignal();
                 gameMapSetMap(map_portal_lobby);
                 glFlightDrawframeHook = gameDialogBrowseGamesCountdown;
                 extern void game_add_network_portal(char* name);
@@ -750,7 +751,7 @@ gameInterfaceMultiplayerConfigure(int action)
             
             // dialog closed - pop keyboard
         case 1:
-            gameNetwork_disconnect();
+            gameNetwork_disconnectSignal();
             gameDialogState.networkGameNameEntered++;
             
             fireActionQueuedAfterEdit = action;
@@ -805,7 +806,7 @@ void gameInterfaceProcessAction()
     switch(fireAction)
     {
         case ACTION_MAP_EDIT:
-            gameNetwork_disconnect();
+            gameNetwork_disconnectSignal();
             game_map_custom_loaded = 1;
             gameInterfaceControls.mainMenu.visible = 0;
             gameMapFileName("custom");
@@ -850,7 +851,7 @@ void gameInterfaceProcessAction()
         }
             
         case ACTION_NETWORK_DISCONNECT:
-            gameNetwork_disconnect();
+            gameNetwork_disconnectSignal();
             gameMapSetMap(initial_map);
             break;
             
@@ -880,7 +881,7 @@ void gameInterfaceProcessAction()
             game_start_score = gameStateSinglePlayer.last_game.score;
             
         case ACTION_START_GAME:
-            gameNetwork_disconnect();
+            gameNetwork_disconnectSignal();
             actions_menu_reset();
             gameInterfaceControls.mainMenu.visible = 0;
             game_start(game_start_difficulty, GAME_TYPE_COLLECT);
@@ -895,7 +896,7 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_START_SURVIVAL_GAME:
-            gameNetwork_disconnect();
+            gameNetwork_disconnectSignal();
             gameInterfaceControls.mainMenu.visible = 0;
             sprintf(strTmp, "survival started!\n");
             gameStateSinglePlayer.started = 1;
@@ -905,7 +906,7 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_START_SPEEDRUN_GAME:
-            gameNetwork_disconnect();
+            gameNetwork_disconnectSignal();
             gameInterfaceControls.mainMenu.visible = 0;
             sprintf(strTmp, "survival started!\n");
             gameStateSinglePlayer.started = 1;
@@ -915,7 +916,7 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_START_LOBBALL_GAME:
-            gameNetwork_disconnect();
+            gameNetwork_disconnectSignal();
             gameInterfaceControls.mainMenu.visible = 0;
             sprintf(strTmp, "lob started!\n");
             gameStateSinglePlayer.started = 1;
@@ -925,7 +926,7 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_START_DEFEND_GAME:
-            gameNetwork_disconnect();
+            gameNetwork_disconnectSignal();
             gameInterfaceControls.mainMenu.visible = 0;
             sprintf(strTmp, "defend started!\n");
             gameStateSinglePlayer.started = 1;
@@ -935,7 +936,7 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_START_TURRET_GAME:
-            gameNetwork_disconnect();
+            gameNetwork_disconnectSignal();
             gameInterfaceControls.mainMenu.visible = 0;
             sprintf(strTmp, "turret started!\n");
             gameStateSinglePlayer.started = 1;

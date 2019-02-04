@@ -268,13 +268,12 @@ calibrate_bail:
     game_lock_lock(&gameNetworkState.msgQueue.lock);
     
     gameNetworkMessageQueued* pNetworkMsg = gameNetworkState.msgQueue.head.next;
-    while(pNetworkMsg)
+    while(pNetworkMsg && !pNetworkMsg->processed)
     {
         gameNetworkMessageQueued* pNetworkMsgNext = pNetworkMsg->next;
-        if(!pNetworkMsg->processed)
-        {
-            do_game_network_handle_msg(&pNetworkMsg->msg, &pNetworkMsg->srcAddr, pNetworkMsg->receive_time);
-        }
+
+        do_game_network_handle_msg(&pNetworkMsg->msg, &pNetworkMsg->srcAddr, pNetworkMsg->receive_time);
+        
         pNetworkMsg->processed = 1;
         pNetworkMsg = pNetworkMsgNext;
     }

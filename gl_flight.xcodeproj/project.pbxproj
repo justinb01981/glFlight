@@ -20,7 +20,6 @@
 		6D1073231585CAE0006B6499 /* texture0.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D1073221585CAE0006B6499 /* texture0.bmp */; };
 		6D3FF5F915FA7B40009A5388 /* mesh.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D3FF5F815FA7B40009A5388 /* mesh.c */; };
 		6D413C041688150500A37ADF /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6D413C031688150500A37ADF /* Settings.bundle */; };
-		6D413C07168833F500A37ADF /* cocoaNetworkThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D413C06168833F500A37ADF /* cocoaNetworkThread.m */; };
 		6D4F2F3E1618241000286C16 /* shoot.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6D4F2F3D1618241000286C16 /* shoot.wav */; };
 		6D4F2F401618241A00286C16 /* boom.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6D4F2F3F1618241A00286C16 /* boom.wav */; };
 		6D512E1715EC1F130064DF49 /* gameUtils.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D512E1615EC1F130064DF49 /* gameUtils.c */; };
@@ -154,6 +153,7 @@
 		D09A5F3C208172D9009F9618 /* texture110.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3A208172D8009F9618 /* texture110.bmp */; };
 		D09A5F3E208174EB009F9618 /* texture111.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3D208174EB009F9618 /* texture111.bmp */; };
 		D09A5F3F208174EB009F9618 /* texture111.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3D208174EB009F9618 /* texture111.bmp */; };
+		D09E3BE22207A95900131247 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D05AEDA121FD5DE300692833 /* GLKit.framework */; };
 		D09E7FC816EFBFC500343CE6 /* texture27.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09E7FC716EFBFC400343CE6 /* texture27.bmp */; };
 		D0A5039A1A43EF8C00C4BBD1 /* engineslow.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A503991A43EF8C00C4BBD1 /* engineslow.wav */; };
 		D0A5039C1A43EF9400C4BBD1 /* enginefast.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A5039B1A43EF9400C4BBD1 /* enginefast.wav */; };
@@ -351,7 +351,6 @@
 		D0BCC9B42052EDC100094809 /* cocoaGameAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D91DEA2166C0DB300362864 /* cocoaGameAudio.m */; };
 		D0BCC9B52052EDC100094809 /* gameAudio.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D91DEA4166C0EF100362864 /* gameAudio.c */; };
 		D0BCC9B62052EDC100094809 /* gameBounding.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D91DEAB1675556200362864 /* gameBounding.c */; };
-		D0BCC9B72052EDC100094809 /* cocoaNetworkThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D413C06168833F500A37ADF /* cocoaNetworkThread.m */; };
 		D0BCC9B82052EDC100094809 /* cocoaAudioThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D53C4D61693FDB4009D6C3C /* cocoaAudioThread.m */; };
 		D0BCC9B92052EDC100094809 /* glFlight.c in Sources */ = {isa = PBXBuildFile; fileRef = D062ED5916E0279B00CA4374 /* glFlight.c */; };
 		D0BCC9BA2052EDC100094809 /* gameGraphics.c in Sources */ = {isa = PBXBuildFile; fileRef = D062ED5C16E0295500CA4374 /* gameGraphics.c */; };
@@ -437,8 +436,6 @@
 		6D3FF5F815FA7B40009A5388 /* mesh.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mesh.c; sourceTree = "<group>"; };
 		6D3FF5FA15FA7B61009A5388 /* mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mesh.h; sourceTree = "<group>"; };
 		6D413C031688150500A37ADF /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		6D413C05168833F500A37ADF /* cocoaNetworkThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoaNetworkThread.h; sourceTree = "<group>"; };
-		6D413C06168833F500A37ADF /* cocoaNetworkThread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = cocoaNetworkThread.m; sourceTree = "<group>"; };
 		6D4F2F351617300F00286C16 /* gameAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameAudio.h; sourceTree = "<group>"; };
 		6D4F2F3D1618241000286C16 /* shoot.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shoot.wav; sourceTree = "<group>"; };
 		6D4F2F3F1618241A00286C16 /* boom.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = boom.wav; sourceTree = "<group>"; };
@@ -687,6 +684,7 @@
 				28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */,
 				D033788714D9FEFD00FD8A74 /* CoreMotion.framework in Frameworks */,
 				D0AD4F6616D6F11600664895 /* AVFoundation.framework in Frameworks */,
+				D09E3BE22207A95900131247 /* GLKit.framework in Frameworks */,
 				D0BCBFB1175FE67F00003168 /* AudioToolbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -762,8 +760,6 @@
 				6D91DEA2166C0DB300362864 /* cocoaGameAudio.m */,
 				6D91DEAA16754FB800362864 /* gameBounding.h */,
 				6D91DEAB1675556200362864 /* gameBounding.c */,
-				6D413C05168833F500A37ADF /* cocoaNetworkThread.h */,
-				6D413C06168833F500A37ADF /* cocoaNetworkThread.m */,
 				6D53C4D51693FDB4009D6C3C /* cocoaAudioThread.h */,
 				6D53C4D61693FDB4009D6C3C /* cocoaAudioThread.m */,
 				6DDAAC9B16D43230003D97DF /* action.h */,
@@ -1508,7 +1504,6 @@
 				6D91DEA3166C0DB300362864 /* cocoaGameAudio.m in Sources */,
 				6D91DEA5166C0EF100362864 /* gameAudio.c in Sources */,
 				6D91DEAC1675556300362864 /* gameBounding.c in Sources */,
-				6D413C07168833F500A37ADF /* cocoaNetworkThread.m in Sources */,
 				6D53C4D71693FDB4009D6C3C /* cocoaAudioThread.m in Sources */,
 				D062ED5A16E0279B00CA4374 /* glFlight.c in Sources */,
 				D062ED5D16E0295500CA4374 /* gameGraphics.c in Sources */,
@@ -1546,7 +1541,6 @@
 				D0BCC9B42052EDC100094809 /* cocoaGameAudio.m in Sources */,
 				D0BCC9B52052EDC100094809 /* gameAudio.c in Sources */,
 				D0BCC9B62052EDC100094809 /* gameBounding.c in Sources */,
-				D0BCC9B72052EDC100094809 /* cocoaNetworkThread.m in Sources */,
 				D0BCC9B82052EDC100094809 /* cocoaAudioThread.m in Sources */,
 				D0BCC9B92052EDC100094809 /* glFlight.c in Sources */,
 				D0BCC9BA2052EDC100094809 /* gameGraphics.c in Sources */,
@@ -1595,7 +1589,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = shipicon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Justin Brady (75WG2NT9R8)";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = YES;
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
@@ -1611,7 +1604,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = d0gf1ght;
-				PROVISIONING_PROFILE_SPECIFIER = "d0gfight2 Development";
+				PROVISIONING_PROFILE_SPECIFIER = "d0gfight2 Distribution";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
