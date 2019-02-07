@@ -217,7 +217,7 @@ int bindTextureRequest(int tex_id)
     
     if(!texture_list_loaded[tex_id])
     {
-        extern void console_clear();
+        extern void console_clear(void);
         extern void console_write(char* fmt, ...);
         
         //console_clear();

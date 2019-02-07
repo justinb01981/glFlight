@@ -465,6 +465,17 @@ world_add_object_core(Model type,
         }
             break;
             
+        case MODEL_LINE:
+            model_coords = model_cube;
+            model_sizeof = sizeof(model_cube);
+            model_indices = model_cube_indices;
+            model_indices_sizeof = sizeof(model_cube_indices);
+            model_texcoords = model_cube_texcoords_alt /*model_cube_texcoords*/;
+            model_texcoords_sizeof = sizeof(model_cube_texcoords);
+            model_primitives_sizeof = sizeof(model_cube_primitives);
+            model_primitives = model_cube_primitives;
+            break;
+            
         default:
             assert(0);
             break;
@@ -560,6 +571,7 @@ world_add_object_core(Model type,
             pElem->renderInfo.priority = 1;
             break;
             
+        case MODEL_LINE:
         case MODEL_CONTRAIL:
             pElem->renderInfo.visible = 1;
             pElem->renderInfo.priority = 1;
@@ -2283,26 +2295,21 @@ world_set_plane(int idx, float ox, float oy, float oz, float x1, float y1, float
 void
 world_add_drawline(float a[3], float b[3], float color[3], unsigned int lifetime)
 {
-    WorldElem* pElem = world_elem_alloc();
-    if(pElem)
+    int i;
+    WorldElem* pLast;
+    int elem_id = world_add_object(MODEL_LINE, a[0], a[1], a[2], 0, 0, 0, 1, 0);
+    pLast = world_get_last_object();
+    pLast->object_type = OBJ_DISPLAYONLY;
+    
+    for(i = 0; i < 3; i++)
     {
-        int i = 0;
-        pElem->coords[i++] = a[0];
-        pElem->coords[i++] = a[1];
-        pElem->coords[i++] = a[2];
-        pElem->coords[i++] = b[0];
-        pElem->coords[i++] = b[1];
-        pElem->coords[i++] = b[2];
-        
-        i = 0;
-        pElem->texcoords[i] = color[i]; i++;
-        pElem->texcoords[i] = color[i]; i++;
-        pElem->texcoords[i] = color[i]; i++;
-        
-        pElem->lifetime = lifetime;
-        
-        world_elem_list_add(pElem, &gWorld->drawline_list_head);
+        pLast->stuff.u.drawline.x1[i] = a[i];
+        pLast->stuff.u.drawline.x2[i] = b[i];
+        pLast->stuff.u.drawline.color[i] = color[i];
+        pLast->stuff.u.drawline.width = 1.0;
     }
+    
+    if(lifetime > 0) world_object_set_lifetime(elem_id, lifetime);
 }
 
 void
@@ -2316,6 +2323,7 @@ world_build_run_program(float x, float y, float z)
             float c[] = {sin(a)*b, 0, cos(a)*b};
             int obj_id =
                 world_add_object(MODEL_ICOSAHEDRON, x + c[0], y + c[1], z + c[2], 0, 0, 0, 2, TEXTURE_ID_BALL);
+            obj_id = obj_id;
         }
     }
 }

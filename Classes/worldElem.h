@@ -174,6 +174,14 @@ struct WorldElem {
                 int changes_target:1, fires:1, fires_missles:1, leaves_trail:1, patrols_no_target_jukes:1, deploys_collect:1, ignore_player:1, ignore_collect:1;
                 int collided;
             } enemy;
+            
+            struct
+            {
+                float x1[3];
+                float x2[3];
+                float color[3];
+                float width;
+            } drawline;
         } u;
         
         struct

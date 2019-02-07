@@ -104,6 +104,7 @@ typedef enum {
     MODEL_FLATTENED_CUBE,
     MODEL_SCENERY,
     MODEL_CONTRAIL,
+    MODEL_LINE,
     MODEL_LAST,
 } Model;
 

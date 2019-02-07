@@ -1079,6 +1079,14 @@ drawElem(WorldElem* pElem)
 //        drawLineWithColorAndWidth(&pElem->coords[0], &pElem->coords[3], &pElem->texcoords[0], 2.0);
 //        drawLineEnd();
 //    }
+    else if(pElem->type == MODEL_LINE)
+    {
+        drawElemBatch();
+        
+        drawLineBegin();
+        drawLineWithColorAndWidth(pElem->stuff.u.drawline.x1, pElem->stuff.u.drawline.x2, pElem->stuff.u.drawline.color, pElem->stuff.u.drawline.width);
+        drawLineEnd();
+    }
     else
     {
         if(pElem->renderInfo.tex_adjust)
@@ -1833,100 +1841,6 @@ drawLineGrid(float start[3], float u[3], float v[3], float nu, float nv)
         }
         
         drawLine(j, k);
-    }
-}
-
-void
-drawBoundingLineGrid()
-{
-    /*
-    #define VECBOUND(x) gWorld->boundingRegion->v[(x)].f
-    
-    // TODO: texture-fill a triangle defined by nearest bounding vector plane when approaching boundary
-    int i = 0, j;
-    
-    int N = WORLD_BOUNDING_SPHERE_STEPS+1;
-    for(i = 1; i <= N/2; i += 1)
-    for(j = N; j < N*N; j += N)
-    {
-        float D = sin(M_PI*2 / WORLD_BOUNDING_SPHERE_STEPS) * (gWorld->bound_radius / M_PI*2*i);
-        
-        {
-            float result[3];
-            
-            float c[] = {
-                VECBOUND(j+i)[0],
-                VECBOUND(j+i)[1],
-                VECBOUND(j+i)[2]
-            };
-            float v1[] = {
-                VECBOUND(j+i)[3],
-                VECBOUND(j+i)[4],
-                VECBOUND(j+i)[5]
-            };
-            float v2[] = {
-                VECBOUND(j+i-1)[0],
-                VECBOUND(j+i-1)[1],
-                VECBOUND(j+i-1)[2]
-            };
-
-            vector_cross_product(v1, v2, result);
-            
-            int d;
-            for(d = 0; d < 3; d++)
-            {
-                result[d] = result[d] * D + c[d] - (result[d]*(D/2));
-            }
-                
-            drawLine(c, v2);
-            
-            //vector_cross_product(u1, u3, result);
-            
-            //for(d = 0; d < 3; d++)
-            //{
-            //    result[d] = result[d]*D + u1[d];
-            //}
-            //drawLine(u1, u3);
-        }
-    }
-    */
-    
-    /*
-    int linter = 20;
-    float lstart[] = {0, 0, 0};
-    float u[] = {linter, 0, 0};
-    float v[] = {0, linter, 0};
-    
-    // grids along x, y
-    lstart[0] = 0; lstart[1] = 0; lstart[2] = 0;
-    u[0] = linter; u[1] = 0; u[2] = 0;
-    v[0] = 0; v[1] = linter; v[2] = 0;
-    drawLineGrid(lstart, u, v, gWorld->bound_x / linter, gWorld->bound_y / linter);
-    lstart[2] = gWorld->bound_z;
-    drawLineGrid(lstart, u, v, gWorld->bound_x / linter, gWorld->bound_y / linter);
-    
-    // grids along z, y
-    lstart[0] = 0; lstart[1] = 0; lstart[2] = 0;
-    u[0] = 0; u[1] = 0; u[2] = linter;
-    v[0] = 0; v[1] = linter; v[2] = 0;
-    drawLineGrid(lstart, u, v, gWorld->bound_z / linter, gWorld->bound_y / linter);
-    lstart[0] = gWorld->bound_x;
-    drawLineGrid(lstart, u, v, gWorld->bound_z / linter, gWorld->bound_y / linter);
-    
-    // grids along , y
-    lstart[0] = 0; lstart[1] = 0; lstart[2] = 0;
-    u[0] = linter; u[1] = 0; u[2] = 0;
-    v[0] = 0; v[1] = 0; v[2] = linter;
-    //drawLineGrid(lstart, u, v, gWorld->bound_x / linter, gWorld->bound_z / linter);
-    lstart[1] = gWorld->bound_y;
-    drawLineGrid(lstart, u, v, gWorld->bound_z / linter, gWorld->bound_z / linter);
-     */
-    
-    WorldElemListNode* pCur = gWorld->drawline_list_head.next;
-    while(pCur)
-    {
-        drawLine(&pCur->elem->coords[0], &pCur->elem->coords[3]);
-        pCur = pCur->next;
     }
 }
 

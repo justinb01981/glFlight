@@ -122,9 +122,9 @@ void world_init(float radius);
 
 void world_update(float tc);
 
-void world_clear_pending();
+void world_clear_pending(void);
 
-void world_free();
+void world_free(void);
 
 void world_build_run_program(float x, float y, float z);
 
@@ -145,7 +145,7 @@ WorldElem* world_get_object_n_at_loc(int n, float x, float y, float z, float ran
 
 WorldElem* world_find_elem_with_attrs(WorldElemListNode* head, int object_type, int affiliation);
 
-WorldElem* world_get_last_object();
+WorldElem* world_get_last_object(void);
 
 void world_move_elem(WorldElem* pElem, float x, float y, float z, int relative);
 
@@ -180,10 +180,10 @@ void
 world_manip_mesh_round(float x, float y, float z);
 
 float
-world_mesh_pending_x();
+world_mesh_pending_x(void);
 
 float
-world_mesh_pending_y();
+world_mesh_pending_y(void);
 
 void
 world_convert_mesh_to_gltriangles(int tex_id);
@@ -205,11 +205,11 @@ int world_object_set_lifetime(int object_id, int tex_passes);
 
 void world_object_set_nametag(int object_id, char* nametag);
 
-void world_lock_init();
+void world_lock_init(void);
 
-void world_lock_destroy();
+void world_lock_destroy(void);
 
-void world_lock();
-void world_unlock();
+void world_lock(void);
+void world_unlock(void);
 
 #endif /* __world_h__ */

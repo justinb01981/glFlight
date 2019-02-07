@@ -710,19 +710,6 @@ calibrate_bail:
     
     WorldElemListNode* pDrawCur = gWorld->elements_visible.next;
     
-    // draw bounding lines
-    drawLineBegin();
-    float lineBounds = 10;
-    /*
-    if(my_ship_x <= lineBounds || my_ship_x >= gWorld->bound_x-lineBounds ||
-       my_ship_y <= lineBounds || my_ship_y >= gWorld->bound_y-lineBounds ||
-       my_ship_z <= lineBounds || my_ship_z >= gWorld->bound_z-lineBounds)
-     */
-    {
-        drawBoundingLineGrid();
-    }
-    drawLineEnd();
-    
     // draw mesh
     WorldElemListNode* cur = gWorld->triangle_mesh_head.next;
     while(cur)
@@ -733,33 +720,6 @@ calibrate_bail:
         drawTriangleMesh(mesh, cur->elem->texture_id);
         cur = cur->next;
     }
-    
-    // draw world-defined lines
-    drawLineBegin();
-    WorldElemListNode* lineCur = gWorld->drawline_list_head.next;
-    while(lineCur)
-    {
-        WorldElem* pElem = lineCur->elem;
-        lineCur = lineCur->next;
-        
-        float lineA[3] = {pElem->coords[0], pElem->coords[1], pElem->coords[2]};
-        float lineB[3] = {pElem->coords[3], pElem->coords[4], pElem->coords[5]};
-        float lineColor[] = {pElem->texcoords[0], pElem->texcoords[1], pElem->texcoords[2]};
-        if(distance(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(),
-                    lineA[0], lineA[1], lineA[2]) <= visible_distance ||
-           distance(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(),
-                    lineB[0], lineB[1], lineB[2]) <= visible_distance)
-        {
-            drawLineWithColorAndWidth(lineA, lineB, lineColor, 1.0);
-        }
-        pElem->lifetime--;
-        if(pElem->lifetime <= 0)
-        {
-            world_elem_list_remove(pElem, &gWorld->drawline_list_head);
-            world_elem_free(pElem);
-        }
-    }
-    drawLineEnd();
     
     // actual drawing (happens asynchronouly)
     drawElemStart(pDrawCur);
