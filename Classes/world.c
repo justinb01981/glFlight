@@ -1982,7 +1982,6 @@ world_update(float tc)
                     {
                         WorldElem* pCurRemoveElem = pElem;
 
-                        
                         // out of bounds
                         world_elem_list_remove(pCurRemoveElem, &gWorld->elements_expiring);
                         world_elem_list_remove(pCurRemoveElem, &gWorld->elements_list);

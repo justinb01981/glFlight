@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-extern float get_time_ms_wall();
+extern float get_time_ms_wall(void);
 
 // private subtypes
 
@@ -571,7 +571,7 @@ static GameNetworkBonjourManager* instance;
                     
                     game_lock_unlock(&gameNetworkState.msgQueue.lock);
                     
-                    extern void do_game_network_read_bonjour();
+                    extern void do_game_network_read_bonjour(void);
                     do_game_network_read_bonjour();
                 }
             }
@@ -582,7 +582,7 @@ static GameNetworkBonjourManager* instance;
             // fall through
         case NSStreamEventErrorOccurred: {
             NSLog(@"NSStreamEventErrorOccurred: %@/%@",  [[stream streamError] localizedDescription], [[stream streamError] localizedFailureReason]);
-            gameNetwork_removePlayer(peer.peerId);
+            gameNetwork_removePlayerBonjour(peer.peerId);
             // the above call will disconnect/remove
             //[peer disconnect];
             //[peers removeObject: peer];
@@ -590,7 +590,7 @@ static GameNetworkBonjourManager* instance;
             
         case NSStreamEventEndEncountered: {
             NSLog(@"NSStreamEventEndEncountered for peer: %@",  [peer debugDescription]);
-            gameNetwork_removePlayer(peer.peerId);
+            gameNetwork_removePlayerBonjour(peer.peerId);
             // the above call will disconnect/remove
             //[peer disconnect];
             //[peers removeObject: peer];

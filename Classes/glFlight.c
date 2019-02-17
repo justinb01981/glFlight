@@ -34,7 +34,7 @@
 #include "gamePlay.h"
 #include "gameGlobals.h"
 
-static void clear_world_pending_removals();
+static void clear_world_pending_removals(void);
 static void draw_btree_elements(WorldElem* pElem, float priority);
 
 extern int isLandscape;
@@ -285,6 +285,10 @@ calibrate_bail:
     paused_bail:
     
     if(glFlightDrawframeHook) glFlightDrawframeHook();
+#if DEBUG
+    if(!world_inited) printf("world_inited: %d", world_inited);
+    //if(!world_inited) goto draw_bail;
+#endif
     
     pListNode = world_elem_list_find(my_ship_id, &gWorld->elements_list);
     if(pListNode) pWorldElemMyShip = pListNode->elem;

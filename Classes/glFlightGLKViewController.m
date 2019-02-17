@@ -10,6 +10,7 @@
 #import "gameInterface.h"
 #import "glFlight.h"
 #import "gameGlobals.h"
+#import "world.h"
 
 @implementation glFlightGLKViewController
 {
@@ -67,11 +68,6 @@
 
 - (void)glkView: (GLKView*)glkView drawInRect: (CGRect)rect {
     [EAGLContext setCurrentContext:((GLKView*)self.view).context];
-    
-//    if(!effect) {
-//        effect = [[GLKBaseEffect alloc] init];
-//    }
-//    [effect prepareToDraw];
 
     gameInput();
     

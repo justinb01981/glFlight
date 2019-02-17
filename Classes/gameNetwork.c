@@ -50,6 +50,7 @@ gameNetworkState_t gameNetworkState;
 
 static unsigned long update_frequency_ms = 1000 / (GAME_TICK_RATE / 2);
 static unsigned long update_time_last = 0;
+const unsigned long GAME_NETWORK_TIMEOUT_MS = (30*1000);
 const static float euler_interp_range_max = (M_PI/8);
 const static float velo_interp_update_mult = 4;
 const static char *map_eom = "\nmap_eom\n";
@@ -57,29 +58,21 @@ const static char *map_eom = "\nmap_eom\n";
 static char *gameKillVerbs[] = {"slaughtered", "evicerated", "de-rezzed", "shot-down", "ended", "terminated"};
 
 extern int GameNetworkBonjourManagerHost(const char* name, int* sock_out);
-extern int GameNetworkBonjourManagerBrowseBegin();
+extern int GameNetworkBonjourManagerBrowseBegin(void);
 extern int GameNetworkBonjourManagerBrowseEnd(gameNetworkAddress* address_returned);
-extern int GameNetworkBonjourManagerDisconnect();
+extern int GameNetworkBonjourManagerDisconnect(void);
 extern int GameNetworkBonjourManagerDisconnectPeer(int peer_id);
 void GameNetworkBonjourManagerSendMessageToPeer(uint8_t* msg_, int peer_id);
 extern int gameNetwork_onBonjourConnecting1(gameNetworkMessage*, gameNetworkAddress*);
 extern int gameNetwork_onDirectoryRegister1(gameNetworkMessage*, gameNetworkAddress*);
 int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress* srcAddr);
-extern float get_time_ms_wall();
+extern float get_time_ms_wall(void);
 
-static char* do_game_map_render();
-void send_bonjour_beacon_callback();
+static char* do_game_map_render(void);
+void send_bonjour_beacon_callback(void);
 
 
 ////////////////////////////////
-
-static void
-socket_set_blocking(int sock, int block)
-{
-    int blocking = block;
-    
-    setsockopt(sock, SOL_SOCKET, O_NONBLOCK, &blocking, sizeof(blocking));
-}
 
 static int
 socket_read_ready(int sock, unsigned int timeout_ms)
@@ -393,6 +386,7 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
     if(gameNetworkState.inited)
     {
         gameNetwork_disconnectSignal();
+        //assert(!gameNetworkState.connected);
     }
     
     update_frequency_ms = update_ms;
@@ -459,21 +453,14 @@ gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becameh
     
     game_lock_lock(&gameNetworkState.msgQueue.lock);
     
+    while(gameNetworkState.player_list_head.next != NULL)
+    {
+        gameNetwork_removePlayer(gameNetworkState.player_list_head.next->player_id);
+    }
+    
     assert(sizeof(gameAddress.storage) >= sizeof(struct sockaddr_storage));
     
-    gameNetworkState.connected = 0;
-    
     gameNetwork_initsockets();
-    
-    playerInfo = gameNetworkState.player_list_head.next_store;
-    while(playerInfo)
-    {
-        gameNetworkPlayerInfo* del = playerInfo;
-        playerInfo = playerInfo->next_store;
-        free(del);
-    }
-    gameNetworkState.player_list_head.next = NULL;
-    gameNetworkState.player_list_head.next_store = NULL;
     
     if(hosting && !gameNetworkState.hostInfo.bonjour_lan)
     {
@@ -613,19 +600,23 @@ gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becameh
     }
     
 gameNetwork_connect_done:
-    gameNetworkState.connected = 1;
+    gameNetworkState.connected_signal = 1;
     game_lock_unlock(&gameNetworkState.msgQueue.lock);
+    while(gameNetworkState.connected_signal)
+    {
+        usleep(GAME_NETWORK_READ_THREAD_IDLE_USLEEP_INTERVAL);
+    }
     return GAME_NETWORK_ERR_NONE;
 }
 
 int
-gameNetwork_host(char* server_name, void (*callback_becamehost)())
+gameNetwork_host(char* server_name, void (*callback_becamehost)(void))
 {
     return gameNetwork_connect_core(1, server_name, callback_becamehost);
 }
 
 int
-gameNetwork_connect(char* server_name, void (*callback_becamehost)())
+gameNetwork_connect(char* server_name, void (*callback_becamehost)(void))
 {
     return gameNetwork_connect_core(0, server_name, callback_becamehost);
 }
@@ -684,14 +675,17 @@ gameNetwork_sendPlayersDisconnect()
 void
 gameNetwork_disconnectSignal()
 {
-    gameNetworkState.connected_ending = 1;
+    if(!gameNetworkState.connected) return;
+        
+    gameNetworkState.connected_signal = 1;
     int waiting = 1;
     
     do
     {
         usleep(GAME_NETWORK_READ_THREAD_IDLE_USLEEP_INTERVAL);
+        
         game_lock_lock(&gameNetworkState.msgQueue.lock);
-        if(!gameNetworkState.connected_ending) waiting = 0;
+        if(!gameNetworkState.connected_signal) waiting = 0;
         game_lock_unlock(&gameNetworkState.msgQueue.lock);
     } while (waiting);
 }
@@ -734,15 +728,15 @@ gameNetwork_disconnect()
     
     while(gameNetworkState.msgQueue.head.next)
     {
-        struct gameNetworkMessageQueued* pFree = gameNetworkState.msgQueue.head.next->next;
+        struct gameNetworkMessageQueued* pFree = gameNetworkState.msgQueue.head.next;
         
         gameNetworkState.msgQueue.head.next = gameNetworkState.msgQueue.head.next->next;
         free(pFree);
     }
     
-    game_lock_unlock(&gameNetworkState.msgQueue.lock);
-    
     gameNetworkState.connected = 0;
+    
+    game_lock_unlock(&gameNetworkState.msgQueue.lock);
 }
 
 int
@@ -990,7 +984,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
 }
 
 gameNetworkError
-gameNetwork_accept_map_download(gameNetworkAddress* src_addr, char* (*mapRenderCallback)())
+gameNetwork_accept_map_download(gameNetworkAddress* src_addr, char* (*mapRenderCallback)(void))
 {
     struct sockaddr_storage from_addr;
     socklen_t from_addr_len;
@@ -1131,17 +1125,6 @@ gameNetwork_addPlayerInfo(int player_id)
     }
     pInfoTail->next = pInfo;
     
-    pInfoTail = gameNetworkState.player_list_head.next_store;
-    while(pInfoTail)
-    {
-        if(pInfoTail->player_id == player_id) return GAME_NETWORK_ERR_NONE;
-        
-        pInfoTail = pInfoTail->next_store;
-    }
-    
-    pInfo->next_store = gameNetworkState.player_list_head.next_store;
-    gameNetworkState.player_list_head.next_store = pInfo;
-    
     return GAME_NETWORK_ERR_NONE;
 }
 
@@ -1193,6 +1176,21 @@ gameNetwork_getPlayerInfoForElemID(int player_elem_id, gameNetworkPlayerInfo** i
 }
 
 gameNetworkError
+gameNetwork_removePlayerBonjour(int player_id)
+{
+    gameNetworkPlayerInfo* pInfo = &gameNetworkState.player_list_head;
+    while(pInfo->next)
+    {
+        if(pInfo->next->player_id == player_id)
+        {
+            pInfo->next->time_last_update = get_time_ms_wall() - GAME_NETWORK_TIMEOUT_MS;
+        }
+        pInfo = pInfo->next;
+    }
+    return GAME_NETWORK_ERR_NONE;
+}
+
+gameNetworkError
 gameNetwork_removePlayer(int player_id)
 {
     game_timeval_t network_time_ms = get_time_ms_wall();
@@ -1207,7 +1205,7 @@ gameNetwork_removePlayer(int player_id)
         if(pInfo->next->player_id == GAME_NETWORK_PLAYER_ID_HOST)
         {
             console_write("Lost connection to %s (host)", pInfo->name);
-            gameNetworkState.connected = 0;
+            gameNetwork_disconnectSignal();
         }
         
         console_write("Player %s disconnected (%lu)", pInfo->next->name,
@@ -1216,7 +1214,7 @@ gameNetwork_removePlayer(int player_id)
         world_remove_object(pInfo->next->elem_id);
         
         gameNetworkPlayerInfo* pFree = pInfo->next;
-        pInfo->next = pFree->next;
+        pInfo->next = pInfo->next->next;
         if(pFree->stream_socket.s > 0)
         {
             close(pFree->stream_socket.s);
@@ -1229,12 +1227,12 @@ gameNetwork_removePlayer(int player_id)
         
         if(pFree->map_data)
         {
-            free(pFree->map_data);
+            char* freeptr = pFree->map_data;
             pFree->map_data = NULL;
+            free(freeptr);
         }
         
-        // do not deallocate, the next_store linked list must retain
-        //free(pFree);
+        free(pFree);
         break;
 
     removePlayer_retry:
@@ -1343,7 +1341,7 @@ gameNetwork_alert(char* alert)
 static void
 game_network_periodic_check()
 {
-    const game_timeval_t time_out_ms = 1000*30;
+    const game_timeval_t time_out_ms = GAME_NETWORK_TIMEOUT_MS;
     gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
     game_timeval_t network_time_ms = get_time_ms_wall();
     int map_retransmit = 0;
@@ -2496,7 +2494,6 @@ do_game_network_read_core()
     int retries = 10;
     gameNetworkMessageQueued* pMsgNew;
     
-    
     if(!gameNetworkState.connected)
     {
         usleep(GAME_NETWORK_READ_THREAD_IDLE_USLEEP_INTERVAL);
@@ -2555,7 +2552,6 @@ do_game_network_read_core()
             pMsgNew->msg = msg;
             pMsgNew->srcAddr = srcAddr;
             pMsgNew->receive_time = get_time_ms_wall();
-            pMsgNew->processed = 0;
             
             gameNetworkMessageQueued* pTail = &gameNetworkState.msgQueue.head;
             while(pTail->next) pTail = pTail->next;
@@ -2576,13 +2572,20 @@ do_game_network_read_core()
 void
 do_game_network_read()
 {
-    if(gameNetworkState.connected_ending)
+    if(gameNetworkState.connected_signal)
     {
-        if(gameNetworkState.connected) gameNetwork_disconnect();
-        gameNetworkState.connected_ending = 0;
+        if(gameNetworkState.connected)
+        {
+            gameNetwork_disconnect();
+        }
+        else
+        {
+            gameNetworkState.connected = 1;
+        }
+        gameNetworkState.connected_signal = 0;
         return;
     }
-    
+
     if(!gameNetworkState.hostInfo.bonjour_lan)
     {
         do_game_network_read_core();
@@ -2703,7 +2706,7 @@ gameNetwork_sendStatsAlert()
     while(row < sizeof(rows)/sizeof(char*))
     {
         int col = 0;
-        pInfo = gameNetworkState.player_list_head.next_store;
+        pInfo = gameNetworkState.player_list_head.next;
         
         if(!pRowTop) pRowTop = str + strlen(str);
         
@@ -2780,7 +2783,7 @@ gameNetwork_sendStatsAlert()
             
             if(row > 1) pLastSep += 3;
             
-            pInfo = pInfo->next_store;
+            pInfo = pInfo->next;
             col++;
         }
         strncat(str, "\n", sizeof(str)-1);

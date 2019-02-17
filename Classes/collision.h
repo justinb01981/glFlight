@@ -514,7 +514,7 @@ do_world_collision_handling(float tc)
                     
             case COLLISION_ACTION_PORTAL_TELEPORT:
                 console_clear();
-                gameNetwork_disconnect();
+                gameNetwork_disconnectSignal();
                 if(strcmp(pCollisionA->elem->stuff.nametag, GAME_NETWORK_HOST_PORTAL_NAME) == 0)
                 {
                     gameNetwork_host(gameSettingGameTitle, load_map_and_host_game);

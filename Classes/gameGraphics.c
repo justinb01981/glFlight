@@ -1331,12 +1331,10 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
     float Ve = gWorld->bound_radius*1.5;
     
     int allocated = 0;
-    size_t n_coords = 0;
-    size_t n_indices = 0;
-    size_t n_tcoords = 0;
+    size_t n_coords = 3*2;
+    size_t n_indices = 3*2;
+    size_t n_tcoords = 2*2;
     size_t n_indices_last;
-    
-    
     
     do{
         float Vi = Vb;
@@ -1497,16 +1495,19 @@ drawBackgroundInit(int tex_id,
 static void
 drawBackgroundUninit()
 {
+    DrawBackgroundData* pFree;
     if(bgData)
     {
-        if(bgData->coords) free(bgData->coords);
-        if(bgData->indices) free(bgData->indices);
-        if(bgData->texcoords) free(bgData->texcoords);
-        if(bgData->tess.coords) free(bgData->tess.coords);
-        if(bgData->tess.indices) free(bgData->tess.indices);
-        if(bgData->tess.texcoords) free(bgData->tess.texcoords);
-        free(bgData);
+        pFree = bgData;
         bgData = NULL;
+        
+        if(pFree->coords) free(pFree->coords);
+        if(pFree->indices) free(pFree->indices);
+        if(pFree->texcoords) free(pFree->texcoords);
+        if(pFree->tess.coords) free(pFree->tess.coords);
+        if(pFree->tess.indices) free(pFree->tess.indices);
+        if(pFree->tess.texcoords) free(pFree->tess.texcoords);
+        free(bgData);
     }
 }
 
@@ -1561,12 +1562,6 @@ drawBackgroundCore()
 
 void drawBackground()
 {
-    if(background_init_needed)
-    {
-        drawBackgroundUninit();
-        drawBackgroundInit(texture_id_background, 0, 0, 0, 100, BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
-        background_init_needed = 0;
-    }
     drawBackgroundCore();
 }
 
@@ -1859,6 +1854,7 @@ drawTriangleMesh(struct mesh_opengl_t* glmesh, int tex_id)
 void
 gameGraphicsInit()
 {
+    drawBackgroundInit(texture_id_background, 0, 0, 0, 100, BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
 }
 
 void
@@ -1874,6 +1870,4 @@ gameGraphicsUninit()
     for(i = 0; i < 3; i++) { if(*(freeBuffers[i])) { free(*(freeBuffers[i])); *freeBuffers[i] = NULL; } }
     
     drawBackgroundUninit();
-    
-    background_init_needed = 1;
 }

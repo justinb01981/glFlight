@@ -31,6 +31,7 @@
 #define GAME_NETWORK_MAP_REQUEST_WINDOW_LEN (GAME_NETWORK_MAX_MAP_STRING_LEN * 1)
 #define GAME_NETWORK_HOST_PORTAL_NAME "*host*"
 #define GAME_NETWORK_READ_THREAD_IDLE_USLEEP_INTERVAL (100000)
+#define MESSAGES_SIGNAL_MAX (256)
 
 //const static char *GAME_NETWORK_LAN_GAME_NAME = "d0gf1ght_lan";
 
@@ -180,7 +181,6 @@ struct gameNetworkPlayerInfo
     int shot_fired;
     
     struct gameNetworkPlayerInfo* next;
-    struct gameNetworkPlayerInfo* next_store;
 };
 
 struct gameNetworkObjectInfo
@@ -231,7 +231,7 @@ typedef struct
     
     int inited;
     int connected;
-    int connected_ending;
+    int connected_signal;
     int map_downloaded;
     unsigned int server_msg_id_next;
     
@@ -344,6 +344,9 @@ gameNetwork_addPlayerInfo(int player_id);
 
 gameNetworkError
 gameNetwork_removePlayer(int player_id);
+
+gameNetworkError
+gameNetwork_removePlayerBonjour(int player_id);
 
 void
 gameNetwork_alert(char* msg);
