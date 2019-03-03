@@ -95,7 +95,7 @@ extern int fireActionQueuedAfterEdit;
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "1.5.0_core";
+const static char* GAME_VERSION_STR = "1.5.1_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 

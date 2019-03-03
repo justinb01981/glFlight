@@ -23,6 +23,7 @@
 #include "gameLock.h"
 #include "collision.h"
 #include "sounds.h"
+#include "model_newship.h"
 
 #define MAX(x, y) ((x) > (y)? (x): (y))
 
@@ -201,14 +202,14 @@ world_add_object_core(Model type,
             break;
             
         case MODEL_SHIP1:
-            model_coords = model_ship1;
-            model_sizeof = sizeof(model_ship1);
-            model_indices = model_ship1_indices;
-            model_indices_sizeof = sizeof(model_ship1_indices);
-            model_texcoords = model_ship1_texcoords;
-            model_texcoords_sizeof = sizeof(model_ship1_texcoords);
-            model_primitives_sizeof = sizeof(model_ship1_primitives);
-            model_primitives = model_ship1_primitives;
+            model_coords = model_newship_coords;
+            model_sizeof = sizeof(model_newship_coords);
+            model_indices = model_newship_indices;
+            model_indices_sizeof = sizeof(model_newship_indices);
+            model_texcoords = model_newship_texcoords;
+            model_texcoords_sizeof = sizeof(model_newship_texcoords);
+            model_primitives_sizeof = sizeof(model_no_primitives);
+            model_primitives = model_no_primitives;
             break;
             
         case MODEL_SHIP2:
@@ -307,7 +308,7 @@ world_add_object_core(Model type,
             model_texcoords = model_cube_texcoords;
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
             model_primitives_sizeof = sizeof(model_cube_primitives);
-            model_primitives = model_cube_primitives;
+            model_primitives = model_no_primitives;
             break;
             
         case MODEL_TELEPORTER:
@@ -318,7 +319,7 @@ world_add_object_core(Model type,
             model_texcoords = model_cube_texcoords;
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
             model_primitives_sizeof = sizeof(model_cube_primitives);
-            model_primitives = model_cube_primitives;
+            model_primitives = model_no_primitives;
             break;
             
         case MODEL_ICOSAHEDRON:
@@ -383,6 +384,9 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_2building_texcoords);
             model_indices = model_2building_indices;
             model_indices_sizeof = sizeof(model_2building_indices);
+            
+            model_primitives = poly_comp.primitives;
+            model_primitives_sizeof = 0;
         }
         break;
             

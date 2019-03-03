@@ -452,11 +452,12 @@ gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becameh
     gameNetwork_disconnectSignal();
     
     game_lock_lock(&gameNetworkState.msgQueue.lock);
-    
-    while(gameNetworkState.player_list_head.next != NULL)
+    /*
+    while(gameNetworkState.player_list_head.next_connected != NULL)
     {
         gameNetwork_removePlayer(gameNetworkState.player_list_head.next->player_id);
     }
+     */
     
     assert(sizeof(gameAddress.storage) >= sizeof(struct sockaddr_storage));
     
@@ -653,13 +654,13 @@ gameNetwork_eagerConnectInit()
 void
 gameNetwork_worldInit()
 {
-    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
+    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next_connected;
     
     while(pInfo)
     {
         pInfo->elem_id = WORLD_ELEM_ID_INVALID;
         
-        pInfo = pInfo->next;
+        pInfo = pInfo->next_connected;
     }
 }
     
@@ -693,12 +694,18 @@ gameNetwork_disconnectSignal()
 void
 gameNetwork_disconnect()
 {
-    // synchronize with network background-thread
-    game_lock_lock(&gameNetworkState.msgQueue.lock);
-    
     if(gameNetworkState.connected)
     {
         gameNetwork_sendPlayersDisconnect();
+        
+        while(gameNetworkState.player_list_head.next != NULL)
+        {
+            gameNetworkPlayerInfo* pFree = gameNetworkState.player_list_head.next;
+            gameNetworkState.player_list_head.next = gameNetworkState.player_list_head.next->next;
+            gameNetworkState.player_list_head.next_connected = gameNetworkState.player_list_head.next;
+            free(pFree);
+        }
+        
     }
 
     int* sock_set[] = {&gameNetworkState.hostInfo.socket.s,
@@ -726,6 +733,9 @@ gameNetwork_disconnect()
     gameNetworkState.gameNetworkHookOnMessage = NULL;
     gameNetworkState.gameNetworkHookGameDiscovered = NULL;
     
+    // synchronize with network background-thread
+    game_lock_lock(&gameNetworkState.msgQueue.lock);
+    
     while(gameNetworkState.msgQueue.head.next)
     {
         struct gameNetworkMessageQueued* pFree = gameNetworkState.msgQueue.head.next;
@@ -742,13 +752,13 @@ gameNetwork_disconnect()
 int
 gameNetwork_countPlayers()
 {
-    gameNetworkPlayerInfo* p = gameNetworkState.player_list_head.next;
+    gameNetworkPlayerInfo* p = gameNetworkState.player_list_head.next_connected;
     int count = 0;
     
     while(p)
     {
         count++;
-        p = p->next;
+        p = p->next_connected;
     }
     return count;
 }
@@ -756,13 +766,13 @@ gameNetwork_countPlayers()
 void
 gameNetwork_startGame(unsigned int sec)
 {
-    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
+    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next_connected;
     
     while(pInfo)
     {
         memset(&pInfo->stats, 0, sizeof(pInfo->stats));
         
-        pInfo = pInfo->next;
+        pInfo = pInfo->next_connected;
     }
     
     send_startgame();
@@ -776,7 +786,7 @@ gameNetwork_send_player_core(gameNetworkMessage* msg, gameNetworkPlayerInfo* pla
 {
     long s;
     
-    gameNetworkPlayerInfo* playerInfo = gameNetworkState.player_list_head.next;
+    gameNetworkPlayerInfo* playerInfo = gameNetworkState.player_list_head.next_connected;
     while(playerInfo)
     {
         if(playerInfoTarget == playerInfo ||
@@ -815,7 +825,7 @@ gameNetwork_send_player_core(gameNetworkMessage* msg, gameNetworkPlayerInfo* pla
                 if(!gameNetworkState.hostInfo.hosting) break;
             }
         }
-        playerInfo = playerInfo->next;
+        playerInfo = playerInfo->next_connected;
     }
     
     return s > 0? GAME_NETWORK_ERR_NONE: GAME_NETWORK_ERR_FAIL;
@@ -873,7 +883,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
         FD_SET(gameNetworkState.hostInfo.socket.s, &rd_set);
         sock_max = gameNetworkState.hostInfo.socket.s;
         
-        gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
+        gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next_connected;
         while(pInfo)
         {
             if(pInfo->stream_socket.s > 0)
@@ -885,7 +895,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
                 
                 FD_SET(pInfo->stream_socket.s, &rd_set);
             }
-            pInfo = pInfo->next;
+            pInfo = pInfo->next_connected;
         }
         
         if(select(sock_max+1, &rd_set, NULL, NULL, &block_time) <= 0)
@@ -900,7 +910,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
         }
         else
         {
-            pInfo = gameNetworkState.player_list_head.next;
+            pInfo = gameNetworkState.player_list_head.next_connected;
             while(pInfo)
             {
                 if(FD_ISSET(pInfo->stream_socket.s, &rd_set))
@@ -908,7 +918,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
                     pSock = &pInfo->stream_socket.s;
                     break;
                 }
-                pInfo = pInfo->next;
+                pInfo = pInfo->next_connected;
             }
         }
         
@@ -947,7 +957,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
                 msg->rebroadcasted = 1;
                 
                 // resend to all players
-                gameNetworkPlayerInfo* playerInfo = gameNetworkState.player_list_head.next;
+                gameNetworkPlayerInfo* playerInfo = gameNetworkState.player_list_head.next_connected;
                 while(playerInfo)
                 {
                     if(playerInfo->player_id == msg->player_id)
@@ -970,7 +980,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
                         }
                            
                     }
-                    playerInfo = playerInfo->next;
+                    playerInfo = playerInfo->next_connected;
                 }
             }
         }
@@ -1119,10 +1129,11 @@ gameNetwork_addPlayerInfo(int player_id)
     
     pInfo->player_id = player_id;
     
-    while(pInfoTail->next)
+    while(pInfoTail->next_connected)
     {
-        pInfoTail = pInfoTail->next;
+        pInfoTail = pInfoTail->next_connected;
     }
+    pInfoTail->next_connected = pInfo;
     pInfoTail->next = pInfo;
     
     return GAME_NETWORK_ERR_NONE;
@@ -1131,7 +1142,7 @@ gameNetwork_addPlayerInfo(int player_id)
 gameNetworkError
 gameNetwork_getPlayerInfo(int player_id, gameNetworkPlayerInfo** info_out, int add_if_not_found)
 {
-    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
+    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next_connected;
     
     while(pInfo)
     {
@@ -1140,7 +1151,7 @@ gameNetwork_getPlayerInfo(int player_id, gameNetworkPlayerInfo** info_out, int a
             *info_out = pInfo;
             return GAME_NETWORK_ERR_NONE;
         }
-        pInfo = pInfo->next;
+        pInfo = pInfo->next_connected;
     }
     
     // not found, add
@@ -1160,7 +1171,7 @@ gameNetwork_getPlayerInfo(int player_id, gameNetworkPlayerInfo** info_out, int a
 gameNetworkError
 gameNetwork_getPlayerInfoForElemID(int player_elem_id, gameNetworkPlayerInfo** info_out)
 {
-    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
+    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next_connected;
     
     while(pInfo)
     {
@@ -1169,7 +1180,7 @@ gameNetwork_getPlayerInfoForElemID(int player_elem_id, gameNetworkPlayerInfo** i
             *info_out = pInfo;
             return GAME_NETWORK_ERR_NONE;
         }
-        pInfo = pInfo->next;
+        pInfo = pInfo->next_connected;
     }
     
     return GAME_NETWORK_ERR_FAIL;
@@ -1179,13 +1190,13 @@ gameNetworkError
 gameNetwork_removePlayerBonjour(int player_id)
 {
     gameNetworkPlayerInfo* pInfo = &gameNetworkState.player_list_head;
-    while(pInfo->next)
+    while(pInfo->next_connected)
     {
-        if(pInfo->next->player_id == player_id)
+        if(pInfo->next_connected->player_id == player_id)
         {
-            pInfo->next->time_last_update = get_time_ms_wall() - GAME_NETWORK_TIMEOUT_MS;
+            pInfo->next_connected->time_last_update = get_time_ms_wall() - GAME_NETWORK_TIMEOUT_MS;
         }
-        pInfo = pInfo->next;
+        pInfo = pInfo->next_connected;
     }
     return GAME_NETWORK_ERR_NONE;
 }
@@ -1195,26 +1206,32 @@ gameNetwork_removePlayer(int player_id)
 {
     game_timeval_t network_time_ms = get_time_ms_wall();
     gameNetworkPlayerInfo* pInfo = &gameNetworkState.player_list_head;
-    while(pInfo->next)
+    while(pInfo->next_connected)
     {
-        if(pInfo->next->player_id != player_id)
+        if(pInfo->next_connected->player_id != player_id)
         {
             goto removePlayer_retry;
         }
         
-        if(pInfo->next->player_id == GAME_NETWORK_PLAYER_ID_HOST)
+        if(pInfo->next_connected->player_id == GAME_NETWORK_PLAYER_ID_HOST)
         {
             console_write("Lost connection to %s (host)", pInfo->name);
-            gameNetwork_disconnectSignal();
+            
+            if(!gameNetworkState.connected_signal)
+            {
+                // we are in main thread, signal background thread to disconnect and stop
+                gameNetwork_disconnectSignal();
+                break;
+            }
         }
         
-        console_write("Player %s disconnected (%lu)", pInfo->next->name,
-                      network_time_ms - pInfo->next->time_last_update);
+        console_write("Player %s disconnected (%lu)", pInfo->next_connected->name,
+                      network_time_ms - pInfo->next_connected->time_last_update);
         
-        world_remove_object(pInfo->next->elem_id);
+        world_remove_object(pInfo->next_connected->elem_id);
         
-        gameNetworkPlayerInfo* pFree = pInfo->next;
-        pInfo->next = pInfo->next->next;
+        gameNetworkPlayerInfo* pFree = pInfo->next_connected;
+        pInfo->next_connected = pInfo->next_connected->next_connected;
         if(pFree->stream_socket.s > 0)
         {
             close(pFree->stream_socket.s);
@@ -1232,11 +1249,12 @@ gameNetwork_removePlayer(int player_id)
             free(freeptr);
         }
         
-        free(pFree);
+        // only freeing at disconnect-time
+        //free(pFree);
         break;
 
     removePlayer_retry:
-        pInfo = pInfo->next;
+        pInfo = pInfo->next_connected;
     }
     
     return GAME_NETWORK_ERR_NONE;
@@ -1342,7 +1360,7 @@ static void
 game_network_periodic_check()
 {
     const game_timeval_t time_out_ms = GAME_NETWORK_TIMEOUT_MS;
-    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
+    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next_connected;
     game_timeval_t network_time_ms = get_time_ms_wall();
     int map_retransmit = 0;
     
@@ -1350,7 +1368,7 @@ game_network_periodic_check()
     static game_timeval_t time_game_remaining_dec_last = 0;
     static game_timeval_t time_game_start_alert_last = 0;
     
-    if(network_time_ms - time_retransmit_map_last > 200 && !gameNetworkState.hostInfo.bonjour_lan)
+    if(network_time_ms - time_retransmit_map_last > 1000*2 && !gameNetworkState.hostInfo.bonjour_lan)
     {
         time_retransmit_map_last = network_time_ms;
         map_retransmit = 1;
@@ -1407,7 +1425,7 @@ game_network_periodic_check()
             gameNetworkState.gameNetworkHookOnMessage(&retryMsg, &pInfo->address);
         }
         
-        pInfo = pInfo->next;
+        pInfo = pInfo->next_connected;
     }
 
     if(!gameNetworkState.hostInfo.hosting)
@@ -1694,9 +1712,9 @@ do_game_network_world_update()
                         world_get_last_object()->durability = 0;
                     }
                     
-                    if(gameNetworkState.hostInfo.hosting && gameNetworkState.player_list_head.next)
+                    if(gameNetworkState.hostInfo.hosting && gameNetworkState.player_list_head.next_connected)
                     {
-                        gameNetworkState.player_list_head.next->stats.shots_fired++;
+                        gameNetworkState.player_list_head.next_connected->stats.shots_fired++;
                     }
                 }
                 break;
@@ -1739,7 +1757,7 @@ do_game_network_world_update()
     }
     
     // interpolate euler-velocity
-    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
+    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next_connected;
     while(pInfo)
     {
         if(pInfo->player_id == my_ship_id)
@@ -1779,7 +1797,7 @@ do_game_network_world_update()
                 pInfo->euler_last_interp = network_time_ms;
             }
         }
-        pInfo = pInfo->next;
+        pInfo = pInfo->next_connected;
     }
 }
 
@@ -1834,6 +1852,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
         strncpy(msg->params.c, gameNetworkState.hostInfo.name, sizeof(msg->params.c));
         //send_lan_broadcast(&msg);
         send_to_address_udp(msg, srcAddr);
+        console_write("GAME_NETWORK_MSG_BEACON_RESP->");
         return;
     }
     
@@ -2517,6 +2536,7 @@ do_game_network_read_core()
                 msg.player_id = gameNetworkState.my_player_id;
                 strncpy(msg.params.c, gameNetworkState.hostInfo.name, sizeof(msg.params.c));
                 send_to_address_udp(&msg, &srcAddr);
+                printf("GAME_NETWORK_MSG_BEACON\n");
                 continue;
             }
             /*
@@ -2552,6 +2572,7 @@ do_game_network_read_core()
             pMsgNew->msg = msg;
             pMsgNew->srcAddr = srcAddr;
             pMsgNew->receive_time = get_time_ms_wall();
+            pMsgNew->processed = 0;
             
             gameNetworkMessageQueued* pTail = &gameNetworkState.msgQueue.head;
             while(pTail->next) pTail = pTail->next;
@@ -2812,11 +2833,11 @@ gameNetwork_sendPing()
     memset(&msg, 0, sizeof(msg));
     msg.cmd = GAME_NETWORK_MSG_PING;
     
-    pInfo = gameNetworkState.player_list_head.next;
+    pInfo = gameNetworkState.player_list_head.next_connected;
     while(pInfo)
     {
         pInfo->time_ping = get_time_ms_wall();
-        pInfo = pInfo->next;
+        pInfo = pInfo->next_connected;
     }
     
     gameNetwork_send(&msg);
@@ -2921,7 +2942,7 @@ int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress
     unsigned long l = gameNetworkState.server_map_data_end - gameNetworkState.server_map_data;
     int request_more = 0;
     
-    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next;
+    gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next_connected;
     while(pInfo)
     {
         if(pInfo->player_id == GAME_NETWORK_PLAYER_ID_HOST)
@@ -2929,7 +2950,7 @@ int gameNetwork_onBonjourConnecting3(gameNetworkMessage* msg, gameNetworkAddress
             pInfo->time_last_update = get_time_ms_wall();
             break;
         }
-        pInfo = pInfo->next;
+        pInfo = pInfo->next_connected;
     }
     
     if(!gameNetworkState.server_map_data) return 0;

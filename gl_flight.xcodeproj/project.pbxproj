@@ -177,6 +177,8 @@
 		D0B4C4D21A325F1500F125D4 /* texture85.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CF1A325F1500F125D4 /* texture85.bmp */; };
 		D0B4C4D41A32616B00F125D4 /* texture86.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4D31A32616B00F125D4 /* texture86.bmp */; };
 		D0B918F01F5BC27B0073ECD6 /* engineloop.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0B918EF1F5BC27B0073ECD6 /* engineloop.wav */; };
+		D0BB4FBB2224FE71009457A4 /* texture115.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0BB4FBA2224FE71009457A4 /* texture115.bmp */; };
+		D0BB4FBC2224FE71009457A4 /* texture115.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0BB4FBA2224FE71009457A4 /* texture115.bmp */; };
 		D0BCBFB1175FE67F00003168 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */; };
 		D0BCC8FD2052EDC100094809 /* texture50.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D07B356518527FE200900D60 /* texture50.bmp */; };
 		D0BCC8FE2052EDC100094809 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 2514C27910084DCA00A42282 /* Shader.fsh */; };
@@ -592,6 +594,7 @@
 		D08AC6C01DAAE3DA00E367B7 /* texture101.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture101.bmp; sourceTree = "<group>"; };
 		D08C196C1D4455D1003EE6B2 /* texture97.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture97.bmp; sourceTree = "<group>"; };
 		D09051C9196DD87200E5F29E /* texture74.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture74.bmp; sourceTree = "<group>"; };
+		D097E2582226161300A19853 /* model_newship.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = model_newship.h; sourceTree = "<group>"; };
 		D098934C1937F44400298C8E /* speedboost.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = speedboost.wav; sourceTree = "<group>"; };
 		D098934E1937FA4100298C8E /* texture66.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture66.bmp; sourceTree = "<group>"; };
 		D09893501937FD7D00298C8E /* texture67.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture67.bmp; sourceTree = "<group>"; };
@@ -622,6 +625,7 @@
 		D0B4C4CF1A325F1500F125D4 /* texture85.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture85.bmp; sourceTree = "<group>"; };
 		D0B4C4D31A32616B00F125D4 /* texture86.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture86.bmp; sourceTree = "<group>"; };
 		D0B918EF1F5BC27B0073ECD6 /* engineloop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engineloop.wav; sourceTree = "<group>"; };
+		D0BB4FBA2224FE71009457A4 /* texture115.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture115.bmp; sourceTree = "<group>"; };
 		D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		D0BCBFB3176136CF00003168 /* gameLock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameLock.h; sourceTree = "<group>"; };
 		D0BCC9CA2052EDC100094809 /* Space Combat 95.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Space Combat 95.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -718,6 +722,7 @@
 				D02B8F151964D67700830369 /* cocoaGameInput.h */,
 				D02B8F161964D67700830369 /* cocoaGameInput.m */,
 				6D512E1915EC21860064DF49 /* models.h */,
+				D097E2582226161300A19853 /* model_newship.h */,
 				D05AED6621F138DE00692833 /* building2_model.h */,
 				D05C28A71F9FEBC700BC2194 /* sphere_model.h */,
 				D0CF62B514A919D600E08151 /* object.h */,
@@ -842,6 +847,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D0BB4FBA2224FE71009457A4 /* texture115.bmp */,
 				D0549E8320ED4126009FF191 /* texture114.bmp */,
 				D0290F3320A25BF2002935C3 /* texture113.bmp */,
 				D0290F3020A2445F002935C3 /* texture112.bmp */,
@@ -1062,6 +1068,7 @@
 			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "gl_flight" */;
 			buildPhases = (
 				1D60588D0D05DD3D006BFB54 /* Resources */,
+				D097E2562226145400A19853 /* Run Script (convert models) */,
 				1D60588E0D05DD3D006BFB54 /* Sources */,
 				1D60588F0D05DD3D006BFB54 /* Frameworks */,
 			);
@@ -1079,6 +1086,7 @@
 			buildConfigurationList = D0BCC9C72052EDC100094809 /* Build configuration list for PBXNativeTarget "Space Combat 95" */;
 			buildPhases = (
 				D0BCC8FC2052EDC100094809 /* Resources */,
+				D097E2572226150000A19853 /* Run Script (convert models) */,
 				D0BCC99E2052EDC100094809 /* Sources */,
 				D0BCC9BF2052EDC100094809 /* Frameworks */,
 			);
@@ -1285,6 +1293,7 @@
 				D0F3BE2417DFEDE100E9C49E /* texture42.bmp in Resources */,
 				D034416C1A1E7B9200C89475 /* texture82.bmp in Resources */,
 				D0F3BE2617E3C72400E9C49E /* texture43.bmp in Resources */,
+				D0BB4FBB2224FE71009457A4 /* texture115.bmp in Resources */,
 				D0F3BE2817E8D8EB00E9C49E /* texture44.bmp in Resources */,
 				D0017FC51C62B524003F0368 /* texture95.bmp in Resources */,
 				D0D661B417EA6C4B00E44885 /* texture45.bmp in Resources */,
@@ -1369,6 +1378,7 @@
 				D0BCC9332052EDC100094809 /* texture15.bmp in Resources */,
 				D09A5F3F208174EB009F9618 /* texture111.bmp in Resources */,
 				D03491EF21D1335F001D5611 /* menubeep.wav in Resources */,
+				D0BB4FBC2224FE71009457A4 /* texture115.bmp in Resources */,
 				D0BCC9342052EDC100094809 /* texture70.bmp in Resources */,
 				D0BCC9352052EDC100094809 /* texture17.bmp in Resources */,
 				D0BCC9362052EDC100094809 /* flyby.wav in Resources */,
@@ -1475,6 +1485,45 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D097E2562226145400A19853 /* Run Script (convert models) */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script (convert models)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\n";
+		};
+		D097E2572226150000A19853 /* Run Script (convert models) */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script (convert models)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1D60588E0D05DD3D006BFB54 /* Sources */ = {

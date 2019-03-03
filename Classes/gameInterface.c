@@ -26,9 +26,10 @@
 #include "gameSettings.h"
 #include "gameDialogs.h"
 
-extern void appWriteSettings();
-extern void GameNetworkBonjourManagerBrowseBegin();
+extern void appWriteSettings(void);
+extern void GameNetworkBonjourManagerBrowseBegin(void);
 extern void game_add_network_portal(char* name);
+extern void load_map_and_host_game(void);
 
 controls gameInterfaceControls;
 
@@ -660,8 +661,6 @@ gameInterfaceHandleTouchBegin(float x, float y)
 static void
 gameInterfaceBrowseFoundGame(char* name)
 {
-    extern void load_map_and_host_game();
-    
     if(gameNetworkState.hostInfo.bonjour_lan)
     {
         glFlightDrawframeHook = NULL;
@@ -686,8 +685,6 @@ gameInterfaceBrowseFoundGame(char* name)
 static int
 gameInterfaceMultiplayerConfigure(int action)
 {
-    extern void load_map_and_host_game();
-    
     switch(action)
     {
         case ACTION_CONNECT_TO_GAME:
@@ -719,12 +716,8 @@ gameInterfaceMultiplayerConfigure(int action)
         case ACTION_HOST_GAME_OR_COMMIT:
         {
             gameNetwork_host(gameSettingGameTitle, load_map_and_host_game);
-            
-            if(action == ACTION_HOST_GAME_OR_COMMIT)
-            {
-                // find an available port and register
-                glFlightDrawframeHook = gameDialogNetworkHostRegister;
-            }
+            // find an available port and register
+            glFlightDrawframeHook = gameDialogNetworkHostRegister;
         }
         break;
     }

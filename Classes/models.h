@@ -42,6 +42,7 @@ typedef struct
 #define MODEL_EXTENDED_MEMORY(modeltype) (\
     modeltype == MODEL_SPHERE ||          \
     modeltype == MODEL_ENEMY_BASE ||      \
+    modeltype == MODEL_SHIP1 ||           \
     modeltype == MODEL_CBUILDING)
 
 /* static array of coordinates, texture-coordinates, triangle-faces, matrix */
@@ -587,6 +588,10 @@ static model_index_t model_cube_indices_nobottom[] =
 };
 
 static int model_cube_primitives[] = 
+{
+};
+
+static int model_no_primitives[] =
 {
 };
 

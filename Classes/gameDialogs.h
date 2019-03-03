@@ -374,7 +374,7 @@ gameDialogBrowseGames()
 static void
 gameDialogNetworkHostRegister()
 {
-    const int timeout = GAME_FRAME_RATE * 4;
+    const int timeout = GAME_FRAME_RATE * 10;
     static int passes = timeout;
     
     passes--;

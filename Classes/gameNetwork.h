@@ -180,6 +180,7 @@ struct gameNetworkPlayerInfo
     
     int shot_fired;
     
+    struct gameNetworkPlayerInfo* next_connected;
     struct gameNetworkPlayerInfo* next;
 };
 
