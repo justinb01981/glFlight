@@ -964,14 +964,17 @@ void gameInterfaceProcessAction()
                 {
                     case MODEL_SHIP1:
                         model_new = MODEL_SHIP2;
+                        texture_id_playership = TEXTURE_ID_ENEMYSHIP;
                         console_write("respawn: virus-fighter");
                         break;
                     case MODEL_SHIP2:
                         model_new = MODEL_SHIP3;
+                        texture_id_playership = TEXTURE_ID_ENEMYSHIP_ACE;
                         console_write("respawn: heavy-fighter");
                         break;
                     default:
                         model_new = MODEL_SHIP1;
+                        texture_id_playership = TEXTURE_ID_SHIP1;
                         console_write("respawn: defense-fighter");
                         break;
                 }

@@ -2259,60 +2259,63 @@ game_run()
         
         if(actions_enabled[fireAction])
         {
-            
-            switch(fireAction)
+            if(gameInterfaceControls.fireRect2.touch_began && time_ms - firedLast > 1000)
             {
-                case ACTION_DROP_BLOCK:
-                    camera_locked_frames = 120;
-                    
-                    obj_id =
-                    world_add_object(MODEL_CUBE2, newBlock[0], newBlock[1], newBlock[2],
-                                     0, 0, 0, block_scale, texture_id_block);
-                    
-                    world_get_last_object()->object_type = OBJ_BLOCK;
-                    break;
-                    
-                case ACTION_PLACE_TURRET:
-                    if(pMyShipNode->elem->stuff.flags.mask &= STUFF_FLAGS_TURRET)
-                    {
-                        pMyShipNode->elem->stuff.flags.mask ^= STUFF_FLAGS_TURRET;
-                        /*
-                        obj_id =
-                        world_add_object(MODEL_TURRET, newBlock[0], newBlock[1], newBlock[2],
-                                         0, 0, 0, 1, texture_id_playership);
-
-                        world_get_last_object()->object_type = OBJ_TURRET;
-                        world_get_last_object()->stuff.affiliation = pMyShipNode->elem->stuff.affiliation;
-                        update_object_velocity(obj_id, 0, 0, 0, 0);
-                         */
+                firedLast = time_ms;
+                switch(fireAction)
+                {
+                    case ACTION_DROP_BLOCK:
+                        camera_locked_frames = 120;
                         
-                        game_add_turret(newBlock[0], newBlock[1], newBlock[2]);
-                        world_get_last_object()->stuff.affiliation = pMyShipNode->elem->stuff.affiliation;
-                    }
-                    break;
-                    
-                case ACTION_FIRE_MISSLE:
-                    fireBullet(ACTION_FIRE_MISSLE);
-                    break;
-                    
-                case ACTION_SHOOT_BLOCK:
-                    fireBullet(ACTION_SHOOT_BLOCK);
-                    break;
-                    
-                case ACTION_REPLACE_OBJECT:
-                    fireBullet(ACTION_REPLACE_OBJECT);
-                    break;
-                    
-                case ACTION_SCALE_OBJECT:
-                    fireBullet(ACTION_SCALE_OBJECT);
-                    break;
-                    
-                case ACTION_BLOCK_TEXTURE:
-                    fireBullet(ACTION_BLOCK_TEXTURE);
-                    break;
-                    
-                default:
-                    break;
+                        obj_id =
+                        world_add_object(MODEL_CUBE2, newBlock[0], newBlock[1], newBlock[2],
+                                         0, 0, 0, block_scale, texture_id_block);
+                        
+                        world_get_last_object()->object_type = OBJ_BLOCK;
+                        break;
+                        
+                    case ACTION_PLACE_TURRET:
+                        if(pMyShipNode->elem->stuff.flags.mask &= STUFF_FLAGS_TURRET)
+                        {
+                            pMyShipNode->elem->stuff.flags.mask ^= STUFF_FLAGS_TURRET;
+                            /*
+                            obj_id =
+                            world_add_object(MODEL_TURRET, newBlock[0], newBlock[1], newBlock[2],
+                                             0, 0, 0, 1, texture_id_playership);
+
+                            world_get_last_object()->object_type = OBJ_TURRET;
+                            world_get_last_object()->stuff.affiliation = pMyShipNode->elem->stuff.affiliation;
+                            update_object_velocity(obj_id, 0, 0, 0, 0);
+                             */
+                            
+                            game_add_turret(newBlock[0], newBlock[1], newBlock[2]);
+                            world_get_last_object()->stuff.affiliation = pMyShipNode->elem->stuff.affiliation;
+                        }
+                        break;
+                        
+                    case ACTION_FIRE_MISSLE:
+                        fireBullet(ACTION_FIRE_MISSLE);
+                        break;
+                        
+                    case ACTION_SHOOT_BLOCK:
+                        fireBullet(ACTION_SHOOT_BLOCK);
+                        break;
+                        
+                    case ACTION_REPLACE_OBJECT:
+                        fireBullet(ACTION_REPLACE_OBJECT);
+                        break;
+                        
+                    case ACTION_SCALE_OBJECT:
+                        fireBullet(ACTION_SCALE_OBJECT);
+                        break;
+                        
+                    case ACTION_BLOCK_TEXTURE:
+                        fireBullet(ACTION_BLOCK_TEXTURE);
+                        break;
+                        
+                    default:
+                        break;
+                }
             }
         }
     }
