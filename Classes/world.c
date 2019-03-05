@@ -1668,6 +1668,7 @@ world_update(float tc)
     // HACK: -- apply min velocity "wobble back/forth"
     float Fmin = 0.01 * (tex_pass % 2) - 1;
     int iF;
+    WorldElemListNode* pOOBListElem = NULL;
     
     WorldElemListNode* pCur = gWorld->elements_moving.next;
     
@@ -1681,6 +1682,12 @@ world_update(float tc)
         WorldElem* pElem;
         
         if(gWorld->world_update_state.ptr_objects_moving) gWorld->world_update_state.ptr_objects_moving = gWorld->world_update_state.ptr_objects_moving->next;
+        
+        if(pOOBListElem)
+        {
+            world_elem_list_remove(pOOBListElem->elem, &gWorld->elements_moving);
+            pOOBListElem = NULL;
+        }
         
         //remove_retry:
         
@@ -1991,9 +1998,7 @@ world_update(float tc)
                         world_elem_list_remove(pCurRemoveElem, &gWorld->elements_list);
                         world_elem_list_add(pCurRemoveElem, &gWorld->elements_to_be_freed);
                         
-                        gWorld->world_update_state.ptr_objects_moving = gWorld->world_update_state.ptr_objects_moving->next;
-                        
-                        world_elem_list_remove(pCurRemoveElem, &gWorld->elements_moving);
+                        pOOBListElem = gWorld->world_update_state.ptr_objects_moving;
                     }
                 }
             }
