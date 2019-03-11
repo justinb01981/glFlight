@@ -197,7 +197,7 @@ struct WorldElem {
         
         int towed_elem_id;
         
-        void* btree_node[2];
+        void* btree_node;
         
     } stuff;
     
@@ -354,10 +354,6 @@ typedef struct world_elem_btree_node_ {
 
 #define WORLD_ELEM_BTREE_NODE_ZERO {NULL, NULL, NULL, 0};
 
-extern volatile unsigned int world_elem_btree_ptr_idx;
-
-unsigned int world_elem_btree_ptr_idx_set(unsigned int i);
-
 void world_elem_btree_insert(world_elem_btree_node* root, WorldElem* elem, float order);
 
 void world_elem_btree_walk(world_elem_btree_node* root, void ((*walk_func)(WorldElem* elem, float order)));
@@ -366,8 +362,8 @@ void world_elem_btree_destroy(world_elem_btree_node* root);
 
 void world_elem_btree_destroy_root(world_elem_btree_node* root);
 
-void world_elem_btree_remove(world_elem_btree_node* root, WorldElem* elem, float order);
+void world_elem_btree_remove(world_elem_btree_node* root, WorldElem* elem);
 
-void world_elem_btree_remove_all(world_elem_btree_node* root, WorldElem* elem, float order);
+void world_elem_btree_remove_all(world_elem_btree_node* root, WorldElem* elem);
 
 #endif

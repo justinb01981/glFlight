@@ -42,6 +42,7 @@ void world_build_visibility_data();
 void world_update(float tc);
 
 extern volatile WorldElemListNode* btreeVisibleTest;
+extern world_elem_btree_node* visibleBtreeRootBuilding;
 
 world_t *gWorld = NULL;
 game_lock_t gWorldLock;
@@ -1313,6 +1314,7 @@ void world_clear_pending()
             pFreeElem = pFreeElem->linked_elem;
             
             world_elem_list_remove(pFreeCur, &gWorld->elements_list);
+            
             world_elem_free(pFreeCur);
         }
     }

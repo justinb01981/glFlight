@@ -95,9 +95,8 @@ WorldElemListNode visibleSkipList;
 
 
 world_elem_btree_node visibleBtreeRootStorage1 = WORLD_ELEM_BTREE_NODE_ZERO;
-world_elem_btree_node visibleBtreeRootStorage2 = WORLD_ELEM_BTREE_NODE_ZERO;
 world_elem_btree_node *visibleBtreeRoot = &visibleBtreeRootStorage1;
-world_elem_btree_node *visibleBtreeRootBuilding = &visibleBtreeRootStorage2;
+world_elem_btree_node *visibleBtreeRootBuilding = &visibleBtreeRootStorage1;
 unsigned int visibleBtreeDrawn = 0;
 WorldElemListNode* btreeVisibleTest = NULL;
 
@@ -106,22 +105,14 @@ unsigned int draw_elem_max = PLATFORM_DRAW_ELEMS_MAX;
 static void
 world_elem_btree_restart()
 {
-    unsigned int prev = world_elem_btree_ptr_idx_set(0);
     world_elem_btree_destroy_root(&visibleBtreeRootStorage1);
-    world_elem_btree_ptr_idx_set(1);
-    world_elem_btree_destroy_root(&visibleBtreeRootStorage2);
-    world_elem_btree_ptr_idx_set(prev);
     btreeVisibleTest = NULL;
 }
 
 static void
 world_elem_btree_add_all(WorldElem* pElem)
 {
-    int prev = world_elem_btree_ptr_idx_set(0);
     world_elem_btree_insert(&visibleBtreeRootStorage1, pElem, pElem->renderInfo.distance);
-    world_elem_btree_ptr_idx_set(1);
-    world_elem_btree_insert(&visibleBtreeRootStorage2, pElem, pElem->renderInfo.distance);
-    world_elem_btree_ptr_idx_set(prev);
 }
 
 void
@@ -159,6 +150,8 @@ glFlightFrameStage1()
         bindTexture(TEXTURE_ID_FONTMAP);
         if(controlsCalibrated) needTrimLock = 1;
         
+        world_elem_btree_restart();
+        
         gameGraphicsUninit();
         gameMapReRender();
         gameNetwork_worldInit();
@@ -167,8 +160,6 @@ glFlightFrameStage1()
         game_terminated_gracefully = 1;
         gameGraphicsInit();
         gameInterfaceReset();
-        
-        world_elem_btree_restart();
         
         visibleElementsLen = 0;
         
@@ -591,51 +582,36 @@ calibrate_bail:
     // visibility-sorting binary tree
     if(!btreeVisibleTest)
     {
-        if(visibleBtreeRoot == &visibleBtreeRootStorage1)
-        {
-            visibleBtreeRoot = &visibleBtreeRootStorage2;
-            visibleBtreeRootBuilding = &visibleBtreeRootStorage1;
-            world_elem_btree_ptr_idx_set(0);
-        }
-        else
-        {
-            visibleBtreeRoot = &visibleBtreeRootStorage1;
-            visibleBtreeRootBuilding = &visibleBtreeRootStorage2;
-            world_elem_btree_ptr_idx_set(1);
-        }
-        
-        world_elem_btree_destroy_root(visibleBtreeRootBuilding);
+        visibleBtreeRootBuilding = &visibleBtreeRootStorage1;
+
+        //world_elem_btree_destroy_root(visibleBtreeRootBuilding);
         
         btreeVisibleTest = gWorld->elements_list.next;
     }
     
     // walk part of the list and add some potentially-visible elements
-    unsigned int btreeVisibleTestCount = 200;
-    unsigned int btreeVisIdx = (visibleBtreeRootBuilding == &visibleBtreeRootStorage1 ? 0 : 1);
+    unsigned int btreeVisibleTestCount = 100;
+    //unsigned int btreeVisIdx = (visibleBtreeRootBuilding == &visibleBtreeRootStorage1 ? 0 : 1);
     while(btreeVisibleTest && btreeVisibleTestCount > 0)
     {
-        if(btreeVisibleTest->elem->stuff.btree_node[btreeVisIdx])
+        btreeVisibleTest->elem->renderInfo.distance =
+            distance(gameCamera_getX(),
+                     gameCamera_getY(),
+                     gameCamera_getZ(),
+                     btreeVisibleTest->elem->physics.ptr->x,
+                     btreeVisibleTest->elem->physics.ptr->y,
+                     btreeVisibleTest->elem->physics.ptr->z);
+        
+        world_elem_btree_remove(visibleBtreeRootBuilding, btreeVisibleTest->elem);
+        
+        // TODO: account for scale approx dist to boundaries of the model poly
+        int visible = element_visible(btreeVisibleTest->elem, visible_distance, visible_dot);
+        
+        if(visible)
         {
+            world_elem_btree_insert(visibleBtreeRootBuilding, btreeVisibleTest->elem, btreeVisibleTest->elem->renderInfo.distance);
         }
-        else
-        {
-            btreeVisibleTest->elem->renderInfo.distance =
-                distance(gameCamera_getX(),
-                         gameCamera_getY(),
-                         gameCamera_getZ(),
-                         btreeVisibleTest->elem->physics.ptr->x,
-                         btreeVisibleTest->elem->physics.ptr->y,
-                         btreeVisibleTest->elem->physics.ptr->z);
-            
-            // TODO: account for scale approx dist to boundaries of the model poly
-            
-            int visible = element_visible(btreeVisibleTest->elem, visible_distance, visible_dot);
-            
-            if(visible)
-            {
-                world_elem_btree_insert(visibleBtreeRootBuilding, btreeVisibleTest->elem, btreeVisibleTest->elem->renderInfo.distance);
-            }
-        }
+        
         btreeVisibleTest = btreeVisibleTest->next;
         btreeVisibleTestCount--;
     }
@@ -701,11 +677,7 @@ calibrate_bail:
                                                         pAddedPtr->elem->physics.ptr->z);
         
         // insert into all visible-trees immediately
-        unsigned int prev_world_elem_btree_ptr_idx = world_elem_btree_ptr_idx_set(0);
-        world_elem_btree_insert(&visibleBtreeRootStorage1, pAddedPtr->elem, pAddedPtr->elem->renderInfo.distance);
-        world_elem_btree_ptr_idx_set(1);
-        world_elem_btree_insert(&visibleBtreeRootStorage2, pAddedPtr->elem, pAddedPtr->elem->renderInfo.distance);
-        world_elem_btree_ptr_idx = prev_world_elem_btree_ptr_idx;
+        world_elem_btree_insert(visibleBtreeRootBuilding, pAddedPtr->elem, pAddedPtr->elem->renderInfo.distance);
         
         world_elem_list_remove(pAddedPtr->elem, &gWorld->elements_to_be_added);
         
@@ -823,7 +795,7 @@ clear_vis_btree_removed(WorldElem* headElem)
 //        {
 //            btreeVisibleTest = btreeVisibleTest->next;
 //        }
-        world_elem_btree_remove_all(NULL, headElem, headElem->renderInfo.distance);
+        world_elem_btree_remove_all(visibleBtreeRootBuilding, headElem);
         
         headElem = headElem->linked_elem;
     }

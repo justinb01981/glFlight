@@ -1320,9 +1320,9 @@ visible_list_remove(WorldElem* elem, unsigned int* n_visible, WorldElemListNode*
 static void
 drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
 {
-    float I_Mk = 25; // model - step size
+    float I_Mk = 25.0; // model - step size
     float Mk = I_Mk;
-    float Tk = 8 / (25/Mk); // texture - step-size multiplier
+    float Tk = 8; // texture - step-size multiplier
     float terrain_height_y = 0;
     
     float Ub = -gWorld->bound_radius*1.5;
@@ -1361,10 +1361,10 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
                     M[0] = Ui;
                     M[1] = terrain_height_y;
                     M[2] = Vi;
-                    T[0] = Ui/Ue * Tk;
-                    T[1] = Vi/Ve * Tk;
+                    T[0] = (Ui/Ue) * Tk;
+                    T[1] = (Vi/Ve) * Tk;
                     
-                    //terrain_height_y += ((int)floor(rand_in_range(0, 100)) % 2 == 0) ? 0.5: -0.5;
+                    //terrain_height_y += ((int)floor(rand_in_range(0, 100)) % 2 == 0) ? 0.05: -0.05;
                     
                     tess_step(M, T, bgData->tess.S);
                 }

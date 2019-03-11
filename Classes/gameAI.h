@@ -35,10 +35,10 @@ typedef struct
 extern gameAIState_t gameAIState;
 
 void
-game_ai_init();
+game_ai_init(void);
 
 void
-game_ai_run();
+game_ai_run(void);
 
 void
 object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem *elem, int target_objtype);
