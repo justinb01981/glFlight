@@ -191,17 +191,18 @@ read_bitmap_to_gltexture(int tex_id)
 
 void initTextures(const char *prefix)
 {
+    int i;
     strcpy(initTexturesPrefix, prefix);
     
     n_textures = 0;
     
-    for(int i = 0; i < MAX_TEXTURES; i++)
+    for(i = 0; i < MAX_TEXTURES; i++)
     {
         texture_list_loaded[i] = 0;
     }
     
     // load the first N textures
-    for(int i = 0; i < texture_preload_count; i++)
+    for(i = 0; i < texture_preload_count; i++)
     {
         bindTextureRequest(i);
     }

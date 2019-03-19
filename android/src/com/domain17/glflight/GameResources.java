@@ -134,7 +134,12 @@ public class GameResources {
         R.raw.texture107,
         R.raw.texture108,
         R.raw.texture109,
-        R.raw.texture110
+        R.raw.texture110,
+			R.raw.texture111,
+			R.raw.texture112,
+			R.raw.texture113,
+			R.raw.texture114,
+			R.raw.texture115
 
 	};
 	
@@ -251,7 +256,12 @@ public class GameResources {
         "texture107.bmp",
         "texture108.bmp",
         "texture109.bmp",
-        "texture110.bmp"
+        "texture110.bmp",
+        "texture111.bmp",
+            "texture112.bmp",
+            "texture113.bmp",
+            "texture114.bmp",
+            "texture115.bmp"
 	};
 	
 	public static String[] sndNameList = {

@@ -1503,7 +1503,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython2.7 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\n";
 		};
 		D097E2572226150000A19853 /* Run Script (convert models) */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1521,7 +1521,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython2.7 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

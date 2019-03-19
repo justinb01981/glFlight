@@ -18,6 +18,7 @@ build_mesh(float x, float y, float z,
            unsigned int mesh_c, unsigned int mesh_r)
 {
     struct mesh_t* mesh = malloc(sizeof(struct mesh_t));
+    int row, col;
     if(!mesh) return NULL;
     int ccw = 0;
     
@@ -61,9 +62,9 @@ build_mesh(float x, float y, float z,
     
     unsigned int triangle_n = 0;
     
-    for(int row = 0; row <= mesh->dim_y-1; row++)
+    for(row = 0; row <= mesh->dim_y-1; row++)
     {
-        for(int col = 0; col <= mesh->dim_x-1; col++)
+        for(col = 0; col <= mesh->dim_x-1; col++)
         {
             struct mesh_triangle_t t;
             
@@ -104,7 +105,7 @@ build_mesh(float x, float y, float z,
     mesh->n_triangles = triangle_n;
     
     struct mesh_coordinate_t coord = {x, y, z};
-    for(int row = 0; row <= mesh->dim_y; row++)
+    for(row = 0; row <= mesh->dim_y; row++)
     {
         struct mesh_coordinate_t coord_cur_r = coord;
         

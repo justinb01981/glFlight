@@ -104,7 +104,7 @@ void radarDrawTextDone()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-static inline void
+static void
 setupGLModelView(float scrWidth, float scrHeight)
 {
     glMatrixMode(GL_MODELVIEW);
@@ -139,7 +139,7 @@ setupGLModelViewDone()
     glPopMatrix();
 }
 
-static inline void
+static void
 setupGLTextureView()
 {
     glMatrixMode(GL_TEXTURE);
@@ -1573,6 +1573,8 @@ struct
 void
 drawBillboardInit(float xVec[3], float yVec[3])
 {
+    int i, j;
+    
     float coords[4][3] =
     {
         {0, 0, 0},
@@ -1581,25 +1583,25 @@ drawBillboardInit(float xVec[3], float yVec[3])
         {xVec[0]+yVec[0], xVec[1]+yVec[1], xVec[2]+yVec[2]}
     };
     
-    for(int i = 0; i < 4; i++)
+    for(i = 0; i < 4; i++)
     {
-        for(int j = 0; j < 3; j++)
+        for(j = 0; j < 3; j++)
         {
             coords[i][j] -= xVec[j]/2;
         }
     }
     
-    for(int i = 0; i < 4; i++)
+    for(i = 0; i < 4; i++)
     {
-        for(int j = 0; j < 3; j++)
+        for(j = 0; j < 3; j++)
         {
             //coords[i][j] += yVec[j]/2;
             coords[i][j] -= yVec[j]/2;
         }
     }
     
-    for(int i = 0; i < 4; i++)
-        for(int j = 0; j < 3; j++) drawBillboardData.coord_offsets[i][j] = coords[i][j];
+    for(i = 0; i < 4; i++)
+        for(j = 0; j < 3; j++) drawBillboardData.coord_offsets[i][j] = coords[i][j];
 }
 
 static gameGraphics_drawState2d drawBillboard_ds;

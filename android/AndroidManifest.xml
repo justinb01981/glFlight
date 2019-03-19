@@ -4,9 +4,10 @@
     android:versionCode="00092500"
     android:versionName="0.9.25.0" >
 
+    <!--
     <uses-sdk
-        android:minSdkVersion="19"
         android:targetSdkVersion="19" />
+        -->
 
     <application locale="en_US"
         android:allowBackup="false"

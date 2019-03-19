@@ -70,53 +70,54 @@ extern collision_action_t collision_actions[OBJ_LAST][OBJ_LAST];
 
 extern char collidedPortalNametagLast[256];
 
-inline static void
+static void
 collision_actions_set_default()
 {
-    for(int r = 0; r < OBJ_LAST; r++)
-        for(int c = 0; c < OBJ_LAST; c++)
+    int r, c;
+    for(r = 0; r < OBJ_LAST; r++)
+        for(c = 0; c < OBJ_LAST; c++)
         {
             collision_actions[r][c] = collision_actions_default[r][c];
             collision_actions[c][r] = collision_actions_default[c][r];
         }
     
     // check that both actions agree
-    for(int r = 0; r < OBJ_LAST; r++)
-        for(int c = 0; c < OBJ_LAST; c++)
+    for(r = 0; r < OBJ_LAST; r++)
+        for(c = 0; c < OBJ_LAST; c++)
         {
             DBPRINTF(("Warning: collision_actions_default row/column mismatch: r=%d c=%d\n", r, c));
         }
 }
 
-inline static void
+static void
 collision_actions_set_grab_powerup()
 {
     collision_actions[OBJ_PLAYER][OBJ_POWERUP_GENERIC] = COLLISION_ACTION_POWERUP_GRAB;
     collision_actions[OBJ_POWERUP_GENERIC][OBJ_PLAYER] = COLLISION_ACTION_POWERUP_GRAB;
 }
 
-inline static void
+static void
 collision_actions_set_ship_grab_powerup()
 {
     collision_actions[OBJ_SHIP][OBJ_POWERUP_GENERIC] = COLLISION_ACTION_DAMAGE;
     collision_actions[OBJ_POWERUP_GENERIC][OBJ_SHIP] = COLLISION_ACTION_DAMAGE;
 }
 
-inline static void
+static void
 collision_actions_set_player_invuln()
 {
     collision_actions[OBJ_PLAYER][OBJ_BULLET] = COLLISION_ACTION_NONE;
     collision_actions[OBJ_BULLET][OBJ_PLAYER] = COLLISION_ACTION_NONE;
 }
 
-inline static void
+static void
 collision_actions_set_player_vuln()
 {
     collision_actions[OBJ_PLAYER][OBJ_BULLET] = COLLISION_ACTION_DAMAGE;
     collision_actions[OBJ_BULLET][OBJ_PLAYER] = COLLISION_ACTION_DAMAGE;
 }
 
-inline static void collision_handling_remove_hook(WorldElem* pElem)
+static void collision_handling_remove_hook(WorldElem* pElem)
 {
     if(pElem == gWorld->world_update_state.collision_recs_iterate_cur->elem)
     {
@@ -124,7 +125,7 @@ inline static void collision_handling_remove_hook(WorldElem* pElem)
     }
 }
 
-inline static void
+static void
 do_world_collision_handling(float tc)
 {
     // collisions

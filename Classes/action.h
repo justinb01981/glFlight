@@ -212,6 +212,7 @@ static void actions_display_menu(char *dest)
     dest[0] = '\0';
     int lines = 0;
     int maxlines = 7;
+    int i;
     
     sprintf(dest,
             "%s %s %s %s %s\n",
@@ -224,12 +225,12 @@ static void actions_display_menu(char *dest)
     while(dlen > 0 ) { strcat(dest, "-"); dlen--; }
     strcat(dest, "\n");
     
-    for(int i = ACTION_FIRST; i < ACTION_LAST; i++)
+    for(i = ACTION_FIRST; i < ACTION_LAST; i++)
     {
         if(actions_enabled[i]) lines++;
     }
     
-    for(int i = (lines <= maxlines? ACTION_FIRST: fireAction); i < ACTION_LAST && maxlines > 0; i++)
+    for(i = (lines <= maxlines? ACTION_FIRST: fireAction); i < ACTION_LAST && maxlines > 0; i++)
     {    
         if(actions_enabled[i])
         {

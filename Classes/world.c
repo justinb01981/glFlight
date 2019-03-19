@@ -34,11 +34,10 @@ WorldElemListNode* add_element_to_region_for_coord(WorldElem* pElem, model_coord
 WorldElemListNode* get_region_list_head(float x, float y, float z);
 void remove_element_from_region(WorldElem* pElem);
 static void get_element_bounding_box(WorldElem* pElem, float box[6]);
-inline static int check_bounding_box_overlap(float boxA[6], float boxB[6]);
-void update_regions();
+static int check_bounding_box_overlap(float boxA[6], float boxB[6]);
+void update_regions(void);
 void convert_mesh_to_world_elems(struct mesh_t* mesh, unsigned int texture_id, float tile_div, struct mesh_coordinate_t* vis_normal);
-static void world_pack_geometry();
-void world_build_visibility_data();
+void world_build_visibility_data(void);
 void world_update(float tc);
 
 extern volatile WorldElemListNode* btreeVisibleTest;
@@ -75,7 +74,7 @@ world_add_object_core(Model type,
     int model_indices_sizeof;
     model_texcoord_t* model_texcoords;
     int model_texcoords_sizeof;
-    int model_primitives_sizeof;
+    int model_primitives_sizeof = 0;
     int* model_primitives;
     int new_durability = 1;
     int model_changed = 0;
@@ -357,6 +356,7 @@ world_add_object_core(Model type,
             model_primitives_sizeof = sizeof(model_tbuilding_primitives);
             model_primitives = model_tbuilding_primitives;
              */
+            model_primitives_sizeof = 0;
             float M2[] = {
                 2.0, 0, 0, 0,
                 0, 4.0, 0, 1.5,
@@ -379,12 +379,12 @@ world_add_object_core(Model type,
             
         case MODEL_CBUILDING:
         {
-            model_coords = model_2building_coords;
-            model_sizeof = sizeof(model_2building_coords);
-            model_texcoords = model_2building_texcoords;
-            model_texcoords_sizeof = sizeof(model_2building_texcoords);
-            model_indices = model_2building_indices;
-            model_indices_sizeof = sizeof(model_2building_indices);
+            model_coords = model_building2_coords;
+            model_sizeof = sizeof(model_building2_coords);
+            model_texcoords = model_building2_texcoords;
+            model_texcoords_sizeof = sizeof(model_building2_texcoords);
+            model_indices = model_building2_indices;
+            model_indices_sizeof = sizeof(model_building2_indices);
             
             model_primitives = poly_comp.primitives;
             model_primitives_sizeof = 0;
@@ -392,7 +392,9 @@ world_add_object_core(Model type,
         break;
             
         case MODEL_ENEMY_BASE:
-        {   
+        {
+            model_primitives_sizeof = 0;
+            
             // TODO: build model by applying rotation matrix to convex primitive and appending coordinates/indices/texture-coordinates
             float M2[] = {
                 1, 0, 0, 0,
@@ -431,7 +433,6 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = poly_comp.model_coords_buffer_len * 2 * sizeof(model_texcoord_t);
             
             model_primitives = poly_comp.primitives;
-            model_primitives_sizeof = 0;
         }
             break;
             
@@ -1435,7 +1436,7 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, flo
     }
 }
 
-inline static void
+static void
 get_element_bounding_box(WorldElem* pElem, float box[6])
 {   
     // format of box will be {xmin, ymin, zmin, xmax, ymax, zmax}
@@ -1468,7 +1469,7 @@ get_element_bounding_box(WorldElem* pElem, float box[6])
     }
 }
 
-inline static int
+static int
 check_bounding_box_overlap(float boxA_in[6], float boxB_in[6])
 {
     float amin, amax;
@@ -1510,12 +1511,6 @@ check_collision(WorldElem* pElemA, WorldElem* pElemB)
     get_element_bounding_box(pElemB, boxB);
     
     return check_bounding_box_overlap(boxA, boxB);
-}
-
-static inline float
-froundlong(float f)
-{
-    return rintf(f);
 }
 
 WorldElemListNode*

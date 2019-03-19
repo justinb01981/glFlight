@@ -118,7 +118,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 		SurfaceHolder h = gameRenderer.surfaceView.getHolder();
 
         /* iOS on iPhone5:320/568 */
-		double sh = 320;
+		double sh = 640;
 		double sw = sh * 1.5;
 
 		viewWidthScaled = sw;
@@ -202,7 +202,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     
     public void onAccuracyChanged(Sensor s, int a) {
     	accuracyLast = a;
-		System.out.println("onAccuracyChanged\n");
+		//System.out.println("onAccuracyChanged\n");
     }
     
     float touchLastX = 0;

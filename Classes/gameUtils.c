@@ -62,7 +62,7 @@ approx_distance(float x1, float y1, float z1, float x2, float y2, float z2)
     return (s);
 }
 
-inline static float 
+static float 
 cam_distance_2(float x1, float y1, float z1)
 {
     return approx_distance(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), x1, y1, z1);
@@ -314,12 +314,13 @@ float dot2(float v[3], float u[3])
 
 void unit_vector_ab(float a[3], float b[3], float out[3])
 {
+    int i;
     float v[3];
     
-    for(int i = 0; i < 3; i++) v[i] = b[i]-a[i];
+    for(i = 0; i < 3; i++) v[i] = b[i]-a[i];
     float d = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
     
-    for(int i = 0; i < 3; i++) out[i] = v[i] / d;
+    for(i = 0; i < 3; i++) out[i] = v[i] / d;
 }
 
 void
@@ -523,7 +524,7 @@ rand_in_range(float b, float e)
 void
 rand_seed(long l)
 {
-    srand(l);
+    srand((unsigned int) l);
 }
 
 void
@@ -531,18 +532,19 @@ position_predict(float loc_a[3][3], float loc_b[3], float loc_a1[3], float loc_b
 {
     float d[3];
     float v[3];
+    int i;
     
     // calculate derivative
-    for(int i = 0; i < 3; i++) d[i] = (loc_a[i][0] - loc_a[i][1])/(loc_b[0]-loc_b[1]) -
+    for(i = 0; i < 3; i++) d[i] = (loc_a[i][0] - loc_a[i][1])/(loc_b[0]-loc_b[1]) -
                                       (loc_a[i][1] - loc_a[i][2])/(loc_b[1]-loc_b[2]);
     
     // calculate velocity
-    for(int i = 0; i < 3; i++) v[i] = (loc_a[i][0] - loc_a[i][1]) / (loc_b[0] - loc_b[1]);
+    for(i = 0; i < 3; i++) v[i] = (loc_a[i][0] - loc_a[i][1]) / (loc_b[0] - loc_b[1]);
     
     // future pos[i] at t = loc_a[i] + (velocity*t) + (derviative*t)
     float t = loc_b1 - loc_b[0];
     
-    for(int i = 0; i < 3; i++) loc_a1[i] = loc_a[i][0] + (v[i] * t) + (d[i] * t);
+    for(i = 0; i < 3; i++) loc_a1[i] = loc_a[i][0] + (v[i] * t) + (d[i] * t);
 }
 
 float

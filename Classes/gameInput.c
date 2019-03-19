@@ -513,7 +513,9 @@ gameInput()
         
         float cap = /*0.05*/ 0.1; // radians
         // output response amplfiers
-        float sm[] = /*{0.6, 0.8, 0.8}*/ {0.7, 0.8, 0.9};
+        //float sm[] = /*{0.6, 0.8, 0.8}*/ {0.7, 0.8, 0.9};
+        float sm[] = /*{0.6, 0.8, 0.8}*/ {0.6, 0.4, 0.6};
+        // TODO: scale insersely based on angle relative to gravity
         
         float cs = (speed - minSpeed) / (maxSpeed*2);
         float speedC = 1.0 /* - (cs*cs*0.9) */ ;

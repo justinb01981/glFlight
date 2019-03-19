@@ -242,7 +242,7 @@ typedef struct WorldElemListNode WorldElemListNode;
 
 extern volatile WorldElemListNode* world_elem_list_remove_watch_elem;
 
-inline static void
+static void
 world_elem_list_init(WorldElemListNode* pHeadNode)
 {
     memset(pHeadNode, 0, sizeof(*pHeadNode));
@@ -260,7 +260,7 @@ world_elem_adjust_geometry_pointers(WorldElem* pElem);
 WorldElem*
 world_elem_clone(WorldElem*);
 
-inline static void
+static void
 world_elem_init(WorldElem* pElem, int elem_id)
 {
     pElem->elem_id = elem_id;
@@ -273,14 +273,14 @@ world_elem_free(WorldElem* pElem);
 void
 world_elem_replace_fix(WorldElem*);
 
-static inline void
+static void
 world_elem_get_coord(WorldElem* pElem, int n, model_coord_t dest[3]) {
     dest[0] = pElem->coords[n*3];
     dest[1] = pElem->coords[n*3+1];
     dest[2] = pElem->coords[n*3+2];
 }
 
-static inline float
+static float
 world_elem_get_velocity(WorldElem* pElem)
 {
     /*

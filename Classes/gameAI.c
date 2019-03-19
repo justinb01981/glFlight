@@ -413,6 +413,8 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
 
     float dist = MAX(0.5, sqrt(ax*ax + ay*ay + az*az));
     
+    float juke_slerp_c = 1.0;
+    
     // find current object heading vector
     get_body_vectors_for_euler(elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
                                &xq, &yq, &zq);
@@ -549,6 +551,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
      */
     else if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_JUKE)
     {
+        juke_slerp_c = 3.0;
         if(time_ms > elem->stuff.u.enemy.time_next_retarget)
         {
             // restore last state prior to JUKE
@@ -586,6 +589,8 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
                 elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
                 elem->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
                 elem->stuff.u.enemy.time_next_retarget = time_ms + 4000;
+                
+                juke_slerp_c = 3.0;
             }
         }
     }
@@ -629,7 +634,9 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     }
     else
     {
-        slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist, elem->stuff.u.enemy.max_slerp*tc, &z1q.w, &z1q.x, &z1q.y, &z1q.z);
+        slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist,
+              elem->stuff.u.enemy.max_slerp*tc*juke_slerp_c,
+              &z1q.w, &z1q.x, &z1q.y, &z1q.z);
         xq.w += z1q.w-zq.w;
         xq.x += z1q.x-zq.x;
         xq.y += z1q.y-zq.y;
@@ -845,7 +852,7 @@ pursuit_speed_for_object(WorldElem* elem, float zdot)
             switch(elem->stuff.u.enemy.enemy_state)
             {
                 case ENEMY_STATE_PATROL:
-                    v = elem->stuff.u.enemy.max_speed/2;
+                    v = elem->stuff.u.enemy.max_speed;
                     if(zdot < zdot_infront) v /= 2;
                     break;
                     

@@ -163,7 +163,7 @@ const static float game_variables_default[] = {
     50,          // ENEMY1_FORGET_DISTANCE
     30,          // ENEMY1_PURSUE_DISTANCE
     MAX_SPEED,   // MAX_SPEED
-    /*1.2*/2.0,  // MAX_TURN_RADIANS
+    1.2,         // MAX_TURN_RADIANS
     0,           // FIRES MISSLES
     1,           // FIRES LASERS
     1,           // CHANGES_TARGET

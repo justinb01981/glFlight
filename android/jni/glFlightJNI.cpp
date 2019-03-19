@@ -27,6 +27,8 @@ extern "C" {
 #include "game/maps.h"
 #include "game/gameDebug.h"
 #include "game/gameDialogs.h"
+    
+#include "stubs.h"
 
 void dbtrace(const char* x, int y) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d\n", x, y); }
 void dbtracelog(const char* x, int y, const char* s) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d %s\n", x, y, s); }
@@ -119,7 +121,8 @@ glFlightJNIInit()
 
 	initTextures(glFlightGameResourceInfo.pathPrefix);
 
-	gameNetwork_init(0, gameSettingsGameName, gameSettingsPlayerName,
+    gameNetwork_init_mem();
+	gameNetwork_init(0, gameSettingsGameNameDefault, gameSettingsPlayerName,
 			gameSettingsNetworkFrequency,
 			gameSettingsPortNumber, gameSettingsLocalIPOverride);
 
@@ -127,12 +130,13 @@ glFlightJNIInit()
 	gameMapFileName("temp");
 	gameMapSetMap(maps_list[0]);
 
+    // HACK: touch inputs are in portrait mode
 	gameInterfaceInit(viewWidth, viewHeight);
     gameInterfaceControls.trim.blinking = 1;
     
     gameDialogCalibrate();
 
-    gameDialogLoading();
+    //gameDialogLoading();
 }
 
 static float xscale = 1;
@@ -175,7 +179,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 {
     // TODO: draw a 'wait...loading' status string each frame until load
     // complete
-	if(!glFlightInited)
+	if(!glFlightInited && viewWidth > 0 && viewHeight > 0)
 	{
 		DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
 
@@ -195,6 +199,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 		gameInput();
 
 		gameInputTimeLast = time_ms_wall;
+		//DBPRINTF(("gameInput"));
 	}
 
     //DBPRINTF(("drawFrame time delta:%f", time_ms_wall - gameDrawTimeLast));
@@ -315,32 +320,37 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInpu
 	float f[16];
 	int l = env_float_copy(e, arr, f);
 
-	const float origScreenHeight = 960;
-	const float origScreenWidth = 640;
-
+    // HACK: to match iOS, treat touch coordinates as portrait-modes
 	float x = f[1];
 	float y = f[0];
 	float action = f[2];
 
 	x = viewHeight - x; // invert
 
-	x = x * (viewWidth/viewHeight); // scale
+	x = x * (viewWidth/viewHeight); // scale for aspect
 
-	y = y * (viewHeight/viewWidth); // scale
+	y = y * (viewHeight/viewWidth); // scale for aspect
 
+    DBPRINTF(("action=%f", action));
 	DBPRINTF(("x=%f", x));
 	DBPRINTF((" y=%f\n", y));
 
 	if(action == 0)
 	{
+		touchStateTouchCount += 1;
+    	gameInterfaceControls.touchId = touchStateTouchCount;
+
 		gameInterfaceHandleTouchBegin(x, y);
 	}
 	else if(action == 1 || action == 3)
 	{
+	    gameInterfaceControls.touchId = touchStateTouchCount; // wrong!
 		gameInterfaceHandleTouchEnd(x, y);
+		touchStateTouchCount -= 1;
 	}
 	else if(action == 2)
 	{
+	    gameInterfaceControls.touchId = touchStateTouchCount;
 		gameInterfaceHandleTouchMove(x, y);
 	}
 }
@@ -394,6 +404,11 @@ int main(int argc, char** argv)
 {
 	DBPRINTF(("main %d\n", 0));
 	return 0;
+}
+    
+void appWriteSettings()
+{
+    gameSettingsWrite(glFlightSettingsPath());
 }
 
 #ifdef __cplusplus

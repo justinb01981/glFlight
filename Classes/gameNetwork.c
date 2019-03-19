@@ -124,7 +124,9 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     
     memset(&addr, 0, sizeof(addr));
     
+#ifdef BSD_SOCKETS
     addr6->sin6_len = sizeof(struct sockaddr_in6);
+#endif
     addr6->sin6_family = AF_INET6;
     addr6->sin6_addr = in6addr_any;
 	addr6->sin6_port = htons(port);
@@ -191,7 +193,9 @@ send_lan_broadcast(gameNetworkMessage* msg)
     sa_bc6.sin6_len = sizeof(sa_bc6);
 #endif
     sa_bc6.sin6_port = htons(gameNetworkState.hostInfo.port);
+#ifdef BSD_SOCKETS
     sa_bc6.sin6_addr = in6addr_linklocal_allnodes;
+#endif
     
     r = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg),
                0, (struct sockaddr*) &sa_bc6, sizeof(sa_bc6));
