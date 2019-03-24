@@ -524,7 +524,7 @@ rand_in_range(float b, float e)
 void
 rand_seed(long l)
 {
-    srand((unsigned int) l);
+    srand(l);
 }
 
 void

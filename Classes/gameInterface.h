@@ -108,6 +108,9 @@ static controlRect*
 gameInterfaceFindControl(float x, float y);
 
 void
+gameInterfaceTouchIDSet(int id);
+
+void
 gameInterfaceHandleTouchMove(float x, float y);
 
 void
@@ -120,10 +123,10 @@ void
 gameInterfaceHandleAllTouchEnd();
 
 void
-gameInterfaceModalDialog(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void));
+gameInterfaceModalDialog(const char* msg, const char *buttonLeft, const char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void));
 
 void
-gameInterfaceModalDialogEnqueue(char* msg, char *buttonLeft, char *buttonRight,
+gameInterfaceModalDialogEnqueue(const char* msg, const char *buttonLeft, const char *buttonRight,
                                 void (*cbLeft)(void), void (*cbRight)(void),
                                 controlRect* overrideRect,
                                 unsigned long life_frames);

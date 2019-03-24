@@ -557,7 +557,7 @@ game_add_turret(float x, float y, float z)
     world_get_last_object()->object_type = OBJ_TURRET;
     world_get_last_object()->stuff.intelligent = 1;
     game_elem_setup_turret(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
-    update_object_velocity(obj_id, 0, -0.1, -0.1, -0.1);
+    update_object_velocity(obj_id, -0.1, -0.1, -0.1, 0);
 }
 
 void
@@ -684,7 +684,6 @@ game_init()
 void
 game_start(float difficulty, int type)
 {
-    int t;
     char dialogStr[255];
     
     score_clear();
@@ -753,9 +752,9 @@ game_start(float difficulty, int type)
     
     collision_actions_set_default();
     
-    for(t = 0; t < OBJ_LAST; t++) gameStateSinglePlayer.object_types_towed[t] = 0;
+    for(int t = 0; t < OBJ_LAST; t++) gameStateSinglePlayer.object_types_towed[t] = 0;
     
-    for(t = 0; t < GAME_POWERUP_DROP_TABLE_LEN; t++) gameStateSinglePlayer.powerup_drop_chance[t] = 0.0;
+    for(int t = 0; t < GAME_POWERUP_DROP_TABLE_LEN; t++) gameStateSinglePlayer.powerup_drop_chance[t] = 0.0;
     
     if(gameStateSinglePlayer.game_type == GAME_TYPE_DEATHMATCH)
     {
@@ -990,16 +989,15 @@ void
 path_generate_random_with_delta(float cur[3], float vec[3], float mag, float delt)
 {
     float out[3];
-    int d;
     
-    for(d = 0; d < 3; d++)
+    for(int d = 0; d < 3; d++)
     {
         out[d] = cur[d] + (vec[d] * mag) + rand_in_range(-1, 1)*delt;
     }
     
     float dist = sqrt((out[0]-cur[0])*(out[0]-cur[0])+(out[1]-cur[1])*(out[1]-cur[1])+(out[2]-cur[2])*(out[2]-cur[2]));
     
-    for(d = 0; d < 3; d++)
+    for(int d = 0; d < 3; d++)
     {
         vec[d] = (out[d] - cur[d]) / dist;
         cur[d] = out[d];
@@ -1009,7 +1007,7 @@ path_generate_random_with_delta(float cur[3], float vec[3], float mag, float del
 static void
 game_setup()
 {
-    int i, j;
+    int i;
     float vp[3];
     float pos[3];
     float boundmin[3];
@@ -1031,7 +1029,7 @@ game_setup()
     
     int grouplen = 1;
     
-    for(i = 0; i < gameStateSinglePlayer.n_collect_points; i++)
+    for(int i = 0; i < gameStateSinglePlayer.n_collect_points; i++)
     {
         /*
         int td = 10; // turret dist
@@ -1044,7 +1042,7 @@ game_setup()
          */
         
         // for each collection point, spawn some number of caps
-        for(j = 0; j < grouplen; j++)
+        for(int j = 0; j < grouplen; j++)
         {
             if(j == 0)
             {
@@ -2194,8 +2192,6 @@ game_run()
         {
             if(pElemBallHeld && pMyShipNode)
             {
-                int i;
-                
                 // update velocity
                 float touchX = (gameInterfaceControls.touchUnmappedX - ballXLast) * 1.0;
                 float touchY = -(gameInterfaceControls.touchUnmappedY - ballYLast) * 1.0;
@@ -2203,8 +2199,8 @@ game_run()
                 pElemBallHeld->physics.ptr->friction = 0;
                 pElemBallHeld->renderInfo.priority = 1;
                 
-                for (i = 0; i < 3; i++) cvz[i] *= 0.8;
-                for (i = 0; i < 3; i++) cvy[i] *= 1.8;
+                for (int i = 0; i < 3; i++) cvz[i] *= 0.8;
+                for (int i = 0; i < 3; i++) cvy[i] *= 1.8;
                 
                 update_object_velocity(pElemBallHeld->elem_id, pMyShipNode->elem->physics.ptr->vx,
                                        pMyShipNode->elem->physics.ptr->vy, pMyShipNode->elem->physics.ptr->vz, 0);

@@ -43,6 +43,7 @@ extern char gameSettingsPlayerNameDefault[255];
 extern char gameSettingsMapName[255];
 extern char gameSettingGameTitle[255];
 extern char gameSettingsGameNameDefault[255];
+extern char gameSettingsGameName[255];
 extern int gameSettingsNetworkFrequency;
 extern int gameSettingsPortNumber;
 extern char gameSettingsLocalIPOverride[255];
