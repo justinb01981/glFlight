@@ -70,6 +70,8 @@
 		D00D78D81A0AFA4800E701B9 /* app_icon_64x64.png in Resources */ = {isa = PBXBuildFile; fileRef = D00D78D71A0AFA4800E701B9 /* app_icon_64x64.png */; };
 		D02071731BF282D4000AC2BA /* texture88.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02071721BF282D4000AC2BA /* texture88.bmp */; };
 		D02071751BF29F11000AC2BA /* texture89.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02071741BF29F11000AC2BA /* texture89.bmp */; };
+		D0280A602241BA2000E8C1E8 /* texture116.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0280A5F2241BA2000E8C1E8 /* texture116.bmp */; };
+		D0280A612241BA2300E8C1E8 /* texture116.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0280A5F2241BA2000E8C1E8 /* texture116.bmp */; };
 		D0290F3120A24460002935C3 /* texture112.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0290F3020A2445F002935C3 /* texture112.bmp */; };
 		D0290F3220A24460002935C3 /* texture112.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0290F3020A2445F002935C3 /* texture112.bmp */; };
 		D0290F3420A25BF3002935C3 /* texture113.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0290F3320A25BF2002935C3 /* texture113.bmp */; };
@@ -507,6 +509,8 @@
 		D015A3F620AA3D2600CB1C31 /* world_motion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = world_motion.h; sourceTree = "<group>"; };
 		D02071721BF282D4000AC2BA /* texture88.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture88.bmp; sourceTree = "<group>"; };
 		D02071741BF29F11000AC2BA /* texture89.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture89.bmp; sourceTree = "<group>"; };
+		D0280A5F2241BA2000E8C1E8 /* texture116.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture116.bmp; sourceTree = "<group>"; };
+		D0280A622241BBF500E8C1E8 /* building3_model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = building3_model.h; sourceTree = "<group>"; };
 		D0290F3020A2445F002935C3 /* texture112.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture112.bmp; sourceTree = "<group>"; };
 		D0290F3320A25BF2002935C3 /* texture113.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture113.bmp; sourceTree = "<group>"; };
 		D02B8EFE195357FE00830369 /* gameSettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gameSettings.c; sourceTree = "<group>"; };
@@ -728,6 +732,7 @@
 				D0CF62B514A919D600E08151 /* object.h */,
 				D015A3F620AA3D2600CB1C31 /* world_motion.h */,
 				D03ABA6414ADACF000C44538 /* world.h */,
+				D0280A622241BBF500E8C1E8 /* building3_model.h */,
 				6D91DE9F16697F0B00362864 /* world.c */,
 				D0CF62B614A919D600E08151 /* object.m */,
 				D02F630E14C6ABD80028601F /* textures.h */,
@@ -847,6 +852,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D0280A5F2241BA2000E8C1E8 /* texture116.bmp */,
 				D0BB4FBA2224FE71009457A4 /* texture115.bmp */,
 				D0549E8320ED4126009FF191 /* texture114.bmp */,
 				D0290F3320A25BF2002935C3 /* texture113.bmp */,
@@ -1253,6 +1259,7 @@
 				D0309F201770F3A600100357 /* texture37.bmp in Resources */,
 				D0A5039A1A43EF8C00C4BBD1 /* engineslow.wav in Resources */,
 				D079A83320217FFD0098641B /* texture108.bmp in Resources */,
+				D0280A602241BA2000E8C1E8 /* texture116.bmp in Resources */,
 				D0309F221770F41C00100357 /* texture38.bmp in Resources */,
 				D0309F241770F42A00100357 /* texture36.bmp in Resources */,
 				D0309F261771A39E00100357 /* texture16.bmp in Resources */,
@@ -1418,6 +1425,7 @@
 				D0BCC9592052EDC100094809 /* texture52.bmp in Resources */,
 				D0BCC95A2052EDC100094809 /* warning.wav in Resources */,
 				D0BCC95B2052EDC100094809 /* texture34.bmp in Resources */,
+				D0280A612241BA2300E8C1E8 /* texture116.bmp in Resources */,
 				D0BCC95C2052EDC100094809 /* texture33.bmp in Resources */,
 				D0BCC95D2052EDC100094809 /* texture35.bmp in Resources */,
 				D0BCC95F2052EDC100094809 /* app_icon76x76.png in Resources */,
@@ -1503,7 +1511,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython2.7 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython2.7 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\npython2.7 tools/objconvert.py building3 models/building3.obj > Classes/building3_model.h;\n";
 		};
 		D097E2572226150000A19853 /* Run Script (convert models) */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1521,7 +1529,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython2.7 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython2.7 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\npython2.7 tools/objconvert.py building3 models/building3.obj > Classes/building3_model.h;\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
