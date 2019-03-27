@@ -492,7 +492,7 @@ world_add_object_core(Model type,
     switch(type)
     {
         case MODEL_ICOSAHEDRON:
-            pElem->renderInfo.priority = 1;
+            //pElem->renderInfo.priority = 1;
             new_durability = DURABILITY_ASTEROID;
             break;
           
@@ -548,7 +548,7 @@ world_add_object_core(Model type,
             
         case MODEL_TBUILDING:
         case MODEL_CBUILDING:
-            pElem->renderInfo.priority = 1;
+            //pElem->renderInfo.priority = 1;
             new_durability = DURABILITY_BLOCK;
             break;
             
@@ -558,7 +558,7 @@ world_add_object_core(Model type,
             break;
             
         case MODEL_FLATTENED_CUBE:
-            pElem->renderInfo.concavepoly = 1;
+            //pElem->renderInfo.concavepoly = 1;
             pElem->renderInfo.priority = 1;
             new_durability = DURABILITY_BLOCK;
             break;
@@ -580,7 +580,7 @@ world_add_object_core(Model type,
         case MODEL_LINE:
         case MODEL_CONTRAIL:
             pElem->renderInfo.visible = 1;
-            pElem->renderInfo.priority = 1;
+            //pElem->renderInfo.priority = 1;
             break;
 
         default:

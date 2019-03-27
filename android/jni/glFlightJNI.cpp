@@ -119,7 +119,7 @@ glFlightJNIInit()
 
 	game_ai_init();
 
-	gameInputInit();
+	//gameInputInit();
 
 	console_init();
 
@@ -137,10 +137,7 @@ glFlightJNIInit()
     // HACK: touch inputs are in portrait mode
 	gameInterfaceInit(viewWidth, viewHeight);
     gameInterfaceControls.trim.blinking = 1;
-    
-    gameDialogCalibrate();
 
-    //gameDialogLoading();
 }
 
 static float xscale = 1;
@@ -276,8 +273,8 @@ JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAu
 		{
 			sprintf(audioStr, "%s:%f", cocoaMessageAudioList.next->str, cocoaMessageAudioList.next->f[0]);
 			cocoaMessageListPop(&cocoaMessageAudioList);
-			dbtrace((char*)"sound\n",0);
 		}
+
 		gameAudioUnlock();
 	}
 
@@ -299,6 +296,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 	float pitch = -jf[1];
 	float yaw = -jf[0];
 
+	/*
 	if(gameInputTrimPending())
 	{
 		trimRoll = roll;
@@ -306,6 +304,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 		trimYaw = yaw;
 		gameInputGyro(roll, pitch, yaw);
 	}
+	*/
 
 	if(/*get_time_ms() - sensorInputLast > 1000/GAME_TICK_RATE*/1)
 	{
