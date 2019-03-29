@@ -9,10 +9,10 @@ LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -lEGL
 
 LOCAL_SRC_FILES += game/world.c game/worldElem.c game/gameUtils.c game/gameBounding.c game/gameCamera.c game/gameShip.c game/quaternions.c game/mesh.c game/gameAudio.c game/actions.c game/textures.c game/gameGraphics.c game/glFlight.c game/gameNetwork.c game/gameAI.c game/gamePlay.c game/world_file.c game/gameInterface.c game/gameInput.c game/gameSettings.c game/collision.c game/gameDialogs.c
 
-LOCAL_CFLAGS += -std=c99 -w -fpermissive
+LOCAL_CFLAGS += -std=c99 -w -fpermissive -g
 
-LOCAL_CPPFLAGS = -w -fpermissive -Wno-narrowing -Wno-reserved-user-defined-literal -Wno-discarded-qualifiers
-LOCAL_CFLAGS =
+LOCAL_CPPFLAGS = -w -fpermissive -Wno-narrowing -Wno-reserved-user-defined-literal -Wno-discarded-qualifiers -g
+LOCAL_CFLAGS = -g
 LOCAL_SRC_FILES += glFlightJNI.cpp stubs.cpp
 
 include $(BUILD_SHARED_LIBRARY)
