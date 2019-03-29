@@ -43,7 +43,6 @@ typedef struct
     modeltype == MODEL_SPHERE ||          \
     modeltype == MODEL_ENEMY_BASE ||      \
     modeltype == MODEL_SHIP1 ||           \
-    modeltype == MODEL_BUILDING3 ||       \
     modeltype == MODEL_CBUILDING)
 
 /* static array of coordinates, texture-coordinates, triangle-faces, matrix */
@@ -107,7 +106,6 @@ typedef enum {
     MODEL_SCENERY,
     MODEL_CONTRAIL,
     MODEL_LINE,
-    MODEL_BUILDING3,
     MODEL_LAST,
 } Model;
 

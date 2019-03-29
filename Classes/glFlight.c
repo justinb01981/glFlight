@@ -180,10 +180,10 @@ glFlightFrameStage1()
     update_time_ms_frame_tick();
     
 calibrate_bail:
-    get_time_ms();
-#if GAME_PLATFORM_ANDROID
-    time_ms = time_ms_wall;
-#endif
+//    get_time_ms();
+//#if GAME_PLATFORM_ANDROID
+//    time_ms = time_ms_wall;
+//#endif
     
     if(gameInterfaceControls.textMenuControl.visible ||
        gameInterfaceControls.keyboardEntry.visible || !controlsCalibrated)

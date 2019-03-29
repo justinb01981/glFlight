@@ -289,7 +289,7 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 */
 
 #define BUILDING_3(x, y, z, h)                       \
-"add_object 25 "#x" "#y" "#z" 1.57 "#h" -1.57 4 116\n"
+"add_object 1 "#x" "#y" "#z" 1.57 "#h" -1.57 4 28\n"
 
 #define FLOATING_CUBE1(x, y, z)                      \
 "add_object 1 "#x" "#y" "#z" 0 0 0 4 28\n"

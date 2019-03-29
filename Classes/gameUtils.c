@@ -30,6 +30,9 @@ int n_elements_compared = 0;
 volatile float time_ms = 1;
 volatile float time_ms_wall = 1;
 
+unsigned long g_time_frames = 0;
+volatile float g_time_ms_start = 0;
+
 float drawDistanceFar = 400;
 
 const int console_write_append_thresh_ms = 1000;
@@ -283,9 +286,23 @@ get_time_ms()
 }
 
 void
-update_time_ms_frame_tick()
-{
-    time_ms += (1000 / GAME_TICK_RATE);
+update_time_ms_frame_tick() {
+
+    get_time_ms();
+
+    if (g_time_ms_start == 0)
+    {
+        g_time_ms_start = time_ms_wall;
+        g_time_frames = 1;
+    }
+
+    float ms_per_frame_avg = (time_ms_wall - g_time_ms_start) / g_time_frames;
+
+    if(ms_per_frame_avg >= (1000/GAME_FRAME_RATE)) ms_per_frame_avg = (1000/GAME_FRAME_RATE);
+
+    time_ms += ms_per_frame_avg;
+
+    g_time_frames++;
 }
 
 unsigned long

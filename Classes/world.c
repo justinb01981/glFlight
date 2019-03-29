@@ -24,7 +24,6 @@
 #include "collision.h"
 #include "sounds.h"
 #include "model_newship.h"
-#include "building3_model.h"
 
 #define MAX(x, y) ((x) > (y)? (x): (y))
 
@@ -392,20 +391,6 @@ world_add_object_core(Model type,
         }
         break;
             
-        case MODEL_BUILDING3:
-        {
-            model_coords = model_building3_coords;
-            model_sizeof = sizeof(model_building3_coords);
-            model_texcoords = model_building3_texcoords;
-            model_texcoords_sizeof = sizeof(model_building3_texcoords);
-            model_indices = model_building3_indices;
-            model_indices_sizeof = sizeof(model_building3_indices);
-            
-            model_primitives = poly_comp.primitives;
-            model_primitives_sizeof = 0;
-        }
-            break;
-            
         case MODEL_ENEMY_BASE:
         {
             model_primitives_sizeof = 0;
@@ -561,7 +546,6 @@ world_add_object_core(Model type,
             pElem->renderInfo.priority = 1;
             break;
             
-        case MODEL_BUILDING3:
         case MODEL_TBUILDING:
         case MODEL_CBUILDING:
             //pElem->renderInfo.priority = 1;
@@ -2009,11 +1993,7 @@ world_update(float tc)
                         // out of bounds
                         world_elem_list_remove(pCurRemoveElem, &gWorld->elements_expiring);
                         world_elem_list_remove(pCurRemoveElem, &gWorld->elements_list);
-                        
-                        if(!world_elem_list_find(pCurRemoveElem->elem_id, &gWorld->elements_to_be_freed))
-                        {
-                            world_elem_list_add(pCurRemoveElem, &gWorld->elements_to_be_freed);
-                        }
+                        world_elem_list_add(pCurRemoveElem, &gWorld->elements_to_be_freed);
                         
                         pOOBListElem = gWorld->world_update_state.ptr_objects_moving;
                     }
