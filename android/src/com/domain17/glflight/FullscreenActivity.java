@@ -214,6 +214,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     	float action = 0;
     	float x = 0;
     	float y = 0;
+    	float pointerID = motionEvent.getPointerId(motionEvent.getActionIndex());
 
 		InputDevice dev = motionEvent.getDevice();
 
@@ -267,7 +268,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 	    		touchLastX = x;
 	    		touchLastY = y;
 	    		touchLastAct = action;
-	    		GameRunnable.touchInput(x, y, action);
+	    		GameRunnable.touchInput(x, y, action, (int) pointerID);
 	    	}
 		}
     	

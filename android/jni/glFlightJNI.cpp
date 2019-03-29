@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <map>
 
 #include <android/log.h>
 
@@ -65,6 +66,9 @@ glFlightPrefs prefs;
 bool glFlightInited = false;
 int glFlightRenderIgnore = 0;
 
+std::map<int,int> touchIDMap;
+int touchStateTouchCount = 0;
+
 static char settingsPath[255];
 
 inline static const char*
@@ -115,7 +119,7 @@ glFlightJNIInit()
 
 	game_ai_init();
 
-	gameInputInit();
+	//gameInputInit();
 
 	console_init();
 
@@ -133,10 +137,7 @@ glFlightJNIInit()
     // HACK: touch inputs are in portrait mode
 	gameInterfaceInit(viewWidth, viewHeight);
     gameInterfaceControls.trim.blinking = 1;
-    
-    gameDialogCalibrate();
 
-    //gameDialogLoading();
 }
 
 static float xscale = 1;
@@ -272,8 +273,8 @@ JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAu
 		{
 			sprintf(audioStr, "%s:%f", cocoaMessageAudioList.next->str, cocoaMessageAudioList.next->f[0]);
 			cocoaMessageListPop(&cocoaMessageAudioList);
-			dbtrace((char*)"sound\n",0);
 		}
+
 		gameAudioUnlock();
 	}
 
@@ -295,6 +296,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 	float pitch = -jf[1];
 	float yaw = -jf[0];
 
+	/*
 	if(gameInputTrimPending())
 	{
 		trimRoll = roll;
@@ -302,6 +304,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 		trimYaw = yaw;
 		gameInputGyro(roll, pitch, yaw);
 	}
+	*/
 
 	if(/*get_time_ms() - sensorInputLast > 1000/GAME_TICK_RATE*/1)
 	{
@@ -320,10 +323,13 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInpu
 	float f[16];
 	int l = env_float_copy(e, arr, f);
 
-    // HACK: to match iOS, treat touch coordinates as portrait-modes
+    // HACK: to match iOS, treat touch coordinates as portrait-mode
 	float x = f[1];
 	float y = f[0];
 	float action = f[2];
+	float pointerID = f[3];
+
+	//assert(pointerID > 0);
 
 	x = viewHeight - x; // invert
 
@@ -334,24 +340,26 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInpu
     DBPRINTF(("action=%f", action));
 	DBPRINTF(("x=%f", x));
 	DBPRINTF((" y=%f\n", y));
+	DBPRINTF((" touchMap: %d", touchIDMap.size()));
 
 	if(action == 0)
 	{
-		touchStateTouchCount += 1;
-    	gameInterfaceControls.touchId = touchStateTouchCount;
+        int touchID = touchIDMap.size()+1;
+        touchIDMap[pointerID] = touchID;
+    	gameInterfaceTouchIDSet(touchID);
 
 		gameInterfaceHandleTouchBegin(x, y);
 	}
 	else if(action == 1 || action == 3)
 	{
-	    gameInterfaceControls.touchId = touchStateTouchCount; // wrong!
+	    gameInterfaceTouchIDSet(touchIDMap[pointerID]);
 		gameInterfaceHandleTouchEnd(x, y);
-		touchStateTouchCount -= 1;
 	}
 	else if(action == 2)
 	{
-	    gameInterfaceControls.touchId = touchStateTouchCount;
-		gameInterfaceHandleTouchMove(x, y);
+	    gameInterfaceTouchIDSet(touchIDMap[pointerID]);
+	    touchIDMap.erase(pointerID);
+	    gameInterfaceHandleTouchMove(x, y);
 	}
 }
 

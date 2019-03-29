@@ -1,6 +1,7 @@
 ifeq ($(OS),Windows)
 CMD_COPY=xcopy /S
 CMD_MKDIR=mkdir
+CMD_MOVE=mv
 CMD_CHDIR=cd
 CMD_EXTRACT=unzip
 CMD_RMDIR=rm -rf
@@ -9,6 +10,7 @@ PATH=$PATH:.
 CMD_MAKE=make
 else
 CMD_COPY=cp -r
+CMD_MOVE=mv
 CMD_MKDIR=mkdir
 CMD_CHDIR=cd
 CMD_EXTRACT=unzip
@@ -19,6 +21,7 @@ CMD_MAKE=make
 endif
 ARCHIVE_PATH=android
 ARCHIVE_FILE=glFlightAndroidBase.zip
+STUDIO_PROJECT_PATH=glFlightAndroidBase
 FILES_RAW_TEXTURES=texture*.bmp
 FILES_RAW_SOUNDS=*.wav
 BUILD_DIR_IOS=build/ios
@@ -67,15 +70,16 @@ GRADLE_DIR=${GRADLE_IMPORT_ROOT}/app/src/main
 
 android_workspace: base_ws
 	${CMD_MKDIR} ${BUILD_DIR_ANDROID}
-	${CMD_COPY} ${ARCHIVE_PATH}/${ARCHIVE_FILE} ${BUILD_DIR_ANDROID}
-	${CMD_CHDIR} ${BUILD_DIR_ANDROID}; ${CMD_EXTRACT} ${ARCHIVE_FILE}
+	#${CMD_COPY} ${ARCHIVE_PATH}/${ARCHIVE_FILE} ${BUILD_DIR_ANDROID}
+	${CMD_COPY} ${ARCHIVE_PATH}/${STUDIO_PROJECT_PATH}/* ${BUILD_DIR_ANDROID}
+	#${CMD_CHDIR} ${BUILD_DIR_ANDROID}; ${CMD_EXTRACT} ${ARCHIVE_FILE}
 	${CMD_COPY} android/* ${BUILD_DIR_ANDROID}/glFlight/
 	${CMD_COPY} Classes/* ${BUILD_DIR_ANDROID}/glFlight/jni/game/
 	${CMD_COPY} *.png ${BUILD_DIR_ANDROID}/glFlight/res/raw/
 	${CMD_COPY} *.jpg ${BUILD_DIR_ANDROID}/glFlight/res/raw/
 	${CMD_COPY} texture*.bmp ${BUILD_DIR_ANDROID}/glflight/res/raw/ 
 	${CMD_COPY} *.wav ${BUILD_DIR_ANDROID}/glFlight/res/raw/ 
-	echo "android (eclipse) workspace created: " ${BUILD_DIR_ANDROID}
+	echo "android (studio gradle) workspace created: " ${BUILD_DIR_ANDROID}
 
 gradle_workspace: android_workspace
 	echo "setting up gradle-build dir: " ${GRADLE_DIR}

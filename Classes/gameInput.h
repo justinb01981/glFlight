@@ -23,6 +23,8 @@ extern double bulletVel;
 extern quaternion_t bx, by, bz, b;
 extern double dc;
 
+static unsigned int TOUCHES_MAX = 4;
+
 void
 gameInputInit();
 

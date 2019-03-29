@@ -1,11 +1,9 @@
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void appWriteSettings();
+//void appWriteSettings();
 
 #ifdef __cplusplus
 }
 #endif
-

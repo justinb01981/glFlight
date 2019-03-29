@@ -37,8 +37,6 @@ int texture_id_block = TEXTURE_ID_BLOCK;
 
 const char *charMap = "abcdefghijklmnopqrstuvwxyz0123456789. _-@!$%^&*";
 
-static unsigned int TOUCHES_MAX = 4;
-
 // variables scoped for fireAction menu handling
 unsigned int maps_list_idx = 0;
 int game_map_custom_loaded = 0;
@@ -308,11 +306,12 @@ gameInterfaceFindControl(float x, float y)
         {
             if(y >= controlSet[i]->y && y < controlSet[i]->y+controlSet[i]->yw)
             {
+                DBPRINTF(("found countrolSet[%d]", i));
                 f = controlSet[i];
             }
         }
     }
-    
+
     // modal, this must be clicked
     if(gameInterfaceControls.dialogRect.visible &&
        gameInterfaceControls.dialogRect.modal)
@@ -327,13 +326,18 @@ gameInterfaceFindControl(float x, float y)
 void
 gameInterfaceHandleTouchMove(float x, float y)
 {
-    if(gameInterfaceControls.touchId-1 >= TOUCHES_MAX) return;
+    if(gameInterfaceControls.touchId-1 >= TOUCHES_MAX)
+    {
+        DBPRINTF(("gameInterfaceControls.touchId %d > TOUCHES_MAX (%d), ignoring", gameInterfaceControls.touchId, TOUCHES_MAX));
+        return;
+    }
     
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
     if(touchedControl)
     {
         touchedControl->touch_rx = (x - touchedControl->x) / touchedControl->xw;
         touchedControl->touch_ry = (y - touchedControl->y) / touchedControl->yw;
+        DBPRINTF(("touch_rx/touch_ry: %f %f", touchedControl->touch_rx, touchedControl->touch_ry));
     }
     
     if(touchedControl == &gameInterfaceControls.accelerator)
@@ -460,9 +464,18 @@ gameInterfaceEditDone()
 }
 
 void
+gameInterfaceTouchIDSet(int id)
+{
+    gameInterfaceControls.touchId = id;
+}
+
+void
 gameInterfaceHandleTouchBegin(float x, float y)
 {
     int rgnv = 0;
+
+    DBPRINTF(("gameInterface.c: touchid = %d", gameInterfaceControls.touchId));
+
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
     
     gameDialogGraphicCancel();
@@ -1143,7 +1156,7 @@ gameInterfaceHandleAllTouchEnd()
 }
 
 void
-gameInterfaceModalDialogEnqueue(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void),
+gameInterfaceModalDialogEnqueue(const char* msg, const char *buttonLeft, const char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void),
                          controlRect* overrideRect, unsigned long life_frames)
 {
     controlRect *pcur;
@@ -1200,7 +1213,7 @@ gameInterfaceModalDialogDequeue()
 }
 
 void
-gameInterfaceModalDialog(char* msg, char *buttonLeft, char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void))
+gameInterfaceModalDialog(const char* msg, const char *buttonLeft, const char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void))
 {
     gameInterfaceModalDialogEnqueue(msg, buttonLeft, buttonRight, cbLeft, cbRight, &gameInterfaceControls.dialogRectDefault, GAME_DIALOG_LIFE_MAX);
 }

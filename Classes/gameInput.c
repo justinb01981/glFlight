@@ -88,6 +88,7 @@ double roll_m, pitch_m, yaw_m;
 int trimCount = 0;
 int trimCountLast = 0;
 unsigned int gyroInputCount = 0;
+unsigned long gyroInputCountLast = 0;
 int gyroStableCount = 0;
 int gyroStableCountThresh = (GYRO_SAMPLE_RATE*4);
 float gyroInputDeltaLast[3] = {0, 0, 0};
@@ -232,7 +233,6 @@ void
 gameInput()
 {
     static float deviceLast[3];
-    static unsigned long gyroInputCountLast = 0;
     
     double devicePitch;
     double deviceYaw;
@@ -281,43 +281,37 @@ gameInput()
     gyroInputDeltaLast[1] = deviceYaw;
     gyroInputDeltaLast[2] = deviceRoll;
     
-    if(!controlsCalibrated)
-    {
-        if(!needTrim && trimCountLast == trimCount)
-        {
-            if(gyroStableCount == (GYRO_SAMPLE_RATE*2))
-            {
+    if(!controlsCalibrated) {
+        if (!needTrim && trimCountLast == trimCount) {
+            if (gyroStableCount == (GYRO_SAMPLE_RATE * 2)) {
                 console_clear();
                 console_write("calibrating...");
                 gameInterfaceSetInterfaceState(INTERFACE_STATE_TRIM_BLINKING);
                 gameInputTrimBegin();
                 gyroStableCount = 1;
             }
-        }
-        else
-        {
-            if(gyroStableCount == 0)
-            {
+        } else {
+            if (gyroStableCount == 0) {
                 /* restart learning */
                 gameInputTrimBegin();
             }
-            
-            gyro_calibrate_log((float) gyroStableCount / (float) (GYRO_SAMPLE_RATE*4) * 100);
-            
-            if(gyroStableCount >= gyroStableCountThresh)
-            {
+
+            gyro_calibrate_log((float) gyroStableCount / (float) (GYRO_SAMPLE_RATE * 4) * 100);
+
+            if (gyroStableCount >= gyroStableCountThresh) {
+                DBPRINTF(("%s:%d", __FILE__, __LINE__));
                 console_append("\ndone\n");
                 needTrim = 0;
                 trimCountLast = 1;
                 gameInterfaceControls.trim.blinking = 0;
-                
+
                 roll_m = deviceRoll;
                 pitch_m = devicePitch;
                 yaw_m = deviceYaw;
             }
         }
     }
-    
+
     /* wait for sensor to come to rest */
     if(gameInputTrimPending()) return;
     
@@ -386,6 +380,8 @@ gameInput()
     
     if(!needTrim && needTrimLast)
     {
+        DBPRINTF(("%s:%d", __FILE__, __LINE__));
+
         gameInterfaceControls.calibrateRect.visible = 0;
         // short trim-length means few input values to calculate range, ignore
         if(tex_pass - trimStartTime >= tex_pass_initial_sample ||

@@ -11,7 +11,7 @@ extern "C" {
     
     void GameNetworkBonjourManagerSendMessageToPeer(uint8_t* msg_, int peer_id)
     {
-        return 0;
+        return;
     }
     
     int GameNetworkBonjourManagerBrowseBegin()
@@ -48,4 +48,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-

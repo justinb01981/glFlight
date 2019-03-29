@@ -32,8 +32,8 @@ public class GameRunnable  {
 		glFlightSensorInput(f);
 	}
 	
-	public static void touchInput(float x, float y, float down) {
-		float f[] = {x, y, down};
+	public static void touchInput(float x, float y, float down, int pointerID) {
+		float f[] = {x, y, down, pointerID};
 		glFlightTouchInput(f);
 	}
 	
