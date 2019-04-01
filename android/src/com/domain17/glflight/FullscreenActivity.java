@@ -98,7 +98,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         appCtx = this.getApplicationContext();
 
         // terminate when leaving front
-        this.getIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //this.getIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         if (GameResources.init(this.getApplicationContext()) != 1) {
             System.out.println("GameResources.init failed\n");
@@ -164,10 +164,10 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         GameRunnable.glFlightUninit();
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-    }
+//    @Override
+//    protected void onPostCreate(Bundle savedInstanceState) {
+//        super.onPostCreate(savedInstanceState);
+//    }
 
     @Override
     protected void onPause() {
@@ -182,6 +182,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         super.onResume();
 
         if(mSensorManager != null) mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_GAME);
+        running = true;
     }
     
     /**
@@ -220,6 +221,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     	float action = 0;
     	float x = 0;
     	float y = 0;
+    	float hackNavBar = (float) viewWidthScaled*0.065f; // from gameInterfaceInit (gameInterface.c)
 
 		InputDevice dev = motionEvent.getDevice();
 
@@ -227,12 +229,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         {
 
             int pointerID = motionEvent.getPointerId(i);
-			double tX = motionEvent.getX(i) ;
-			double tY = motionEvent.getY(i);
-
-			// scale
-			tX /= (dev.getMotionRange(InputDevice.MOTION_RANGE_X).getMax() / viewWidthScaled);
-			tY /= (dev.getMotionRange(InputDevice.MOTION_RANGE_Y).getMax() /  viewHeightScaled);
+			double tX = (motionEvent.getX(i) / dev.getMotionRange(InputDevice.MOTION_RANGE_X).getMax()) * (viewWidthScaled+hackNavBar);
+			double tY = (motionEvent.getY(i) / dev.getMotionRange(InputDevice.MOTION_RANGE_Y).getMax()) * viewHeightScaled;
 
 			System.out.println("touched at [" + tX + "," + tY +
 					"] action:" + motionEvent.getActionMasked() + "\n");

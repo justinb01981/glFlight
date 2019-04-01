@@ -383,11 +383,12 @@ public class GameResources {
 	public static void playSound(String nameArg) {
 		String[] nameSplit = nameArg.split(":");
 		String name = nameSplit[0];
-		float rate = Float.valueOf(nameSplit[1]);
+		float vol = Float.valueOf(nameSplit[1]);
+		float rate = Float.valueOf(nameSplit[2]);
 
 		if(inst.soundMap.containsKey(name))  {
 			System.out.println("playing sound:" + name + " at rate:" + rate);
-			inst.soundPool.play(inst.soundMap.get(name), 1.0f, 1.0f, 1, 0, rate);
+			inst.soundPool.play(inst.soundMap.get(name), vol, vol, 1, 0, rate);
 			System.out.println("playing sound:" + name + "done:");
 		}
 	}
