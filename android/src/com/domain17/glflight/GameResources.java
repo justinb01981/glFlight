@@ -139,7 +139,8 @@ public class GameResources {
         R.raw.texture112,
         R.raw.texture113,
         R.raw.texture114,
-        R.raw.texture115
+        R.raw.texture115,
+		R.raw.texture116
 
 	};
 	
@@ -261,7 +262,8 @@ public class GameResources {
         "texture112.bmp",
         "texture113.bmp",
         "texture114.bmp",
-        "texture115.bmp"
+        "texture115.bmp",
+		"texture116.bmp"
 	};
 	
 	public static String[] sndNameList = {
@@ -332,7 +334,6 @@ public class GameResources {
 		
 		System.out.println("init resources");
 
-
 		String envPrefix = c.getExternalCacheDir() + "/";
 		/*Environment.getExternalStorageDirectory().getAbsolutePath() + "/";*/
 		
@@ -345,13 +346,20 @@ public class GameResources {
 		{
 	
 		 try {
+			 	String fileName = envPrefix + resFilename[i];
+			 	try {
+					InputStream in_dest = new FileInputStream(fileName);
+					System.out.println("skipping " + resFilename[i]);
+					continue;
+				} catch (Exception e) {
+
+			 	}
+
 		        InputStream in_s = res.openRawResource(resObj[i]);
 
 		        byte[] b = new byte[in_s.available()];
 		        in_s.read(b);
 		        in_s.close();
-		        
-		        String fileName = envPrefix + resFilename[i];
 		        
 		        System.out.println("GameResources: loading " + resFilename[i] + " (len:" + b.length + ") to " + fileName);
 		        
@@ -372,9 +380,15 @@ public class GameResources {
 		return 1;
 	}
 
-	public static void playSound(String name) {
-		if(inst.soundMap.containsKey(name)) {
-			inst.soundPool.play(inst.soundMap.get(name), 1.0f, 1.0f, 1, 1, 1.0f);
+	public static void playSound(String nameArg) {
+		String[] nameSplit = nameArg.split(":");
+		String name = nameSplit[0];
+		float rate = Float.valueOf(nameSplit[1]);
+
+		if(inst.soundMap.containsKey(name))  {
+			System.out.println("playing sound:" + name + " at rate:" + rate);
+			inst.soundPool.play(inst.soundMap.get(name), 1.0f, 1.0f, 1, 0, rate);
+			System.out.println("playing sound:" + name + "done:");
 		}
 	}
 }

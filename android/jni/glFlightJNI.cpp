@@ -140,6 +140,11 @@ glFlightJNIInit()
 
 }
 
+JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightResourcesInit(JNIEnv *e, jobject o)
+{
+    return 0;
+}
+
 static float xscale = 1;
 static float yscale = 1;
 
@@ -271,7 +276,9 @@ JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAu
 		gameAudioLock();
 		if(cocoaMessageAudioList.next)
 		{
-			sprintf(audioStr, "%s:%f", cocoaMessageAudioList.next->str, cocoaMessageAudioList.next->f[0]);
+			sprintf(audioStr, "%s:%f:%f", cocoaMessageAudioList.next->str,
+			        cocoaMessageAudioList.next->f[0],
+			        cocoaMessageAudioList.next->f[1]);
 			cocoaMessageListPop(&cocoaMessageAudioList);
 		}
 
@@ -353,12 +360,12 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInpu
 	else if(action == 1 || action == 3)
 	{
 	    gameInterfaceTouchIDSet(touchIDMap[pointerID]);
+        touchIDMap.erase(pointerID);
 		gameInterfaceHandleTouchEnd(x, y);
 	}
 	else if(action == 2)
 	{
 	    gameInterfaceTouchIDSet(touchIDMap[pointerID]);
-	    touchIDMap.erase(pointerID);
 	    gameInterfaceHandleTouchMove(x, y);
 	}
 }

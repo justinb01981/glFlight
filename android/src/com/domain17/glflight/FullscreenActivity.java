@@ -41,126 +41,123 @@ import com.domain17.glflight.util.*;
  * @see SystemUiHider
  */
 public class FullscreenActivity extends Activity implements SensorEventListener {
-	
-	public boolean running = false;
-	public boolean renderContinuously = false;
-	Context appCtx;
-	int accuracyLast = SensorManager.SENSOR_STATUS_UNRELIABLE;
 
-	double viewWidthScaled;
-	double viewHeightScaled;
+    public boolean running = false;
+    public boolean renderContinuously = false;
+    Context appCtx;
+    int accuracyLast = SensorManager.SENSOR_STATUS_UNRELIABLE;
 
-	public class GameGLConfigChooser implements EGLConfigChooser {
+    double viewWidthScaled;
+    double viewHeightScaled;
 
-		@Override
-		public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
+    public class GameGLConfigChooser implements EGLConfigChooser {
 
-			/* http://www.khronos.org/registry/egl/sdk/docs/man/html/eglChooseConfig.xhtml */
-			int[] config_attrs = {
-					EGL10.EGL_LEVEL, 0,
-					EGL10.EGL_COLOR_BUFFER_TYPE, EGL10.EGL_RGB_BUFFER,
-					EGL10.EGL_RED_SIZE, 8,
-					EGL10.EGL_GREEN_SIZE, 8,
-					EGL10.EGL_BLUE_SIZE, 8,
-					EGL10.EGL_ALPHA_SIZE, 8,
-					EGL10.EGL_DEPTH_SIZE, 16,
-					EGL10.EGL_RENDERABLE_TYPE, 4,
-					EGL10.EGL_STENCIL_SIZE, 8,
-					EGL10.EGL_SAMPLE_BUFFERS, 1,
-					EGL10.EGL_SAMPLES, 0,
-					EGL10.EGL_NONE
-			};
-			num_config = new int[1];
-			if (!egl.eglChooseConfig(display, config_attrs, null, 0,
-					num_config)) {
-				throw new IllegalArgumentException("eglChooseConfig failed");
-			}
+        @Override
+        public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
 
-			int config_count = num_config[0];
-			configs = new EGLConfig[config_count];
+            /* http://www.khronos.org/registry/egl/sdk/docs/man/html/eglChooseConfig.xhtml */
+            int[] config_attrs = {
+                    EGL10.EGL_LEVEL, 0,
+                    EGL10.EGL_COLOR_BUFFER_TYPE, EGL10.EGL_RGB_BUFFER,
+                    EGL10.EGL_RED_SIZE, 8,
+                    EGL10.EGL_GREEN_SIZE, 8,
+                    EGL10.EGL_BLUE_SIZE, 8,
+                    EGL10.EGL_ALPHA_SIZE, 8,
+                    EGL10.EGL_DEPTH_SIZE, 16,
+                    EGL10.EGL_RENDERABLE_TYPE, 4,
+                    EGL10.EGL_STENCIL_SIZE, 8,
+                    EGL10.EGL_SAMPLE_BUFFERS, 1,
+                    EGL10.EGL_SAMPLES, 0,
+                    EGL10.EGL_NONE
+            };
+            num_config = new int[1];
+            if (!egl.eglChooseConfig(display, config_attrs, null, 0,
+                    num_config)) {
+                throw new IllegalArgumentException("eglChooseConfig failed");
+            }
 
-			if (!egl.eglChooseConfig(display, null, configs, config_count,
-					num_config)) {
-				throw new IllegalArgumentException("eglChooseConfig failed");
-			}
+            int config_count = num_config[0];
+            configs = new EGLConfig[config_count];
 
-			return configs[0];
-		}
+            if (!egl.eglChooseConfig(display, null, configs, config_count,
+                    num_config)) {
+                throw new IllegalArgumentException("eglChooseConfig failed");
+            }
 
-		public EGLConfig[] configs;
-		int[] num_config;
-	};
+            return configs[0];
+        }
+
+        public EGLConfig[] configs;
+        int[] num_config;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         appCtx = this.getApplicationContext();
-        
+
         // terminate when leaving front
         this.getIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        
-        if(GameResources.init(this.getApplicationContext()) != 1)
-        {
-        	System.out.println("GameResources.init failed\n");
+
+        if (GameResources.init(this.getApplicationContext()) != 1) {
+            System.out.println("GameResources.init failed\n");
+        } else {
+            System.out.println("GameResources.init succeeded\n");
         }
-        else
-        {
-        	System.out.println("GameResources.init succeeded\n");
-        }
-        
+
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         //this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		gameRenderer.surfaceView = new GLSurfaceView(this);
+        gameRenderer.surfaceView = new GLSurfaceView(this);
 
-		SurfaceHolder h = gameRenderer.surfaceView.getHolder();
+        SurfaceHolder h = gameRenderer.surfaceView.getHolder();
 
         /* iOS on iPhone5:320/568 */
-		double sh = 640;
-		double sw = sh * 1.5;
+        double sh = 640;
+        double sw = sh * 1.5;
 
-		viewWidthScaled = sw;
-		viewHeightScaled = sh;
+        viewWidthScaled = sw;
+        viewHeightScaled = sh;
 
-		h.setFixedSize((int) sw, (int) sh);
+        h.setFixedSize((int) sw, (int) sh);
 
-		GameGLConfigChooser glConfigChooser = new GameGLConfigChooser();
-		gameRenderer.surfaceView.setEGLConfigChooser(false);
-		gameRenderer.surfaceView.setEGLConfigChooser(glConfigChooser);
-		gameRenderer.surfaceView.setDrawingCacheEnabled(false);
+        GameGLConfigChooser glConfigChooser = new GameGLConfigChooser();
+        gameRenderer.surfaceView.setEGLConfigChooser(false);
+        gameRenderer.surfaceView.setEGLConfigChooser(glConfigChooser);
+        gameRenderer.surfaceView.setDrawingCacheEnabled(false);
 
-		gameRenderer.surfaceView.setRenderer(gameRenderer);
+        gameRenderer.surfaceView.setRenderer(gameRenderer);
 
-		if(!renderContinuously) gameRenderer.surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-        
+        if (!renderContinuously)
+            gameRenderer.surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
         setContentView(gameRenderer.surfaceView);
-        
+
         contentView = gameRenderer.surfaceView;
 
         contentView.setOnTouchListener(mOnTouchListener);
-        
-        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        
-        if(mSensorGyro != null)
-        {
-        	System.out.println("got gyro sensor\n");
-        	mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_GAME);
+
+        if (mSensorGyro != null) {
+            System.out.println("got gyro sensor\n");
+            mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_GAME);
+        } else {
+            System.out.println("didn't get gyro sensor\n");
         }
-        else
-        {
-        	System.out.println("didn't get gyro sensor\n");
-		}
 
-		GameRunnable.glFlightInit(gameRenderer);
+        GameRunnable.glFlightInit(gameRenderer);
 
-		running = true;
-		mBGThread.start();
-		mTimerThread.start();
+        running = true;
+        mBGThread.start();
+        mTimerThread.start();
+
+        mSensorManager.flush(this);
     }
-    
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -171,19 +168,28 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
     }
-    
+
     @Override
     protected void onPause() {
-    	super.onPause();
-    	
-    	running = false;
+        super.onPause();
+
+        if(mSensorManager != null) mSensorManager.unregisterListener(this);
+        running = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(mSensorManager != null) mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_GAME);
     }
     
     /**
      * SensorEventListener
      */
-    
+
     public void onSensorChanged(SensorEvent e) {
+		//System.out.println("onSensorChanged\n");
     	/*
     	if(GameRunnable.glFlightSensorNeedsCalibrate() != 0)
     	{
@@ -214,14 +220,13 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     	float action = 0;
     	float x = 0;
     	float y = 0;
-    	float pointerID = motionEvent.getPointerId(motionEvent.getActionIndex());
 
 		InputDevice dev = motionEvent.getDevice();
 
 		for(int i = 0; i < motionEvent.getPointerCount(); i++)
-		{
-			int index = i;
+        {
 
+            int pointerID = motionEvent.getPointerId(i);
 			double tX = motionEvent.getX(i) ;
 			double tY = motionEvent.getY(i);
 
@@ -268,7 +273,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 	    		touchLastX = x;
 	    		touchLastY = y;
 	    		touchLastAct = action;
-	    		GameRunnable.touchInput(x, y, action, (int) pointerID);
+	    		GameRunnable.touchInput(x, y, action, pointerID);
 	    	}
 		}
     	
@@ -292,7 +297,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 		Timer t;
 		public GameTimer() {
 			t = new Timer();
-			t.scheduleAtFixedRate(this, 0, 1000 / (GameRenderer.fps*16));
+			t.scheduleAtFixedRate(this, 0, 1000 / (GameRenderer.fps));
 		}
 
 		public void run() {
@@ -314,12 +319,13 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     			long sleep_ms = 1000/(GameRenderer.fps/2);
 
     			while(running) {
+
 					GameRunnable.runBGThread();
 	    			
 	    			while(true) {
 	    				String sndName = GameRunnable.nextSoundEvent();
 	    				if(sndName.length() <= 0) break;
-	    				
+
 	    				GameResources.playSound(sndName);
 	    			}
 
