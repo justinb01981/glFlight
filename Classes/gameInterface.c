@@ -306,7 +306,6 @@ gameInterfaceFindControl(float x, float y)
         {
             if(y >= controlSet[i]->y && y < controlSet[i]->y+controlSet[i]->yw)
             {
-                DBPRINTF(("found countrolSet[%d]", i));
                 f = controlSet[i];
             }
         }
@@ -337,7 +336,6 @@ gameInterfaceHandleTouchMove(float x, float y)
     {
         touchedControl->touch_rx = (x - touchedControl->x) / touchedControl->xw;
         touchedControl->touch_ry = (y - touchedControl->y) / touchedControl->yw;
-        DBPRINTF(("touch_rx/touch_ry: %f %f", touchedControl->touch_rx, touchedControl->touch_ry));
     }
     
     if(touchedControl == &gameInterfaceControls.accelerator)
