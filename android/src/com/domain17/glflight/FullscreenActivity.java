@@ -142,25 +142,31 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
-        if (mSensorGyro != null) {
-            System.out.println("got gyro sensor\n");
-            mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_GAME);
-        } else {
-            System.out.println("didn't get gyro sensor\n");
-        }
+        // sensor registerListener called in onResume
 
         GameRunnable.glFlightInit(gameRenderer);
 
         running = true;
         mBGThread.start();
         mTimerThread.start();
-
-        mSensorManager.flush(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        mSensorManager.unregisterListener(this);
+
+        running = false;
+
+        try {
+            mBGThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        mTimerThread.cancel();
+
         GameRunnable.glFlightUninit();
     }
 
@@ -173,15 +179,14 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     protected void onPause() {
         super.onPause();
 
-        if(mSensorManager != null) mSensorManager.unregisterListener(this);
-        running = false;
+        mSensorManager.unregisterListener(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if(mSensorManager != null) mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_GAME);
         running = true;
     }
     
@@ -190,20 +195,10 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
      */
 
     public void onSensorChanged(SensorEvent e) {
-		//System.out.println("onSensorChanged\n");
-    	/*
-    	if(GameRunnable.glFlightSensorNeedsCalibrate() != 0)
-    	{
-    		System.out.println("gyro sensor recalibrating");
-    		
-    		mSensorManager.unregisterListener(this);
-    		mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_GAME);
-    	}
-    	*/
     	if(e.sensor == mSensorGyro)
     	{
-			if(/*accuracyLast >= SensorManager.SENSOR_STATUS_ACCURACY_LOW*/true)
-                GameRunnable.glFlightSensorInput(e.values);
+    	    // TODO: use mSensorManager.getOrientation();
+            GameRunnable.glFlightSensorInput(e.values);
     	}
     }
     

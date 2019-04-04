@@ -64,7 +64,6 @@ glFlightGameResourceInfo_t glFlightGameResourceInfo;
 glFlightPrefs prefs;
 
 bool glFlightInited = false;
-int glFlightRenderIgnore = 0;
 
 std::map<int,int> touchIDMap;
 int touchStateTouchCount = 0;
@@ -112,14 +111,13 @@ glFlightJNIInit()
 	world_lock_init();
 
 	gameSettingsPlatformInit(glFlightDefaultPlayerName(), glFlightDefaultGameName());
+
 	if(!gameSettingsRead(glFlightSettingsPath()))
 	{
 		gameSettingsDefaults();
 	}
 
 	game_ai_init();
-
-	//gameInputInit();
 
 	console_init();
 
@@ -132,7 +130,7 @@ glFlightJNIInit()
 
 	gameMapFilePrefix(glFlightGameResourceInfo.pathPrefix);
 	gameMapFileName("temp");
-	gameMapSetMap(maps_list[0]);
+	gameMapSetMap(initial_map);
 
     // HACK: touch inputs are in portrait mode
 	gameInterfaceInit(viewWidth, viewHeight);
@@ -176,6 +174,16 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 	DBPRINTF(("Java_com_example_glflight_GameRenderer_onSurfaceChanged: "
 			"viewHeight:%f",
 			viewHeight));
+
+    // complete
+    if(!glFlightInited && viewWidth > 0 && viewHeight > 0)
+    {
+        DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
+
+        glFlightJNIInit();
+
+		glFlightInited = true;
+    }
 }
 
 static game_timeval_t gameInputTimeLast = 0;
@@ -184,29 +192,17 @@ static game_timeval_t gameDrawTimeLast = 0;
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jobject o)
 {
     // TODO: draw a 'wait...loading' status string each frame until load
-    // complete
-	if(!glFlightInited && viewWidth > 0 && viewHeight > 0)
-	{
-		DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
 
-		if(glFlightRenderIgnore > 0) { glFlightRenderIgnore--; return; }
-
-		glFlightJNIInit();
-
-		glFlightInited = true;
-		return;
-	}
-
-	glFlightFrameStage1();
-	glFlightFrameStage2();
-
-    if(time_ms_wall - gameInputTimeLast >= (1000/GYRO_SAMPLE_RATE))
+	if(time_ms_wall - gameInputTimeLast >= (1000/GYRO_SAMPLE_RATE))
 	{
 		gameInput();
 
 		gameInputTimeLast = time_ms_wall;
 		//DBPRINTF(("gameInput"));
 	}
+
+	glFlightFrameStage1();
+	glFlightFrameStage2();
 
     //DBPRINTF(("drawFrame time delta:%f", time_ms_wall - gameDrawTimeLast));
 
@@ -220,8 +216,6 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIE
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNIEnv *e, jobject o)
 {
-    glFlightRenderIgnore = 100;
-
     gameNetwork_disconnect();
     if(save_map)
     {
@@ -234,8 +228,6 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNI
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JNIEnv *e, jobject o)
 {
-    DBPRINTF(("Java_com_domain17_glflight_GameRunnable_glFlightUninit called"));
-
     glFlightInited = false;
 
     gameNetwork_disconnect();
@@ -246,6 +238,14 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JN
         world_unlock();
     }
 	gameSettingsWrite(glFlightSettingsPath());
+
+    // HACK: reinitialize some important globals
+
+    gameInputUninit();
+    tex_pass = 0;
+    glFlightDrawframeHook = gameDialogInitialCountdown;
+
+    DBPRINTF(("Java_com_domain17_glflight_GameRunnable_glFlightUninit called + exiting"));
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightRunTimerThread(JNIEnv *e, jobject o)
@@ -303,6 +303,8 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 	float pitch = -jf[1];
 	float yaw = -jf[0];
 
+	if(!glFlightInited) return;
+
 	/*
 	if(gameInputTrimPending())
 	{
@@ -318,6 +320,8 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 		gameInputGyro2(roll, pitch, yaw, 0.08);
 		sensorInputLast = get_time_ms();
 	}
+
+	gameInputMotion(roll, pitch, yaw);
 }
 
 JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorNeedsCalibrate(JNIEnv *e, jobject o)

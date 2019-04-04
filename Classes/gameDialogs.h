@@ -267,7 +267,7 @@ static void
 gameDialogInitial()
 {
     console_clear();
-    
+
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
                              "^C                             ^C\n"
