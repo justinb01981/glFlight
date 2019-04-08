@@ -592,6 +592,18 @@ layout select_dialog_item_material
 layout select_dialog_multichoice_material
 layout select_dialog_singlechoice_material
 layout support_simple_spinner_dropdown_item
+raw app_icon114x114
+raw app_icon120x120
+raw app_icon120x120_orig
+raw app_icon152x152
+raw app_icon57x57
+raw app_icon72x72
+raw app_icon76x76
+raw app_icon_57x57
+raw app_icon_64x64
+raw app_icon_lg
+raw app_icon_lg_prev
+raw app_icon_spacecombat_lg
 raw boom
 raw boomold1
 raw bump
@@ -615,6 +627,7 @@ raw highscore
 raw lockedon
 raw menubeep
 raw missle
+raw placeholder
 raw screenshot1
 raw screenshot2
 raw shipicon

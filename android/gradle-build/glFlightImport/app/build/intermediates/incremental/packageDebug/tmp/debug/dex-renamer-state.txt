@@ -1,7 +1,7 @@
-#Mon Apr 08 06:35:33 PDT 2019
-base.0=/Users/justin/workspace/glFlight/build/android/glFlight/gradle-build/glFlightImport/app/build/intermediates/transforms/dexMerger/debug/0
+#Mon Apr 08 11:27:10 PDT 2019
+base.0=/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/transforms/dexMerger/debug/1
 path.1=classes.dex
 renamed.1=classes2.dex
 path.0=classes.dex
 renamed.0=classes.dex
-base.1=/Users/justin/workspace/glFlight/build/android/glFlight/gradle-build/glFlightImport/app/build/intermediates/transforms/dexMerger/debug/1
+base.1=/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/transforms/dexMerger/debug/0

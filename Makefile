@@ -29,6 +29,7 @@ FILES_RAW_SOUNDS=*.wav
 BUILD_DIR_IOS=build/ios
 BUILD_DIR_ANDROID=android/gradle-build/glFlightImport
 CMD_NDK_BUILD=ndk-build
+RAW_RES_EXCLUDED= Default-568h@2x.old.png Default-568h@2x.png Default-Landscape.png Default.png Default2.png Default@2x.png *copy.bmp enemydead-old1.wav *copy.bmp
 
 all: gradle_workspace ios_workspace
 	echo "done"
@@ -36,6 +37,7 @@ all: gradle_workspace ios_workspace
 clean:
 	${CMD_RMDIR} build/ios
 	${CMD_RMDIR} build/android
+	${CMD_RM} ${BUILD_DIR_ANDROID}/app/src/main/jni/game
 
 workspace: ios_workspace gradle_workspace
 
@@ -73,6 +75,7 @@ GRADLE_DIR=${GRADLE_IMPORT_ROOT}/app/src/main
 android_workspace: base_ws
 	${CMD_LINK} ../../../../../../../Classes ${GRADLE_DIR}/jni/game
 	${CMD_COPY} *.png ${GRADLE_DIR}/res/raw
+	#$(foreach var,${RAW_RES_EXCLUDED},echo $(var); rm ${GRADLE_DIR}/res/raw/$(var);)
 	${CMD_COPY} *.jpg ${GRADLE_DIR}/res/raw
 	${CMD_COPY} texture*.bmp ${GRADLE_DIR}/res/raw
 	${CMD_COPY} *.wav ${GRADLE_DIR}/res/raw
