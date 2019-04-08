@@ -61,17 +61,17 @@ ios_workspace: base_ws
 	echo "iOS (XCode) workspace created:" ${BUILD_DIR_IOS}
 
 PREV_DIR=${PWD}
-PROJ_DIR=${BUILD_DIR_ANDROID}/glFlight
-PROJ_DIR_RES=${BUILD_DIR_ANDROID}/gradle-build/iglFlightImport/app/src/main/res
+PROJ_DIR=${BUILD_DIR_ANDROID}
+PROJ_DIR_RES=${BUILD_DIR_ANDROID}/app/src/main/res
 PROJ_DIR_RESRAW=${PROJ_DIR_RES}/raw
 #PROJ_DIR_JNI=${BUILD_DIR_ANDROID}/glFlight/jni
 #PROJ_DIR_GAME=${BUILD_DIR_ANDROID}/glFlight/jni/game/
 #PROJ_DIR_LIBS=${BUILD_DIR_ANDROID}/glFlight/libs
-GRADLE_IMPORT_ROOT=${PROJ_DIR}/gradle-build/glFlightImport
+GRADLE_IMPORT_ROOT=${PROJ_DIR}
 GRADLE_DIR=${GRADLE_IMPORT_ROOT}/app/src/main
 
 android_workspace: base_ws
-	${CMD_LINK} Classes ${GRADLE_DIR}/jni/game
+	${CMD_LINK} ../../../../../../../Classes ${GRADLE_DIR}/jni/game
 	${CMD_COPY} *.png ${GRADLE_DIR}/res/raw
 	${CMD_COPY} *.jpg ${GRADLE_DIR}/res/raw
 	${CMD_COPY} texture*.bmp ${GRADLE_DIR}/res/raw
