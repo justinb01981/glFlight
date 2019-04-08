@@ -483,6 +483,7 @@ gameInterfaceHandleTouchBegin(float x, float y)
     if(touchedControl)
     {
         touchedControl->touch_began = 1;
+        touchedControl->touch_id = gameInterfaceControls.touchId;
         gameInterfaceHandleTouchMove(x, y);
         
         gameInterfaceControls.textMenuControl.tex_id = TEXTURE_ID_CONTROLS_TEXTMENU;
@@ -720,9 +721,15 @@ gameInterfaceMultiplayerConfigure(int action)
             else
             {
                 // browse directory
-                gameNetwork_connect(gameSettingGameTitle, load_map_and_host_game);
+                if(gameNetwork_connect(gameSettingGameTitle, load_map_and_host_game) != GAME_NETWORK_ERR_NONE)
+                {
+                    console_write("failed to connect to server");
+                    glFlightDrawframeHook = NULL;
+                    gameNetworkState.gameNetworkHookGameDiscovered = NULL;
+                    return 0;
+                }
+                return 1;
             }
-            return 1;
         }
         break;
         
@@ -874,7 +881,9 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_HELP:
+#if !GAME_PLATFORM_ANDROID
             gameDialogVisitHomepage();
+#endif
             gameDialogGraphic(TEXTURE_ID_CONTROLS_HELP);
             break;
             
@@ -1117,20 +1126,27 @@ void gameInterfaceProcessAction()
 }
 
 void
-gameInterfaceHandleTouchEnd(float x, float y)
-{
-    controlRect* touchedControl = gameInterfaceFindControl(x, y);
-    
-    if(touchedControl)
-    {
+gameInterfaceHandleTouchEnd(float x, float y) {
+    controlRect *touchedControl = gameInterfaceFindControl(x, y);
+
+    if (touchedControl) {
         touchedControl->touch_began = 0;
         //gameInterfaceHandleTouchMove(x, y);
         touchedControl->touch_end_last = time_ms;
     }
-    
-    if(touchedControl == &gameInterfaceControls.trim)
-    {
+
+    if (touchedControl == &gameInterfaceControls.trim) {
         needTrim = 0;
+    }
+
+    // clear controls touched by this touchid
+    for (int i = 0; gameInterfaceControls.controlArray[i] != NULL; i++)
+    {
+        if (gameInterfaceControls.controlArray[i]->touch_id == gameInterfaceControls.touchId)
+        {
+            gameInterfaceControls.controlArray[i]->touch_began = 0;
+            gameInterfaceControls.controlArray[i]->touch_end_last = time_ms;
+        }
     }
     
     gameInterfaceControls.touchUnmapped = 0;

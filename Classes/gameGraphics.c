@@ -45,7 +45,7 @@ gameGraphics_drawState2d drawControls_ds;
 void* gl_vertex_ptr_last = 0;
 void* gl_texcoord_ptr_last = 0;
 
-int texture_id_playership;
+int texture_id_playership = TEXTURE_ID_SHIP1;
 int texture_id_background = BACKGROUND_TEXTURE;
 
 int background_init_needed = 1;

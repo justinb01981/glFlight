@@ -436,6 +436,7 @@ gameInput()
     //if(needTrim) return;
     
     // average values between inputs
+    /*
     inputAvg[0][inputAvg_i] = deviceRoll;
     inputAvg[1][inputAvg_i] = devicePitch;
     inputAvg[2][inputAvg_i] = deviceYaw;
@@ -450,6 +451,7 @@ gameInput()
     deviceRoll /= AVG_INPUTS_LENGTH;
     devicePitch /= AVG_INPUTS_LENGTH;
     deviceYaw /= AVG_INPUTS_LENGTH;
+     */
     
     // make relative to trimmed/center position
     deviceRoll -= roll_m;
@@ -493,10 +495,10 @@ gameInput()
     {
         float cap = /*0.05*/ 0.1; // radians
 
-        // output response amplfiers
+        // output response ampilfiers
         //float sm[] = /*{0.6, 0.8, 0.8}*/ {0.7, 0.8, 0.9};
         float sm[] = /*{0.6, 0.8, 0.8}*/ PLATFORM_INPUT_COEFFICIENTS;
-        // TODO: scale insersely based on angle relative to gravity
+        // TODO: scale inversely based on angle relative to gravity
         
         if(gameSettingsSimpleControls)
         {

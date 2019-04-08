@@ -20,7 +20,7 @@
 unsigned int texture_list[MAX_TEXTURES];
 unsigned int texture_list_loaded[MAX_TEXTURES];
 int n_textures = 0;
-int texture_preload_count = 69;
+int texture_preload_count = 12;
 const static unsigned char alpha_black = 0x00;
 const static unsigned char alpha_semitrans = 0xD0;
 char initTexturesPrefix[255];

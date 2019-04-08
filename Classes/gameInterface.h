@@ -12,6 +12,8 @@
 #include "action.h"
 #include "gameTimeval.h"
 
+#define CONTROLARRAY_LEN 64
+
 typedef struct
 {
     double x, y;
@@ -19,6 +21,7 @@ typedef struct
     double xm, ym;
     int tex_id;
     int touch_began;
+    int touch_id;
     int visible;
     int ignore_touch;
     int hide_frames;
@@ -78,7 +81,7 @@ typedef struct {
 
     int consoleHidden;
     
-    controlRect* controlArray[64];
+    controlRect* controlArray[CONTROLARRAY_LEN];
     
     int touchCount;
     int touchId;

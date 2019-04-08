@@ -327,29 +327,24 @@ calibrate_bail:
     
     if(my_ship_id == WORLD_ELEM_ID_INVALID) // respawn
     {
-    respawned = 1;
+        respawned = 1;
 
-    pWorldElemMyShip = NULL;
+        pWorldElemMyShip = NULL;
 
-    game_ammo_missles = game_ammo_missles_max;
+        game_ammo_missles = game_ammo_missles_max;
 
-    if (update_ship_stats)
-    {
-    }
-    else
-    {
-    world_random_spawn_location(spawn, gameNetworkState.my_player_id);
-    }
+        if (update_ship_stats)
+        {
+        }
+        else
+        {
+            world_random_spawn_location(spawn, gameNetworkState.my_player_id);
+        }
 
-    gameShip_init(spawn[0], spawn[1], spawn[2],
-    spawn[3], spawn[4], spawn[5]);
+        gameShip_init(spawn[0], spawn[1], spawn[2],
+        spawn[3], spawn[4], spawn[5]);
 
-    update_ship_stats = 1;
-
-    if (texture_id_playership != TEXTURE_ID_SHIP1)
-    {
-        assert(0);
-    }
+        update_ship_stats = 1;
 
         my_ship_id =
             world_add_object(model_my_ship,

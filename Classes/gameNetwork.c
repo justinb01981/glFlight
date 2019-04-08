@@ -515,6 +515,7 @@ gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becameh
             if(!gameNetworkState.hostInfo.bonjour_lan)
             {
                 console_write("\ninvalid ipv4 address/hostname");
+                game_lock_unlock(&gameNetworkState.msgQueue.lock);
                 return GAME_NETWORK_ERR_FAIL;
             }
         }
@@ -542,6 +543,7 @@ gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becameh
             {
                 if(sockaddr_p->sa_family != GAME_NETWORK_BONJOUR_ADDRFAMILY_HACK)
                 {
+                    game_lock_unlock(&gameNetworkState.msgQueue.lock);
                     return GAME_NETWORK_ERR_FAIL;
                 }
                 
