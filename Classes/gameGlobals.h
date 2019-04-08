@@ -79,6 +79,7 @@ extern int fireActionQueuedAfterEdit;
 #define PLATFORM_DRAW_ELEMS_MAX 1000
 #define GYRO_SAMPLE_RATE (60)
 #define VISIBLE_DISTANCE_PLATFORM 200
+#define PLATFORM_INPUT_COEFFICIENTS {0.5, 0.6, 0.7}
 #else
 #define GAME_PLATFORM_IS_LANDSCAPE 0
 #define GYRO_FEEDBACK_COEFF (0.002)
@@ -88,6 +89,7 @@ extern int fireActionQueuedAfterEdit;
 #define PLATFORM_DRAW_ELEMS_MAX 1000
 #define GYRO_SAMPLE_RATE (30)
 #define VISIBLE_DISTANCE_PLATFORM 200
+#define PLATFORM_INPUT_COEFFICIENTS {0.5, 0.6, 0.7}
 #endif
 
 /* reducing friction influences this... should be MAX_THRUST really */
