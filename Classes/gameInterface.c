@@ -472,8 +472,6 @@ gameInterfaceHandleTouchBegin(float x, float y)
 {
     int rgnv = 0;
 
-    DBPRINTF(("gameInterface.c: touchid = %d", gameInterfaceControls.touchId));
-
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
     
     gameDialogGraphicCancel();

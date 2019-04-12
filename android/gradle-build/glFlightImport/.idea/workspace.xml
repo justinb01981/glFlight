@@ -68,8 +68,8 @@
       <file leaf-file-name="GameResources.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/domain17/glflight/GameResources.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="333">
-              <caret line="137" column="25" lean-forward="true" selection-start-line="137" selection-start-column="25" selection-end-line="137" selection-end-column="25" />
+            <state relative-caret-position="258">
+              <caret line="132" column="25" lean-forward="false" selection-start-line="132" selection-start-column="25" selection-end-line="132" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -2373,18 +2373,17 @@
         <option value="$PROJECT_DIR$/app/src/main/jni/game/textures.c" />
         <option value="$PROJECT_DIR$/app/src/main/res/values-v14/styles.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/domain17/glflight/GameRunnable.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/domain17/glflight/GameResources.java" />
         <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/java/domain17/glflight/GameRenderer.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/domain17/glflight/FullscreenActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/raw/enemydead-old1.wav" />
+        <option value="$PROJECT_DIR$/app/src/main/java/domain17/glflight/GameResources.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="116" />
-    <option name="y" value="364" />
+    <option name="y" value="23" />
     <option name="width" value="1680" />
     <option name="height" value="958" />
   </component>
@@ -2738,7 +2737,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1554755183552" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1554778363595" />
       </method>
     </configuration>
     <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
@@ -2786,7 +2785,7 @@
       </Profilers>
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1554755183553" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1554778363595" />
       </method>
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -2978,7 +2977,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1554755183557" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1554778363596" />
       </method>
     </configuration>
     <list size="1">
@@ -3140,8 +3139,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="116" y="364" width="1680" height="958" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="23" width="1680" height="958" extended-state="6" />
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32949308" sideWeight="0.4957265" order="6" side_tool="false" content_ui="tabs" />
@@ -3310,6 +3308,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -3341,7 +3340,7 @@
         <state relative-caret-position="169">
           <caret line="12" column="33" lean-forward="false" selection-start-line="12" selection-start-column="33" selection-end-line="12" selection-end-column="33" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -3358,7 +3357,7 @@
         <state relative-caret-position="161">
           <caret line="23" column="31" lean-forward="false" selection-start-line="23" selection-start-column="31" selection-end-line="23" selection-end-column="31" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -3534,8 +3533,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/domain17/glflight/GameResources.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="137" column="25" lean-forward="true" selection-start-line="137" selection-start-column="25" selection-end-line="137" selection-end-column="25" />
+        <state relative-caret-position="258">
+          <caret line="132" column="25" lean-forward="false" selection-start-line="132" selection-start-column="25" selection-end-line="132" selection-end-column="25" />
           <folding />
         </state>
       </provider>

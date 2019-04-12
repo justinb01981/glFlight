@@ -1,5 +1,5 @@
-# Blender MTL File: 'untitled.blend'
-# Material Count: 2
+# Blender MTL File: 'building3.blend'
+# Material Count: 3
 
 newmtl Material
 Ns 96.078431
@@ -12,7 +12,7 @@ d 1.000000
 illum 2
 map_Ke /Users/justin/workspace/glFlight/texture116.bmp
 
-newmtl Material_Material_Emit
+newmtl Material_Material_Emit.002
 Ns 96.078431
 Ka 1.000000 1.000000 1.000000
 Kd 0.640000 0.640000 0.640000
@@ -21,5 +21,17 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd /Users/justin/workspace/glFlight/texture116.bmp
+map_Kd /Users/justin/Desktop/Untitled.png
+map_Ke /Users/justin/workspace/glFlight/texture116.bmp
+
+newmtl Material_Untitled.png
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/justin/Desktop/Untitled.png
 map_Ke /Users/justin/workspace/glFlight/texture116.bmp

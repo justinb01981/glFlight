@@ -432,6 +432,11 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         float fm = (1.0 + (1.0 / (float) rand_in_range(1, 100)));
         float leadVel = bulletVel;
         
+        if(elem->object_type == OBJ_MISSLE)
+        {
+            leadVel = MAX_SPEED_MISSLE;
+        }
+        
         // if not firing, intercept course
         if(!elem->stuff.u.enemy.fires)
         {

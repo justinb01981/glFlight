@@ -399,21 +399,28 @@ int drawRadar()
             float elemPos[3] = {cur->elem->physics.ptr->x, cur->elem->physics.ptr->y, cur->elem->physics.ptr->z};
             
             // calculate lead
+            /*
             if(cur->elem->physics.ptr->velocity > 0)
             {
                 elemPos[0] += cur->elem->physics.ptr->vx*leadv;
                 elemPos[1] += cur->elem->physics.ptr->vy*leadv;
                 elemPos[2] += cur->elem->physics.ptr->vz*leadv;
             }
+             */
             
             if(camera_relative)
             {
                 ev[0] = (elemPos[0] - gameCamera_getX()) / dist;
                 ev[1] = (elemPos[1] - gameCamera_getY()) / dist;
                 ev[2] = (elemPos[2] - gameCamera_getZ()) / dist;
-                gameShip_getXVector(xvec);
-                gameShip_getYVector(yvec);
-                gameShip_getZVector(zvec);
+                gameCamera_getXVector(xvec);
+                gameCamera_getYVector(yvec);
+                gameCamera_getZVector(zvec);
+                for(int i = 0; i < 3; i++)
+                {
+                    zvec[i]*=-1;
+                    xvec[i]*=-1;
+                }
             }
             else
             {
@@ -1330,11 +1337,13 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
     float Ue = gWorld->bound_radius*1.5;
     float Ve = gWorld->bound_radius*1.5;
     
-    int allocated = 0;
+    const int step_allocate = 0, step_generate = 1;
+    int step = step_allocate;
     size_t n_coords = 3*2;
     size_t n_indices = 3*2;
     size_t n_tcoords = 2*2;
     size_t n_indices_last;
+    size_t n_distorted = 0;
     
     do{
         float Vi = Vb;
@@ -1345,7 +1354,7 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
         
         n_indices_last = n_indices;
         
-        if(allocated)
+        if(step == step_generate)
         {
             tess_begin(M, T, bgData->tess.S);
         }
@@ -1356,7 +1365,7 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
             {
                 Ui += Mk;
 
-                if(allocated)
+                if(step == step_generate)
                 {
                     M[0] = Ui;
                     M[1] = terrain_height_y;
@@ -1377,7 +1386,7 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
             }
             
             Vi += fabs(Mk);
-            if(allocated)
+            if(step == step_generate)
             {
                 M[0] = Ui;
                 M[2] = Vi;
@@ -1391,9 +1400,9 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
             Mk *= -1;
         }
         
-        if(!allocated)
+        if(step == step_allocate)
         {
-            allocated = 1;
+            step = step_generate;
             bgData->tess.coords = malloc(sizeof(model_coord_t) * n_coords);
             bgData->tess.indices = malloc(sizeof(model_index_t) * n_indices);
             bgData->tess.texcoords = malloc(sizeof(model_texcoord_t) * n_tcoords);
@@ -1406,6 +1415,7 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
             
             Mk = I_Mk;
         }
+        
     } while(n_indices != n_indices_last);
     
     tess_end(bgData->tess.S);
