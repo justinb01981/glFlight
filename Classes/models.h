@@ -6,6 +6,8 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#include "string.h"
+
 /*
 #import <Foundation/Foundation.h>
 #import <OpenGLES/EAGL.h>
@@ -589,12 +591,75 @@ static model_index_t model_cube_indices_nobottom[] =
     1,0,4, 4,5,1
 };
 
+static model_coord_t model_cube_normals[] =
+{
+    0.5, 0.0, 0.0, // coord
+    1.0, 0.0, 0.0, // vec
+    
+    0.0, 0.5, 0.0, // coord
+    0.0, 1.0, 0.0, // vec
+    
+    0.0, 0.0, 0.5, // coord
+    0.0, 0.0, 1.0, // vec
+    
+    -0.5, 0.0, 0.0, // coord
+    -1.0, 0.0, 0.0, // vec
+    
+    0.0, -0.5, 0.0, // coord
+    0.0, -1.0, 0.0, // vec
+    
+    0.0, 0.0, -0.5, // coord
+    0.0, 0.0, -1.0, // vec
+};
+
 static int model_cube_primitives[] = 
 {
 };
 
 static int model_no_primitives[] =
 {
+};
+
+static model_coord_t model_flattenedcube_normals[] =
+{
+    0.5, 0.0, 0.0, // coord
+    1.0, 0.0, 0.0, // vec
+    
+    0.0, 0.1, 0.0, // coord
+    0.0, 1.0, 0.0, // vec
+    
+    0.0, 0.0, 0.5, // coord
+    0.0, 0.0, 1.0, // vec
+    
+    -0.5, 0.0, 0.0, // coord
+    -1.0, 0.0, 0.0, // vec
+    
+    0.0, -0.1, 0.0, // coord
+    0.0, -1.0, 0.0, // vec
+    
+    0.0, 0.0, -0.5, // coord
+    0.0, 0.0, -1.0, // vec
+};
+
+static model_coord_t model_enemybase_normals[] =
+{
+    2.0, 0.0, 0.0, // coord
+    1.0, 0.0, 0.0, // vec
+    
+    0.0, 2.0, 0.0, // coord
+    0.0, 1.0, 0.0, // vec
+    
+    0.0, 0.0, 2.0, // coord
+    0.0, 0.0, 1.0, // vec
+    
+    -2.0, 0.0, 0.0, // coord
+    -1.0, 0.0, 0.0, // vec
+    
+    0.0, -2.0, 0.0, // coord
+    0.0, -1.0, 0.0, // vec
+    
+    0.0, 0.0, -2.0, // coord
+    0.0, 0.0, -1.0, // vec
 };
 
 /********************************************************/
@@ -696,6 +761,27 @@ static model_texcoord_t model_sprite_texcoords[] =
 };
 static int model_sprite_primitives[] =
 {
+};
+
+static model_coord_t model_sprite_normals[] =
+{
+    1.0, 0.0, 0.0, // coord
+    1.0, 0.0, 0.0, // vec
+    
+    0.0, 1.0, 0.0, // coord
+    0.0, 1.0, 0.0, // vec
+    
+    0.0, 0.0, 1.0, // coord
+    0.0, 0.0, 1.0, // vec
+    
+    -1.0, 0.0, 0.0, // coord
+    -1.0, 0.0, 0.0, // vec
+    
+    0.0, -1.0, 0.0, // coord
+    0.0, -1.0, 0.0, // vec
+    
+    0.0, 0.0, -1.0, // coord
+    0.0, 0.0, -1.0, // vec
 };
 
 /********************************************************/
@@ -831,6 +917,27 @@ static model_texcoord_t model_ship2_texcoords[] = {
     0.2,0.1,
     0.1,0.6,
     0.1,0.7,
+};
+
+static model_coord_t model_ship2_normals[] =
+{
+    1.0, 0.0, 0.0, // coord
+    1.0, 0.0, 0.0, // vec
+    
+    0.0, 1.0, 0.0, // coord
+    0.0, 1.0, 0.0, // vec
+    
+    0.0, 0.0, 1.0, // coord
+    0.0, 0.0, 1.0, // vec
+    
+    -1.0, 0.0, 0.0, // coord
+    -1.0, 0.0, 0.0, // vec
+    
+    0.0, -1.0, 0.0, // coord
+    0.0, -1.0, 0.0, // vec
+    
+    0.0, 0.0, -1.0, // coord
+    0.0, 0.0, -1.0, // vec
 };
 
 /********************************************************/
@@ -1009,6 +1116,27 @@ static model_texcoord_t model_ship3_texcoords[] = {
     1,0.8
 };
 
+static model_coord_t model_ship3_normals[] =
+{
+    1.0, 0.0, 0.0, // coord
+    1.0, 0.0, 0.0, // vec
+    
+    0.0, 1.0, 0.0, // coord
+    0.0, 1.0, 0.0, // vec
+    
+    0.0, 0.0, 1.0, // coord
+    0.0, 0.0, 1.0, // vec
+    
+    -1.0, 0.0, 0.0, // coord
+    -1.0, 0.0, 0.0, // vec
+    
+    0.0, -1.0, 0.0, // coord
+    0.0, -1.0, 0.0, // vec
+    
+    0.0, 0.0, -1.0, // coord
+    0.0, 0.0, -1.0, // vec
+};
+
 /********************************************************/
 
 /********************************************************/
@@ -1075,6 +1203,27 @@ static model_texcoord_t model_icosahedron_texcoords[] =
     0.8,0.75,
     0,0.75,
     0.3,1.0
+};
+
+static model_coord_t model_icosahedron_normals[] =
+{
+    1.0, 0.0, 0.0, // coord
+    1.0, 0.0, 0.0, // vec
+    
+    0.0, 1.0, 0.0, // coord
+    0.0, 1.0, 0.0, // vec
+    
+    0.0, 0.0, 1.0, // coord
+    0.0, 0.0, 1.0, // vec
+    
+    -1.0, 0.0, 0.0, // coord
+    -1.0, 0.0, 0.0, // vec
+    
+    0.0, -1.0, 0.0, // coord
+    0.0, -1.0, 0.0, // vec
+    
+    0.0, 0.0, -1.0, // coord
+    0.0, 0.0, -1.0, // vec
 };
 
 /********************************************************/
@@ -1790,7 +1939,54 @@ static model_index_t model_tbuilding_indices[] = {
 };
 static int model_tbuilding_primitives[] = {
 };
+static model_coord_t model_tbuilding_normals[] =
+{
+    1.0, 0.0, 0.0, // coord
+    1.0, 0.0, 0.0, // vec
+    
+    0.0, 4.0, 0.0, // coord
+    0.0, 1.0, 0.0, // vec
+    
+    0.0, 0.0, 1.0, // coord
+    0.0, 0.0, 1.0, // vec
+    
+    -1.0, 0.0, 0.0, // coord
+    -1.0, 0.0, 0.0, // vec
+    
+    0.0, -1.0, 0.0, // coord
+    0.0, -1.0, 0.0, // vec
+    
+    0.0, 0.0, -1.0, // coord
+    0.0, 0.0, -1.0, // vec
+};
+
 /********************************************************/
+
+static model_coord_t model_building3_normals_trimmed[] = {
+    1.0, 2.5, 0,
+    1.0, 0, 0,
+    
+    -1.0, 2.5, 0,
+    -1.0, 0, 0,
+    
+    0.0, 2.5, 1.0,
+    0.0, 0, 1.0,
+    
+    0.0, 2.5, -1.0,
+    0.0, 0, -1.0,
+    
+    0.0, 2.5, 1.0,
+    0.0, 0, 1.0,
+    
+    0.0, 2.5, -1.0,
+    0.0, 0, -1.0,
+    
+    0.0, 5.0, 0,
+    0.0, 1.0, 0,
+    
+    0.0, -1.0, 0,
+    0.0, -1.0, 0
+};
 
 /********************************************************/
 
@@ -1821,6 +2017,14 @@ struct models_shared_t_
         model_texcoord_t texcoords[2048];
         size_t indices_count;
     } sphere;
+    
+    struct
+    {
+        model_coord_t building1[16];
+        model_coord_t building2[16];
+        model_coord_t building3[16];
+        model_coord_t cube[36];
+    } normals;
 };
 typedef struct models_shared_t_ models_shared_t;
 extern models_shared_t models_shared;

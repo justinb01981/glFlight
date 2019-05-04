@@ -1268,3 +1268,24 @@ static model_index_t model_sphere_indices[] = {
 
 static int model_sphere_primitives[] = {
 };
+
+static model_coord_t model_sphere_normals[] =
+{
+    1.0, 0.0, 0.0, // coord
+    1.0, 0.0, 0.0, // vec
+    
+    0.0, 1.0, 0.0, // coord
+    0.0, 1.0, 0.0, // vec
+    
+    0.0, 0.0, 1.0, // coord
+    0.0, 0.0, 1.0, // vec
+    
+    -1.0, 0.0, 0.0, // coord
+    -1.0, 0.0, 0.0, // vec
+    
+    0.0, -1.0, 0.0, // coord
+    0.0, -1.0, 0.0, // vec
+    
+    0.0, 0.0, -1.0, // coord
+    0.0, 0.0, -1.0, // vec
+};

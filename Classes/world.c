@@ -40,6 +40,7 @@ void update_regions(void);
 void convert_mesh_to_world_elems(struct mesh_t* mesh, unsigned int texture_id, float tile_div, struct mesh_coordinate_t* vis_normal);
 void world_build_visibility_data(void);
 void world_update(float tc);
+int check_collision(WorldElem*, WorldElem*);
 
 extern volatile WorldElemListNode* btreeVisibleTest;
 extern world_elem_btree_node* visibleBtreeRootBuilding;
@@ -56,7 +57,8 @@ float visible_distance = VISIBLE_DISTANCE_PLATFORM;
 static struct mesh_t* world_pending_mesh = NULL;
 static float world_pending_mesh_info[3];
 
-static float check_bounding_box_overlap_result[6];
+static float check_bounding_box_overlap_result[3];
+static float collision_vorigin[3];
 
 models_shared_t models_shared;
 
@@ -69,8 +71,9 @@ world_add_object_core(Model type,
                       int replace_id)
 {
 	int i;
-    model_coord_t* model_coords;
+    model_coord_t* model_coords, *model_normals;
     int model_sizeof;
+    int model_normals_sizeof;
     model_index_t* model_indices;
     int model_indices_sizeof;
     model_texcoord_t* model_texcoords;
@@ -143,7 +146,7 @@ world_add_object_core(Model type,
     pElem->destructible = 1;
     pElem->renderInfo.visible = 1;
     pElem->spans_regions = 1;
-	
+
 	switch (type)
 	{
         case MODEL_CUBE_INVERTED:
@@ -155,6 +158,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
             model_primitives_sizeof = sizeof(model_cube_primitives);
             model_primitives = model_cube_primitives;
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_CUBE:
@@ -166,6 +171,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
             model_primitives_sizeof = sizeof(model_cube_primitives);
             model_primitives = model_cube_primitives;
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
             
     	case MODEL_CUBE2:
@@ -177,6 +184,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
             model_primitives_sizeof = sizeof(model_cube_primitives);
             model_primitives = model_cube_primitives;
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
         
         case MODEL_SCENERY:
@@ -189,6 +198,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_square_texcoords);
             model_primitives_sizeof = sizeof(model_square_primatives);
             model_primitives = model_square_primatives;
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_PYRAMID:
@@ -200,6 +211,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_pyramid_texcoords);
             model_primitives_sizeof = sizeof(model_pyramid_primatives);
             model_primitives = model_pyramid_primatives;
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_SHIP1:
@@ -211,6 +224,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_newship_texcoords);
             model_primitives_sizeof = sizeof(model_no_primitives);
             model_primitives = model_no_primitives;
+            model_normals = model_ship2_normals;
+            model_normals_sizeof = sizeof(model_ship2_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_SHIP2:
@@ -222,6 +237,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_ship2_texcoords);
             model_primitives_sizeof = sizeof(model_ship2_primitives);
             model_primitives = model_ship2_primitives;
+            model_normals = model_ship2_normals;
+            model_normals_sizeof = sizeof(model_ship2_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_SHIP3:
@@ -233,6 +250,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_ship3_texcoords);
             model_primitives_sizeof = sizeof(model_ship3_primitives);
             model_primitives = model_ship3_primitives;
+            model_normals = model_ship3_normals;
+            model_normals_sizeof = sizeof(model_ship3_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_TURRET:
@@ -244,6 +263,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_turret_texcoords);
             model_primitives_sizeof = sizeof(model_turret_primitives);
             model_primitives = model_turret_primitives;
+            model_normals = model_ship2_normals;
+            model_normals_sizeof = sizeof(model_ship2_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_BULLET:
@@ -255,6 +276,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_bullet_texcoords);
             model_primitives_sizeof = sizeof(model_bullet_primitives);
             model_primitives = model_bullet_primitives;
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_MISSLE:
@@ -266,6 +289,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_missle_texcoords);
             model_primitives_sizeof = sizeof(model_missle_primitives);
             model_primitives = model_missle_primitives;
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_SURFACE:
@@ -277,6 +302,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_surface_texcoords);
             model_primitives_sizeof = sizeof(model_surface_primitives);
             model_primitives = model_surface_primitives;
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_SPRITE:
@@ -288,6 +315,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_sprite_texcoords);
             model_primitives_sizeof = sizeof(model_sprite_primitives);
             model_primitives = model_sprite_primitives;
+            model_normals = model_sprite_normals;
+            model_normals_sizeof = sizeof(model_sprite_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_VERTICAL_PILLAR:
@@ -299,6 +328,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_vertical_pillar_texcoords);
             model_primitives_sizeof = sizeof(model_vertical_pillar_primitives);
             model_primitives = model_vertical_pillar_primitives;
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_MESH:
@@ -310,6 +341,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
             model_primitives_sizeof = sizeof(model_cube_primitives);
             model_primitives = model_no_primitives;
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_TELEPORTER:
@@ -321,6 +354,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
             model_primitives_sizeof = sizeof(model_cube_primitives);
             model_primitives = model_no_primitives;
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_ICOSAHEDRON:
@@ -332,6 +367,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_icosahedron_texcoords);
             model_primitives_sizeof = sizeof(model_icosahedron_primitives);
             model_primitives = model_icosahedron_primitives;
+            model_normals = model_icosahedron_normals;
+            model_normals_sizeof = sizeof(model_icosahedron_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_SPHERE:
@@ -343,6 +380,8 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_sphere_texcoords);
             model_primitives_sizeof = sizeof(model_sphere_primitives);
             model_primitives = model_sphere_primitives;
+            model_normals = model_sphere_normals;
+            model_normals_sizeof = sizeof(model_sphere_normals) / sizeof(model_coord_t);
             break;
             
         case MODEL_TBUILDING:
@@ -373,6 +412,9 @@ world_add_object_core(Model type,
             model_texcoords = poly_comp.model_texcoords_buffer;
             model_texcoords_sizeof = poly_comp.model_coords_buffer_len * 2 * sizeof(model_texcoord_t);
             
+            model_normals = model_tbuilding_normals;
+            model_normals_sizeof = sizeof(model_tbuilding_normals) / sizeof(model_coord_t);
+            
             model_primitives = poly_comp.primitives;
             model_primitives_sizeof = 0;
         }
@@ -387,6 +429,9 @@ world_add_object_core(Model type,
             model_indices = model_building2_indices;
             model_indices_sizeof = sizeof(model_building2_indices);
             
+            model_normals = model_building2_normals;
+            model_normals_sizeof = sizeof(model_building2_normals) / sizeof(model_coord_t);
+            
             model_primitives = poly_comp.primitives;
             model_primitives_sizeof = 0;
         }
@@ -400,6 +445,9 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_building3_texcoords);
             model_indices = model_building3_indices;
             model_indices_sizeof = sizeof(model_building3_indices);
+            
+            model_normals = model_building3_normals_trimmed;
+            model_normals_sizeof = sizeof(model_building3_normals_trimmed) / sizeof(model_coord_t);
             
             model_primitives = poly_comp.primitives;
             model_primitives_sizeof = 0;
@@ -447,6 +495,9 @@ world_add_object_core(Model type,
             model_texcoords = poly_comp.model_texcoords_buffer;
             model_texcoords_sizeof = poly_comp.model_coords_buffer_len * 2 * sizeof(model_texcoord_t);
             
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
+            
             model_primitives = poly_comp.primitives;
         }
             break;
@@ -468,6 +519,9 @@ world_add_object_core(Model type,
             model_texcoords = poly_comp.model_texcoords_buffer;
             model_texcoords_sizeof = poly_comp.model_coords_buffer_len * 2 * sizeof(model_texcoord_t);
             
+            model_normals = model_flattenedcube_normals;
+            model_normals_sizeof = sizeof(model_flattenedcube_normals) / sizeof(model_coord_t);
+            
             model_primitives = poly_comp.primitives;
             model_primitives_sizeof = 0;
         }
@@ -483,6 +537,9 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_contrail_texcoords);
             model_primitives_sizeof = sizeof(model_contrail_primitives);
             model_primitives = model_contrail_primitives;
+            
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
         }
             break;
             
@@ -495,12 +552,20 @@ world_add_object_core(Model type,
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
             model_primitives_sizeof = sizeof(model_cube_primitives);
             model_primitives = model_cube_primitives;
+            
+            model_normals = model_cube_normals;
+            model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
             
         default:
             assert(0);
             break;
 	}
+    
+    pElem->bounding.pnorm = malloc(sizeof(model_coord_t) * model_normals_sizeof);
+    pElem->bounding.normals = model_normals_sizeof;
+    memcpy(pElem->bounding.pnorm, model_normals, model_normals_sizeof * sizeof(model_coord_t));
+    model_normals = pElem->bounding.pnorm;
     
     // HACK: make some decisions based off model-type
     if(replace_id < 0)
@@ -606,6 +671,7 @@ world_add_object_core(Model type,
     for(i = 0; i < (model_sizeof/sizeof(model_coord_t)); i+=3)
     {
         quaternion_t pt = {0, model_coords[i+0] * scale, model_coords[i+1] * scale, model_coords[i+2] * scale};
+        quaternion_t pt_norm = {0, model_normals[i+0] * scale, model_normals[i+1] * scale, model_normals[i+2] * scale};
         quaternion_t xq = {0, 1, 0, 0};
         quaternion_t yq = {0, 0, 1, 0};
         quaternion_t zq = {0, 0, 0, 1};
@@ -616,6 +682,7 @@ world_add_object_core(Model type,
             quaternion_rotate_inplace(&pt, &zq, alpha);
             quaternion_rotate_inplace(&xq, &zq, alpha);
             quaternion_rotate_inplace(&yq, &zq, alpha);
+            quaternion_rotate_inplace(&pt_norm, &zq, alpha);
         }
         
         // pitch
@@ -624,6 +691,7 @@ world_add_object_core(Model type,
             quaternion_rotate_inplace(&pt, &xq, beta);
             quaternion_rotate_inplace(&yq, &xq, beta);
             quaternion_rotate_inplace(&zq, &xq, beta);
+            quaternion_rotate_inplace(&pt_norm, &xq, beta);
         }
         
         // roll
@@ -632,6 +700,7 @@ world_add_object_core(Model type,
             quaternion_rotate_inplace(&pt, &zq, gamma);
             quaternion_rotate_inplace(&xq, &zq, gamma);
             quaternion_rotate_inplace(&yq, &zq, gamma);
+            quaternion_rotate_inplace(&pt_norm, &zq, gamma);
         }
         
         pElem->coords[i+0] = x + pt.x;
@@ -1422,6 +1491,7 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, flo
     int dmin;
     int i;
 
+    /*
     float v = pCollisionA->physics.ptr->velocity + repulse_min;
 
     mv[0] = (pCollisionA->physics.ptr->x - pCollisionB->physics.ptr->x) * v * tc * s;
@@ -1449,6 +1519,34 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, flo
     if(isnan(pCollisionA->physics.ptr->x) || isnan(pCollisionA->physics.ptr->y) || isnan(pCollisionA->physics.ptr->z))
     {
         printf("world_repulse_elem/isNan\n");
+    }
+     */
+    
+    int cancelI = 0;
+    for(i = 0; i < 3; i++)
+    {
+        //if(check_bounding_box_overlap_result[i] > check_bounding_box_overlap_result[cancelI]) cancelI = i;
+        
+        //mv[i] = check_bounding_box_overlap_result[i] * (pCollisionA->physics.ptr->velocity+repulse_min) * tc * s;
+    }
+    
+    mv[0] = (collision_vorigin[0] - pCollisionA->physics.ptr->x) * 1.0;
+    mv[1] = (collision_vorigin[1] - pCollisionA->physics.ptr->y) * 1.0;
+    mv[2] = (collision_vorigin[2] - pCollisionA->physics.ptr->z) * 1.0;
+    
+    move_elem_relative(pCollisionA, mv[0], mv[1], mv[2]);
+    
+    // reverse velocity
+    float* p[] = {
+        &pCollisionA->physics.ptr->vx,
+        &pCollisionA->physics.ptr->vy,
+        &pCollisionA->physics.ptr->vz
+    };
+    
+    for(i = 0; i < 3; i++)
+    {
+        //*p[i] = mv[i] * (0.5/tc);
+        *p[i] = check_bounding_box_overlap_result[i] * (s/tc) * pCollisionA->physics.ptr->velocity;
     }
 }
 
@@ -1517,16 +1615,60 @@ check_bounding_box_overlap(float boxA_in[6], float boxB_in[6])
     return 1;
 }
 
-static int
+int
 check_collision(WorldElem* pElemA, WorldElem* pElemB)
 {
-    model_coord_t boxA[6];
-    model_coord_t boxB[6];
+    const int nv = 6;
+    int dotneg = 0;
+    float dmin = -INT_MAX;
+    float dminR[3];
     
+    for(int i = 0; i < pElemB->bounding.normals; i += nv)
+    {
+        float vP[] = {
+            pElemA->physics.ptr->x - pElemB->physics.ptr->x + (-pElemB->bounding.pnorm[i+0]*pElemB->scale),
+            pElemA->physics.ptr->y - pElemB->physics.ptr->y + (-pElemB->bounding.pnorm[i+1]*pElemB->scale),
+            pElemA->physics.ptr->z - pElemB->physics.ptr->z + (-pElemB->bounding.pnorm[i+2]*pElemB->scale)
+        };
+
+        float vD[] = {
+            pElemB->bounding.pnorm[i+nv/2],
+            pElemB->bounding.pnorm[i+nv/2+1],
+            pElemB->bounding.pnorm[i+nv/2+2]
+        };
+        
+        float d = dot2(vP, vD);
+        if(d < 0.0)
+        {
+            if(d > dmin)
+            {
+                dminR[0] = vD[0];
+                dminR[1] = vD[1];
+                dminR[2] = vD[2];
+                dmin = d;
+            }
+            
+            dotneg ++;
+        }
+    }
+    
+    int k = (dotneg*nv >= pElemB->bounding.normals);
+    if(k)
+    {
+        check_bounding_box_overlap_result[0] = dminR[0];
+        check_bounding_box_overlap_result[1] = dminR[1];
+        check_bounding_box_overlap_result[2] = dminR[2];
+        return 1;
+    }
+    
+    return 0;
+    
+    /*
     get_element_bounding_box(pElemA, boxA);
     get_element_bounding_box(pElemB, boxB);
     
     return check_bounding_box_overlap(boxA, boxB);
+     */
 }
 
 WorldElemListNode*
@@ -1731,7 +1873,7 @@ world_update(float tc)
                 {
                     pElem->physics.ptr->vx += gWorld->vec_gravity[0] * tc;
                     pElem->physics.ptr->vy += gWorld->vec_gravity[1] * tc;
-                    pElem->physics.ptr->vz += gWorld->vec_gravity[2] * tc;
+                    pElem->physics.ptr->vz += gWorld->vec_gravity[2] * tc;   
                 }
                 
                 if(pElem->physics.ptr->friction)
@@ -1828,6 +1970,8 @@ world_update(float tc)
                     
                     if(!out_of_bounds_remove)
                     {
+                        collision_vorigin[0] = pElem->physics.ptr->x; collision_vorigin[1] = pElem->physics.ptr->y; collision_vorigin[2] = pElem->physics.ptr->z;
+                        
                         // MARK: -- attempt to move along vm
                         move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
                         
@@ -1869,7 +2013,7 @@ world_update(float tc)
                                         
                                         if(pRegionElem != pElem)
                                         {
-                                            if(check_collision(pRegionElem, pElem))
+                                            if(check_collision(pElem, pRegionElem))
                                             {
                                                 WorldElem* pElemCollided = pRegionElem;
                                                 

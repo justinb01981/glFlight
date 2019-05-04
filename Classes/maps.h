@@ -1330,6 +1330,7 @@ const static char* initial_map = ""                         \
 "set_background_info "BACKGROUND_TEXTURE_STR"\n" \
 WORLD_SCALED_FRAME(1, /*57*/28, 4) \
 MAP_GENERATED_MACRO \
+WORLD_ADD_OBJECT(0, -4, 5, -4, 0, 0, 0, 1.0 , 115)           \
 WORLD_ADD_OBJECT(12, -2, 5, -4, 0, 0, 0, 1.0 , 24)          \
 WORLD_ADD_OBJECT(14, 2, 5, -4, 0, 0, 0, 1.0 , 71)           \
 "";

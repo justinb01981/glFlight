@@ -34,6 +34,7 @@ typedef struct
     GLfloat velocity;
     
     int     gravity:1, friction:1;
+    
 } phys_data;
 
 typedef struct
@@ -82,6 +83,12 @@ struct WorldElem {
         phys_data data;
         phys_data* ptr;
     } physics;
+    
+    struct
+    {
+        model_coord_t* pnorm;
+        int normals;
+    } bounding;
     
     struct WorldElem* linked_elem;
     struct WorldElem* head_elem;

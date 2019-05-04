@@ -1343,7 +1343,6 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
     size_t n_indices = 3*2;
     size_t n_tcoords = 2*2;
     size_t n_indices_last;
-    size_t n_distorted = 0;
     
     do{
         float Vi = Vb;

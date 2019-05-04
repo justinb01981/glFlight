@@ -6,12 +6,15 @@
 import sys
 import math
 
+sqrt = math.sqrt
+
 Acoords = []
 AcoordsOrdered = []
 Atcoords = []
 AtcoordsOrdered = []
 Anormals = []
 Afaces = []
+AnormalsOrdered = []
 
 vcam = [1, 1, 1]
 mname = 'tbuilding'
@@ -23,6 +26,9 @@ def vCross(a, b):
             a[0]*b[1] - a[1]*b[0]
             ]
 
+def vDot(a, b):
+    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]
+
 if __name__ == '__main__':
     mname = sys.argv[1]
     objfile = open(sys.argv[2], 'r')
@@ -33,6 +39,10 @@ if __name__ == '__main__':
         break
 
       tok = l.split(' ')
+
+#      if(tok[0] == 'o'):
+        ## new convex object faces, clear normals
+#        AnormalsOrdered = []
 
       if(tok[0] == 'v'):
         i = int(1)
@@ -136,6 +146,14 @@ if __name__ == '__main__':
           for i in [1,2,3]:
               Afaces[flen-i] = flen-i
 
+          ## insert normal origin
+          nO = [Acoords[face[0]*3] + u[0]/2 + v[0]/2, 
+                Acoords[face[0]*3+1] + u[1]/2 + v[1]/2, 
+                Acoords[face[0]*3+2] + u[2]/2 + v[2]/2
+                ]
+          AnormalsOrdered += nO
+          AnormalsOrdered += vnormal
+
           triangles -= 1
         ##-- end triangles
 
@@ -182,6 +200,16 @@ if __name__ == '__main__':
     print ('static model_index_t model_' + mname + '_indices[] = {')
     idx = 0
     c = Afaces
+    while idx < len(c):
+      eol = ',' if idx+3 < len(c) else ''
+      print (str(c[idx]) + ', ' + str(c[idx+1]) + ', ' + str(c[idx+2]) + eol)
+      idx += 3
+    print ('};')
+
+    ## print model normals
+    print ('static model_coord_t model_' + mname + '_normals[] = {')
+    idx = 0
+    c = AnormalsOrdered
     while idx < len(c):
       eol = ',' if idx+3 < len(c) else ''
       print (str(c[idx]) + ', ' + str(c[idx+1]) + ', ' + str(c[idx+2]) + eol)

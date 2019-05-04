@@ -123,6 +123,13 @@ world_elem_free(WorldElem* pElem)
         free(pfree);
     }
     
+    if(pElem->bounding.pnorm)
+    {
+        model_coord_t *pfree = pElem->bounding.pnorm;
+        pElem->bounding.pnorm = NULL;
+        free(pfree);
+    }
+    
     free(pElem);
 }
 
