@@ -2017,14 +2017,6 @@ struct models_shared_t_
         model_texcoord_t texcoords[2048];
         size_t indices_count;
     } sphere;
-    
-    struct
-    {
-        model_coord_t building1[16];
-        model_coord_t building2[16];
-        model_coord_t building3[16];
-        model_coord_t cube[36];
-    } normals;
 };
 typedef struct models_shared_t_ models_shared_t;
 extern models_shared_t models_shared;

@@ -562,10 +562,11 @@ world_add_object_core(Model type,
             break;
 	}
     
+    if(pElem->bounding.pnorm) free(pElem->bounding.pnorm);
     pElem->bounding.pnorm = malloc(sizeof(model_coord_t) * model_normals_sizeof);
     pElem->bounding.normals = model_normals_sizeof;
-    memcpy(pElem->bounding.pnorm, model_normals, model_normals_sizeof * sizeof(model_coord_t));
-    model_normals = pElem->bounding.pnorm;
+    //memcpy(pElem->bounding.pnorm, model_normals, model_normals_sizeof * sizeof(model_coord_t));
+    //model_normals = pElem->bounding.pnorm;
     
     // HACK: make some decisions based off model-type
     if(replace_id < 0)
@@ -668,10 +669,30 @@ world_add_object_core(Model type,
             break;
     }
     
+    for(i = 0; i < model_normals_sizeof; i+=3)
+    {
+        quaternion_t xq = {0, 1, 0, 0};
+        quaternion_t zq = {0, 0, 0, 1};
+        
+        // scale is applied in boundary detection
+        quaternion_t pt_norm = {1, model_normals[i+0], model_normals[i+1], model_normals[i+2]};
+    
+        quaternion_rotate_inplace(&pt_norm, &zq, alpha);
+        quaternion_rotate_inplace(&xq, &zq, alpha);
+        
+        quaternion_rotate_inplace(&pt_norm, &xq, beta);
+        quaternion_rotate_inplace(&zq, &xq, beta);
+        
+        quaternion_rotate_inplace(&pt_norm, &zq, gamma);
+        
+        pElem->bounding.pnorm[i+0] = pt_norm.x;
+        pElem->bounding.pnorm[i+1] = pt_norm.y;
+        pElem->bounding.pnorm[i+2] = pt_norm.z;
+    }
+    
     for(i = 0; i < (model_sizeof/sizeof(model_coord_t)); i+=3)
     {
-        quaternion_t pt = {0, model_coords[i+0] * scale, model_coords[i+1] * scale, model_coords[i+2] * scale};
-        quaternion_t pt_norm = {0, model_normals[i+0] * scale, model_normals[i+1] * scale, model_normals[i+2] * scale};
+        quaternion_t pt = {1, model_coords[i+0] * scale, model_coords[i+1] * scale, model_coords[i+2] * scale};
         quaternion_t xq = {0, 1, 0, 0};
         quaternion_t yq = {0, 0, 1, 0};
         quaternion_t zq = {0, 0, 0, 1};
@@ -682,7 +703,6 @@ world_add_object_core(Model type,
             quaternion_rotate_inplace(&pt, &zq, alpha);
             quaternion_rotate_inplace(&xq, &zq, alpha);
             quaternion_rotate_inplace(&yq, &zq, alpha);
-            quaternion_rotate_inplace(&pt_norm, &zq, alpha);
         }
         
         // pitch
@@ -691,7 +711,6 @@ world_add_object_core(Model type,
             quaternion_rotate_inplace(&pt, &xq, beta);
             quaternion_rotate_inplace(&yq, &xq, beta);
             quaternion_rotate_inplace(&zq, &xq, beta);
-            quaternion_rotate_inplace(&pt_norm, &xq, beta);
         }
         
         // roll
@@ -700,7 +719,6 @@ world_add_object_core(Model type,
             quaternion_rotate_inplace(&pt, &zq, gamma);
             quaternion_rotate_inplace(&xq, &zq, gamma);
             quaternion_rotate_inplace(&yq, &zq, gamma);
-            quaternion_rotate_inplace(&pt_norm, &zq, gamma);
         }
         
         pElem->coords[i+0] = x + pt.x;
