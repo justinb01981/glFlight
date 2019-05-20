@@ -1791,7 +1791,11 @@ game_run()
             
             printf("enemies_found:%f\n", enemies_found);
             
-            if(strncmp(gameSettingsPlayerName, "god", 3) == 0) pMyShipNode->elem->durability = 9999;
+            if(strncmp(gameSettingsPlayerName, "god", 3) == 0)
+            {
+                pMyShipNode->elem->durability = 9999;
+                game_ammo_missles = 99;
+            }
          
             // MARK: only if game has started...
             if(gameStateSinglePlayer.started)
@@ -2690,7 +2694,6 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
     x->stuff.u.enemy.max_slerp = 4.0; // radians per second
     x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
-    x->stuff.u.enemy.time_last_run = time_ms + GAME_AI_UPDATE_INTERVAL_MS;
     x->stuff.u.enemy.scan_distance = 50;
     x->stuff.u.enemy.pursue_distance = 30;
 }

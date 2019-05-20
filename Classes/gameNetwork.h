@@ -95,6 +95,16 @@ struct bonjour_addr_stuffed_in_sockaddr_in {
     uint32_t peer_id;
 };
 
+typedef struct {
+    float loc_last[3][3];
+    float euler_last[3][3];
+    float vel_predict_delta;
+    
+    game_timeval_t timestamp_adjust;
+    game_timeval_t timestamp_last[3];
+    game_timeval_t euler_last_interp;
+} motion_interp_st;
+
 typedef struct
 {
     unsigned int vers;
@@ -156,13 +166,10 @@ struct gameNetworkPlayerInfo
     gameNetworkAddress address;
     gameNetworkSocket stream_socket;
     game_timeval_t time_last_update;
-    game_timeval_t timestamp_last[3];
-    game_timeval_t timestamp_adjust;
     game_timeval_t time_ping;
     game_timeval_t network_latency;
     game_timeval_t time_status_last;
     game_timeval_t time_cube_pooped_last;
-    game_timeval_t euler_last_interp;
     char* map_data;
     
     struct
@@ -174,9 +181,7 @@ struct gameNetworkPlayerInfo
         int score_calculated;
     } stats;
     
-    float loc_last[3][3];
-    float euler_last[3][3];
-    float vel_predict_delta;
+    motion_interp_st motion;
     
     int shot_fired;
     
@@ -192,6 +197,7 @@ struct gameNetworkObjectInfo
     int elem_id_local;
     float loc_last[3][3];
     float timestamp_last[3];
+    motion_interp_st motion;
     game_timeval_t update_time, send_update_time;
 };
 typedef struct gameNetworkObjectInfo gameNetworkObjectInfo;

@@ -415,9 +415,14 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     float juke_slerp_c = 1.0;
     
+    quaternion_t zqOrigin, xqOrigin;
+    
     // find current object heading vector
     get_body_vectors_for_euler(elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
                                &xq, &yq, &zq);
+    
+    zqOrigin = zq;
+    xqOrigin = xq;
     
     float zdot = zq.x*(ax/dist) + zq.y*(ay/dist) + zq.z*(az/dist);
     
@@ -432,19 +437,14 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         float fm = (1.0 + (1.0 / (float) rand_in_range(1, 100)));
         float leadVel = bulletVel;
         
-        if(elem->object_type == OBJ_MISSLE)
-        {
-            leadVel = MAX_SPEED_MISSLE;
-        }
-        
         // if not firing, intercept course
         if(!elem->stuff.u.enemy.fires)
         {
-            leadVel = elem->stuff.u.enemy.max_speed;
+            leadVel = elem->stuff.u.enemy.max_speed * (1);
             fm = 1.0;
         }
         
-        float leadv = (dist / leadVel) * fm;
+        float leadv = (dist / leadVel);
         
         ax -= vx*leadv;
         ay -= vy*leadv;
@@ -480,7 +480,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             elem->stuff.u.enemy.tgt_z = az;
         }
         
-        //
         if(time_ms >= elem->stuff.u.enemy.time_next_retarget &&
            zdot < zdot_juke &&
            elem->stuff.u.enemy.patrols_no_target_jukes &&
@@ -642,20 +641,22 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist,
               elem->stuff.u.enemy.max_slerp*tc*juke_slerp_c,
               &z1q.w, &z1q.x, &z1q.y, &z1q.z);
-        xq.w += z1q.w-zq.w;
-        xq.x += z1q.x-zq.x;
-        xq.y += z1q.y-zq.y;
-        xq.z += z1q.z-zq.z;
-        yq.w += z1q.w-zq.w;
-        yq.x += z1q.x-zq.x;
-        yq.y += z1q.y-zq.y;
-        yq.z += z1q.z-zq.z;
-        zq = z1q;
-    }
-    
-    if(isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
-    {
-        z1q = zq;
+        
+        if(isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
+        {
+        }
+        else
+        {
+            xq.w += z1q.w-zq.w;
+            xq.x += z1q.x-zq.x;
+            xq.y += z1q.y-zq.y;
+            xq.z += z1q.z-zq.z;
+            yq.w += z1q.w-zq.w;
+            yq.x += z1q.x-zq.x;
+            yq.y += z1q.y-zq.y;
+            yq.z += z1q.z-zq.z;
+            zq = z1q;
+        }
     }
     
     // test that conversion to euler is possible
@@ -684,9 +685,37 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     {
         if(isnan(*pFloatCheckIsNan[iF]))
         {
+            printf("gameAI.c: isnan (%p)\n", elem);
+            /*
             //*pFloatCheckIsNan[iF] = 0;
-            *pFloatCheckIsNan[iF] = *pFloatCheckIsNanR[iF];
-            printf("isnan: %p\n", elem);
+            
+            //*pFloatCheckIsNan[iF] = *pFloatCheckIsNanR[iF];
+            
+            // normalize body vectors
+            xq = QX;
+            yq = QY;
+            zq = QZ;
+            
+            quaternion_t resz, resx;
+            
+            slerp(zq.w, zq.x, zq.y, zq.z, zqOrigin.w, zqOrigin.x, zqOrigin.y, zqOrigin.z, 1.0, &resz.w, &resz.x, &resz.y, &resz.z);
+            slerp(xq.w, xq.x, xq.y, xq.z, xqOrigin.w, xqOrigin.x, xqOrigin.y, xqOrigin.z, 1.0, &resx.w, &resx.x, &resx.y, &resx.z);
+            
+            float A[] = {resz.x, resz.y, resz.z};
+            float B[] = {resx.x, resx.y, resx.z};
+            float R[3];
+            
+            vector_cross_product(A, B, R);
+            
+            quaternion_t resy = {1, R[0], R[1], R[2]};
+            
+            get_euler_from_body_vectors(&resx, &resy, &resz, &alpha, &beta, &gamma);
+            */
+            
+            // assuming gimbal lock is the problem, retry after minor euler alpha change
+            elem->physics.ptr->alpha *= 0.95;
+            elem->stuff.u.enemy.time_last_run = time_ms - elem->stuff.u.enemy.time_run_interval;
+            return;
         }
     }
     

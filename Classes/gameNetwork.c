@@ -29,6 +29,7 @@
 //#endif
     
 #include "gameNetwork.h"
+#include "gameMotionInterp.h"
 #include "world.h"
 #include "gameUtils.h"
 #include "gameGlobals.h"
@@ -48,11 +49,9 @@
 
 gameNetworkState_t gameNetworkState;
 
-static unsigned long update_frequency_ms = 1000 / (GAME_TICK_RATE / 2);
+unsigned long update_frequency_ms = 1000 / (GAME_TICK_RATE / 2);
 static unsigned long update_time_last = 0;
 const unsigned long GAME_NETWORK_TIMEOUT_MS = (30*1000);
-const static float euler_interp_range_max = (M_PI/8);
-const static float velo_interp_update_mult = 4;
 const static char *map_eom = "\nmap_eom\n";
 
 static char *gameKillVerbs[] = {"slaughtered", "evicerated", "de-rezzed", "shot-down", "ended", "terminated"};
@@ -1771,37 +1770,11 @@ do_game_network_world_update()
         }
         else
         {
-            float euler[3];
-            int i;
-            for(i = 0; i < 3; i++)
-            {
-                euler[i] = ((pInfo->euler_last[i][0] - pInfo->euler_last[i][1]) /
-                            (pInfo->timestamp_last[0] - pInfo->timestamp_last[1])) *
-                    (network_time_ms - pInfo->euler_last_interp);
-            }
-            
             WorldElemListNode* pElemNode = world_elem_list_find(pInfo->elem_id, &gWorld->elements_moving);
-            
             WorldElem* pElem = NULL;
             if(pElemNode) pElem = pElemNode->elem;
             
-            if(pElem)
-            {
-                if(fabs(euler[0]) < euler_interp_range_max &&
-                   fabs(euler[1]) < euler_interp_range_max &&
-                   fabs(euler[2]) < euler_interp_range_max)
-                {
-                    gameNetwork_updatePlayerObject(pInfo,
-                                                   pElem->physics.ptr->x, pElem->physics.ptr->y, pElem->physics.ptr->z,
-                                                   pElem->physics.ptr->alpha + euler[0],
-                                                   pElem->physics.ptr->beta + euler[1],
-                                                   pElem->physics.ptr->gamma + euler[2],
-                                                   pElem->physics.ptr->vx,
-                                                   pElem->physics.ptr->vy,
-                                                   pElem->physics.ptr->vz);
-                }
-                pInfo->euler_last_interp = network_time_ms;
-            }
+            motion_interpolate_euler(network_time_ms, &pInfo->motion, pInfo, pElem);
         }
         pInfo = pInfo->next_connected;
     }
@@ -1937,7 +1910,6 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                 {
                     WorldElem *pPlayerElem = NULL;
                     
-                    t = msg->params.f[16];
                     pNode = world_elem_list_find(playerInfo->elem_id, &gWorld->elements_list);
                     
                     if(pNode)
@@ -1974,99 +1946,16 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                     
                     pPlayerElem = pNode->elem;
                     
+                    motion_interp_st* motion = &playerInfo->motion;
+                    
                     float velDetected[3] =
                     {
-                        (msg->params.f[1] - pPlayerElem->physics.ptr->x) * (1000.0 / (t - playerInfo->timestamp_last[0])),
-                        (msg->params.f[2] - pPlayerElem->physics.ptr->y) * (1000.0 / (t - playerInfo->timestamp_last[0])),
-                        (msg->params.f[3] - pPlayerElem->physics.ptr->z) * (1000.0 / (t - playerInfo->timestamp_last[0]))
+                        (msg->params.f[1] - pPlayerElem->physics.ptr->x) * (1000.0 / (t - motion->timestamp_last[0])),
+                        (msg->params.f[2] - pPlayerElem->physics.ptr->y) * (1000.0 / (t - motion->timestamp_last[0])),
+                        (msg->params.f[3] - pPlayerElem->physics.ptr->z) * (1000.0 / (t - motion->timestamp_last[0]))
                     };
                     
-                    // adjust timing depending up or down depending on which is closer to new position
-                    float plottedMore[3], plottedLess[3], plottedCompare[3];
-                    for(int d = 0; d < 3; d++)
-                    {
-                        plottedMore[d] = predict_a1_at_b1_for_a_over_b(playerInfo->loc_last[d], playerInfo->timestamp_last, t+playerInfo->timestamp_adjust+1);
-                        plottedLess[d] = predict_a1_at_b1_for_a_over_b(playerInfo->loc_last[d], playerInfo->timestamp_last, t+playerInfo->timestamp_adjust-1);
-                        plottedCompare[d] = msg->params.f[1+d];
-                    }
-                    
-                    // log location
-                    for(int i = 2; i > 0; i--)
-                    {
-                        for(int d = 0; d < 3; d++)
-                        {
-                            playerInfo->loc_last[d][i] = playerInfo->loc_last[d][i-1];
-                            playerInfo->euler_last[d][i] = playerInfo->euler_last[d][i-1];
-                            
-                            if(!interp_velo)
-                            {
-                                playerInfo->loc_last[d][i] = msg->params.f[1+d];
-                                playerInfo->euler_last[d][i] = msg->params.f[4+d];
-                            }
-                        }
-                        playerInfo->timestamp_last[i] = playerInfo->timestamp_last[i-1];
-                        
-                        if(!interp_velo)
-                        {
-                            playerInfo->timestamp_last[i] = 0;
-                        }
-                    }
-                    playerInfo->loc_last[0][0] = msg->params.f[1];
-                    playerInfo->loc_last[1][0] = msg->params.f[2];
-                    playerInfo->loc_last[2][0] = msg->params.f[3];
-                    playerInfo->euler_last[0][0] = msg->params.f[4];
-                    playerInfo->euler_last[1][0] = msg->params.f[5];
-                    playerInfo->euler_last[2][0] = msg->params.f[6];
-                    
-                    playerInfo->timestamp_last[0] = t;
-                    
-                    float v[3] = {
-                        pPlayerElem->physics.ptr->x,
-                        pPlayerElem->physics.ptr->y,
-                        pPlayerElem->physics.ptr->z
-                    };
-                    
-                    float time_win = playerInfo->timestamp_last[0] - playerInfo->timestamp_last[2];
-                    if(interp_velo && time_win < update_frequency_ms * velo_interp_update_mult && time_win > 0)
-                    {
-                        // predict velocity
-                        float v1[3];
-                        for(int d = 0; d < 3; d++)
-                        {
-                            v1[d] = predict_a1_at_b1_for_a_over_b(playerInfo->loc_last[d],
-                                                                  playerInfo->timestamp_last,
-                                                                  t + 1000
-                                                                  /*+ playerInfo->timestamp_adjust*/);
-                            v[d] = v1[d] - v[d];
-                        }
-                        
-                        // TODO: calculate timestamp compensation (and use it)
-                        if(distance(plottedLess[0], plottedLess[1], plottedLess[2], plottedCompare[0], plottedCompare[1], plottedCompare[2]) <
-                           distance(plottedMore[0], plottedMore[1], plottedMore[2], plottedCompare[0], plottedCompare[1], plottedCompare[2]))
-                        {
-                            if(playerInfo->timestamp_adjust > update_frequency_ms*2) playerInfo->timestamp_adjust--;
-                        }
-                        else
-                        {
-                            if(playerInfo->timestamp_adjust < update_frequency_ms*2) playerInfo->timestamp_adjust++;
-                        }
-                        
-                        gameNetwork_updatePlayerObject(playerInfo,
-                                                       pPlayerElem->physics.ptr->x, pPlayerElem->physics.ptr->y, pPlayerElem->physics.ptr->z,
-                                                       msg->params.f[4], msg->params.f[5], msg->params.f[6],
-                                                       v[0], v[1], v[2]);
-                    }
-                    else
-                    {
-                        v[0] = pPlayerElem->physics.ptr->vx;
-                        v[1] = pPlayerElem->physics.ptr->vy;
-                        v[2] = pPlayerElem->physics.ptr->vz;
-                        
-                        gameNetwork_updatePlayerObject(playerInfo,
-                                                       msg->params.f[1], msg->params.f[2], msg->params.f[3],
-                                                       msg->params.f[4], msg->params.f[5], msg->params.f[6],
-                                                       v[0], v[1], v[2]);
-                    }
+                    motion_interpolate_velocity(network_time_ms, motion, pPlayerElem, msg, interp_velo);
 
                     //pPlayerElem->stuff.player.player_id = playerInfo->player_id;
                     pPlayerElem->stuff.affiliation = pPlayerElem->stuff.game_object_id = playerInfo->player_id;
@@ -2273,6 +2162,9 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
 
                     if(last_found)
                     {
+                        motion_interpolate_velocity(network_time_ms, &objectInfo->motion, last_found->elem, msg, 1);
+                        
+                        /*
                         // log position information
                         for(int i = 2; i > 0; i--)
                         {
@@ -2319,6 +2211,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                             update_object_velocity(objectInfo->elem_id_local,
                                                    obj_v[0], obj_v[1], obj_v[2], 0);
                         }
+                         */
                     }
                     
                     objectInfo->update_time = network_time_ms;

@@ -117,6 +117,10 @@
 		D03665EB20162D5A00B106AE /* texture106.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665EA20162D5A00B106AE /* texture106.bmp */; };
 		D03665F4201801FE00B106AE /* texture107.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665F3201801FD00B106AE /* texture107.bmp */; };
 		D03ADBA8178271E900D725F7 /* actions.c in Sources */ = {isa = PBXBuildFile; fileRef = D03ADBA7178271E800D725F7 /* actions.c */; };
+		D03ECCDF228766C1001581E2 /* texture117.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03ECCDE228766C1001581E2 /* texture117.bmp */; };
+		D03ECCE0228766C1001581E2 /* texture117.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03ECCDE228766C1001581E2 /* texture117.bmp */; };
+		D03ECD8F228F7EC1001581E2 /* gameMotionInterp.c in Sources */ = {isa = PBXBuildFile; fileRef = D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */; };
+		D03ECD90228F7EC1001581E2 /* gameMotionInterp.c in Sources */ = {isa = PBXBuildFile; fileRef = D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */; };
 		D04256671DA75CFB00E9C17B /* texture98.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D04256661DA75CFB00E9C17B /* texture98.bmp */; };
 		D04EB4CD1BDDCD5E0089D9F0 /* app_icon120x120_orig.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4CC1BDDCD5E0089D9F0 /* app_icon120x120_orig.png */; };
 		D04EB4CF1BDDF9DB0089D9F0 /* app_icon_lg_prev.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4CE1BDDF9DB0089D9F0 /* app_icon_lg_prev.jpg */; };
@@ -561,6 +565,9 @@
 		D03ADBA617823B5B00D725F7 /* gameSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameSettings.h; sourceTree = "<group>"; };
 		D03ADBA7178271E800D725F7 /* actions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actions.c; sourceTree = "<group>"; };
 		D03BD6BD20E2576E001CC3DC /* mapgenerated.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mapgenerated.h; sourceTree = "<group>"; };
+		D03ECCDE228766C1001581E2 /* texture117.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture117.bmp; sourceTree = "<group>"; };
+		D03ECD8D228F6FB0001581E2 /* gameMotionInterp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameMotionInterp.h; sourceTree = "<group>"; };
+		D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gameMotionInterp.c; sourceTree = "<group>"; };
 		D04256661DA75CFB00E9C17B /* texture98.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture98.bmp; sourceTree = "<group>"; };
 		D04EB4CC1BDDCD5E0089D9F0 /* app_icon120x120_orig.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon120x120_orig.png; sourceTree = "<group>"; };
 		D04EB4CE1BDDF9DB0089D9F0 /* app_icon_lg_prev.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = app_icon_lg_prev.jpg; sourceTree = "<group>"; };
@@ -763,6 +770,8 @@
 				6D595F61164C867E00C21926 /* world_file.h */,
 				6D595F5E164C80FE00C21926 /* world_file.c */,
 				6D595F77165CD33800C21926 /* gameNetwork.h */,
+				D03ECD8D228F6FB0001581E2 /* gameMotionInterp.h */,
+				D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */,
 				6D595F78165CD34500C21926 /* gameNetwork.c */,
 				D062FE1D1FEB702C00ABE435 /* GameNetworkBonjourManager.h */,
 				D062FE1E1FEB702C00ABE435 /* GameNetworkBonjourManager.m */,
@@ -852,6 +861,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D03ECCDE228766C1001581E2 /* texture117.bmp */,
 				D0280A5F2241BA2000E8C1E8 /* texture116.bmp */,
 				D0BB4FBA2224FE71009457A4 /* texture115.bmp */,
 				D0549E8320ED4126009FF191 /* texture114.bmp */,
@@ -1170,6 +1180,7 @@
 				D02B8F0D195DF2CC00830369 /* texture30.bmp in Resources */,
 				6DEA18FD15A4610B007BD58F /* texture2.bmp in Resources */,
 				D02B8F0E195DF2CC00830369 /* texture31.bmp in Resources */,
+				D03ECCDF228766C1001581E2 /* texture117.bmp in Resources */,
 				6DEFF8ED15A60C310078E98E /* texture3.bmp in Resources */,
 				D0A5536918BC16C700F7E798 /* towing.wav in Resources */,
 				D0A66F41194B9497004A5E42 /* texture68.bmp in Resources */,
@@ -1463,6 +1474,7 @@
 				D0BCC9812052EDC100094809 /* texture106.bmp in Resources */,
 				D0549E8520ED412C009FF191 /* texture114.bmp in Resources */,
 				D0BCC9822052EDC100094809 /* texture56.bmp in Resources */,
+				D03ECCE0228766C1001581E2 /* texture117.bmp in Resources */,
 				D0BCC9832052EDC100094809 /* texture105.bmp in Resources */,
 				D0BCC9852052EDC100094809 /* texture66.bmp in Resources */,
 				D0BD22F020559D9000D4AEE3 /* Default.sc.png in Resources */,
@@ -1547,6 +1559,7 @@
 				D077557E152588C800DF2E0B /* quaternions.c in Sources */,
 				D02B8F1A1964D7D700830369 /* gameInput.c in Sources */,
 				6DD6C315157422AD00BF3305 /* gameInterface.c in Sources */,
+				D03ECD8F228F7EC1001581E2 /* gameMotionInterp.c in Sources */,
 				D02B8F0119535AAB00830369 /* gameDialogs.c in Sources */,
 				6DF655DD15E6CFF70015D5DF /* gameCamera.c in Sources */,
 				6D512E1715EC1F130064DF49 /* gameUtils.c in Sources */,
@@ -1584,6 +1597,7 @@
 				D0BCC9A62052EDC100094809 /* quaternions.c in Sources */,
 				D0BCC9A72052EDC100094809 /* gameInput.c in Sources */,
 				D0BCC9A82052EDC100094809 /* gameInterface.c in Sources */,
+				D03ECD90228F7EC1001581E2 /* gameMotionInterp.c in Sources */,
 				D0BCC9A92052EDC100094809 /* gameDialogs.c in Sources */,
 				D0BCC9AA2052EDC100094809 /* gameCamera.c in Sources */,
 				D0BCC9AB2052EDC100094809 /* gameUtils.c in Sources */,
