@@ -55,9 +55,18 @@ target_link_libraries(glFlightMain opengl32)
 
 install(TARGETS glFlightMain DESTINATION .)
 
-#set(RESOURCES_DIR C:/Users/Justin/workspace/glFLight)
-#add_custom_command(TARGET glFlightMain POST_BUILD
-#    COMMAND ${CMAKE_COMMAND} -E copy ${RESOURCES_DIR}/*.bmp WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+file(GLOB resourcesBmp ../*.bmp)
+file(GLOB resourcesWav ../*.wav)
+
+foreach(resFile ${resourcesBmp})
+    add_custom_command(TARGET glFlightMain POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${resFile} resources)
+endforeach(resFile)
+
+foreach(resFile ${resourcesWav})
+    add_custom_command(TARGET glFlightMain POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${resFile} resources)
+endforeach(resFile)
 
 
 

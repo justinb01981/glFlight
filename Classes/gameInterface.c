@@ -123,7 +123,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     };
     gameInterfaceControls.radar.y -= (screenHeight*0.15);
     gameInterfaceControls.radar.tex_id = TEXTURE_ID_CONTROLS_RADAR;
-    gameInterfaceControls.radar.visible = 0;
+    gameInterfaceControls.radar.visible = 1;
     
     controlRect menuRect = {
         screenWidth - (screenWidth*0.70),
