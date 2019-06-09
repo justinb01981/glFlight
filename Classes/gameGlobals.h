@@ -120,6 +120,8 @@ const static float TOW_DISTANCE_MAX = 20;
 const static float GAME_AI_UPDATE_INTERVAL_MS = 50;
 
 #define GAME_FRAME_RATE 60
+#define GAME_FRAME_RATE_TIMES_4 240
+#define GAME_FRAME_RATE_TIMES_10 600
 #define GAME_TICK_RATE PLATFORM_TICK_RATE
 
 extern int controlsCalibrated;

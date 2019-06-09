@@ -651,11 +651,11 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         yq.y += z1q.y-zq.y;
         yq.z += z1q.z-zq.z;
         zq = z1q;
-    }
-    
-    if(isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
-    {
-        z1q = zq;
+
+        if (isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
+        {
+            z1q = zq;
+        }
     }
     
     // test that conversion to euler is possible

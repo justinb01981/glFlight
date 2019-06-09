@@ -1266,9 +1266,6 @@ static model_index_t model_sphere_indices[] = {
 237, 238, 239
 };
 
-static int model_sphere_primitives[] = {
-};
-
 static model_coord_t model_sphere_normals[] =
 {
     1.0, 0.0, 0.0, // coord

@@ -77,6 +77,7 @@ typedef struct {
     float textHeight;
     
     struct {
+		int unused;
     } dialogMessages;
 
     int consoleHidden;

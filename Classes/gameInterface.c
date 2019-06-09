@@ -123,7 +123,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     };
     gameInterfaceControls.radar.y -= (screenHeight*0.15);
     gameInterfaceControls.radar.tex_id = TEXTURE_ID_CONTROLS_RADAR;
-    gameInterfaceControls.radar.visible = 1;
+    gameInterfaceControls.radar.visible = 0;
     
     controlRect menuRect = {
         screenWidth - (screenWidth*0.70),
@@ -336,6 +336,7 @@ gameInterfaceHandleTouchMove(float x, float y)
     {
         touchedControl->touch_rx = (x - touchedControl->x) / touchedControl->xw;
         touchedControl->touch_ry = (y - touchedControl->y) / touchedControl->yw;
+        DBPRINTF(("touch_rx: %f touch_ry: %f", touchedControl->touch_rx, touchedControl->touch_ry));
     }
     
     if(touchedControl == &gameInterfaceControls.accelerator)

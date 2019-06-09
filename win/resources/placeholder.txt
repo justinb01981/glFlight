@@ -1,0 +1,1 @@
+copy all ../../*.bmp and ../../*.wav here

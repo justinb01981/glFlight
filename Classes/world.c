@@ -79,7 +79,7 @@ world_add_object_core(Model type,
     model_texcoord_t* model_texcoords;
     int model_texcoords_sizeof;
     int model_primitives_sizeof = 0;
-    int* model_primitives;
+	int* model_primitives = NULL;
     int new_durability = 1;
     int model_changed = 0;
     WorldElem* pElem;
@@ -156,8 +156,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_cube_indices);
             model_texcoords = model_cube_texcoords_alt /*model_cube_texcoords*/;
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
-            model_primitives_sizeof = sizeof(model_cube_primitives);
-            model_primitives = model_cube_primitives;
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
@@ -169,8 +167,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_cube_indices);
             model_texcoords = model_cube_texcoords_alt /*model_cube_texcoords*/;
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
-            model_primitives_sizeof = sizeof(model_cube_primitives);
-            model_primitives = model_cube_primitives;
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
@@ -182,8 +178,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_cube_indices);
             model_texcoords = model_cube_texcoords;
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
-            model_primitives_sizeof = sizeof(model_cube_primitives);
-            model_primitives = model_cube_primitives;
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
@@ -196,8 +190,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_square_indices);
             model_texcoords = model_square_texcoords;
             model_texcoords_sizeof = sizeof(model_square_texcoords);
-            model_primitives_sizeof = sizeof(model_square_primatives);
-            model_primitives = model_square_primatives;
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
@@ -209,8 +201,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_pyramid_indices);
             model_texcoords = model_pyramid_texcoords;
             model_texcoords_sizeof = sizeof(model_pyramid_texcoords);
-            model_primitives_sizeof = sizeof(model_pyramid_primatives);
-            model_primitives = model_pyramid_primatives;
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
@@ -222,8 +212,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_newship_indices);
             model_texcoords = model_newship_texcoords;
             model_texcoords_sizeof = sizeof(model_newship_texcoords);
-            model_primitives_sizeof = sizeof(model_no_primitives);
-            model_primitives = model_no_primitives;
             model_normals = model_ship2_normals;
             model_normals_sizeof = sizeof(model_ship2_normals) / sizeof(model_coord_t);
             break;
@@ -235,8 +223,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_ship2_indices);
             model_texcoords = model_ship2_texcoords;
             model_texcoords_sizeof = sizeof(model_ship2_texcoords);
-            model_primitives_sizeof = sizeof(model_ship2_primitives);
-            model_primitives = model_ship2_primitives;
             model_normals = model_ship2_normals;
             model_normals_sizeof = sizeof(model_ship2_normals) / sizeof(model_coord_t);
             break;
@@ -248,8 +234,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_ship3_indices);
             model_texcoords = model_ship3_texcoords;
             model_texcoords_sizeof = sizeof(model_ship3_texcoords);
-            model_primitives_sizeof = sizeof(model_ship3_primitives);
-            model_primitives = model_ship3_primitives;
             model_normals = model_ship3_normals;
             model_normals_sizeof = sizeof(model_ship3_normals) / sizeof(model_coord_t);
             break;
@@ -261,8 +245,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_turret_indices);
             model_texcoords = model_turret_texcoords;
             model_texcoords_sizeof = sizeof(model_turret_texcoords);
-            model_primitives_sizeof = sizeof(model_turret_primitives);
-            model_primitives = model_turret_primitives;
             model_normals = model_ship2_normals;
             model_normals_sizeof = sizeof(model_ship2_normals) / sizeof(model_coord_t);
             break;
@@ -274,8 +256,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_bullet_indices);
             model_texcoords = model_bullet_texcoords;
             model_texcoords_sizeof = sizeof(model_bullet_texcoords);
-            model_primitives_sizeof = sizeof(model_bullet_primitives);
-            model_primitives = model_bullet_primitives;
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
@@ -287,8 +267,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_missle_indices);
             model_texcoords = model_missle_texcoords;
             model_texcoords_sizeof = sizeof(model_missle_texcoords);
-            model_primitives_sizeof = sizeof(model_missle_primitives);
-            model_primitives = model_missle_primitives;
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
@@ -300,8 +278,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_surface_indices);
             model_texcoords = model_surface_texcoords;
             model_texcoords_sizeof = sizeof(model_surface_texcoords);
-            model_primitives_sizeof = sizeof(model_surface_primitives);
-            model_primitives = model_surface_primitives;
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
@@ -313,8 +289,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_sprite_indices);
             model_texcoords = model_sprite_texcoords;
             model_texcoords_sizeof = sizeof(model_sprite_texcoords);
-            model_primitives_sizeof = sizeof(model_sprite_primitives);
-            model_primitives = model_sprite_primitives;
             model_normals = model_sprite_normals;
             model_normals_sizeof = sizeof(model_sprite_normals) / sizeof(model_coord_t);
             break;
@@ -326,8 +300,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_vertical_pillar_indices);
             model_texcoords = model_vertical_pillar_texcoords;
             model_texcoords_sizeof = sizeof(model_vertical_pillar_texcoords);
-            model_primitives_sizeof = sizeof(model_vertical_pillar_primitives);
-            model_primitives = model_vertical_pillar_primitives;
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
@@ -339,8 +311,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_cube_indices);
             model_texcoords = model_cube_texcoords;
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
-            model_primitives_sizeof = sizeof(model_cube_primitives);
-            model_primitives = model_no_primitives;
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
@@ -352,8 +322,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_cube_indices);
             model_texcoords = model_cube_texcoords;
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
-            model_primitives_sizeof = sizeof(model_cube_primitives);
-            model_primitives = model_no_primitives;
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
             break;
@@ -365,8 +333,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_icosahedron_indices);
             model_texcoords = model_icosahedron_texcoords;
             model_texcoords_sizeof = sizeof(model_icosahedron_texcoords);
-            model_primitives_sizeof = sizeof(model_icosahedron_primitives);
-            model_primitives = model_icosahedron_primitives;
             model_normals = model_icosahedron_normals;
             model_normals_sizeof = sizeof(model_icosahedron_normals) / sizeof(model_coord_t);
             break;
@@ -378,8 +344,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_sphere_indices);
             model_texcoords = model_sphere_texcoords;
             model_texcoords_sizeof = sizeof(model_sphere_texcoords);
-            model_primitives_sizeof = sizeof(model_sphere_primitives);
-            model_primitives = model_sphere_primitives;
             model_normals = model_sphere_normals;
             model_normals_sizeof = sizeof(model_sphere_normals) / sizeof(model_coord_t);
             break;
@@ -396,7 +360,6 @@ world_add_object_core(Model type,
             model_primitives_sizeof = sizeof(model_tbuilding_primitives);
             model_primitives = model_tbuilding_primitives;
              */
-            model_primitives_sizeof = 0;
             float M2[] = {
                 2.0, 0, 0, 0,
                 0, 4.0, 0, 1.5,
@@ -415,8 +378,6 @@ world_add_object_core(Model type,
             model_normals = model_tbuilding_normals;
             model_normals_sizeof = sizeof(model_tbuilding_normals) / sizeof(model_coord_t);
             
-            model_primitives = poly_comp.primitives;
-            model_primitives_sizeof = 0;
         }
         break;
             
@@ -432,8 +393,6 @@ world_add_object_core(Model type,
             model_normals = model_building2_normals;
             model_normals_sizeof = sizeof(model_building2_normals) / sizeof(model_coord_t);
             
-            model_primitives = poly_comp.primitives;
-            model_primitives_sizeof = 0;
         }
         break;
             
@@ -449,14 +408,11 @@ world_add_object_core(Model type,
             model_normals = model_building3_normals_trimmed;
             model_normals_sizeof = sizeof(model_building3_normals_trimmed) / sizeof(model_coord_t);
             
-            model_primitives = poly_comp.primitives;
-            model_primitives_sizeof = 0;
         }
             break;
             
         case MODEL_ENEMY_BASE:
         {
-            model_primitives_sizeof = 0;
             
             // TODO: build model by applying rotation matrix to convex primitive and appending coordinates/indices/texture-coordinates
             float M2[] = {
@@ -497,8 +453,6 @@ world_add_object_core(Model type,
             
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
-            
-            model_primitives = poly_comp.primitives;
         }
             break;
             
@@ -522,8 +476,6 @@ world_add_object_core(Model type,
             model_normals = model_flattenedcube_normals;
             model_normals_sizeof = sizeof(model_flattenedcube_normals) / sizeof(model_coord_t);
             
-            model_primitives = poly_comp.primitives;
-            model_primitives_sizeof = 0;
         }
             break;
             
@@ -535,8 +487,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_contrail_indices);
             model_texcoords = model_contrail_texcoords;
             model_texcoords_sizeof = sizeof(model_contrail_texcoords);
-            model_primitives_sizeof = sizeof(model_contrail_primitives);
-            model_primitives = model_contrail_primitives;
             
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
@@ -550,8 +500,6 @@ world_add_object_core(Model type,
             model_indices_sizeof = sizeof(model_cube_indices);
             model_texcoords = model_cube_texcoords_alt /*model_cube_texcoords*/;
             model_texcoords_sizeof = sizeof(model_cube_texcoords);
-            model_primitives_sizeof = sizeof(model_cube_primitives);
-            model_primitives = model_cube_primitives;
             
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
@@ -667,11 +615,36 @@ world_add_object_core(Model type,
         default:
             break;
     }
+
+    for (i = 0; i < (model_normals_sizeof / sizeof(model_coord_t)); i += 3)
+    {
+        quaternion_t pt_norm = { 0, model_normals[i + 0] * scale, model_normals[i + 1] * scale, model_normals[i + 2] * scale };
+        quaternion_t xq = { 0, 1, 0, 0 };
+        quaternion_t yq = { 0, 0, 1, 0 };
+        quaternion_t zq = { 0, 0, 0, 1 };
+
+        // yaw
+        if (alpha != 0)
+        {
+            quaternion_rotate_inplace(&pt_norm, &zq, alpha);
+        }
+
+        // pitch
+        if (beta != 0)
+        {
+            quaternion_rotate_inplace(&pt_norm, &xq, beta);
+        }
+
+        // roll
+        if (gamma != 0)
+        {
+            quaternion_rotate_inplace(&pt_norm, &zq, gamma);
+        }
+    }
     
     for(i = 0; i < (model_sizeof/sizeof(model_coord_t)); i+=3)
     {
         quaternion_t pt = {0, model_coords[i+0] * scale, model_coords[i+1] * scale, model_coords[i+2] * scale};
-        quaternion_t pt_norm = {0, model_normals[i+0] * scale, model_normals[i+1] * scale, model_normals[i+2] * scale};
         quaternion_t xq = {0, 1, 0, 0};
         quaternion_t yq = {0, 0, 1, 0};
         quaternion_t zq = {0, 0, 0, 1};
@@ -682,7 +655,6 @@ world_add_object_core(Model type,
             quaternion_rotate_inplace(&pt, &zq, alpha);
             quaternion_rotate_inplace(&xq, &zq, alpha);
             quaternion_rotate_inplace(&yq, &zq, alpha);
-            quaternion_rotate_inplace(&pt_norm, &zq, alpha);
         }
         
         // pitch
@@ -691,7 +663,6 @@ world_add_object_core(Model type,
             quaternion_rotate_inplace(&pt, &xq, beta);
             quaternion_rotate_inplace(&yq, &xq, beta);
             quaternion_rotate_inplace(&zq, &xq, beta);
-            quaternion_rotate_inplace(&pt_norm, &xq, beta);
         }
         
         // roll
@@ -700,7 +671,6 @@ world_add_object_core(Model type,
             quaternion_rotate_inplace(&pt, &zq, gamma);
             quaternion_rotate_inplace(&xq, &zq, gamma);
             quaternion_rotate_inplace(&yq, &zq, gamma);
-            quaternion_rotate_inplace(&pt_norm, &zq, gamma);
         }
         
         pElem->coords[i+0] = x + pt.x;

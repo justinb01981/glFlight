@@ -10,9 +10,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
+
+#ifndef _NOT_POSIX
 #include <unistd.h>
 #include <assert.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -23,6 +24,16 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <errno.h>
+#else
+#include <winsock2.h>
+#include <ws2tcpip.h>
+//#include <ws2ipdef.h>
+//#include <socketapi.h>
+//#include <WinInet.h>
+//#include <in6addr.h>
+#endif
+
+
 
 //#ifdef __cplusplus
 //extern "C" {
@@ -151,7 +162,9 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
 #endif
     
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &so_arg, sizeof(so_arg));
+#ifndef _NOT_POSIX
     setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &so_arg, sizeof(so_arg));
+#endif
     
     /* bind */
     if(do_bind)
@@ -205,7 +218,7 @@ static void
 send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
 {
     struct sockaddr_in6 sa;
-    ssize_t r;
+    size_t r;
     
     memcpy(&sa, address->storage, address->len);
     
