@@ -257,13 +257,15 @@ public:
             gameInterfaceHandleTouchEnd(gameInterfaceControls.fireRectMissle.x, gameInterfaceControls.fireRectMissle.y);
         }
 
+        const float speedInc = 1.0;
+
         if (isKeyPressed(KEY_ACCEL) && !keysLast[KEY_ACCEL])
         {
-            speed += 1.0;
+            if(targetSpeed + speedInc <= maxSpeed) targetSpeed += speedInc;
         }
         if (isKeyPressed(KEY_DECEL) && !keysLast[KEY_DECEL])
         {
-            speed -= 1.0;
+            if(targetSpeed - speedInc >= minSpeed) targetSpeed -= speedInc;
         }
 
         gameInputGyro(eulerO[0], eulerO[1], eulerO[2]);
