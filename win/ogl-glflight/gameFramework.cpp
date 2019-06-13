@@ -918,6 +918,11 @@ void gameFramework::keyCallback(GLFWwindow* Window, int Key, int Scancode, int A
 	gameFramework * Test = static_cast<gameFramework*>(glfwGetWindowUserPointer(Window));
 	assert(Test);
 
+    // ignore "repeat" events when key is already down
+    if (Action == KEY_REPEAT) {
+        return;
+    }
+
 	Test->KeyPressed[Key] = Action == KEY_PRESS;
 
 	if(Test->isKeyPressed(GLFW_KEY_ESCAPE))

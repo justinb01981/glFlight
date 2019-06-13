@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 FILE(GLOB GAME_SRC ../Classes/*.c)
 FILE(GLOB FRAMEWORK_SUPPORT ogl-samples-master/framework/*.cpp)
-set(SOURCE_FILES ogl-glflight/stubs.cpp ogl-glflight/gameWinStubs.c ogl-glflight/glFlightMain.cpp ogl-glflight/gameFramework.cpp ${GAME_SRC})
+set(SOURCE_FILES ogl-glflight/stubs.cpp ogl-glflight/gameWinStubs.c ogl-glflight/glFlightMain.cpp ogl-glflight/gameFramework.cpp ogl-glflight/gameAudioOpenAL.cpp ${GAME_SRC})
 
 include_directories(ogl-glflight)
 include_directories(../Classes)
@@ -26,6 +26,7 @@ set(EGL_DIRECTORY egl-1.4)
 set(ES_DIRECTORY gles-2.0)
 set(GLFW_DIRECTORY glfw-3.1.1)
 set(FREEIMAGE_DIRECTORY FreeImage-3.15.4)
+set(OPENAL_DIRECTORY "C:\\Program Files (x86)\\OpenAL 1.1 SDK")
 
 link_directories(${OGL_DIR}/external/${EGL_DIRECTORY}/lib/${PLATFORM})
 include_directories(${OGL_DIR}/external/${EGL_DIRECTORY})
@@ -40,6 +41,9 @@ link_directories(${OGL_DIR}/external/${GLFW_DIRECTORY}/src)
 include_directories(${OGL_DIR}/framework)
 link_directories(${OGL_DIR}/external/framework)
 
+include_directories(${OPENAL_DIRECTORY}/include)
+link_directories(${OPENAL_DIRECTORY}/libs/${PLATFORM})
+
 include_directories(${OGL_DIR}/external)
 include_directories(${OGL_DIR}/external/glfw-3.1.1/include)
 include_directories(${OGL_DIR}/external/glfw-3.1.1/deps)
@@ -47,7 +51,7 @@ include_directories(${OGL_DIR}/external/glu-0.1.0.0/glu)
 
 add_executable(glFlightMain ${SOURCE_FILES})
 
-target_link_libraries(glFlightMain framework libEGL FreeImage glfw3)
+target_link_libraries(glFlightMain framework libEGL FreeImage glfw3 OpenAL32)
 target_link_libraries(glFlightMain wsock32 ws2_32 winmm)
 target_link_libraries(glFlightMain opengl32)
 

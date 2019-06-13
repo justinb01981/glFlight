@@ -16,13 +16,14 @@
 
 #include "gameFramework.hpp"
 #include "gameWinTypes.h"
+#include "gameAudioOpenAL.h"
 
 #include <map>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-GLdouble d;
+#include <al.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,6 +59,7 @@ bool glFlightInited = false;
 
 std::map<int, int> touchIDMap;
 int touchStateTouchCount = 0;
+long long renderNext = 0;
 
 class GLFlightGame : public gameFramework
 {
@@ -128,6 +130,10 @@ public:
 
         glFlightInited = true;
 
+        openALInit();
+
+        renderNext = get_time_ms();
+
         return true;
     }
 
@@ -150,6 +156,8 @@ public:
         tex_pass = 0;
         glFlightDrawframeHook = gameDialogInitialCountdown;
 
+        openALUninit();
+
         DBPRINTF(("Java_com_domain17_glflight_GameRunnable_glFlightUninit called + exiting"));
 
         return true;
@@ -168,8 +176,13 @@ public:
 
 		glFlightFrameStage2();
 
+        renderNext += 1000 / GAME_FRAME_RATE;
+
 		// 60 FPS
-		Sleep(1000 / GAME_TICK_RATE);
+        //if (renderNext - get_time_ms() > 0)
+        //{
+   //       Sleep(renderNext - get_time_ms());
+        //}
 
         return true;
 	}
@@ -188,7 +201,6 @@ public:
         static int KEY_FIRE_MISSLE = GLFW_KEY_LEFT_SHIFT;
         static int KEY_ACCEL = GLFW_KEY_W;
         static int KEY_DECEL = GLFW_KEY_S;
-
 
         gameInterfaceTouchIDSet(1);
 
@@ -296,7 +308,9 @@ public:
                     cocoaMessageAudioList.next->f[0],
                     cocoaMessageAudioList.next->f[1]);
                 */
-                PlaySound(cocoaMessageAudioList.next->str, NULL, SND_FILENAME | SND_ASYNC);
+
+                openALPlay(cocoaMessageAudioList.next->str, cocoaMessageAudioList.next->f[0], cocoaMessageAudioList.next->f[1]);
+
                 cocoaMessageListPop(&cocoaMessageAudioList);
             }
 
