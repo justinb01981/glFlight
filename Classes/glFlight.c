@@ -537,8 +537,9 @@ calibrate_bail:
          glCullFace(GL_BACK);
      }
     
-     glDepthFunc(GL_LESS);
-     glEnable(GL_DEPTH_TEST);
+     // not using depth testing
+     //glDepthFunc(GL_LESS);
+     //glEnable(GL_DEPTH_TEST);
      glFrontFace(GL_CCW);
     
     drawBackground();
@@ -629,9 +630,7 @@ calibrate_bail:
     glMatrixMode(GL_MODELVIEW);
     
     glEnableClientState(GL_VERTEX_ARRAY);
-    
     glEnable(GL_TEXTURE_2D);
-    
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     
     glLoadIdentity();

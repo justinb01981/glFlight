@@ -222,7 +222,7 @@ ADD_OBJ_END(4, 40) \
 "object_set_info 8\n"
 
 #define BASE_ENEMY_1                           \
-"add_object "MAPMODEL_ENEMYBASE" rndx 50 rndz 0 0 0 4 "BASE_TEXTURE_ID_ENEMY"\n"       \
+"add_object " MAPMODEL_ENEMYBASE " rndx 50 rndz 0 0 0 4 " BASE_TEXTURE_ID_ENEMY "\n"       \
 "object_set_info 15\n"
 
 #define BASE_TURRET_1                        \
@@ -231,7 +231,7 @@ ADD_OBJ_END(4, 40) \
 "object_set_info 8\n"
 
 #define BASE_GENERIC(x, z)                            \
-"register_params 17 "/*"rndx"*/#x" "MAP_BASE_ALT" "/*"rndz"*/#z" 0 0 0 8 "/*"42"*//*"88"*/MAP_TEXTURE_ID_ANIMATED_STATIC" 0 0 0 0 0 0 0\n"                 \
+"register_params 17 "/*"rndx"*/#x" " MAP_BASE_ALT " "/*"rndz"*/#z" 0 0 0 8 "/*"42"*//*"88"*/MAP_TEXTURE_ID_ANIMATED_STATIC" 0 0 0 0 0 0 0\n"                 \
 "add_object r r r r r r r r " "r" "\n" \
 "object_set_info 13\n" \
 
@@ -267,8 +267,8 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0) \
 ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 
 #define BUILDING_1(x, y, z, h)                       \
-"set_vector "#x" "#y" "#z" 0 4 0\n"                  \
-"add_object 20 vecx_0 vecy_0 vecz_0 1.57 "#h" -1.57 4 112\n"
+"set_vector " #x " " #y " " #z " 0 4 0\n"                  \
+"add_object 20 vecx_0 vecy_0 vecz_0 1.57 " #h " -1.57 4 112\n"
 //"add_object 1 vecx_0 vecy_1 vecz_0 0 0 0 4 16\n"   \
 //"add_object 1 vecx_0 vecy_2 vecz_0 0 0 0 4 16\n"   \
 //"add_object 1 vecx_0 vecy_3 vecz_0 0 0 0 4 16\n"   \
@@ -315,7 +315,7 @@ const static char initial_map_200x100x200[] = ""
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
 
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"
 
 //"add_object 0 100 50 100 0 0 0 1 13\n" /* add a jet */
 //"add_enemy_jet 1 10\n" /* make last object a jet of difficulty n, durability x */
@@ -542,11 +542,11 @@ const static char initial_map_collection[] = ""
 
 //"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
 
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"
 
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
 
-"add_object "MAPMODEL_SPRITE_SCENERY" -175 75 -175 1.6 0.78 -1.6 100 ""114""\n"
+"add_object " MAPMODEL_SPRITE_SCENERY " -175 75 -175 1.6 0.78 -1.6 100 ""114""\n"
 "object_set_info 16\n" // scenery
 
 // else
@@ -589,7 +589,7 @@ const static char initial_map_turret[] = ""
 
 //"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
 
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"
 
 //MESH_CUBES_2(28, 4)
 WORLD_SCALED_FRAME_TURRET(1, 57, 4)
@@ -728,46 +728,46 @@ const static char initial_map_deathmatch[] = ""
 
 "set_world_size 200\n" // all must be divisible by MAX_WORLD_REGIONS
 ///WORLD_SCALED_FRAME_TERRAIN(-10, 28, 4)
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"
 
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"add_object "  MAPMODEL_ICOSAHEDRON  " rndx rndy rndz 0 0 0 2 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 4 14\n"
+"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 4 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 4 14\n"
+"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 4 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 8 14\n"
+"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 8 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 8 14\n"
+"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 8 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 4 14\n"
+"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 4 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 16 14\n"
+"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 16 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 8 14\n"
+"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 8 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 8 14\n"
+"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 8 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 // drifting asteroid example
-"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
+"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 2 14\n"
 "object_set_info 4\n" // moving block
 "object_set_velocity 0 0.5 0\n"
 
@@ -794,7 +794,7 @@ FLOATING_ISLAND(100, 100, -100)
 const static char initial_map_survival[] = ""
 
 WORLD_SCALED_FRAME(1, 28, 4)
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"
 
 // else
 "register_params 2 rndx 20 rndy 0 0 0 10 0 0 0 0 0 0 0 0\n"
@@ -1141,7 +1141,7 @@ const static char map_400x100x400[] = ""
 "set_world_size 400\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"
 
 "add_bounding_vec wx0.5 wy0 wz0.5 0 1 0\n" // floor
 "add_bounding_vec wx0.5 wy1.0 wz0.5 0 -1 0\n" // ceiling
@@ -1176,7 +1176,7 @@ const static char map_400x100x400_flat[] = ""
 "set_world_size 400\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"
 
 // mesh of cubes
 "mesh_manip_add wx1.0 " "wy0.0" " wz1.0" " -8 0 0" " 0 0 -8" " 50 50\n"
@@ -1188,7 +1188,7 @@ const static char map_200x100x200_pits[] = ""
 "set_world_size 200\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"
 
 // mesh of cubes
 "mesh_manip_add wx1.0 " "wy0.5" " wz1.0" " -4 0 0" " 0 0 -4" " 50 50\n"
@@ -1215,7 +1215,7 @@ RANDOM_FLOATING_BLOCKS_1
 // MARK: -- map - lobby
 const static char map_portal_lobby[] = ""
 "set_world_size 50\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"
 ;
 
 const static char pokeball_map[] = ""
@@ -1224,7 +1224,7 @@ const static char pokeball_map[] = ""
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
 
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"
 MESH_CUBES_1(19, 5)
 
 // add test tower
@@ -1266,7 +1266,7 @@ WORLD_ADD_OBJECT(11, rndx, rndy, rndz, 0, 0, 0, 1, 35) \
 
 //"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
 
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"
 
 //MESH_CUBES_2(28, 4)
 //WORLD_SCALED_FRAME_GL_TERRAIN(1, 83, 4)
@@ -1327,7 +1327,7 @@ const static char* maps_list_names[] =
 };
 
 const static char* initial_map = ""                         \
-"set_background_info "BACKGROUND_TEXTURE_STR"\n" \
+"set_background_info " BACKGROUND_TEXTURE_STR "\n" \
 WORLD_SCALED_FRAME(1, /*57*/28, 4) \
 MAP_GENERATED_MACRO \
 WORLD_ADD_OBJECT(0, -4, 5, -4, 0, 0, 0, 1.0 , 115)           \

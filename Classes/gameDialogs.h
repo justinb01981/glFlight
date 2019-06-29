@@ -374,8 +374,7 @@ gameDialogBrowseGames()
 static void
 gameDialogNetworkHostRegister()
 {
-    const int timeout = GAME_FRAME_RATE * 10;
-    static int passes = timeout;
+    static int passes = GAME_FRAME_RATE * 10;
     
     passes--;
     if(passes <= 0)
@@ -383,26 +382,25 @@ gameDialogNetworkHostRegister()
         glFlightDrawframeHook = NULL;
         gameNetworkState.gameNetworkHookOnMessage = NULL;
         
-        passes = timeout;
+        passes = GAME_FRAME_RATE * 10;
     }
 }
 
 static void
 gameDialogNetworkCountdownEnded()
 {
-    const int timeout = GAME_FRAME_RATE * 4;
-    static int passes = timeout;
+    static int passes = GAME_FRAME_RATE * 4;
     
     passes--;
     if(passes <= 0)
     {
-        console_write("NO games found - hosting\n");
+        console_write((char*) "NO games found - hosting\n");
         glFlightDrawframeHook = NULL;
         gameNetworkState.gameNetworkHookOnMessage = NULL;
         
         fireAction = ACTION_HOST_GAME_OR_COMMIT;
         gameInterfaceProcessAction();
-        passes = timeout;
+        passes = GAME_FRAME_RATE * 4;
     }
 }
 
@@ -479,7 +477,7 @@ gameDialogStartNetworkGame2()
     gameNetwork_startGame(300);
     gameStateSinglePlayer.max_enemies = gameDialogCounter;
     
-    gameNetwork_alert("ALERT:game started!");
+    gameNetwork_alert((char*)"ALERT:game started!");
 }
 
 static void
@@ -503,7 +501,7 @@ gameDialogStartNetworkGameNewMap()
     
     gameStateSinglePlayer.map_use_current = 1;
     
-    console_append("MAP: %s\n", maps_list_names[maps_list_idx]);
+    console_append((char*) "MAP: %s\n", maps_list_names[maps_list_idx]);
 }
 
 //static void
