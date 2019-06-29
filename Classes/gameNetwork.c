@@ -24,6 +24,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <errno.h>
+
+#define ADDRINFO struct addrinfo
 #else
 #include <winsock2.h>
 #include <ws2tcpip.h>
