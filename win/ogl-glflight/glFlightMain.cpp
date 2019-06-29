@@ -55,14 +55,18 @@ extern "C" {
 
 glFlightPrefs prefs;
 
-bool glFlightInited = false;
-
-std::map<int, int> touchIDMap;
-int touchStateTouchCount = 0;
-long long renderNext = 0;
-
 class GLFlightGame : public gameFramework
 {
+private:
+    bool glFlightInited = false;
+
+    std::map<int, int> touchIDMap;
+    int touchStateTouchCount = 0;
+
+    unsigned long bgThreadId;
+
+    WSAData wsaData;
+
 public:
 
     GLFlightGame(int argc, char* argv[]) :
@@ -126,20 +130,26 @@ public:
         glActiveTexture(GL_TEXTURE0);
         glEnable(GL_TEXTURE_2D);
 
+        WSAStartup(MAKEWORD(2, 2), &wsaData);
+
         glFlightInitialize();
 
         glFlightInited = true;
 
         openALInit();
 
-        renderNext = get_time_ms();
+        CreateThread(NULL, 1024 * 64, GLFlightGame::backgroundWorker, &glFlightInited, 0, &bgThreadId);
 
         return true;
     }
 
-    bool end() {
+    bool end() 
+    {
 
         glFlightInited = false;
+
+        // TODO: poll for thread exit code
+        Sleep(1000);
 
         gameNetwork_disconnect();
         if (save_map)
@@ -174,15 +184,7 @@ public:
         gameInputTranslate();
         gameAudioProcessEvents();
 
-		glFlightFrameStage2();
-
-        renderNext += 1000 / GAME_FRAME_RATE;
-
-		// 60 FPS
-        //if (renderNext - get_time_ms() > 0)
-        //{
-   //       Sleep(renderNext - get_time_ms());
-        //}
+        glFlightFrameStage2();
 
         return true;
 	}
@@ -316,6 +318,19 @@ public:
 
             gameAudioUnlock();
         }
+    }
+
+    static unsigned long 
+    backgroundWorker(void* arg)
+    {
+        bool* glFlightInited = (bool*) arg;
+
+        while (glFlightInited)
+        {
+            do_game_network_read();
+        }
+
+        return 0;
     }
 };
 

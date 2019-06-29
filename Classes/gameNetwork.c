@@ -27,10 +27,13 @@
 #else
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <mstcpip.h>
 //#include <ws2ipdef.h>
 //#include <socketapi.h>
 //#include <WinInet.h>
 //#include <in6addr.h>
+
+#define close closesocket
 #endif
 
 
@@ -124,28 +127,35 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
 {
     int sock;
     struct sockaddr_in6 addr;
-    struct sockaddr_in6* addr6 = (void*) &addr;
-    
-    sock = socket(AF_INET6, (stream? SOCK_STREAM: SOCK_DGRAM), 0);
-    if(sock < 0)
+    struct sockaddr_in6* addr6 = (void*)& addr;
+    int proto = 0;
+    ADDRINFO hints, * addrResult;
+
+    sock = socket(AF_INET6, (stream ? SOCK_STREAM : SOCK_DGRAM), proto);
+    if (sock < 0)
     {
         console_write("%s:%d %s\n", __func__, __LINE__, "socket failure");
         return -1;
     }
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET6;
+    hints.ai_flags = AI_PASSIVE | AI_V4MAPPED;
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_protocol = 0;
     
-    memset(&addr, 0, sizeof(addr));
-    
+    getaddrinfo(NULL, GAME_NETWORK_PORT_STR, &hints, &addrResult);
+    memcpy(addr6, addrResult->ai_addr, addrResult->ai_addrlen);
+
 #ifdef BSD_SOCKETS
     addr6->sin6_len = sizeof(struct sockaddr_in6);
 #endif
-    addr6->sin6_family = AF_INET6;
-    addr6->sin6_addr = in6addr_any;
-	addr6->sin6_port = htons(port);
-    
-	int bcast_enabled = 1;
-	int so_arg = 1;
+
+    int bcast_enabled = 1;
+    int so_arg = 1;
     int backlog = 10;
-    if(!stream)
+
+    if (!stream)
     {
         setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &bcast_enabled, sizeof(bcast_enabled));
     }
@@ -156,15 +166,15 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
         setsockopt(sock, SOL_SOCKET, O_NONBLOCK, &blocking, sizeof(blocking));
         */
     }
-    
+
 #ifdef BSD_SOCKETS
-	setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &so_arg, sizeof(so_arg));
+    setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &so_arg, sizeof(so_arg));
 #endif
-    
+
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &so_arg, sizeof(so_arg));
-#ifndef _NOT_POSIX
-    setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &so_arg, sizeof(so_arg));
-#endif
+
+    so_arg = 0;
+    setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &so_arg, sizeof(so_arg));
     
     /* bind */
     if(do_bind)
@@ -176,7 +186,7 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
         return -1;
     }
     
-    if(stream)
+    if(do_bind && stream)
     {
         if(listen(sock, backlog))
         {
@@ -217,10 +227,10 @@ send_lan_broadcast(gameNetworkMessage* msg)
 static void
 send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
 {
-    struct sockaddr_in6 sa;
-    size_t r;
-    
-    memcpy(&sa, address->storage, address->len);
+    struct sockaddr_in6* sa;
+    int r;
+
+    sa = (struct sockaddr_in6*) address->storage;
     
     if(gameNetworkState.hostInfo.bonjour_lan)
     {
@@ -230,7 +240,7 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
     
     errno = 0;
     r = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg),
-               0, (struct sockaddr*) &sa, address->len);
+               0, (struct sockaddr*) sa, address->len);
     if(r < 0)
     {
         printf("sendto: %ld - errno:%s\n", r, strerror(errno));
@@ -330,44 +340,46 @@ static int
 gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
 {
     char buf[128];
-    struct sockaddr_in6 addr6;
     
     if(!strchr(name, '.')) return GAME_NETWORK_ERR_FAIL;
-    
-    // find directory server
-    struct hostent* he = gethostbyname(name);
-    if(he && he->h_length > 0)
+
+    ADDRINFO addrInfo, *addrInfoResult;
+    memset(&addrInfo, 0, sizeof(addrInfo));
+    addrInfo.ai_family = AF_INET6;
+    addrInfo.ai_flags |= AI_V4MAPPED;
+    addrInfo.ai_protocol = IPPROTO_UDP;
+    addrInfo.ai_socktype = SOCK_DGRAM;
+
+    if (getaddrinfo(name, GAME_NETWORK_PORT_STR, &addrInfo, &addrInfoResult) != 0)
     {
-        memset(addr->storage, 0, sizeof(addr->storage));
-        
-        addr->len = sizeof(struct sockaddr_in);
-        struct sockaddr_in* sa = (struct sockaddr_in*) addr->storage;
-        sa->sin_family = AF_INET;
-        sa->sin_port = htons(GAME_NETWORK_PORT);
-#ifdef BSD_SOCKETS
-        sa->sin_len = sizeof(struct sockaddr_in);
-#endif
-        memcpy(&sa->sin_addr, he->h_addr_list[0],
-               sizeof(sa->sin_addr));
-        console_write("server DNS resolved: %s", inet_ntoa(sa->sin_addr));
-        
-        // convert to ipv6
-        sprintf(buf, "::FFFF:%s", inet_ntoa(sa->sin_addr));
-        memset(addr->storage, 0, sizeof(addr->storage));
-        addr->len = 0;
-        
-        if(inet_pton(AF_INET6, buf, &addr6.sin6_addr) == 1)
-        {
-            addr6.sin6_port = htons(gameNetworkState.hostInfo.port);
-            addr6.sin6_family = AF_INET6;
-#ifdef BSD_SOCKETS
-            addr6.sin6_len = sizeof(struct sockaddr_in6);
-#endif
-            addr->len = sizeof(struct sockaddr_in6);
-            memcpy(addr->storage, &addr6, sizeof(addr6));
-            return GAME_NETWORK_ERR_NONE;
-        }
+        return GAME_NETWORK_ERR_FAIL;
     }
+    
+    if (addrInfoResult->ai_family == AF_INET)
+    {
+        struct sockaddr_in* sa = addrInfoResult->ai_addr;
+        inet_ntop(addrInfoResult->ai_family, &sa->sin_addr, buf, sizeof(buf));
+        console_write("server DNS resolved: %s", buf);
+    }
+    if (addrInfoResult->ai_family == AF_INET6)
+    {
+        struct sockaddr_in6* sa = addrInfoResult->ai_addr;
+        inet_ntop(AF_INET6, &sa->sin6_addr, buf, sizeof(buf));
+        console_write("server DNS resolved: %s (ipv6)", buf);
+    }
+
+    memset(addr->storage, 0, sizeof(addr->storage));
+    if (addrInfoResult->ai_family == AF_INET6)
+    {
+        memcpy(addr->storage, addrInfoResult->ai_addr, addrInfoResult->ai_addrlen);
+        addr->len = addrInfoResult->ai_addrlen;
+    }
+    else
+    {
+        return GAME_NETWORK_ERR_FAIL;
+    }
+    freeaddrinfo(addrInfoResult);
+    return GAME_NETWORK_ERR_NONE;
     
     console_write("DNS lookup failed for %s\n", name);
     
@@ -465,6 +477,8 @@ gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becameh
     char strtmp[256];
     
     gameAddress.len = 0;
+
+    memset(&gameAddress, 0, sizeof(gameAddress));
     
     gameNetwork_disconnectSignal();
     
@@ -724,7 +738,6 @@ gameNetwork_disconnect()
             gameNetworkState.player_list_head.next_connected = gameNetworkState.player_list_head.next;
             free(pFree);
         }
-        
     }
 
     int* sock_set[] = {&gameNetworkState.hostInfo.socket.s,
@@ -739,8 +752,11 @@ gameNetwork_disconnect()
             int so_arg = 0;
             setsockopt(*(sock_set[s]), SOL_SOCKET, SO_LINGER, &so_arg, sizeof(so_arg));
 
-            close(*(sock_set[s]));
-            *(sock_set[s]) = -1;
+            if (*(sock_set[s]) > 0)
+            {
+                close(*(sock_set[s]));
+                *(sock_set[s]) = -1;
+            }
         }
     }
     
@@ -803,7 +819,7 @@ gameNetwork_startGame(unsigned int sec)
 gameNetworkError
 gameNetwork_send_player_core(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerInfoTarget)
 {
-    long s;
+    long s = 1;
     
     gameNetworkPlayerInfo* playerInfo = gameNetworkState.player_list_head.next_connected;
     while(playerInfo)
@@ -877,7 +893,7 @@ gameNetwork_send(gameNetworkMessage* msg)
 gameNetworkError
 gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsigned int timeout_ms)
 {
-    long r;
+    long r = 0;
     struct sockaddr_in6 from_addr;
     socklen_t from_addr_len;
     struct timeval block_time;
@@ -950,7 +966,18 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
                      0, (struct sockaddr*) &from_addr, &from_addr_len);
         if(r <= 0)
         {
-            printf("recvfrom: %ld errno:%s\n", r, strerror(errno));
+#ifdef _NOT_POSIX
+            errno = WSAGetLastError();
+            if (errno == WSAEMSGSIZE)
+            {
+                printf("errno=WSAEMSGSIZE: (sizeof(gameNetworkMessage):%u)\n", sizeof(gameNetworkMessage));
+                continue;
+            }
+            if (errno == WSAECONNRESET)
+            {
+                continue;
+            }
+#endif
             //close(*pSock);
             //*pSock = -1;
             return GAME_NETWORK_ERR_FAIL;
@@ -959,6 +986,8 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
         memset(src_addr, 0, sizeof(*src_addr));
         memcpy(src_addr->storage, &from_addr, from_addr_len);
         src_addr->len = from_addr_len;
+
+        // TODO: endian swap all fields on little-endian platforms
         
         if(gameNetworkState.hostInfo.hosting)
         {
