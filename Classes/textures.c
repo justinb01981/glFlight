@@ -30,6 +30,8 @@ convert_to_le_u32(u_int32_t v)
 {
     unsigned int test = 1;
     unsigned char* ptr = (unsigned char*) &test;
+
+    assert(sizeof(unsigned int) == 4);
     
     if(*ptr == 0)
     {
@@ -77,7 +79,7 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
      * created with GIMP
      */
     
-    fp = fopen(file_name, "r");
+    fp = fopen(file_name, "rb");
     if(fp)
     {
         // seek to end
@@ -103,6 +105,7 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
             fread(&pixel_offset, 1, sizeof(pixel_offset), fp);
             // offset is little-endian
             pixel_offset = convert_to_le_u32(pixel_offset);
+
             fseek(fp, pixel_offset, SEEK_SET);
             
             DBPRINTF(("texture %s: size:%lu pixel_offset:%d\n", file_name, file_size, pixel_offset));
@@ -117,7 +120,11 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
                     memset(pixel, 0x00, sizeof(pixel));
                     
                     int read_len = fread(pixel, 1, 3, fp);
-                    if(read_len < 3) break;
+                    
+                    if (read_len < 3) {
+                        DBPRINTF(("\tbail: read_len=%u, offset=%u\n", read_len, offset));
+                        break;
+                    }
                     
                     // little-endian-RGB -> RGBA
                     data[offset+0] = pixel[2];

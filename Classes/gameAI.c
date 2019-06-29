@@ -641,21 +641,20 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         slerp(zq.w, zq.x, zq.y, zq.z, 1, ax/dist, ay/dist, az/dist,
               elem->stuff.u.enemy.max_slerp*tc*juke_slerp_c,
               &z1q.w, &z1q.x, &z1q.y, &z1q.z);
-        
-        if(isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
+
+        xq.w += z1q.w-zq.w;
+        xq.x += z1q.x-zq.x;
+        xq.y += z1q.y-zq.y;
+        xq.z += z1q.z-zq.z;
+        yq.w += z1q.w-zq.w;
+        yq.x += z1q.x-zq.x;
+        yq.y += z1q.y-zq.y;
+        yq.z += z1q.z-zq.z;
+        zq = z1q;
+
+        if (isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
         {
-        }
-        else
-        {
-            xq.w += z1q.w-zq.w;
-            xq.x += z1q.x-zq.x;
-            xq.y += z1q.y-zq.y;
-            xq.z += z1q.z-zq.z;
-            yq.w += z1q.w-zq.w;
-            yq.x += z1q.x-zq.x;
-            yq.y += z1q.y-zq.y;
-            yq.z += z1q.z-zq.z;
-            zq = z1q;
+            z1q = zq;
         }
     }
     

@@ -19,6 +19,8 @@
 
 #include "gameIncludes.h"
 
+const static int MODEL_PRIMITIVES_NONE = 0;
+
 typedef GLfloat model_coord_t;
 // keep these in-sync
 #define index_type_enum GL_UNSIGNED_INT
@@ -142,9 +144,6 @@ static model_texcoord_t model_pyramid_texcoords[] =
     0,1
 };
 
-static int model_pyramid_primatives[] =
-{
-};
 /********************************************************/
 
 /********************************************************/
@@ -235,16 +234,6 @@ static model_index_t model_ship1_indices[] = {
     17,16,19,
 };
 
-static int model_ship1_primitives[] = {
-    /*
-    24,
-    12,
-    12,
-    18,
-    18,
-     */
-};
-
 static model_texcoord_t model_ship1_texcoords[] = {
     // diamond polygon cockpit
     0.5, 1,
@@ -318,14 +307,6 @@ static model_index_t model_turret_indices[] = {
     9,10,11
 };
 
-static int model_turret_primitives[] = {
-    /*
-    24,
-    6,
-    6,
-     */
-};
-
 static model_texcoord_t model_turret_texcoords[] = {
     0.5,0.5,
     0.5,0.5,
@@ -374,9 +355,6 @@ static model_texcoord_t model_bullet_texcoords[] = {
     0.5, 0.5
 };
 
-static int model_bullet_primitives[] =
-{
-};
 /********************************************************/
 
 static model_texcoord_t model_contrail_texcoords[] =
@@ -445,9 +423,6 @@ static model_index_t model_contrail_indices[] =
     11,8,9, 10,11,9, // bottom
 };
 
-static int model_contrail_primitives[] =
-{
-};
 /********************************************************/
 static model_texcoord_t model_cube_texcoords_alt[] =
 {
@@ -612,14 +587,6 @@ static model_coord_t model_cube_normals[] =
     0.0, 0.0, -1.0, // vec
 };
 
-static int model_cube_primitives[] = 
-{
-};
-
-static int model_no_primitives[] =
-{
-};
-
 static model_coord_t model_flattenedcube_normals[] =
 {
     0.5, 0.0, 0.0, // coord
@@ -687,9 +654,6 @@ static model_texcoord_t model_square_texcoords[] =
 	0,1
 };
 
-static int model_square_primatives[] =
-{
-};
 /********************************************************/
 static model_coord_t model_surface[] = 
 {
@@ -710,9 +674,7 @@ static model_texcoord_t model_surface_texcoords[] =
 	1,1,
 	0,1
 };
-static int model_surface_primitives[] =
-{
-};
+
 /********************************************************/
 static model_coord_t model_sprite[] = 
 {
@@ -758,9 +720,6 @@ static model_texcoord_t model_sprite_texcoords[] =
 	1,0,
 	1,1,
 	0,1,
-};
-static int model_sprite_primitives[] =
-{
 };
 
 static model_coord_t model_sprite_normals[] =
@@ -830,9 +789,6 @@ static model_index_t model_vertical_pillar_indices[] =
 	5,4,7, 7,6,5,
 };
 
-static int model_vertical_pillar_primitives[] = 
-{
-};
 /********************************************************/
 
 static model_coord_t model_ship2[] =
@@ -885,14 +841,6 @@ static model_index_t model_ship2_indices[] = {
     11,12,14, 14,12,11,
     12,13,14, 14,13,12,
     11,14,15, 15,14,11
-};
-
-static int model_ship2_primitives[] = {
-    /*
-    24,
-    18,
-    18,
-     */
 };
 
 static model_texcoord_t model_ship2_texcoords[] = {
@@ -971,11 +919,6 @@ static model_texcoord_t model_missle_texcoords[] = {
     0.5, 0.75,
     0.5, 0.25
 };
-
-static int model_missle_primitives[] =
-{
-};
-
 
 /********************************************************/
 
@@ -1069,16 +1012,6 @@ static model_index_t model_ship3_indices[] = {
     21,15,20,
     21,15,17,
     17,15,21
-};
-
-static int model_ship3_primitives[] = {
-    /*
-    24,
-    24,
-    24,
-    24,
-    24
-     */
 };
 
 static model_texcoord_t model_ship3_texcoords[] = {
@@ -1183,10 +1116,6 @@ static model_index_t model_icosahedron_indices[] =
     9,8,11,
     10,9,11,
     6,10,11
-};
-
-static int model_icosahedron_primitives[] =
-{
 };
 
 static model_texcoord_t model_icosahedron_texcoords[] =
@@ -1466,16 +1395,6 @@ static model_texcoord_t model_enemy_base_core_texcoords[] = {
     0.5, 1,
     0.5, 0.5,
     0.5, 0.5
-};
-
-static int model_enemy_base_primatives[] =
-{
-    /*
-    18,
-    18,
-    18,
-    18
-     */
 };
 
 /********************************************************/
@@ -1871,9 +1790,6 @@ static model_index_t model_blendship_indices[] = {
     48, 46, 47
 };
 
-static int model_blendship_primitives[] = {
-};
-
 /********************************************************/
 static model_coord_t model_tbuilding_coords[] = {
     0.5, -0.5, -0.5,
@@ -1937,8 +1853,7 @@ static model_index_t model_tbuilding_indices[] = {
     18, 19, 20,
     21, 22, 23
 };
-static int model_tbuilding_primitives[] = {
-};
+
 static model_coord_t model_tbuilding_normals[] =
 {
     1.0, 0.0, 0.0, // coord
@@ -1997,13 +1912,11 @@ models_iterate()
     
     l = model_cube[0];
     l = model_cube_indices[0];
-    l = model_cube_primitives[0];
     l = model_cube_texcoords[0];
     l = model_cube_texcoords_alt[0];
     
     l = model_vertical_pillar[0];
     l = model_vertical_pillar_indices[0];
-    l = model_vertical_pillar_primitives[0];
     
 }
 /********************************************************/

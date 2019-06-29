@@ -12,7 +12,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdarg.h>
+#ifndef _NOT_POSIX
 #include <sys/time.h>
+#else
+#include <time.h>
+#include <Winsock2.h>
+#endif
 #include "worldElem.h"
 #include "gameCamera.h"
 #include "gameGlobals.h"
@@ -23,8 +28,11 @@
 
 
 typedef int BOOL;
+
+#ifndef _NOT_POSIX
 const static int TRUE = 1;
 const static int FALSE = 0;
+#endif
 
 int n_elements_compared = 0;
 volatile float time_ms = 1;

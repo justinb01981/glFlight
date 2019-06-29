@@ -90,7 +90,7 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
         else if(strcmp(token, "object_identify") == 0)
         {
             map_cmd->type = MAP_IDENT_OBJECT;
-            if(line) strncpy(map_cmd->cparams, line, sizeof(map_cmd->cparams)-1);
+            if (line) strncpy(map_cmd->cparams, line, sizeof(map_cmd->cparams) - 1);
             n_params = 1;
         }
         else if(strcmp(token, "object_set_sub_info") == 0)
@@ -350,8 +350,6 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
         
         strtok_r(NULL, " ", &line);
     }
-    
-    
     
     free(line1);
     

@@ -923,7 +923,7 @@ void drawControls()
             strcpy(controls[i]->text, menuBuf);
         }
         
-        if(controls[i] == &gameInterfaceControls.trim)
+        if(controls[i] == &gameInterfaceControls.trim && controls[i]->visible)
         {
             glMatrixMode(GL_TEXTURE);
             glPopMatrix();
@@ -987,6 +987,7 @@ void drawControls()
                     Ox = controls[i]->x + controls[i]->xw - gameInterfaceControls.textHeight;
                     Oy = controls[i]->y;
                 }
+                
                 drawText(displayText,
                          // lines drawn along x
                          Ox,
@@ -1028,6 +1029,7 @@ drawState2dSet(gameGraphics_drawState2d* state)
     
     glVertexPointer(3, GL_FLOAT, 0, drawState_2d.coords);
     glTexCoordPointer(2, GL_FLOAT, 0, drawState_2d.texcoords);
+
 }
 
 void
@@ -1043,9 +1045,10 @@ drawElemBatch()
     if(drawElem_indicesBatchBuffer_count > 0)
     {
         glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBufferCur);
-        gl_vertex_ptr_last = drawElem_vertexBatchBufferCur;
         glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBufferCur);
+        gl_vertex_ptr_last = drawElem_vertexBatchBufferCur;
         gl_texcoord_ptr_last = drawElem_textCoordBatchBufferCur;
+
         glDrawElements(GL_TRIANGLES, drawElem_indicesBatchBuffer_count, index_type_enum, drawElem_indicesBatchBufferCur);
         
         drawElem_indicesBatchBufferCur = drawElem_indicesBatchBufferCur + drawElem_indicesBatchBuffer_count;
@@ -1527,8 +1530,9 @@ drawBackground_tess(float* modelC, float* textureC, unsigned int* indicesC, unsi
 {
     glVertexPointer(3, GL_FLOAT, 0, modelC);
     glTexCoordPointer(2, GL_FLOAT, 0, textureC);
+
     bindTexture(TEXTURE_ID_TERRAIN);
-    glDrawElements(GL_TRIANGLES, (int) indicesN, index_type_enum, indicesC);
+    glDrawElements(GL_TRIANGLES, (int)indicesN, index_type_enum, indicesC);
 }
 
 void
@@ -1559,9 +1563,10 @@ drawBackgroundCore()
     
     glVertexPointer(3, GL_FLOAT, 0, bgData->coords);
     glTexCoordPointer(2, GL_FLOAT, 0, bgData->texcoords);
+
     bindTexture(bgData->tex_id);
     glDrawElements(GL_TRIANGLES, bgData->n_indices,
-                   index_type_enum, bgData->indices);
+        index_type_enum, bgData->indices);
     
     glPopMatrix();
     
@@ -1741,6 +1746,7 @@ drawLineWithColorAndWidth(float a[3], float b[3], float color[3], float width)
      */
 
     glVertexPointer(3, GL_FLOAT, 0, drawLineData.coords);
+
     glDrawElements(GL_LINES, 2, index_type_enum, drawLineData.indices);
 }
 
@@ -1856,7 +1862,6 @@ void
 drawTriangleMesh(struct mesh_opengl_t* glmesh, int tex_id)
 {
     glVertexPointer(3, GL_FLOAT, 0, glmesh->coords);
-    
     glTexCoordPointer(2, GL_FLOAT, 0, glmesh->tex_coords);
     
     bindTexture(tex_id);

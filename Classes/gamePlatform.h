@@ -11,10 +11,16 @@
 
 /* edit these */
 
+#ifdef GAME_PLATFORM_ANGLE 
+
+#else
+
 #ifdef GAME_PLATFORM_IOS
 #define GAME_PLATFORM_ANDROID 0
 #else
 #define GAME_PLATFORM_ANDROID 1
+#endif
+
 #endif
 
 #endif

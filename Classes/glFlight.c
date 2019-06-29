@@ -630,9 +630,7 @@ calibrate_bail:
     glMatrixMode(GL_MODELVIEW);
     
     glEnableClientState(GL_VERTEX_ARRAY);
-    
     glEnable(GL_TEXTURE_2D);
-    
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     
     glLoadIdentity();

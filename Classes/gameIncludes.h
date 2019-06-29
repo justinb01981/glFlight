@@ -10,7 +10,13 @@
 #define gl_flight_gameIncludes_h
 
 #include "gamePlatform.h"
-
+#if GAME_PLATFORM_ANGLE 
+#define GL_GLES_PROTOTYPES 1
+//#include <GLES2/gl2.h>
+//#include <GL/glext.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#else
 #if GAME_PLATFORM_ANDROID
 #include <GLES/gl.h>
 #include <GLES/glext.h>
@@ -22,6 +28,8 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #define BSD_SOCKETS
+#endif
+
 #endif
 
 #endif

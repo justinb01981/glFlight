@@ -83,7 +83,7 @@ typedef struct
 #define GAME_VARIABLES_MAX 32
 #define GAME_VARIABLE(x) (game_variable_get(x))
 
-static char *game_log_messages[] = {
+static const char *game_log_messages[] = {
     /*"^D: firewalled :-)\n"*/ "^D secured\n",
     "HIDDEN: detected: virus\n",
     "HIDDEN: detected: bounty hunter\n",

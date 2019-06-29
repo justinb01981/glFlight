@@ -79,7 +79,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2877"
             endingLineNumber = "2877"
-            landmarkName = "gameNetwork_onBonjourConnecting3()"
+            landmarkName = "gameNetwork_action_handle()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -255,7 +255,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3004"
             endingLineNumber = "3004"
-            landmarkName = "gameNetwork_onDirectoryRegister1()"
+            landmarkName = "gameNetwork_onBonjourConnecting2()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
