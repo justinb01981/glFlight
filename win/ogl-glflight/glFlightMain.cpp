@@ -97,6 +97,7 @@ public:
 
         console_init();
 
+        sprintf(glFlightGameResourceInfo.pathPrefix, "resources/");
         initTextures(glFlightGameResourceInfo.pathPrefix);
 
         gameNetwork_init_mem();
