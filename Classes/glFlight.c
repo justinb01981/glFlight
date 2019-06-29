@@ -537,8 +537,9 @@ calibrate_bail:
          glCullFace(GL_BACK);
      }
     
-     glDepthFunc(GL_LESS);
-     glEnable(GL_DEPTH_TEST);
+    // not using depth testing (yet)
+     //glDepthFunc(GL_LESS);
+     //glEnable(GL_DEPTH_TEST);
      glFrontFace(GL_CCW);
     
     drawBackground();

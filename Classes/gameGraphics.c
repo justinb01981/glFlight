@@ -325,6 +325,7 @@ void drawText(char *str, float x, float y, float scale)
     
     glDisable(GL_BLEND);
     
+    glMatrixMode(GL_TEXTURE);
     glPopMatrix();
     
     setupGLModelViewDone();
@@ -924,6 +925,7 @@ void drawControls()
         
         if(controls[i] == &gameInterfaceControls.trim)
         {
+            glMatrixMode(GL_TEXTURE);
             glPopMatrix();
         }
         

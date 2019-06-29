@@ -540,6 +540,7 @@ RANDOM_FLOATING_BLOCKS_1
 // MARK: -- map - collection
 const static char initial_map_collection[] = ""
 
+#if 0
 //"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
 
 "set_background_info "BACKGROUND_TEXTURE_STR"\n"
@@ -582,6 +583,10 @@ BASE_GENERIC(0, 0)
 "register_params_update 0 10 10 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
 "add_object 1 r r r 0 0 0 10 40\n"
  */
+#else
+WORLD_SCALED_FRAME(1, /*57*/28, 4)
+"map_program_with_args 100 0 100\n"
+#endif
 ;
 
 // MARK: -- map - turret

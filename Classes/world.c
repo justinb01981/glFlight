@@ -2499,20 +2499,42 @@ world_add_drawline(float a[3], float b[3], float color[3], unsigned int lifetime
     if(lifetime > 0) world_object_set_lifetime(elem_id, lifetime);
 }
 
+int added = 0;
+
+void
+world_build_run_program_rgn(float Ao[3], float Auv[3], float Am, float R[16], Model m, int texture_id, int depth)
+{
+    float P[3];
+    float V[3];
+    int C = 4;
+    int i;
+    
+    memcpy(P, Ao, sizeof(P));
+    
+    V[0] = Auv[0]*R[0] + Auv[1]*R[1] + Auv[2]*R[2] + R[3];
+    V[1] = Auv[0]*R[C] + Auv[1]*R[C+1] + Auv[2]*R[C+2] + R[C+3];
+    V[2] = Auv[0]*R[C*2] + Auv[1]*R[C*2+1] + Auv[2]*R[C*2+2] + R[C*2+3];
+    
+    for(i = 0; i < 3; i++) P[i] = Ao[i]+V[i];
+    
+    world_add_object(m, P[0], P[1], P[2], 0, 0, 0, 1.0, texture_id);
+    
+    if(depth > 0) world_build_run_program_rgn(P, V, Am, R, m, texture_id, depth-1);
+}
+
 void
 world_build_run_program(float x, float y, float z)
 {
-    float a, b;
-    for(a = 0; a < M_PI*2; a += 0.4)
-    {
-        for(b = 0; b < 50; b += 10)
-        {
-            float c[] = {sin(a)*b, 0, cos(a)*b};
-            int obj_id =
-                world_add_object(MODEL_ICOSAHEDRON, x + c[0], y + c[1], z + c[2], 0, 0, 0, 2, TEXTURE_ID_BALL);
-            obj_id = obj_id;
-        }
-    }
+    float origin[] = {0, 0, 0};
+    float V[] = {1, 0, 0};
+    float R[] = {
+        0.70710725027, 0, -0.70710631209, 0,
+        0, 1, 0, 5,
+        0.70710725027, 0, 0.70710631209, 0,
+        0, 0, 0, 1
+    };
+    
+    world_build_run_program_rgn(origin, V, 1, R, MODEL_BUILDING3, TEXTURE_ID_BUILDING3, 32);
 }
 
 int

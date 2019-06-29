@@ -1712,14 +1712,6 @@ game_run()
                     }
                     break;
                     
-                case OBJ_WRECKAGE:
-                    {
-                        world_replace_object(pCur->elem->elem_id, pCur->elem->type,
-                                             pCur->elem->physics.ptr->x, pCur->elem->physics.ptr->y, pCur->elem->physics.ptr->z,
-                                             0, 0, 0, pCur->elem->scale * 1.01, pCur->elem->texture_id);
-                    }
-                    break;
-                    
                 default:
                     break;
             }

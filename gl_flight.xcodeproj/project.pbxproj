@@ -117,8 +117,6 @@
 		D03665EB20162D5A00B106AE /* texture106.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665EA20162D5A00B106AE /* texture106.bmp */; };
 		D03665F4201801FE00B106AE /* texture107.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665F3201801FD00B106AE /* texture107.bmp */; };
 		D03ADBA8178271E900D725F7 /* actions.c in Sources */ = {isa = PBXBuildFile; fileRef = D03ADBA7178271E800D725F7 /* actions.c */; };
-		D03ECCDF228766C1001581E2 /* texture117.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03ECCDE228766C1001581E2 /* texture117.bmp */; };
-		D03ECCE0228766C1001581E2 /* texture117.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03ECCDE228766C1001581E2 /* texture117.bmp */; };
 		D03ECD8F228F7EC1001581E2 /* gameMotionInterp.c in Sources */ = {isa = PBXBuildFile; fileRef = D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */; };
 		D03ECD90228F7EC1001581E2 /* gameMotionInterp.c in Sources */ = {isa = PBXBuildFile; fileRef = D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */; };
 		D04256671DA75CFB00E9C17B /* texture98.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D04256661DA75CFB00E9C17B /* texture98.bmp */; };
@@ -565,7 +563,6 @@
 		D03ADBA617823B5B00D725F7 /* gameSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameSettings.h; sourceTree = "<group>"; };
 		D03ADBA7178271E800D725F7 /* actions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actions.c; sourceTree = "<group>"; };
 		D03BD6BD20E2576E001CC3DC /* mapgenerated.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mapgenerated.h; sourceTree = "<group>"; };
-		D03ECCDE228766C1001581E2 /* texture117.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture117.bmp; sourceTree = "<group>"; };
 		D03ECD8D228F6FB0001581E2 /* gameMotionInterp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameMotionInterp.h; sourceTree = "<group>"; };
 		D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gameMotionInterp.c; sourceTree = "<group>"; };
 		D04256661DA75CFB00E9C17B /* texture98.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture98.bmp; sourceTree = "<group>"; };
@@ -861,7 +858,6 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				D03ECCDE228766C1001581E2 /* texture117.bmp */,
 				D0280A5F2241BA2000E8C1E8 /* texture116.bmp */,
 				D0BB4FBA2224FE71009457A4 /* texture115.bmp */,
 				D0549E8320ED4126009FF191 /* texture114.bmp */,
@@ -1180,7 +1176,6 @@
 				D02B8F0D195DF2CC00830369 /* texture30.bmp in Resources */,
 				6DEA18FD15A4610B007BD58F /* texture2.bmp in Resources */,
 				D02B8F0E195DF2CC00830369 /* texture31.bmp in Resources */,
-				D03ECCDF228766C1001581E2 /* texture117.bmp in Resources */,
 				6DEFF8ED15A60C310078E98E /* texture3.bmp in Resources */,
 				D0A5536918BC16C700F7E798 /* towing.wav in Resources */,
 				D0A66F41194B9497004A5E42 /* texture68.bmp in Resources */,
@@ -1474,7 +1469,6 @@
 				D0BCC9812052EDC100094809 /* texture106.bmp in Resources */,
 				D0549E8520ED412C009FF191 /* texture114.bmp in Resources */,
 				D0BCC9822052EDC100094809 /* texture56.bmp in Resources */,
-				D03ECCE0228766C1001581E2 /* texture117.bmp in Resources */,
 				D0BCC9832052EDC100094809 /* texture105.bmp in Resources */,
 				D0BCC9852052EDC100094809 /* texture66.bmp in Resources */,
 				D0BD22F020559D9000D4AEE3 /* Default.sc.png in Resources */,
@@ -1631,7 +1625,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = shipicon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Justin Brady (FP3HEP75WZ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
@@ -1749,7 +1743,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Justin Brady (ZQVH66AQJ9)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
