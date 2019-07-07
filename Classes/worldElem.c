@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <assert.h>
+#include <math.h>
 #include "gameDebug.h"
 #include "worldElem.h"
 #include "simple_hash.h"
@@ -779,6 +780,8 @@ world_elem_btree_remove(world_elem_btree_node* root, WorldElem* elem)
     if(!elem->stuff.btree_node) return;
     
     float order = ((world_elem_btree_node*)elem->stuff.btree_node)->order;
+    
+    //if(isnan(order)) assert(0);
     
     //if(((world_elem_btree_node*)elem->stuff.btree_node[world_elem_btree_ptr_idx])) ((world_elem_btree_node*)elem->stuff.btree_node[world_elem_btree_ptr_idx])->elem = NULL;
     //elem->stuff.btree_node[world_elem_btree_ptr_idx] = NULL;

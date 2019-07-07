@@ -1481,51 +1481,12 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, flo
     float mv[3];
     float s = Frepulse;
     float repulse_min = 0.1;
-    int dmin;
     int i;
-
-    /*
-    float v = pCollisionA->physics.ptr->velocity + repulse_min;
-
-    mv[0] = (pCollisionA->physics.ptr->x - pCollisionB->physics.ptr->x) * v * tc * s;
-    mv[1] = (pCollisionA->physics.ptr->y - pCollisionB->physics.ptr->y) * v * tc * s;
-    mv[2] = (pCollisionA->physics.ptr->z - pCollisionB->physics.ptr->z) * v * tc * s;
     
-    // repulse along min overlapping axis
-    dmin = 0;
     for(i = 0; i < 3; i++)
     {
-        if(check_bounding_box_overlap_result[i] < check_bounding_box_overlap_result[dmin]) dmin = i;
+        mv[i] = check_bounding_box_overlap_result[i] * (pCollisionA->physics.ptr->velocity+repulse_min) * s;
     }
-    for(i = 0; i < 3; i++) if(dmin != i) mv[i] = 0.0;
-    
-    // cancel velocity along one axis
-    float* p[] = {
-        &pCollisionA->physics.ptr->vx,
-        &pCollisionA->physics.ptr->vy,
-        &pCollisionA->physics.ptr->vz
-    };
-    for(i = 0; i < 3; i++) if(dmin == i) *(p[i]) = 0;
-
-    move_elem_relative(pCollisionA, mv[0], mv[1], mv[2]);
-    
-    if(isnan(pCollisionA->physics.ptr->x) || isnan(pCollisionA->physics.ptr->y) || isnan(pCollisionA->physics.ptr->z))
-    {
-        printf("world_repulse_elem/isNan\n");
-    }
-     */
-    
-    int cancelI = 0;
-    for(i = 0; i < 3; i++)
-    {
-        //if(check_bounding_box_overlap_result[i] > check_bounding_box_overlap_result[cancelI]) cancelI = i;
-        
-        //mv[i] = check_bounding_box_overlap_result[i] * (pCollisionA->physics.ptr->velocity+repulse_min) * tc * s;
-    }
-    
-    mv[0] = (collision_vorigin[0] - pCollisionA->physics.ptr->x) * 1.0;
-    mv[1] = (collision_vorigin[1] - pCollisionA->physics.ptr->y) * 1.0;
-    mv[2] = (collision_vorigin[2] - pCollisionA->physics.ptr->z) * 1.0;
     
     move_elem_relative(pCollisionA, mv[0], mv[1], mv[2]);
     
@@ -1538,8 +1499,7 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, flo
     
     for(i = 0; i < 3; i++)
     {
-        //*p[i] = mv[i] * (0.5/tc);
-        *p[i] = check_bounding_box_overlap_result[i] * (s/tc) * pCollisionA->physics.ptr->velocity;
+        *p[i] = check_bounding_box_overlap_result[i] * (s/tc);
     }
 }
 
@@ -1812,7 +1772,6 @@ world_update(float tc)
     int do_check_collisions = 1;
     int do_sound_checks = 1;
     float FRdiv = 64;
-    float FRcollision = collision_repulsion_coeff;
     // HACK: -- apply min velocity "wobble back/forth"
     float Fmin = 0.01 * (tex_pass % 2) - 1;
     int iF;
@@ -1963,10 +1922,14 @@ world_update(float tc)
                     
                     if(!out_of_bounds_remove)
                     {
-                        collision_vorigin[0] = pElem->physics.ptr->x; collision_vorigin[1] = pElem->physics.ptr->y; collision_vorigin[2] = pElem->physics.ptr->z;
+                        float momentum = 1;
+                        
+                        collision_vorigin[0] = pElem->physics.ptr->x;
+                        collision_vorigin[1] = pElem->physics.ptr->y;
+                        collision_vorigin[2] = pElem->physics.ptr->z;
                         
                         // MARK: -- attempt to move along vm
-                        move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
+                        //move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
                         
                         // MARK: -- resolve collisions with other objects
                         collision_action_table_t* collision_actions_table_list[] =
@@ -1994,9 +1957,7 @@ world_update(float tc)
                                 {
                                     WorldElem* pRegionElem;
                                     
-                                    region_collision_retry:
-                                    
-                                    if(FRcollision <= 0) break;
+                                    //region_collision_retry:
                                     
                                     gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead->next;
                                     
@@ -2038,11 +1999,9 @@ world_update(float tc)
                                                 
                                                 if(colact == COLLISION_ACTION_REPULSE)
                                                 {
-                                                    world_repulse_elem(pElem, pElemCollided, tc, FRcollision);
+                                                    momentum = 0;
                                                     
-                                                    // re-start collision test at new (repulsed) coordinates
-                                                    cl = 0;
-                                                    FRcollision -= collision_repulsion_coeff/FRdiv;
+                                                    world_repulse_elem(pElem, pElemCollided, tc, collision_repulsion_coeff);
                                                     
                                                     if(pElem->elem_id == my_ship_id && !sound_played)
                                                     {
@@ -2052,8 +2011,6 @@ world_update(float tc)
                                                                                      pElem->physics.ptr->y,
                                                                                      pElem->physics.ptr->z);
                                                     }
-                                                    
-                                                    goto region_collision_retry;
                                                 }
 
                                             collision_list_add_retry:
@@ -2123,7 +2080,6 @@ world_update(float tc)
                                         if(!gWorld->world_update_state.world_region_iterate_cur)
                                         {
                                             gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead;
-                                            FRcollision -= collision_repulsion_coeff/FRdiv;
                                         }
                                         
                                         gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;
@@ -2133,11 +2089,12 @@ world_update(float tc)
                             cl++;
                         }
                         
+                        // no collisions, move along VM
+                        if(momentum > 0) move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
+                        
                         // MARK: -- resolve collisions with other objects - DONE (restore collision priority)
                         
                         add_element_to_region(pElem);
-                        
-                        FRcollision = collision_repulsion_coeff;
                     }
                     else
                     {
@@ -2472,44 +2429,6 @@ world_add_drawline(float a[3], float b[3], float color[3], unsigned int lifetime
     }
     
     if(lifetime > 0) world_object_set_lifetime(elem_id, lifetime);
-}
-
-int added = 0;
-
-void
-world_build_run_program_rgn(float Ao[3], float Auv[3], float Am, float R[16], Model m, int texture_id, int depth)
-{
-    float P[3];
-    float V[3];
-    int C = 4;
-    int i;
-    
-    memcpy(P, Ao, sizeof(P));
-    
-    V[0] = Auv[0]*R[0] + Auv[1]*R[1] + Auv[2]*R[2] + R[3];
-    V[1] = Auv[0]*R[C] + Auv[1]*R[C+1] + Auv[2]*R[C+2] + R[C+3];
-    V[2] = Auv[0]*R[C*2] + Auv[1]*R[C*2+1] + Auv[2]*R[C*2+2] + R[C*2+3];
-    
-    for(i = 0; i < 3; i++) P[i] = Ao[i]+V[i];
-    
-    world_add_object(m, P[0], P[1], P[2], 0, 0, 0, 1.0, texture_id);
-    
-    if(depth > 0) world_build_run_program_rgn(P, V, Am, R, m, texture_id, depth-1);
-}
-
-void
-world_build_run_program(float x, float y, float z)
-{
-    float origin[] = {0, 0, 0};
-    float V[] = {1, 0, 0};
-    float R[] = {
-        0.70710725027, 0, -0.70710631209, 0,
-        0, 1, 0, 5,
-        0.70710725027, 0, 0.70710631209, 0,
-        0, 0, 0, 1
-    };
-    
-    world_build_run_program_rgn(origin, V, 1, R, MODEL_BUILDING3, TEXTURE_ID_BUILDING3, 32);
 }
 
 int

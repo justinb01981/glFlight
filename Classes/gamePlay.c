@@ -1511,7 +1511,7 @@ game_handle_destruction(WorldElem* elem)
         // add wreckage
         wreck_id =
         world_add_object(MODEL_SPRITE, elem->physics.ptr->x, elem->physics.ptr->y, elem->physics.ptr->z,
-                         0, 0, 0, 1, TEXTURE_ID_WRECKAGE);
+                         0, 0, 0, 4, TEXTURE_ID_WRECKAGE);
         world_get_last_object()->destructible = 0;
         world_get_last_object()->object_type = OBJ_WRECKAGE;
         world_object_set_lifetime(wreck_id, GAME_FRAME_RATE * 5);

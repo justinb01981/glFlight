@@ -105,7 +105,7 @@ typedef struct {
     game_timeval_t euler_last_interp;
 } motion_interp_st;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
     unsigned int vers;
     unsigned int game_id;

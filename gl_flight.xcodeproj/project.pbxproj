@@ -120,6 +120,8 @@
 		D03ECD8F228F7EC1001581E2 /* gameMotionInterp.c in Sources */ = {isa = PBXBuildFile; fileRef = D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */; };
 		D03ECD90228F7EC1001581E2 /* gameMotionInterp.c in Sources */ = {isa = PBXBuildFile; fileRef = D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */; };
 		D04256671DA75CFB00E9C17B /* texture98.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D04256661DA75CFB00E9C17B /* texture98.bmp */; };
+		D04E466D22C833D1003D0055 /* mapgenerated.c in Sources */ = {isa = PBXBuildFile; fileRef = D04E466C22C833D1003D0055 /* mapgenerated.c */; };
+		D04E466E22C833D2003D0055 /* mapgenerated.c in Sources */ = {isa = PBXBuildFile; fileRef = D04E466C22C833D1003D0055 /* mapgenerated.c */; };
 		D04EB4CD1BDDCD5E0089D9F0 /* app_icon120x120_orig.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4CC1BDDCD5E0089D9F0 /* app_icon120x120_orig.png */; };
 		D04EB4CF1BDDF9DB0089D9F0 /* app_icon_lg_prev.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4CE1BDDF9DB0089D9F0 /* app_icon_lg_prev.jpg */; };
 		D04EB4D11BDE0F5F0089D9F0 /* app_icon76x76.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4D01BDE0F5F0089D9F0 /* app_icon76x76.png */; };
@@ -566,6 +568,7 @@
 		D03ECD8D228F6FB0001581E2 /* gameMotionInterp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameMotionInterp.h; sourceTree = "<group>"; };
 		D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gameMotionInterp.c; sourceTree = "<group>"; };
 		D04256661DA75CFB00E9C17B /* texture98.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture98.bmp; sourceTree = "<group>"; };
+		D04E466C22C833D1003D0055 /* mapgenerated.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mapgenerated.c; sourceTree = "<group>"; };
 		D04EB4CC1BDDCD5E0089D9F0 /* app_icon120x120_orig.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon120x120_orig.png; sourceTree = "<group>"; };
 		D04EB4CE1BDDF9DB0089D9F0 /* app_icon_lg_prev.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = app_icon_lg_prev.jpg; sourceTree = "<group>"; };
 		D04EB4D01BDE0F5F0089D9F0 /* app_icon76x76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon76x76.png; sourceTree = "<group>"; };
@@ -759,6 +762,7 @@
 				6D07DE3A15F7FC830048129B /* gameShip.h */,
 				6D07DE3C15F7FCA00048129B /* gameShip.c */,
 				6D595F641652CB0D00C21926 /* maps.h */,
+				D04E466C22C833D1003D0055 /* mapgenerated.c */,
 				D03BD6BD20E2576E001CC3DC /* mapgenerated.h */,
 				6D3FF5FA15FA7B61009A5388 /* mesh.h */,
 				6D3FF5F815FA7B40009A5388 /* mesh.c */,
@@ -1556,6 +1560,7 @@
 				D03ECD8F228F7EC1001581E2 /* gameMotionInterp.c in Sources */,
 				D02B8F0119535AAB00830369 /* gameDialogs.c in Sources */,
 				6DF655DD15E6CFF70015D5DF /* gameCamera.c in Sources */,
+				D04E466D22C833D1003D0055 /* mapgenerated.c in Sources */,
 				6D512E1715EC1F130064DF49 /* gameUtils.c in Sources */,
 				6D512E1B15EC21A20064DF49 /* worldElem.c in Sources */,
 				6D07DE3D15F7FCA00048129B /* gameShip.c in Sources */,
@@ -1594,6 +1599,7 @@
 				D03ECD90228F7EC1001581E2 /* gameMotionInterp.c in Sources */,
 				D0BCC9A92052EDC100094809 /* gameDialogs.c in Sources */,
 				D0BCC9AA2052EDC100094809 /* gameCamera.c in Sources */,
+				D04E466E22C833D2003D0055 /* mapgenerated.c in Sources */,
 				D0BCC9AB2052EDC100094809 /* gameUtils.c in Sources */,
 				D0BCC9AC2052EDC100094809 /* worldElem.c in Sources */,
 				D0BCC9AD2052EDC100094809 /* gameShip.c in Sources */,

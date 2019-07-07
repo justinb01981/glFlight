@@ -8,6 +8,9 @@
 #ifndef mapgenerated_h
 #define mapgenerated_h
 
+void
+world_build_run_program(float x, float y, float z);
+
 #define MAP_GENERATED_MACRO \
 BUILDING_1(-135, 2, -154, 0.9576357000171083) \
 BUILDING_1(-152.0, 2.0, -116.0, 2.5567508819748728) \
