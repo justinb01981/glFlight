@@ -183,6 +183,31 @@ world_build_run_program(float x, float y, float z)
         }
     }
     
+    // add some asteroids
+    /*
+     "add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 2 14\n"
+     "object_set_info 4\n" // moving block
+     "object_set_velocity 0 0.5 0\n"
+     */
+    float asteroid_scale = SCALE_MAX;
+    float asteroid_speed = (MAX_SPEED/10)*GAME_TICK_RATE;
+    for(int i = 0; i < 16; i++)
+    {
+        float C[] = {
+            rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+            rand_in_range(1, gWorld->bound_radius),
+            rand_in_range(-gWorld->bound_radius, gWorld->bound_radius)
+        };
+        
+        if(world_elem_list_find_nearest(&head, C, &neardist) != NULL && neardist >= asteroid_scale)
+        {
+            world_add_object(MODEL_ICOSAHEDRON, C[0], C[1], C[2], 0, 0, 0, asteroid_scale, TEXTURE_ID_ASTEROID);
+            world_get_last_object()->object_type = OBJ_BLOCK_MOVING;
+            update_object_velocity(world_get_last_object()->elem_id,
+                                   rand_in_range(-asteroid_speed, asteroid_speed), rand_in_range(-asteroid_speed, asteroid_speed), rand_in_range(-asteroid_speed, asteroid_speed), 0);
+        }
+    }
+    
     world_elem_list_clear(&head);
     
     // MARK: add enemy base
@@ -215,7 +240,5 @@ world_build_run_program(float x, float y, float z)
         update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
         game_elem_setup_spawnpoint(world_get_last_object());
     }
-    
-    // MARK: -- add buildings
     
 }

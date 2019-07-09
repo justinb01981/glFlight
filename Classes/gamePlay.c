@@ -686,6 +686,8 @@ game_start(float difficulty, int type)
 {
     char dialogStr[255];
     
+    object_id_portal = WORLD_ELEM_ID_INVALID;
+    
     score_clear();
     
     console_log_clear(0, 1);
@@ -1923,7 +1925,7 @@ game_run()
                     
                     if(gameStateSinglePlayer.base_spawn_collect_m < 0) gameStateSinglePlayer.base_spawn_collect_m = 0;
                     
-                    printf("base_spawn_collect_m %f\n", gameStateSinglePlayer.base_spawn_collect_m);
+                    //DBPRINTF(("base_spawn_collect_m %f\n", gameStateSinglePlayer.base_spawn_collect_m));
                     
                     if(gameStateSinglePlayer.base_spawn_collect_m >= 1.0)
                     {

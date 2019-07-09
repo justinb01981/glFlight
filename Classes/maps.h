@@ -731,6 +731,7 @@ RANDOM_DECORATION_1
 // MARK: -- map - deathmatch
 const static char initial_map_deathmatch[] = ""
 
+#if 0
 "set_world_size 200\n" // all must be divisible by MAX_WORLD_REGIONS
 ///WORLD_SCALED_FRAME_TERRAIN(-10, 28, 4)
 "set_background_info " BACKGROUND_TEXTURE_STR "\n"
@@ -793,6 +794,12 @@ FLOATING_ISLAND(-100, 100, -100)
 FLOATING_ISLAND(100, 50, -100)
 FLOATING_ISLAND(100, 100, -100)
 
+#else
+
+WORLD_SCALED_FRAME(1, /*57*/28, 4)
+"map_program_with_args 100 0 100\n"
+
+#endif
 ;
 
 // MARK: -- map - survival
