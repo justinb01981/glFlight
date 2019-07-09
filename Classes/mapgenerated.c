@@ -176,7 +176,7 @@ world_build_run_program(float x, float y, float z)
                 
                 if(world_elem_list_find_nearest(&head, C, &neardist) != NULL && neardist >= SCALE_MAX)
                 {
-                    world_add_object(model_t[iSet], C[0], C[1], C[2], 0, 0, 0, SCALE_MAX, model_tex[iSet]);
+                    world_add_object(model_t[iSet], C[0], C[1], C[2], M_PI/2, rand_in_range(-M_PI, M_PI), -M_PI/2, SCALE_MAX, model_tex[iSet]);
                     world_elem_list_add(world_get_last_object(), &head);
                 }
             }
