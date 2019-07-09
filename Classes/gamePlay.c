@@ -1781,8 +1781,6 @@ game_run()
             
             game_target_objective_id = gameStateSinglePlayer.elem_id_spawnpoint;
             
-            printf("enemies_found:%f\n", enemies_found);
-            
             if(strncmp(gameSettingsPlayerName, "god", 3) == 0)
             {
                 pMyShipNode->elem->durability = 9999;

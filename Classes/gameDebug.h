@@ -27,7 +27,7 @@ dbprintf_helper(char* fmt, ...)
 #define DBPRINTF(x) dbprintf_helper x
 
 #else
-#define DBPRINTF(x) { printf("%s:%d", __FILE__, __LINE__); printf x; }
+#define DBPRINTF(x) { printf("%s:%d", __FILE__, __LINE__); printf x; printf("\n"); }
 #endif
 
 #endif

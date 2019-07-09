@@ -45,6 +45,7 @@
 //#endif
     
 #include "gameNetwork.h"
+#include "gameNetworkByteOrder.h"
 #include "gameMotionInterp.h"
 #include "world.h"
 #include "gameUtils.h"
@@ -233,9 +234,12 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
 
     sa = (struct sockaddr_in6*) address->storage;
     
+    gameMessage_to_nbo(msg);
+    
     if(gameNetworkState.hostInfo.bonjour_lan)
     {
         GameNetworkBonjourManagerSendMessageToPeer((void*) msg, ((struct bonjour_addr_stuffed_in_sockaddr_in *) address->storage)->peer_id);
+        gameMessage_from_nbo(msg);
         return;
     }
     
@@ -246,6 +250,8 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
     {
         printf("sendto: %ld - errno:%s\n", r, strerror(errno));
     }
+    
+    gameMessage_from_nbo(msg);
 }
 
 static void gameNetworkAddress_incrementPort(gameNetworkAddress* address)
@@ -703,6 +709,8 @@ gameNetwork_sendPlayersDisconnect()
 {
     gameNetworkMessage msg;
     
+    memset(&msg, 0, sizeof(msg));
+    
     msg.cmd = GAME_NETWORK_MSG_DISCONNECT;
     gameNetwork_send(&msg);
 }
@@ -821,6 +829,9 @@ gameNetworkError
 gameNetwork_send_player_core(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerInfoTarget)
 {
     long s = 1;
+    int needs_stream;
+    
+    needs_stream = msg->needs_stream;
     
     gameNetworkPlayerInfo* playerInfo = gameNetworkState.player_list_head.next_connected;
     while(playerInfo)
@@ -828,9 +839,10 @@ gameNetwork_send_player_core(gameNetworkMessage* msg, gameNetworkPlayerInfo* pla
         if(playerInfoTarget == playerInfo ||
            (playerInfoTarget == NULL && playerInfo->player_id != gameNetworkState.my_player_id))
         {
+            if(playerInfo->address.len > 0)
             if(playerInfo->player_id != msg->player_id)
             {
-                if(msg->needs_stream)
+                if(needs_stream)
                 {
                     long r = send(playerInfo->stream_socket.s, msg, sizeof(*msg), 0);
                     
@@ -876,13 +888,20 @@ gameNetwork_forward_to_player(gameNetworkMessage* msg, gameNetworkPlayerInfo* pl
 gameNetworkError
 gameNetwork_send_player(gameNetworkMessage* msg, gameNetworkPlayerInfo* playerInfoTarget)
 {
+    int r;
     msg->player_id = gameNetworkState.my_player_id;
     
     msg->needs_stream = 0;
     
     msg->timestamp = get_time_ms_wall();
     
-    return gameNetwork_send_player_core(msg, playerInfoTarget);
+    gameMessage_to_nbo(msg);
+    
+    r = gameNetwork_send_player_core(msg, playerInfoTarget);
+    
+    gameMessage_from_nbo(msg);
+    
+    return r;
 }
 
 gameNetworkError
@@ -989,6 +1008,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
         src_addr->len = from_addr_len;
 
         // TODO: endian swap all fields on little-endian platforms
+        gameMessage_from_nbo(msg);
         
         if(gameNetworkState.hostInfo.hosting)
         {
@@ -1003,7 +1023,10 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
             }
             else if(!msg->rebroadcasted)
             {
+                int needs_stream = msg->needs_stream;
                 msg->rebroadcasted = 1;
+                
+                gameMessage_to_nbo(msg);
                 
                 // resend to all players
                 gameNetworkPlayerInfo* playerInfo = gameNetworkState.player_list_head.next_connected;
@@ -1020,7 +1043,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
                     }
                     else
                     {
-                        int* rb_sock = msg->needs_stream? &playerInfo->stream_socket.s:
+                        int* rb_sock = needs_stream? &playerInfo->stream_socket.s:
                                       &gameNetworkState.hostInfo.socket.s;
                         
                         if(gameNetwork_forward_to_player(msg, playerInfo) == GAME_NETWORK_ERR_FAIL)
@@ -1031,6 +1054,8 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
                     }
                     playerInfo = playerInfo->next_connected;
                 }
+                
+                gameMessage_from_nbo(msg);
             }
         }
         else
@@ -1143,6 +1168,8 @@ gameNetwork_accept_stream_connection(gameNetworkAddress* src_addr)
                 // TODO: timeout
                 gameNetworkMessage connectMsg;
                 long r = recv(a, &connectMsg, sizeof(connectMsg), 0);
+                
+                gameMessage_from_nbo(&connectMsg);
                 
                 if(r == sizeof(connectMsg))
                 {
@@ -1457,6 +1484,8 @@ game_network_periodic_check()
 
                 pInfo->time_status_last = network_time_ms;
                 
+                memset(&statusMsg, 0, sizeof(statusMsg));
+                
                 statusMsg.cmd = GAME_NETWORK_MSG_PLAYER_STATUS;
                 statusMsg.params.playerStatus.is_towing = 0;
                 statusMsg.params.playerStatus.ping_ms = pInfo->time_ping;
@@ -1469,6 +1498,7 @@ game_network_periodic_check()
         {
             gameNetworkMessage retryMsg;
             
+            memset(&retryMsg, 0, sizeof(retryMsg));
             retryMsg.cmd = GAME_NETWORK_MSG_PING;
 
             gameNetworkState.gameNetworkHookOnMessage(&retryMsg, &pInfo->address);
@@ -1520,6 +1550,8 @@ game_network_periodic_check()
         gameNetworkState.time_last_name_send = network_time_ms;
         
         gameNetworkMessage nameMsg;
+        
+        memset(&nameMsg, 0, sizeof(nameMsg));
         
         nameMsg.cmd = GAME_NETWORK_MSG_MYINFO;
         strncpy(nameMsg.params.c, gameNetworkState.my_player_name, sizeof(nameMsg.params.c)-1);
@@ -1835,6 +1867,8 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
     int interp_velo = 1;
     char* ptrStr;
     
+    //DBPRINTF(("msg.cmd:%d (ntohl:%d", msg->cmd, ntohl(msg->cmd)));
+    
     if(!gameNetworkState.connected) return;
     
     if(gameNetworkState.gameNetworkHookOnMessage != NULL)
@@ -1870,10 +1904,13 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
     
     if(msg->cmd == GAME_NETWORK_MSG_BEACON && gameNetworkState.hostInfo.hosting)
     {
+        memset(msg, 0, sizeof(*msg));
+        
         msg->cmd = GAME_NETWORK_MSG_BEACON_RESP;
         msg->player_id = gameNetworkState.my_player_id;
         strncpy(msg->params.c, gameNetworkState.hostInfo.name, sizeof(msg->params.c));
         //send_lan_broadcast(&msg);
+
         send_to_address_udp(msg, srcAddr);
         console_write("GAME_NETWORK_MSG_BEACON_RESP->");
         return;
@@ -2393,6 +2430,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                         
                         msgOut.cmd = GAME_NETWORK_MSG_GET_MAP_BEGIN;
                         msgOut.player_id = gameNetworkState.my_player_id;
+                        
                         send_to_address_udp(&msgOut, srcAddr);
                     }
                     else if(offset > 0 && playerInfo->map_data && offset < strlen(playerInfo->map_data))
@@ -2475,11 +2513,14 @@ do_game_network_read_core()
             // messages that don't require synchronizing with rendering/game thread
             if(msg.cmd == GAME_NETWORK_MSG_BEACON && gameNetworkState.hostInfo.hosting)
             {
+                memset(&msg, 0, sizeof(msg));
+                
                 msg.cmd = GAME_NETWORK_MSG_BEACON_RESP;
                 msg.player_id = gameNetworkState.my_player_id;
                 strncpy(msg.params.c, gameNetworkState.hostInfo.name, sizeof(msg.params.c));
+
                 send_to_address_udp(&msg, &srcAddr);
-                printf("GAME_NETWORK_MSG_BEACON\n");
+                DBPRINTF(("GAME_NETWORK_MSG_BEACON\n"));
                 continue;
             }
             /*
@@ -2988,7 +3029,6 @@ int gameNetwork_onBonjourConnecting2(gameNetworkMessage* msg, gameNetworkAddress
         gameNetworkState.server_map_data = gameNetworkState.server_map_data_end = malloc(GAME_NETWORK_MAP_REQUEST_WINDOW_LEN);
         *gameNetworkState.server_map_data = '\0';
         
-        
         memset(&downloadMsg, 0, sizeof(downloadMsg));
         downloadMsg.cmd = GAME_NETWORK_MSG_GET_MAP_REQUEST;
         downloadMsg.rebroadcasted = 1;
@@ -2998,6 +3038,7 @@ int gameNetwork_onBonjourConnecting2(gameNetworkMessage* msg, gameNetworkAddress
         if(gameNetwork_getPlayerInfo(msg->player_id, &playerInfo, 1) == GAME_NETWORK_ERR_NONE)
         {
             memcpy(&playerInfo->address, srcAddr, sizeof(gameNetworkAddress));
+
             send_to_address_udp(&downloadMsg, srcAddr);
         }
         

@@ -25,6 +25,7 @@
 #include "gameSettings.h"
 #include "maps.h"
 #include "gameDialogs.h"
+#include "gameTests.h"
 
 @implementation gl_flightAppDelegate
 
@@ -103,6 +104,8 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
                   [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] UTF8String]);
     
     gameInterfaceInit(viewWidth, viewHeight);
+    
+    if(gameTests_run_sanity() != 0) assert(0);
 }
 
 void glFlightResume(time_t time_last_suspend)

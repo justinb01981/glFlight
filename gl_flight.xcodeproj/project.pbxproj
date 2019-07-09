@@ -145,6 +145,8 @@
 		D079A83320217FFD0098641B /* texture108.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D079A83220217FFC0098641B /* texture108.bmp */; };
 		D07B356618527FE200900D60 /* texture50.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D07B356518527FE200900D60 /* texture50.bmp */; };
 		D07B35681853A5CF00900D60 /* missle.wav in Resources */ = {isa = PBXBuildFile; fileRef = D07B35671853A5CF00900D60 /* missle.wav */; };
+		D080491122D2B7EC002684B7 /* gameTests.c in Sources */ = {isa = PBXBuildFile; fileRef = D080491022D2B7EC002684B7 /* gameTests.c */; };
+		D080491222D2B7EC002684B7 /* gameTests.c in Sources */ = {isa = PBXBuildFile; fileRef = D080491022D2B7EC002684B7 /* gameTests.c */; };
 		D087BAEB204707B400F4D6E0 /* texture109.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D087BAEA204707B300F4D6E0 /* texture109.bmp */; };
 		D08AC6C11DAAE3DA00E367B7 /* texture99.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D08AC6BE1DAAE3DA00E367B7 /* texture99.bmp */; };
 		D08AC6C21DAAE3DA00E367B7 /* texture100.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D08AC6BF1DAAE3DA00E367B7 /* texture100.bmp */; };
@@ -599,6 +601,9 @@
 		D079A83220217FFC0098641B /* texture108.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture108.bmp; sourceTree = "<group>"; };
 		D07B356518527FE200900D60 /* texture50.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture50.bmp; sourceTree = "<group>"; };
 		D07B35671853A5CF00900D60 /* missle.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = missle.wav; sourceTree = "<group>"; };
+		D080490E22D26B88002684B7 /* gameNetworkByteOrder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameNetworkByteOrder.h; sourceTree = "<group>"; };
+		D080490F22D2B7DB002684B7 /* gameTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameTests.h; sourceTree = "<group>"; };
+		D080491022D2B7EC002684B7 /* gameTests.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gameTests.c; sourceTree = "<group>"; };
 		D087BAEA204707B300F4D6E0 /* texture109.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture109.bmp; sourceTree = "<group>"; };
 		D08AC6BE1DAAE3DA00E367B7 /* texture99.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture99.bmp; sourceTree = "<group>"; };
 		D08AC6BF1DAAE3DA00E367B7 /* texture100.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture100.bmp; sourceTree = "<group>"; };
@@ -770,10 +775,13 @@
 				6D262136163F3A6B00F7EC2D /* simple_hash.h */,
 				6D595F61164C867E00C21926 /* world_file.h */,
 				6D595F5E164C80FE00C21926 /* world_file.c */,
+				D080490F22D2B7DB002684B7 /* gameTests.h */,
+				D080491022D2B7EC002684B7 /* gameTests.c */,
 				6D595F77165CD33800C21926 /* gameNetwork.h */,
+				6D595F78165CD34500C21926 /* gameNetwork.c */,
+				D080490E22D26B88002684B7 /* gameNetworkByteOrder.h */,
 				D03ECD8D228F6FB0001581E2 /* gameMotionInterp.h */,
 				D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */,
-				6D595F78165CD34500C21926 /* gameNetwork.c */,
 				D062FE1D1FEB702C00ABE435 /* GameNetworkBonjourManager.h */,
 				D062FE1E1FEB702C00ABE435 /* GameNetworkBonjourManager.m */,
 				6D91DEA1166C0DB200362864 /* cocoaGameAudio.h */,
@@ -1576,6 +1584,7 @@
 				6D53C4D71693FDB4009D6C3C /* cocoaAudioThread.m in Sources */,
 				D062ED5A16E0279B00CA4374 /* glFlight.c in Sources */,
 				D062ED5D16E0295500CA4374 /* gameGraphics.c in Sources */,
+				D080491122D2B7EC002684B7 /* gameTests.c in Sources */,
 				D0EECB201753E08B00B5B815 /* gamePlay.c in Sources */,
 				D0EECB221753E27C00B5B815 /* gameAI.c in Sources */,
 				D0C822821A11EDC4005E9490 /* collision.c in Sources */,
@@ -1615,6 +1624,7 @@
 				D0BCC9B82052EDC100094809 /* cocoaAudioThread.m in Sources */,
 				D0BCC9B92052EDC100094809 /* glFlight.c in Sources */,
 				D0BCC9BA2052EDC100094809 /* gameGraphics.c in Sources */,
+				D080491222D2B7EC002684B7 /* gameTests.c in Sources */,
 				D0BCC9BB2052EDC100094809 /* gamePlay.c in Sources */,
 				D0BCC9BC2052EDC100094809 /* gameAI.c in Sources */,
 				D0BCC9BD2052EDC100094809 /* collision.c in Sources */,

@@ -78,10 +78,19 @@ typedef enum
     //GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET,
     //GAME_NETWORK_MSG_DIRECTORY_QUERY_LIST_AT_OFFSET_RESPONSE,
     //GAME_NETWORK_MSG_DIRECTORY_RESPONSE,
-    GAME_NETWORK_MSG_STARTGAME,
-    GAME_NETWORK_MSG_ENDGAME,
+    GAME_NETWORK_MSG_STARTGAME, // FLOAT_ARRAY
+    GAME_NETWORK_MSG_ENDGAME, // ???
     GAME_NETWORK_MSG_LAST
 } gameNetworkMsgType;
+
+typedef enum {
+    GAME_NETWORK_MSGARG_CHAR,
+    GAME_NETWORK_MSGARG_DIRECTORY,
+    GAME_NETWORK_MSGARG_PLAYERINFO,
+    GAME_NETWORK_MSGARG_MAPINFO,
+    GAME_NETWORK_MSGARG_FLOATARRAY,
+    GAME_NETWORK_MSGARG_INTARRAY,
+} gameNetworkArgsType;
 
 typedef struct
 {
@@ -115,6 +124,7 @@ typedef struct __attribute__((packed))
     unsigned int needs_stream:1;
     unsigned int needs_ack:1;
     unsigned int is_ack:1;
+    unsigned int is_nbo:1;
     unsigned int elem_id_net;
     unsigned int msg_seq;
     game_timeval_t timestamp;
@@ -130,7 +140,7 @@ typedef struct __attribute__((packed))
         } directoryInfo;
         
         struct {
-            unsigned long offset;
+            unsigned long long offset;
             char s[GAME_NETWORK_MAX_MAP_STRING_LEN];
         } mapData;
         
