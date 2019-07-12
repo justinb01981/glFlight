@@ -1810,7 +1810,6 @@ game_run()
                         case OBJ_SPAWNPOINT:
                             pCur->elem->stuff.affiliation = gameNetworkState.my_player_id;
                             gameStateSinglePlayer.elem_id_spawnpoint = pCur->elem->elem_id;
-                            game_move_spawnpoint(pCur->elem);
                             break;
                             
                         case OBJ_POWERUP_GENERIC:

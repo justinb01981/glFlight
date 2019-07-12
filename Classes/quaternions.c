@@ -338,7 +338,7 @@ void
 get_body_vectors_for_euler(float alpha, float beta, float gamma,
                            quaternion_t* vec_x, quaternion_t* vec_y, quaternion_t* vec_z)
 {
-    quaternion_t zero = {0, 0, 0, 0};
+    quaternion_t zero = {1, 0, 0, 0};
     
     *vec_x = zero;
     *vec_y = zero;

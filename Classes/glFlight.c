@@ -343,7 +343,7 @@ calibrate_bail:
         }
 
         gameShip_init(spawn[0], spawn[1], spawn[2],
-        spawn[3], spawn[4], spawn[5]);
+                      spawn[3], spawn[4], spawn[5]);
 
         update_ship_stats = 1;
 

@@ -23,6 +23,7 @@ typedef struct {
 } terrain_t;
 
 static float SCALE_MAX = 4;
+static int num_asteroids = 0;
 
 WorldElemListNode*
 world_elem_list_find_nearest(WorldElemListNode* head, float A[3], float* result_distance)
@@ -189,9 +190,10 @@ world_build_run_program(float x, float y, float z)
      "object_set_info 4\n" // moving block
      "object_set_velocity 0 0.5 0\n"
      */
+    
     float asteroid_scale = SCALE_MAX;
     float asteroid_speed = (MAX_SPEED/10)*GAME_TICK_RATE;
-    for(int i = 0; i < 16; i++)
+    for(int i = 0; i < num_asteroids; i++)
     {
         float C[] = {
             rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
@@ -239,6 +241,15 @@ world_build_run_program(float x, float y, float z)
         world_get_last_object()->object_type = OBJ_BASE;
         update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
         game_elem_setup_spawnpoint(world_get_last_object());
+        
+        // MARK: -- add friendly spawn location
+        world_add_object(MODEL_CUBE,
+                         0, gWorld->bound_radius/8, -gWorld->bound_radius/2,
+                         0, 0, 0,
+                         6, TEXTURE_ID_ANIMATED_STATIC);
+        world_get_last_object()->object_type = OBJ_SPAWNPOINT;
+        //update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
+        world_object_set_lifetime(world_get_last_object()->elem_id, 300);
     }
     
 }

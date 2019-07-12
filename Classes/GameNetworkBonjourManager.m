@@ -7,6 +7,7 @@
 
 #include "GameNetworkBonjourManager.h"
 #include "gameNetwork.h"
+#include "gameNetworkByteOrder.h"
 
 #include <sys/select.h>
 #include <sys/types.h>
@@ -536,6 +537,11 @@ static GameNetworkBonjourManager* instance;
             
             memset(msg, 0, sizeof(*msg));
             bytesRead = [peer.inputStream read:(uint8_t*)&msg->msg maxLength:sizeof(gameNetworkMessage)];
+            
+            if(bytesRead == sizeof(gameNetworkMessage))
+            {
+                gameMessage_from_nbo(&msg->msg);
+            }
             
             struct bonjour_addr_stuffed_in_sockaddr_in *p_saddr = (struct bonjour_addr_stuffed_in_sockaddr_in *) msg->srcAddr.storage;
             p_saddr->len = msg->srcAddr.len = sizeof(struct bonjour_addr_stuffed_in_sockaddr_in);

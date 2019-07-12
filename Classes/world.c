@@ -1104,11 +1104,10 @@ world_random_spawn_location(float loc[6], int affiliation)
                     loc[i++] = pCur->elem->physics.ptr->x;
                     loc[i++] = pCur->elem->physics.ptr->y;
                     loc[i++] = pCur->elem->physics.ptr->z;
-                    
-                    // random heading on x/z axis
-                    loc[i++] = M_PI/2; // alpha
-                    loc[i++] = rand_in_range(0, M_PI*2 * 100) / 100; // beta
-                    loc[i++] = -M_PI/2; // gamma
+                
+                    loc[i++] = pCur->elem->physics.ptr->alpha; // alpha
+                    loc[i++] = pCur->elem->physics.ptr->beta; // beta
+                    loc[i++] = pCur->elem->physics.ptr->gamma; // gamma
                     return;
                 }
             }

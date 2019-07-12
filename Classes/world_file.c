@@ -123,6 +123,11 @@ static int parse_command(char* command_line, world_map_command* map_cmd)
             map_cmd->type = MAP_ADD_OBJECTS_PACKED;
             n_params = 14;
         }
+        else if(strcmp(token, "add_spawn_invis") == 0)
+        {
+            map_cmd->type = MAP_ADD_SPAWN_INVISIBLE;
+            n_params = 6;
+        }
         else if(strcmp(token, "add_spawn") == 0)
         {
             map_cmd->type = MAP_ADD_SPAWN_POINT;
@@ -401,6 +406,7 @@ void map_render(char *map_buf)
             {
                 float vx, vy, vz, vsteps;
                 float rc[2], d_xyz[3];
+                float spawn_scaling = 6;
                 
                 if(map_cmd.type == MAP_REGISTER_PARAMS)
                 {
@@ -543,11 +549,13 @@ void map_render(char *map_buf)
                         }
                         break;
                         
+                    case MAP_ADD_SPAWN_INVISIBLE:
+                        spawn_scaling = 0.01;
                     case MAP_ADD_SPAWN_POINT:
                         last_object_id =
                         world_add_object(MODEL_CUBE, map_cmd.params[0], map_cmd.params[1], map_cmd.params[2],
                                          map_cmd.params[3], map_cmd.params[4], map_cmd.params[5],
-                                         6, TEXTURE_ID_ANIMATED_STATIC);
+                                         spawn_scaling, TEXTURE_ID_ANIMATED_STATIC);
                         world_get_last_object()->object_type = OBJ_SPAWNPOINT;
                         world_object_set_lifetime(last_object_id, 300);
                         break;
