@@ -13,7 +13,7 @@ add_definitions(/FI"gameWinTypes.h")
 
 add_definitions(-fpermissive)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-add_definitions(-DGAME_PLATFORM_ANGLE)
+add_definitions(-DGAME_PLATFORM_OGL)
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-DGLEW_STATIC)
 

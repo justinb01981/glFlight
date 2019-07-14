@@ -10,7 +10,7 @@
 #define gl_flight_gameIncludes_h
 
 #include "gamePlatform.h"
-#if GAME_PLATFORM_ANGLE 
+#if GAME_PLATFORM_OGL 
 #define GL_GLES_PROTOTYPES 1
 //#include <GLES2/gl2.h>
 //#include <GL/glext.h>

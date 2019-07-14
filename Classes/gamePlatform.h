@@ -11,7 +11,7 @@
 
 /* edit these */
 
-#ifdef GAME_PLATFORM_ANGLE 
+#ifdef GAME_PLATFORM_OGL 
 
 #else
 

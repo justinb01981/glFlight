@@ -71,6 +71,9 @@ static unsigned long update_time_last = 0;
 const unsigned long GAME_NETWORK_TIMEOUT_MS = (30*1000);
 const static char *map_eom = "\nmap_eom\n";
 
+const long GAME_NETWORK_PORT_DEFAULT = 52000;
+unsigned long GAME_NETWORK_PORT = 52000;
+
 static char *gameKillVerbs[] = {"slaughtered", "evicerated", "de-rezzed", "shot-down", "ended", "terminated"};
 
 extern int GameNetworkBonjourManagerHost(const char* name, int* sock_out);
@@ -132,6 +135,9 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     struct sockaddr_in6* addr6 = (void*)& addr;
     int proto = 0;
     ADDRINFO hints, * addrResult;
+    char portnum[255];
+
+    sprintf(portnum, "%u", GAME_NETWORK_PORT);
 
     sock = socket(AF_INET6, (stream ? SOCK_STREAM : SOCK_DGRAM), proto);
     if (sock < 0)
@@ -146,7 +152,7 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_protocol = 0;
     
-    getaddrinfo(NULL, GAME_NETWORK_PORT_STR, &hints, &addrResult);
+    getaddrinfo(NULL, portnum, &hints, &addrResult);
     memcpy(addr6, addrResult->ai_addr, addrResult->ai_addrlen);
 
 #ifdef BSD_SOCKETS
@@ -173,7 +179,7 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &so_arg, sizeof(so_arg));
 #endif
 
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &so_arg, sizeof(so_arg));
+    //setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &so_arg, sizeof(so_arg));
 
     so_arg = 0;
     setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &so_arg, sizeof(so_arg));
@@ -346,7 +352,7 @@ send_endgame()
 static int
 gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
 {
-    char buf[128];
+    char buf[128], portnum[255];
     
     if(!strchr(name, '.')) return GAME_NETWORK_ERR_FAIL;
 
@@ -357,7 +363,9 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
     addrInfo.ai_protocol = IPPROTO_UDP;
     addrInfo.ai_socktype = SOCK_DGRAM;
 
-    if (getaddrinfo(name, GAME_NETWORK_PORT_STR, &addrInfo, &addrInfoResult) != 0)
+    sprintf(portnum, "%u", GAME_NETWORK_PORT_DEFAULT);
+
+    if (getaddrinfo(name, portnum, &addrInfo, &addrInfoResult) != 0)
     {
         return GAME_NETWORK_ERR_FAIL;
     }
@@ -409,6 +417,12 @@ gameNetwork_initsockets()
     //if(gameNetworkState.hostInfo.stream_socket.s != -1) close_socket(gameNetworkState.hostInfo.stream_socket.s);
     if(gameNetworkState.hostInfo.stream_socket.s == -1)
     gameNetworkState.hostInfo.stream_socket.s = prepare_listen_socket(1, gameNetworkState.hostInfo.port+2, gameNetworkState.hostInfo.hosting);
+
+    if (gameNetworkState.hostInfo.socket.s < 0 || gameNetworkState.hostInfo.map_socket.s < 0 || gameNetworkState.hostInfo.stream_socket.s < 0)
+    {
+        console_append("incrementing GAME_NETWORK_PORT");
+        GAME_NETWORK_PORT += 1;
+    }
 }
 
 gameNetworkError
@@ -1063,6 +1077,8 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
         }
         break;
     }
+
+    if (r != sizeof(*msg)) DBPRINTF((" ERROR: msg size wrong (%u/%u)", r, sizeof(*msg)));
     
     return r == sizeof(*msg)? GAME_NETWORK_ERR_NONE: GAME_NETWORK_ERR_FAIL;
 }
@@ -2029,6 +2045,8 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                     
                     motion_interp_st* motion = &playerInfo->motion;
                     
+                    t = msg->params.f[16];
+
                     float velDetected[3] =
                     {
                         (msg->params.f[1] - pPlayerElem->physics.ptr->x) * (1000.0 / (t - motion->timestamp_last[0])),

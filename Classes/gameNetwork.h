@@ -15,9 +15,8 @@
 #define GAME_NETWORK_MAX_PLAYERS 64
 #define GAME_NETWORK_MAX_STRING_LEN 128
 #define GAME_NETWORK_MAX_MAP_STRING_LEN 256
-#define GAME_NETWORK_PORT 52000
+//#define GAME_NETWORK_PORT 52000
 #define GAME_NETWORK_PORT_BONJOUR 52010
-#define GAME_NETWORK_PORT_STR "52000"
 #define GAME_NETWORK_PLAYER_ID_HOST 16000
 #define GAME_NETWORK_PLAYER_ID_MAX (GAME_NETWORK_PLAYER_ID_HOST-1)
 #define GAME_NETWORK_OBJECT_ID_MIN (GAME_NETWORK_PLAYER_ID_HOST+1)
@@ -114,7 +113,12 @@ typedef struct {
     game_timeval_t euler_last_interp;
 } motion_interp_st;
 
+#ifdef GAME_PLATFORM_OGL
+__pragma(pack(push, 1)) 
+typedef struct
+#else
 typedef struct __attribute__((packed))
+#endif
 {
     unsigned int vers;
     unsigned int game_id;
@@ -150,7 +154,10 @@ typedef struct __attribute__((packed))
         } playerStatus;
         
     } params;
-} gameNetworkMessage;
+}  gameNetworkMessage;
+#ifdef GAME_PLATFORM_OGL
+__pragma(pack(pop))
+#endif
 
 struct gameNetworkMessageQueued {
     struct gameNetworkMessageQueued* next;

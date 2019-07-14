@@ -8,6 +8,8 @@
 #ifndef gameNetworkByteOrder_h
 #define gameNetworkByteOrder_h
 
+#include <assert.h>
+
 static gameNetworkArgsType
 gameMessage_args_for_type(int type)
 {
