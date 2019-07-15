@@ -306,7 +306,6 @@ public:
             gameAudioLock();
             if (cocoaMessageAudioList.next)
             {
-                
                 sprintf(audioStr, "%s%s", glFlightGameResourceInfo.pathPrefix, cocoaMessageAudioList.next->str);
 
                 openALPlay(audioStr, cocoaMessageAudioList.next->f[0], cocoaMessageAudioList.next->f[1]);

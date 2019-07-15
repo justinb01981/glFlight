@@ -806,7 +806,7 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     // hit a boundary, find a new patrol location
     if(elemAI && !elemC)
     {
-        if(time_ms > elemAI->stuff.u.enemy.time_next_retarget)
+        if(time_ms > elemAI->stuff.u.enemy.time_next_retarget || elemAI->stuff.u.enemy.enemy_state != ENEMY_STATE_JUKE)
         {
             game_ai_newheading(elemAI, juke_distance);
             elemAI->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
