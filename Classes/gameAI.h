@@ -41,6 +41,9 @@ void
 game_ai_run(void);
 
 void
+game_ai_setup(WorldElem* pNewElem);
+
+void
 object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem *elem, int target_objtype);
 
 void

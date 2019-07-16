@@ -225,7 +225,7 @@ world_build_run_program(float x, float y, float z)
                          rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
                          gWorld->bound_radius/4,
                          rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
-                         0, 0, 0,
+                         0.01, 0.01, 0.01,
                          8,
                          TEXTURE_ID_ENEMY_SPAWNPOINT);
         world_get_last_object()->object_type = OBJ_SPAWNPOINT_ENEMY;
@@ -236,7 +236,7 @@ world_build_run_program(float x, float y, float z)
         
         world_add_object(MODEL_SPHERE,
                          0, gWorld->bound_radius/4, 0,
-                         0, 0, 0,
+                         0.01, 0.01, 0.01,
                          8, TEXTURE_ID_ANIMATED_STATIC);
         world_get_last_object()->object_type = OBJ_BASE;
         update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
@@ -245,7 +245,7 @@ world_build_run_program(float x, float y, float z)
         // MARK: -- add friendly spawn location
         world_add_object(MODEL_CUBE,
                          0, gWorld->bound_radius/8, -gWorld->bound_radius/2,
-                         0, 0, 0,
+                         0.01, 0.01, 0.01,
                          6, TEXTURE_ID_ANIMATED_STATIC);
         world_get_last_object()->object_type = OBJ_SPAWNPOINT;
         //update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);

@@ -2644,6 +2644,7 @@ game_elem_setup_ship(WorldElem* elem, int skill)
     elem->durability = gameStateSinglePlayer.enemy_durability;
     elem->stuff.u.enemy.ignore_collect = 0;
     elem->bounding_remain = 1;
+    game_ai_setup(elem);
 }
 
 void
@@ -2666,6 +2667,7 @@ game_elem_setup_turret(WorldElem* elem, int skill)
     elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     elem->stuff.u.enemy.scan_distance = 1;
     elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE");
+    game_ai_setup(elem);
 }
 
 void
@@ -2684,9 +2686,10 @@ game_elem_setup_missle(WorldElem* x)
     x->durability = DURABILITY_MISSLE;
     x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
     x->stuff.u.enemy.max_slerp = 4.0; // radians per second
-    x->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
+    x->stuff.u.enemy.time_next_retarget = get_time_ms();
     x->stuff.u.enemy.scan_distance = 50;
     x->stuff.u.enemy.pursue_distance = 30;
+    game_ai_setup(x);
 }
 
 void

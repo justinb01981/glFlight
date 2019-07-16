@@ -53,6 +53,13 @@ game_ai_init()
 {
 }
 
+void
+game_ai_setup(WorldElem* pNewElem)
+{
+    pNewElem->stuff.u.enemy.time_last_run = 0;
+    pNewElem->stuff.u.enemy.time_next_retarget = time_ms;
+}
+
 static int
 target_priority(WorldElem* pSearchElem, WorldElem* pTargetElem, float* dist_ignore)
 {
@@ -288,7 +295,7 @@ game_ai_run()
             else // no target
             {
                 if(pCurElem->stuff.u.enemy.changes_target &&
-                   time_ms > pCurElem->stuff.u.enemy.time_next_retarget)
+                   time_ms >= pCurElem->stuff.u.enemy.time_next_retarget)
                 {
                     pCurElem->stuff.u.enemy.time_next_retarget = time_ms + 2000;
                     
