@@ -56,7 +56,7 @@ game_ai_init()
 void
 game_ai_setup(WorldElem* pNewElem)
 {
-    pNewElem->stuff.u.enemy.time_last_run = 0;
+    pNewElem->stuff.u.enemy.time_last_run = time_ms;
     pNewElem->stuff.u.enemy.time_next_retarget = time_ms;
 }
 
@@ -203,12 +203,6 @@ game_ai_run()
             float pv[6];
             int pi = 0;
             int target_objtype = OBJ_UNKNOWN;
-            
-            if(pCurElem->stuff.u.enemy.time_last_run == 0)
-            {
-                // brand new object
-                pCurElem->stuff.u.enemy.time_last_run = pCurElem->stuff.u.enemy.time_next_retarget = time_ms;
-            }
             
             if(time_ms - pCurElem->stuff.u.enemy.time_last_run < pCurElem->stuff.u.enemy.time_run_interval)
             {
@@ -382,7 +376,7 @@ game_ai_run()
             }
             
             pCurElem->stuff.u.enemy.collided = 0;
-            pCurElem->stuff.u.enemy.time_last_run = time_ms;
+            pCurElem->stuff.u.enemy.time_last_run = time_ms + rand_in_range(-pCurElem->stuff.u.enemy.time_run_interval/10, pCurElem->stuff.u.enemy.time_run_interval/10);
         }
         
     game_ai_run_skip_ai:

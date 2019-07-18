@@ -263,6 +263,8 @@ void game_over()
     gameStateSinglePlayer.started = 0;
     
     gameStateSinglePlayer.stats.score = 0;
+    
+    gameMapSetMap(initial_map);
 }
 
 int

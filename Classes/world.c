@@ -1478,18 +1478,7 @@ void
 world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, float Frepulse)
 {
     float mv[3];
-    float s = Frepulse;
-    float repulse_min = 0.1;
     int i;
-    
-    for(i = 0; i < 3; i++)
-    {
-        mv[i] = check_bounding_box_overlap_result[i] * (pCollisionA->physics.ptr->velocity+repulse_min) * s;
-    }
-    
-    move_elem_relative(pCollisionA, mv[0], mv[1], mv[2]);
-    
-    // reverse velocity
     float* p[] = {
         &pCollisionA->physics.ptr->vx,
         &pCollisionA->physics.ptr->vy,
@@ -1498,7 +1487,18 @@ world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, flo
     
     for(i = 0; i < 3; i++)
     {
-        *p[i] = check_bounding_box_overlap_result[i] * (s/tc);
+        //mv[i] = check_bounding_box_overlap_result[i] * (*p[i]+repulse_min) * s;
+        mv[i] = check_bounding_box_overlap_result[i] * pCollisionA->physics.ptr->velocity * tc;
+    }
+    
+    move_elem_relative(pCollisionA, mv[0], mv[1], mv[2]);
+    
+    // reverse velocity
+    
+    for(i = 0; i < 3; i++)
+    {
+        //*p[i] = check_bounding_box_overlap_result[i] * (s/tc);
+        *p[i] += mv[i]*Frepulse / tc;
     }
 }
 

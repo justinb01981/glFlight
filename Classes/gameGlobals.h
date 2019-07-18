@@ -111,7 +111,7 @@ extern float GYRO_DC;
 const static int pooped_cube_interval_ms = 50;
 const static int pooped_cube_lifetime = 100;
 
-const static float collision_repulsion_coeff = 0.02;
+const static float collision_repulsion_coeff = 1.1;
 
 const static float RADAR_MIN_VELOCITY = 1;
 
