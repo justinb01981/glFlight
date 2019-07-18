@@ -184,13 +184,7 @@ world_build_run_program(float x, float y, float z)
         }
     }
     
-    // add some asteroids
-    /*
-     "add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 2 14\n"
-     "object_set_info 4\n" // moving block
-     "object_set_velocity 0 0.5 0\n"
-     */
-    
+    // MARK: add some asteroids
     float asteroid_scale = SCALE_MAX;
     float asteroid_speed = (MAX_SPEED/10)*GAME_TICK_RATE;
     for(int i = 0; i < num_asteroids; i++)
