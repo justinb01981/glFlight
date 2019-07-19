@@ -72,5 +72,9 @@ foreach(resFile ${resourcesWav})
         COMMAND ${CMAKE_COMMAND} -E copy ${resFile} resources)
 endforeach(resFile)
 
+set(ZIP_COMMAND tar -czf out.zip)
+
+#add_custom_command(TARGET glFlightMain POST_BUILD
+#    COMMAND echo  > out.txt)
 
 
