@@ -668,6 +668,16 @@ bool gameFramework::checkTemplate(GLFWwindow* pWindow, char const* Title)
 	return Success;
 }
 
+void gameFramework::pollJoystick(float** axes, size_t *axes_n, unsigned char** buttons, size_t *buttons_n)
+{
+    int tmp1, tmp2;
+    *axes = (float*) glfwGetJoystickAxes(GLFW_JOYSTICK_1, &tmp1);
+    *axes_n = tmp1;
+
+    *buttons = (unsigned char*) glfwGetJoystickButtons(GLFW_JOYSTICK_1, &tmp2);
+    *buttons_n = tmp2;
+}
+
 void gameFramework::beginTimer()
 {
 	glBeginQuery(GL_TIME_ELAPSED, this->TimerQueryName);

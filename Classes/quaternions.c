@@ -357,6 +357,18 @@ get_body_vectors_for_euler(float alpha, float beta, float gamma,
     // Z''
     quaternion_rotate_inplace(vec_x, vec_z, gamma);
     quaternion_rotate_inplace(vec_y, vec_z, gamma);
+
+    quaternion_t* q_nan[] = {
+        &vec_x, &vec_y, &vec_z
+    };
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (isnan(q_nan[i]->w)) q_nan[i]->w = 1.0;
+        if (isnan(q_nan[i]->x)) q_nan[i]->x = 0;
+        if (isnan(q_nan[i]->y)) q_nan[i]->y = 0;
+        if (isnan(q_nan[i]->z)) q_nan[i]->z = 0;
+    }
 }
 
 void

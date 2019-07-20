@@ -42,6 +42,7 @@ extern "C" {
 #include "maps.h"
 #include "gameDebug.h"
 #include "gameDialogs.h"
+#include "gameJoystick.h"
 
 #include "glFlight.h"
 
@@ -62,6 +63,8 @@ private:
 
     std::map<int, int> touchIDMap;
     int touchStateTouchCount = 0;
+
+    gameJoystick joy;
 
     unsigned long bgThreadId;
 
@@ -197,18 +200,40 @@ public:
         static float eulerO[3] = { 0, 0, 0 };
         static float sSense = 0.2;
         static float mouseDownRightLoc[2] = { 0, 0 };
+        static int joyActivated = 0;
+        static float* joyAxes;
+        static unsigned char* joyButtons;
+        size_t joyAxes_n, joyButtons_n;
+        static int joyLast[GLFW_KEY_LAST] = { 0 };
+        static unsigned int joyZero[64] = { 0 };
 
-        static int KEY_ROLL_ADD = GLFW_KEY_Q;
-        static int KEY_ROLL_SUB = GLFW_KEY_E;
-        static int KEY_FIRE_LASER = GLFW_KEY_SPACE;
-        static int KEY_FIRE_MISSLE = GLFW_KEY_LEFT_SHIFT;
-        static int KEY_ACCEL = GLFW_KEY_W;
-        static int KEY_DECEL = GLFW_KEY_S;
 
         gameInterfaceTouchIDSet(1);
 
         float x = (viewHeight - MouseCurrent.y) * (viewWidth/viewHeight);
-        float y = (MouseCurrent.x) * (viewHeight/viewWidth);
+        float y = (MouseCurrent.x) * (viewHeight / viewWidth);
+
+        gameFramework::pollJoystick((float**) &joyAxes, &joyAxes_n, &joyButtons, &joyButtons_n);
+
+        for (int i = 0; i < joyButtons_n; i++)
+        {
+            if (joyButtons[i] == GLFW_PRESS && !joyActivated)
+            {
+                joyActivated = 1;
+            }
+        }
+
+        if (joyActivated && joyAxes_n > 2 && joyButtons_n > 3)
+        {
+            eulerO[0] = joyAxes[joy.JAXIS_ROLL] / joy.jD;
+            eulerO[1] = joyAxes[joy.JAXIS_PITCH] / joy.jD;
+            eulerO[2] = joyAxes[joy.JAXIS_YAW] / joy.jD;
+        }
+        else
+        {
+            joyAxes = (float*) joyZero;
+            joyButtons = (unsigned char*) joyZero;
+        }
 
         // x/y are swapped
         if ((MouseButtonFlags & gameFramework::MOUSE_BUTTON_LEFT))
@@ -236,49 +261,56 @@ public:
             eulerO[1] = -1 * M_PI * (MouseCurrent.y - mouseDownRightLoc[0])/400 * sSense;
             eulerO[2] = -1 * M_PI * (MouseCurrent.x - mouseDownRightLoc[1])/400 * sSense;
         }
+        else if (joyActivated)
+        {
+            // euler[] already set
+        }
         else
         {
             eulerO[1] = eulerO[2] = 0.0;
         }
 
-        if (isKeyPressed(KEY_ROLL_ADD))
+        if (!joyActivated)
         {
-            eulerO[0] = -1.0 * sSense;
-        } 
-        else if (isKeyPressed(KEY_ROLL_SUB))
-        {
-            eulerO[0] = 1.0 * sSense;
-        }
-        else
-        {
-            eulerO[0] = 0.0;
+            if (isKeyPressed(joy.KEY_ROLL_ADD))
+            {
+                eulerO[0] = -1.0 * sSense;
+            }
+            else if (isKeyPressed(joy.KEY_ROLL_SUB))
+            {
+                eulerO[0] = 1.0 * sSense;
+            }
+            else
+            {
+                eulerO[0] = 0.0;
+            }
         }
 
-        if (isKeyPressed(KEY_FIRE_LASER) && !keysLast[KEY_FIRE_LASER])
+        if ((isKeyPressed(joy.KEY_FIRE_LASER) && !keysLast[joy.KEY_FIRE_LASER]) || (joyButtons[joy.JKEY_FIRE_LASER] == GLFW_PRESS && !joyLast[joy.JKEY_FIRE_LASER]))
         {
             gameInterfaceHandleTouchBegin(gameInterfaceControls.fire.x, gameInterfaceControls.fire.y);
         }
-        if (!isKeyPressed(KEY_FIRE_LASER) && keysLast[KEY_FIRE_LASER])
+        if ((!isKeyPressed(joy.KEY_FIRE_LASER) && keysLast[joy.KEY_FIRE_LASER]) || (joyButtons[joy.JKEY_FIRE_LASER] == GLFW_RELEASE && joyLast[joy.JKEY_FIRE_LASER]))
         {
             gameInterfaceHandleTouchEnd(gameInterfaceControls.fire.x, gameInterfaceControls.fire.y);
         }
 
-        if (isKeyPressed(KEY_FIRE_MISSLE))
+        if ((isKeyPressed(joy.KEY_FIRE_MISSLE)) || (joyButtons[joy.JKEY_FIRE_MISSLE] == GLFW_PRESS && !joyLast[joy.JKEY_FIRE_MISSLE]))
         {
             gameInterfaceHandleTouchBegin(gameInterfaceControls.fireRectMissle.x, gameInterfaceControls.fireRectMissle.y);
         }
-        if (!isKeyPressed(KEY_FIRE_MISSLE) && keysLast[KEY_FIRE_MISSLE])
+        if ((!isKeyPressed(joy.KEY_FIRE_MISSLE) && keysLast[joy.KEY_FIRE_MISSLE]) || (joyButtons[joy.JKEY_FIRE_MISSLE] == GLFW_RELEASE && joyLast[joy.JKEY_FIRE_MISSLE]))
         {
             gameInterfaceHandleTouchEnd(gameInterfaceControls.fireRectMissle.x, gameInterfaceControls.fireRectMissle.y);
         }
 
         const float speedInc = 1.0;
 
-        if (isKeyPressed(KEY_ACCEL) && !keysLast[KEY_ACCEL])
+        if (isKeyPressed(joy.KEY_ACCEL) && !keysLast[joy.KEY_ACCEL])
         {
             if(targetSpeed + speedInc <= maxSpeed) targetSpeed += speedInc;
         }
-        if (isKeyPressed(KEY_DECEL) && !keysLast[KEY_DECEL])
+        if (isKeyPressed(joy.KEY_DECEL) && !keysLast[joy.KEY_DECEL])
         {
             if(targetSpeed - speedInc >= minSpeed) targetSpeed -= speedInc;
         }
@@ -286,10 +318,14 @@ public:
         gameInputGyro(eulerO[0], eulerO[1], eulerO[2]);
 
         mouseFlagsLast = MouseButtonFlags;
-        keysLast[KEY_FIRE_LASER] = isKeyPressed(KEY_FIRE_LASER);
-        keysLast[KEY_FIRE_MISSLE] = isKeyPressed(KEY_FIRE_MISSLE);
-        keysLast[KEY_ACCEL] = isKeyPressed(KEY_ACCEL);
-        keysLast[KEY_DECEL] = isKeyPressed(KEY_DECEL);
+        keysLast[joy.KEY_FIRE_LASER] = isKeyPressed(joy.KEY_FIRE_LASER);
+        joyLast[joy.JKEY_FIRE_LASER] = joyButtons[joy.JKEY_FIRE_LASER];
+        keysLast[joy.KEY_FIRE_MISSLE] = isKeyPressed(joy.KEY_FIRE_MISSLE);
+        joyLast[joy.JKEY_FIRE_MISSLE] = joyButtons[joy.JKEY_FIRE_MISSLE];
+        keysLast[joy.KEY_ACCEL] = isKeyPressed(joy.KEY_ACCEL);
+        joyLast[joy.JKEY_ACCEL] = joyButtons[joy.JKEY_ACCEL];
+        keysLast[joy.KEY_DECEL] = isKeyPressed(joy.KEY_DECEL);
+        joyLast[joy.JKEY_DECEL] = joyButtons[joy.JKEY_DECEL];
 
         gameInput();
     }

@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 FILE(GLOB GAME_SRC ../Classes/*.c)
 FILE(GLOB FRAMEWORK_SUPPORT ogl-samples-master/framework/*.cpp)
-set(SOURCE_FILES ogl-glflight/stubs.cpp ogl-glflight/gameWinStubs.c ogl-glflight/glFlightMain.cpp ogl-glflight/gameFramework.cpp ogl-glflight/gameAudioOpenAL.cpp ${GAME_SRC})
+set(SOURCE_FILES ogl-glflight/stubs.cpp ogl-glflight/gameWinStubs.c ogl-glflight/glFlightMain.cpp ogl-glflight/gameFramework.cpp ogl-glflight/gameAudioOpenAL.cpp ogl-glflight/gameJoystick.cpp ${GAME_SRC})
 
 include_directories(ogl-glflight)
 include_directories(../Classes)

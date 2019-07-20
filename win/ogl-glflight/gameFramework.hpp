@@ -276,6 +276,8 @@ protected:
 	glm::vec3 cameraPosition() const;
 	bool checkTemplate(GLFWwindow* pWindow, char const* Title);
 
+    void pollJoystick(float** axes, size_t* axes_n, unsigned char** buttons, size_t* buttons_n);
+
 protected:
 	void beginTimer();
 	void endTimer();
