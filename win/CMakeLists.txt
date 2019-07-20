@@ -21,6 +21,8 @@ set(OGL_DIR ogl-samples-master)
 
 add_subdirectory(${OGL_DIR})
 
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
 set(PLATFORM "win64")
 set(EGL_DIRECTORY egl-1.4)
 set(ES_DIRECTORY gles-2.0)
@@ -57,7 +59,7 @@ target_link_libraries(glFlightMain opengl32)
 
 #add_dependencies(glFlightMain ${OGL_DIR})
 
-install(TARGETS glFlightMain DESTINATION .)
+install(TARGETS glFlightMain DESTINATION glFlight.build)
 
 file(GLOB resourcesBmp ../*.bmp)
 file(GLOB resourcesWav ../*.wav)
@@ -71,6 +73,9 @@ foreach(resFile ${resourcesWav})
     add_custom_command(TARGET glFlightMain POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${resFile} resources)
 endforeach(resFile)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/joy_config.txt
+        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 set(ZIP_COMMAND tar -czf out.zip)
 

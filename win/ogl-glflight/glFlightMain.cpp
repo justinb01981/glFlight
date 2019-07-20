@@ -220,14 +220,16 @@ public:
             if (joyButtons[i] == GLFW_PRESS && !joyActivated)
             {
                 joyActivated = 1;
+
+                DBPRINTF(("joystick active: ACCEL/DECEL: %d %d", joy.JKEY_ACCEL, joy.JKEY_DECEL));
             }
         }
 
         if (joyActivated && joyAxes_n > 2 && joyButtons_n > 3)
         {
-            eulerO[0] = joyAxes[joy.JAXIS_ROLL] / joy.jD;
-            eulerO[1] = joyAxes[joy.JAXIS_PITCH] / joy.jD;
-            eulerO[2] = joyAxes[joy.JAXIS_YAW] / joy.jD;
+            eulerO[0] = pow(joyAxes[joy.JAXIS_ROLL] / joy.jD, 2) * joyAxes[joy.JAXIS_ROLL];
+            eulerO[1] = pow(joyAxes[joy.JAXIS_PITCH] / joy.jD, 2) * joyAxes[joy.JAXIS_PITCH];
+            eulerO[2] = pow(-joyAxes[joy.JAXIS_YAW] / joy.jD, 2) * -joyAxes[joy.JAXIS_YAW];
         }
         else
         {
@@ -306,11 +308,11 @@ public:
 
         const float speedInc = 1.0;
 
-        if (isKeyPressed(joy.KEY_ACCEL) && !keysLast[joy.KEY_ACCEL])
+        if ((isKeyPressed(joy.KEY_ACCEL) && !keysLast[joy.KEY_ACCEL]) || (joyButtons[joy.JKEY_ACCEL] == GLFW_PRESS && !joyLast[joy.JKEY_ACCEL]))
         {
             if(targetSpeed + speedInc <= maxSpeed) targetSpeed += speedInc;
         }
-        if (isKeyPressed(joy.KEY_DECEL) && !keysLast[joy.KEY_DECEL])
+        if ((isKeyPressed(joy.KEY_DECEL) && !keysLast[joy.KEY_DECEL]) || (joyButtons[joy.JKEY_DECEL] == GLFW_PRESS && !joyLast[joy.JKEY_DECEL]))
         {
             if(targetSpeed - speedInc >= minSpeed) targetSpeed -= speedInc;
         }

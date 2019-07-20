@@ -30,7 +30,7 @@ gameJoystick::gameJoystick()
     string line = string(2048, '\0');
     struct kComp {
         bool operator()(char* a, char* b) const {
-            return strcmp(a, b) == 0;
+            return strcmp(a, b)<0;
         }
     };
     map<char*, int*, kComp> valueMap;
@@ -67,7 +67,12 @@ gameJoystick::gameJoystick()
             auto pre = line.substr(0, off);
             if (valueMap[(char*) pre.c_str()] != NULL)
             {
-                sscanf(line.c_str() + off + 1, "%d", valueMap[(char*)pre.c_str()]);
+                int* dest = valueMap[(char*)pre.c_str()];
+                char* ptr = (char*) line.c_str() + off + 1;
+                if (sscanf(ptr, "%d", dest) < 1)
+                {
+                    cout << "unable to parse line: " << line.c_str() << endl;
+                }
             }
         }
     }
