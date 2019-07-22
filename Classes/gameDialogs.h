@@ -589,7 +589,7 @@ gameDialogNetworkGameEnded()
     gameDialogNetworkGameStatus();
     
     controlRect* peek = gameInterfaceModalDialogPeek();
-    if(strncmp(peek->text, msg, sizeof(peek->text)) == 0) return;
+    if(peek && strncmp(peek->text, msg, sizeof(peek->text)) == 0) return;
     
     gameInterfaceModalDialog(msg, "OK", "OK", gameDialogDisconnectAndDequeue, gameDialogDisconnectAndDequeue);
     

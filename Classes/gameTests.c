@@ -13,6 +13,7 @@
 int
 run_network_sanity()
 {
+#if DEBUG
     int original_val = 65535;
     
     gameNetworkMessage msg;
@@ -29,6 +30,7 @@ run_network_sanity()
     assert(msg.rebroadcasted != 0);
     
     if(msg.cmd != GAME_NETWORK_MSG_HITME || msg.params.i[0] != original_val) return -1;
+#endif
     
     return 0;
 }
