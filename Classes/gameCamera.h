@@ -53,25 +53,28 @@ gameCamera_initWithHeading(float x, float y, float z,
 
 // called periodically to fix-up body axes which suffer from drift
 void
-gameCamera_normalize();
+gameCamera_normalize(void);
+
+void
+gameCamera_sanity(void);
 
 float
-gameCamera_getX();
+gameCamera_getX(void);
 
 float
-gameCamera_getY();
+gameCamera_getY(void);
 
 float
-gameCamera_getZ();
+gameCamera_getZ(void);
 
 float
-gameCamera_getEulerAlpha();
+gameCamera_getEulerAlpha(void);
 
 float
-gameCamera_getEulerBeta();
+gameCamera_getEulerBeta(void);
 
 float
-gameCamera_getEulerGamma();
+gameCamera_getEulerGamma(void);
 
 void
 gameCamera_pitchRadians(float r);

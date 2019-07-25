@@ -464,6 +464,8 @@ calibrate_bail:
         }
     }
     
+    gameCamera_sanity();
+    
     if(update_ship_stats)
     {
         switch(model_my_ship)

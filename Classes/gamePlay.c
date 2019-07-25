@@ -2333,7 +2333,8 @@ game_run()
     
     // poop cubes
     static game_timeval_t time_cube_poop_last = 0;
-    if(time_ms - time_cube_poop_last > pooped_cube_interval_ms)
+    //if(time_ms - time_cube_poop_last > pooped_cube_interval_ms)
+    if(time_ms - time_cube_poop_last > pooped_cube_interval_ms/(speed/maxSpeed))
     {
         time_cube_poop_last = time_ms;
         firePoopedCube(pMyShipNode->elem);

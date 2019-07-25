@@ -1476,7 +1476,8 @@ game_network_periodic_check()
        && network_time_ms - time_game_start_alert_last > 10000)
     {
         time_game_start_alert_last = network_time_ms;
-        gameDialogStartNetworkGameWait();
+        //gameDialogStartNetworkGameWait(); 
+        console_append("waiting for players...");
     }
     
     while(pInfo)
@@ -1968,6 +1969,8 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
             
             // send back message with our player-name
             send_connect(&playerInfo->address);
+            
+            gameDialogStartNetworkGameWait();
         }
         else
         {

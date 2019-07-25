@@ -99,6 +99,14 @@ gameCamera_normalize()
     cam_pos = tmp;
 }
 
+void
+gameCamera_sanity()
+{
+    if(isnan(cam_pos.x)) cam_pos.x = 0;
+    if(isnan(cam_pos.y)) cam_pos.y = 0;
+    if(isnan(cam_pos.z)) cam_pos.z = 0;
+}
+
 float
 gameCamera_getX() { return cam_pos.x; }
 
