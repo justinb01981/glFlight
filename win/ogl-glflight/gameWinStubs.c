@@ -42,7 +42,7 @@ glFlightGameResourceInfo_t glFlightGameResourceInfo;
 const char*
 glFlightSettingsPath()
 {
-    sprintf(settingsPath, "%s/settings.txt", glFlightGameResourceInfo.pathPrefix);
+    sprintf(settingsPath, "%ssettings.txt", glFlightGameResourceInfo.pathPrefix);
     return settingsPath;
 }
 

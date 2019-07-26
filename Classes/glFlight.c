@@ -157,7 +157,7 @@ glFlightFrameStage1()
         gameNetwork_worldInit();
         my_ship_id = WORLD_ELEM_ID_INVALID;
         gameStateSinglePlayer.started = 0;
-        gameStateSinglePlayer.game_type = GAME_TYPE_NONE;
+        //gameStateSinglePlayer.game_type = GAME_TYPE_NONE;
         game_terminated_gracefully = 1;
         gameGraphicsInit();
         gameInterfaceReset();
