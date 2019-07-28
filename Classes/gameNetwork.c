@@ -1476,8 +1476,8 @@ game_network_periodic_check()
        && network_time_ms - time_game_start_alert_last > 10000)
     {
         time_game_start_alert_last = network_time_ms;
-        //gameDialogStartNetworkGameWait(); 
-        console_append("waiting for players...");
+        //gameDialogStartNetworkGameWait();
+        console_append("waiting for players...\n");
     }
     
     while(pInfo)
