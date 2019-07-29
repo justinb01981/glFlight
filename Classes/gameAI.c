@@ -472,9 +472,12 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             elem->stuff.u.enemy.time_next_retarget = time_ms + 4000;
             
             // head away from target
-            ax = ax * -2;
-            ay = ay * -2;
-            az = az * -2;
+            //ax = ax * -2;
+            //ay = ay * -2;
+            //az = az * -2;
+            ax = -elem->physics.ptr->x;
+            ay = gWorld->bound_radius * 0.5;
+            az = -elem->physics.ptr->z;
             
             elem->stuff.u.enemy.tgt_x = ax;
             elem->stuff.u.enemy.tgt_y = ay;
@@ -577,10 +580,12 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     {
         float S = boundary_avoid_distance * 2;
         float dest[3];
-        dest[0] = elem->physics.ptr->x + zq.x*S;
-        dest[1] = elem->physics.ptr->y + zq.y*S;
-        dest[2] = elem->physics.ptr->z + zq.z*S;
         float result[3];
+
+        // zq points backwards
+        dest[0] = elem->physics.ptr->x + -zq.x*S;
+        dest[1] = elem->physics.ptr->y + -zq.y*S;
+        dest[2] = elem->physics.ptr->z + -zq.z*S;
              
         if(world_bounding_violations(dest, result) /*&& zdot < 0.7*/)
         {
@@ -588,7 +593,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             {
                 elem->stuff.u.enemy.tgt_x = dest[0] + result[0] * S * 4;
                 elem->stuff.u.enemy.tgt_y = dest[1] + result[1] * S * 4;
-                elem->stuff.u.enemy.tgt_z = dest[1] + result[2] * S * 4;
+                elem->stuff.u.enemy.tgt_z = dest[2] + result[2] * S * 4;
                 
                 elem->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
                 elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;

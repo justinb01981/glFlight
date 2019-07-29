@@ -2468,7 +2468,7 @@ fireBullet(int bulletAction)
         gameShip_getEuler(&bullet_euler[0], &bullet_euler[1], &bullet_euler[2]);
         
         game_add_bullet(bullet_pos, bullet_euler, missle? MAX_SPEED_MISSLE: bulletVel, bv, bulletAction,
-                        missle? game_target_missle_id: -1, listNodeShip->elem->stuff.affiliation);
+                        missle? game_target_missle_id: WORLD_ELEM_ID_INVALID, listNodeShip->elem->stuff.affiliation);
     }
 }
 
