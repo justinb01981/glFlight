@@ -398,6 +398,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     float tc;
     float zdot_ikillyou = 0.5;
     float zdot_juke = 0.3;
+    float zdot_collision = 0.7;
     float dist_tooclose = 10.0;
     float boundary_avoid_distance = 5.0;
     int iF;
@@ -441,7 +442,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         // if not firing, intercept course
         if(!elem->stuff.u.enemy.fires)
         {
-            leadVel = elem->stuff.u.enemy.max_speed * (1);
+            leadVel = elem->physics.ptr->velocity;
             fm = 1.0;
         }
         
@@ -464,7 +465,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         
         // avoid collision
         if(dist <= elem->stuff.u.enemy.run_distance &&
-           //zdot > 0.0 &&
+           zdot > zdot_collision &&
            target_avoid_collision(target_objtype))
         {
             elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
