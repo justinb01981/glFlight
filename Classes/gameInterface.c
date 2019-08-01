@@ -1006,6 +1006,7 @@ void gameInterfaceProcessAction()
         case ACTION_SETTING_CONTROL_MODE:
             gameSettingsComplexControls = !gameSettingsComplexControls;
             appWriteSettings();
+            console_write("%s", gameSettingsComplexControls ? "enabled" : "disabled");
             break;
             
         case ACTION_SETTING_LOCK_CAMERA:

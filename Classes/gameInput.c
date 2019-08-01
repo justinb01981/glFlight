@@ -517,16 +517,19 @@ gameInput()
             float a1 = atan2(shipx[2], shipx[0]);
             float c1 = atan2(shipz[0], shipz[2]);
             
-            float r = 0.005;
+            float r = 0.01;
             
             if(a1 < 0) r *= -1;
             if(c1 > 0) r *= -1;
             if(atan2(shipx[1], shipx[0]) < 0) r *= -1;
             
-            gameShip_roll(r);
+            if(fabs(shipx[1]) > 0.02) gameShip_roll(r);
             
             // block pitch when gimbal lock near
-            if(dot(shipy[0], shipy[1], shipy[2], 0, 1, 0) <= 0.1) gameShip_roll(fabs(r)*4);
+            if(dot(shipy[0], shipy[1], shipy[2], 0, 1, 0) <= 0.1)
+            {
+                gameShip_roll(fabs(r)*2);
+            }
         }
         
         if(fabs(input_roll) > dz_roll*dz_m[0] && gameSettingsComplexControls)
