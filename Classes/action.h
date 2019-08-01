@@ -127,7 +127,7 @@ static const char* action_strings[ACTION_LAST] =
     "ship type",
     "camera mode",
     "input sensitivity",
-    "control mode",
+    "3-axis control mode",
     "deathmatch bot skill",
     "mute audio",
     "ship appearance(texture)",

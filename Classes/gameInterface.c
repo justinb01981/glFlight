@@ -1004,7 +1004,7 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_SETTING_CONTROL_MODE:
-            gameSettingsSimpleControls = !gameSettingsSimpleControls;
+            gameSettingsComplexControls = !gameSettingsComplexControls;
             appWriteSettings();
             break;
             

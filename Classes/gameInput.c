@@ -494,25 +494,42 @@ gameInput()
     if(!needTrim && !game_paused)
     {
         float cap = /*0.05*/ 0.1; // radians
+        static float ship_euler_last[3] = {0, 0, 0};
 
         // output response ampilfiers
         //float sm[] = /*{0.6, 0.8, 0.8}*/ {0.7, 0.8, 0.9};
         float sm[] = /*{0.6, 0.8, 0.8}*/ PLATFORM_INPUT_COEFFICIENTS;
         // TODO: scale inversely based on angle relative to gravity
         
-        if(gameSettingsSimpleControls)
+        if(!gameSettingsComplexControls)
         {
-            // simplified controls (roll buttons)? on-screen controls?
-            gameInterfaceSetInterfaceState(INTERFACE_STATE_ONSCREEN_INPUT_CONTROL);
-            if(!gameInterfaceControls.altControl.touch_began)
-            {
-                roll_m = deviceRoll;
-                input_roll = 0;
-                fcr += 0;
-            }
+            // drift toward level with the horizon
+            float shipy[3], shipx[3], shipz[3];
+            
+            input_roll = input_yaw*-1.5;
+            
+            gameShip_unfakeRoll();
+            
+            gameShip_getYVector(shipy);
+            gameShip_getXVector(shipx);
+            gameShip_getZVector(shipz);
+            
+            float a1 = atan2(shipx[2], shipx[0]);
+            float c1 = atan2(shipz[0], shipz[2]);
+            
+            float r = 0.005;
+            
+            if(a1 < 0) r *= -1;
+            if(c1 > 0) r *= -1;
+            if(atan2(shipx[1], shipx[0]) < 0) r *= -1;
+            
+            gameShip_roll(r);
+            
+            // block pitch when gimbal lock near
+            if(dot(shipy[0], shipy[1], shipy[2], 0, 1, 0) <= 0.1) gameShip_roll(fabs(r)*4);
         }
         
-        if(fabs(input_roll) > dz_roll*dz_m[0] /*&& touchThrottle*/)
+        if(fabs(input_roll) > dz_roll*dz_m[0] && gameSettingsComplexControls)
         {
             //printf("-----------ROLLING-----------\n");
             
@@ -544,6 +561,13 @@ gameInput()
             if(fabs(s) > cap) s = cap * (s/fabs(s));
 
             gameShip_yaw(s);
+        }
+        
+        if(!gameSettingsComplexControls)
+        {
+            gameShip_getEuler(&ship_euler_last[0], &ship_euler_last[1], &ship_euler_last[2]);
+            
+            gameShip_fakeRoll(input_roll);
         }
     }
     

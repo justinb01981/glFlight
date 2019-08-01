@@ -47,7 +47,7 @@ extern char gameSettingsGameName[255];
 extern int gameSettingsNetworkFrequency;
 extern int gameSettingsPortNumber;
 extern char gameSettingsLocalIPOverride[255];
-extern int gameSettingsSimpleControls;
+extern int gameSettingsComplexControls;
 extern char gameSettingsVersionStr[255];
 extern char gameSettingsKillHistory[4096];
 static char gameSettingsDirectoryServerNameREMOVED[255];
@@ -101,7 +101,7 @@ gameSettingsDefaults()
     gameSettingsNetworkFrequency = 50;
     gameSettingsPortNumber = 52000;
     gameStateSinglePlayer.lifetime_credits = 0;
-    gameSettingsSimpleControls = 0;
+    gameSettingsComplexControls = 0;
     strcpy(gameSettingsVersionStr, GAME_VERSION_STR);
 }
 
@@ -147,7 +147,7 @@ gameSettingsWrite(const char *filename)
         fprintf(fp, "%d\n", gameSettingsNetworkFrequency);
         fprintf(fp, "%d\n", gameSettingsPortNumber);
         fprintf(fp, "%lu\n", gameStateSinglePlayer.lifetime_credits);
-        fprintf(fp, "%d\n", gameSettingsSimpleControls);
+        fprintf(fp, "%d\n", gameSettingsComplexControls);
         fprintf(fp, "%s\n", GAME_VERSION_STR);
         fprintf(fp, "%s\n", gameSettingsKillHistory);
         
@@ -186,7 +186,7 @@ gameSettingsRead(const char *filename)
         }
         else if(settings_version == 33 && settings_ver == 32)
         {
-            gameSettingsSimpleControls = 0;
+            gameSettingsComplexControls = 0;
         }
         else if(settings_version == 37 && settings_ver == 36)
         {
@@ -224,7 +224,7 @@ gameSettingsRead(const char *filename)
         if(fscanf(fp, "%d", &gameSettingsNetworkFrequency) < 1) break;
         if(fscanf(fp, "%d", &gameSettingsPortNumber) < 1) break;
         if(fscanf(fp, "%lu", &gameStateSinglePlayer.lifetime_credits) < 1) break;
-        if(fscanf(fp, "%d", &gameSettingsSimpleControls) < 1) break;
+        if(fscanf(fp, "%d", &gameSettingsComplexControls) < 1) break;
         if(fscanf(fp, "%s", gameSettingsVersionStr) < 1) break;
         if(fscanf(fp, "%s", gameSettingsKillHistory) < 1) break;
         

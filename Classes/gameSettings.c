@@ -20,6 +20,6 @@ char gameSettingsGameNameDefault[255];
 char gameSettingsLocalIPOverride[255];
 int gameSettingsNetworkFrequency;
 int gameSettingsPortNumber;
-int gameSettingsSimpleControls;
+int gameSettingsComplexControls;
 char gameSettingsVersionStr[255];
 char gameSettingsKillHistory[4096];

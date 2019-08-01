@@ -21,9 +21,9 @@ float my_ship_z;
 float my_ship_alpha;
 float my_ship_beta;
 float my_ship_gamma;
-quaternion_t my_ship_bx;
-quaternion_t my_ship_by;
-quaternion_t my_ship_bz;
+quaternion_t my_ship_bx, my_ship_bx_last;
+quaternion_t my_ship_by, my_ship_by_last;
+quaternion_t my_ship_bz, my_ship_bz_last;
 
 void
 gameShip_init(float x, float y, float z, float alpha, float beta, float gamma)
@@ -36,6 +36,7 @@ gameShip_init(float x, float y, float z, float alpha, float beta, float gamma)
     my_ship_gamma = gamma;
     
     get_body_vectors_for_euler(alpha, beta, gamma, &my_ship_bx, &my_ship_by, &my_ship_bz);
+    get_body_vectors_for_euler(alpha, beta, gamma, &my_ship_bx_last, &my_ship_by_last, &my_ship_bz_last);
     
     /*
     my_ship_alpha = alpha;
@@ -233,5 +234,23 @@ float gameShip_calcRoll()
     if(qB.y > 0.0) trimR = -trimR + M_PI;
     
     return trimR;
+}
+
+void gameShip_fakeRoll(float r)
+{
+    my_ship_bx_last = my_ship_bx;
+    my_ship_by_last = my_ship_by;
+    my_ship_bz_last = my_ship_bz;
+    
+    gameShip_roll(r);
+}
+
+void gameShip_unfakeRoll()
+{
+    my_ship_bx = my_ship_bx_last;
+    my_ship_by = my_ship_by_last;
+    my_ship_bz = my_ship_bz_last;
+    
+    gameShip_normalize();
 }
 

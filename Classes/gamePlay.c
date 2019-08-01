@@ -2004,7 +2004,7 @@ game_run()
                 collision_actions_set_player_vuln();
             }
             
-            if(!gameSettingsSimpleControls)
+            if(!gameSettingsComplexControls)
             {                
                 if(gameStateSinglePlayer.boost_charge < 1.0)
                 {

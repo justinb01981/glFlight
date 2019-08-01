@@ -30,6 +30,11 @@ float min_patrol_distance = 20;
 float collect_deploy_distance = -2.5;
 float change_target_frequency = 10000;
 float zdot_infront = 0.5;
+const float zdot_ikillyou = 0.5;
+const float zdot_juke = 0.3;
+const float zdot_collision = 0.7;
+const float dist_tooclose = 10.0;
+const float boundary_avoid_distance = 5.0;
 
 float juke_distance = 20.0, juke_distance_patrol = 50.0;
 
@@ -396,11 +401,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     int skill = elem->stuff.u.enemy.intelligence;
     quaternion_t xq, yq, zq, z1q;
     float tc;
-    float zdot_ikillyou = 0.5;
-    float zdot_juke = 0.3;
-    float zdot_collision = 0.7;
-    float dist_tooclose = 10.0;
-    float boundary_avoid_distance = 5.0;
     int iF;
     
     tc = time_ms - elem->stuff.u.enemy.time_last_run;

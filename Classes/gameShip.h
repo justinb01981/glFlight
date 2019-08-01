@@ -59,4 +59,10 @@ gameShip_getEuler(float* alpha, float* beta, float* gamma)
 float
 gameShip_calcRoll();
 
+void
+gameShip_fakeRoll(float r);
+
+void
+gameShip_unfakeRoll();
+
 #endif
