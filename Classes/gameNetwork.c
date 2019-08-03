@@ -3126,6 +3126,9 @@ void load_map_and_host_game()
     save_map = 0;
     console_write("Hosting game: %s\nWaiting for guests...",
                   gameNetworkState.hostInfo.name);
+    
+    gameStateSinglePlayer.game_type = GAME_TYPE_NONE;
+    
     if(!game_map_custom_loaded) gameMapSetMap(initial_map_deathmatch);
     
     gameNetworkState.gameNetworkHookGameDiscovered = NULL;
