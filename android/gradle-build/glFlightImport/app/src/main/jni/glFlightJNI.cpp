@@ -317,7 +317,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 
 	if(/*get_time_ms() - sensorInputLast > 1000/GAME_TICK_RATE*/1)
 	{
-		gameInputGyro2(roll, pitch, yaw, 0.08);
+		gameInputGyro2(roll, pitch, yaw);
 		sensorInputLast = get_time_ms();
 	}
 
