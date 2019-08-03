@@ -22,6 +22,7 @@ extern int isLandscape;
 extern double bulletVel;
 extern quaternion_t bx, by, bz, b;
 extern double dc;
+extern float gyroSensitivityCAndroid;
 
 
 static unsigned int TOUCHES_MAX = 4;
@@ -42,7 +43,7 @@ void
 gameInputGyro(float roll, float pitch, float yaw);
 
 void
-gameInputGyro2(float roll, float pitch, float yaw, float c);
+gameInputGyro2(float roll, float pitch, float yaw);
 
 void
 gameInputMotion(float roll, float pitch, float yaw);

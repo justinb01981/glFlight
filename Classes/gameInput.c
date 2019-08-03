@@ -92,9 +92,11 @@ unsigned int gyroInputCount = 0;
 unsigned long gyroInputCountLast = 0;
 int gyroStableCount = 0;
 int gyroStableCountThresh = (GYRO_SAMPLE_RATE*4);
-float gyroInputDeltaLast[3] = {0, 0, 0};
+//float gyroInputDeltaLast[3] = {0, 0, 0};
 float fcr = 0.0, fcp = 0.0, fcy = 0.0;
-float gyroInputStableThresh = 0.01;
+//float gyroInputStableThresh = 0.01;
+//float gyroSensitivityCAndroid = 0.5;
+float gyroInputRange[3][2];
 
 const float tex_pass_initial_sample = 60;
 
@@ -130,6 +132,8 @@ gameInputInit()
     bulletVel = MAX_SPEED*5;
     needTrim = 1;
     needTrimLast = 0;
+
+    memset(gyroInputRange, 0, sizeof(gyroInputRange));
     
     isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
 
@@ -192,7 +196,7 @@ gameInputGyro(float roll, float pitch, float yaw)
 }
 
 void
-gameInputGyro2(float roll, float pitch, float yaw, float c)
+gameInputGyro2(float roll, float pitch, float yaw)
 {
     gyroInputCount++;
     if(needTrim)
@@ -203,9 +207,9 @@ gameInputGyro2(float roll, float pitch, float yaw, float c)
     }
     else
     {
-        motionRoll += roll * c;
-        motionPitch += pitch * c;
-        motionYaw += yaw * c;
+        motionRoll += roll;
+        motionPitch += pitch;
+        motionYaw += yaw;
     }
 
     trimCountLast = trimCount;
@@ -280,26 +284,6 @@ gameInput()
     
     gameInputStatsAppend(s);
     
-    if(gyroStableCount > 0 &&
-       (fabs(devicePitch-gyroInputDeltaLast[0]) >= gyroInputStableThresh ||
-        fabs(deviceYaw-gyroInputDeltaLast[1]) >= gyroInputStableThresh ||
-        fabs(deviceRoll-gyroInputDeltaLast[2]) >= gyroInputStableThresh))
-    {
-        gyroStableCount = 0;
-
-        gyroInputStableThresh += fabs(((devicePitch-gyroInputDeltaLast[0]) +
-                                  (deviceYaw-gyroInputDeltaLast[1]) +
-                                  (deviceRoll-gyroInputDeltaLast[2])) / 3) * 0.5;
-    }
-    else
-    {
-        gyroStableCount ++;
-    }
-    
-    gyroInputDeltaLast[0] = devicePitch;
-    gyroInputDeltaLast[1] = deviceYaw;
-    gyroInputDeltaLast[2] = deviceRoll;
-    
     if(!controlsCalibrated) {
         if (!needTrim && trimCountLast == trimCount) {
             if (gyroStableCount == (GYRO_SAMPLE_RATE * 2)) {
@@ -307,12 +291,20 @@ gameInput()
                 console_write("calibrating...");
                 gameInterfaceSetInterfaceState(INTERFACE_STATE_TRIM_BLINKING);
                 gameInputTrimBegin();
-                gyroStableCount = 1;
             }
         } else {
-            if (gyroStableCount == 0) {
-                /* restart learning */
-                gameInputTrimBegin();
+
+            float deviceI[] = {deviceRoll, devicePitch, deviceYaw};
+
+            for(int r = 0; r < 3; r++) {
+                if(deviceI[r] < gyroInputRange[r][0]) {
+                    gyroInputRange[r][0] = deviceI[r];
+                    gyroStableCount = 0;
+                }
+                if(deviceI[r] > gyroInputRange[r][1]) {
+                    gyroInputRange[r][1] = deviceI[r];
+                    gyroStableCount = 0;
+                }
             }
 
             gyro_calibrate_log((float) gyroStableCount / (float) (GYRO_SAMPLE_RATE * 4) * 100);
@@ -323,12 +315,10 @@ gameInput()
                 needTrim = 0;
                 trimCountLast = 1;
                 gameInterfaceControls.trim.blinking = 0;
-
-                roll_m = deviceRoll;
-                pitch_m = devicePitch;
-                yaw_m = deviceYaw;
             }
         }
+
+        gyroStableCount += 1;
     }
 
     // input variance too wide for trimming, ignore
@@ -410,9 +400,9 @@ gameInput()
             gameInterfaceCalibrateDone();
         }
         
-        roll_m = deviceRoll;
-        pitch_m = devicePitch;
-        yaw_m = deviceYaw;
+        roll_m = gyroInputRange[0][0] + (gyroInputRange[0][1]-gyroInputRange[0][0])/2;
+        pitch_m = gyroInputRange[1][0] + (gyroInputRange[1][1]-gyroInputRange[1][0])/2;
+        yaw_m = gyroInputRange[2][0] + (gyroInputRange[2][1]-gyroInputRange[2][0])/2;
         
         // zero out input-averaging buffer
         for(int a = 0; a < AVG_INPUTS_LENGTH; a++)
@@ -454,9 +444,14 @@ gameInput()
      */
     
     // make relative to trimmed/center position
-    deviceRoll -= roll_m;
-    devicePitch -= pitch_m;
-    deviceYaw -= yaw_m;
+    deviceRoll = (deviceRoll - gyroInputRange[0][0]) / ((gyroInputRange[0][1]-gyroInputRange[0][0])/2) / 10;
+    devicePitch = (devicePitch - gyroInputRange[1][0]) / ((gyroInputRange[1][1]-gyroInputRange[1][0])/2) / 10;
+    deviceYaw = (deviceYaw - gyroInputRange[2][0]) / ((gyroInputRange[2][1]-gyroInputRange[2][0])/2) / 10;
+
+    DBPRINTF((
+            "roll:%f\npitch:%f\nyaw:%f\n",
+            deviceRoll, devicePitch, deviceYaw
+            ));
     
     /*
     float inputScale = 2.0;
@@ -506,7 +501,7 @@ gameInput()
             // drift toward level with the horizon
             float shipy[3], shipx[3], shipz[3];
             
-            input_roll = input_yaw*-1.5;
+            input_roll = input_yaw*sm[2]*-1.5;
             
             gameShip_unfakeRoll();
             
