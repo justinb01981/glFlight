@@ -72,14 +72,14 @@ extern int fireActionQueuedAfterEdit;
 
 #if GAME_PLATFORM_ANDROID
 #define GAME_PLATFORM_IS_LANDSCAPE 0
-#define GYRO_FEEDBACK_COEFF (0.001)
-#define GYRO_DC_DEFAULT /*0.004*/ (0.002)
-#define GYRO_FEEDBACK_DEFAULT (0.01)
+#define GYRO_FEEDBACK_COEFF (0.002)
+#define GYRO_DC_DEFAULT /*0.004*/ (0.05)
+#define GYRO_FEEDBACK_DEFAULT (0.1)
 #define PLATFORM_TICK_RATE 60
 #define PLATFORM_DRAW_ELEMS_MAX 1000
 #define GYRO_SAMPLE_RATE (60)
 #define VISIBLE_DISTANCE_PLATFORM 200
-#define PLATFORM_INPUT_COEFFICIENTS {0.5, 0.6, 0.7}
+#define PLATFORM_INPUT_COEFFICIENTS {1.0, 2.0, 1}
 #else
 #define GAME_PLATFORM_IS_LANDSCAPE 0
 #define GYRO_FEEDBACK_COEFF (0.002)
@@ -97,7 +97,7 @@ extern int fireActionQueuedAfterEdit;
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "1.6.2_core";
+const static char* GAME_VERSION_STR = "1.6.1_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 

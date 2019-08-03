@@ -10,6 +10,14 @@
 
 #include <assert.h>
 
+#if GAME_PLATFORM_ANDROID
+#include <sys/endian.h>
+
+#define ntohll(x) (x)
+#define htonll(x) (x)
+
+#endif
+
 static gameNetworkArgsType
 gameMessage_args_for_type(int type)
 {
