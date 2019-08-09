@@ -271,9 +271,9 @@ gameDialogInitial()
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
                              "^C                             ^C\n"
-                             "^C    Hold your device still   ^C\n"
-                             "^C  while calibrating controls ^C\n"
-                             "^C                             ^C\n"
+                             "^C     Gently tilt device      ^C\n"
+                             "^C         until cursor        ^C\n"
+                             "^C          is centered        ^C\n"
                              "^C       (Tap to begin)        ^C\n"
                              "^C                             ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",

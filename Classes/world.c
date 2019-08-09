@@ -50,8 +50,8 @@ game_lock_t gWorldLock;
 
 float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
 float C_FRICTION = /*0.04*/ 0.030; // higher values = more friction
-float GYRO_FEEDBACK = GYRO_FEEDBACK_DEFAULT;
-float GYRO_DC = GYRO_DC_DEFAULT;
+float GYRO_FEEDBACK = 0;
+float GYRO_DC = 3;
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
 
 static struct mesh_t* world_pending_mesh = NULL;

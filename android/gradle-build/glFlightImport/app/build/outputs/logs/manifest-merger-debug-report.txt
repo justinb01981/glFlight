@@ -1,119 +1,119 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:2:1-41:12
-INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:2:1-41:12
-INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:2:1-41:12
-INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:2:1-41:12
-MERGED from [com.android.support:appcompat-v7:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\appcompat-v7-23.4.0.aar\5e6f2eb26d1c5e1507b6dfcd694da0d8\AndroidManifest.xml:17:1-27:12
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\animated-vector-drawable-23.4.0.aar\195a3836f69fecc4f4d67be6e3a061f8\AndroidManifest.xml:2:1-9:12
-MERGED from [com.android.support:support-vector-drawable:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\support-vector-drawable-23.4.0.aar\d7de96e86750ffa1dcefd6cf88ffadf9\AndroidManifest.xml:2:1-9:12
-MERGED from [com.android.support:support-v4:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\support-v4-23.4.0.aar\7df85308504901c14bab549a603f938f\AndroidManifest.xml:17:1-24:12
-INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:2:1-41:12
-INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:2:1-41:12
-INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:2:1-41:12
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
+MERGED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:17:1-27:12
+MERGED from [com.android.support:animated-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/813980d27462849c6257c36bc5bb24de/AndroidManifest.xml:2:1-9:12
+MERGED from [com.android.support:support-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/c83f8317c61ee09b729fe95ec7f85958/AndroidManifest.xml:2:1-9:12
+MERGED from [com.android.support:support-v4:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/3f899c846fe63fbb7142e69f03ba3630/AndroidManifest.xml:17:1-24:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
 	package
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:3:5-36
-		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
-		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:3:5-36
+		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 	android:versionName
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:5:5-34
-		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
-		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:5:5-34
+		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 	xmlns:android
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:2:11-69
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:11-69
 	android:versionCode
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:4:5-35
-		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
-		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:4:5-35
+		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 application
-ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:12:5-33:19
-MERGED from [com.android.support:appcompat-v7:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\appcompat-v7-23.4.0.aar\5e6f2eb26d1c5e1507b6dfcd694da0d8\AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:appcompat-v7:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\appcompat-v7-23.4.0.aar\5e6f2eb26d1c5e1507b6dfcd694da0d8\AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\animated-vector-drawable-23.4.0.aar\195a3836f69fecc4f4d67be6e3a061f8\AndroidManifest.xml:7:5-20
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\animated-vector-drawable-23.4.0.aar\195a3836f69fecc4f4d67be6e3a061f8\AndroidManifest.xml:7:5-20
-MERGED from [com.android.support:support-vector-drawable:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\support-vector-drawable-23.4.0.aar\d7de96e86750ffa1dcefd6cf88ffadf9\AndroidManifest.xml:7:5-20
-MERGED from [com.android.support:support-vector-drawable:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\support-vector-drawable-23.4.0.aar\d7de96e86750ffa1dcefd6cf88ffadf9\AndroidManifest.xml:7:5-20
-MERGED from [com.android.support:support-v4:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\support-v4-23.4.0.aar\7df85308504901c14bab549a603f938f\AndroidManifest.xml:22:5-20
-MERGED from [com.android.support:support-v4:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\support-v4-23.4.0.aar\7df85308504901c14bab549a603f938f\AndroidManifest.xml:22:5-20
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:12:5-33:19
+MERGED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:animated-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/813980d27462849c6257c36bc5bb24de/AndroidManifest.xml:7:5-20
+MERGED from [com.android.support:animated-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/813980d27462849c6257c36bc5bb24de/AndroidManifest.xml:7:5-20
+MERGED from [com.android.support:support-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/c83f8317c61ee09b729fe95ec7f85958/AndroidManifest.xml:7:5-20
+MERGED from [com.android.support:support-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/c83f8317c61ee09b729fe95ec7f85958/AndroidManifest.xml:7:5-20
+MERGED from [com.android.support:support-v4:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/3f899c846fe63fbb7142e69f03ba3630/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/3f899c846fe63fbb7142e69f03ba3630/AndroidManifest.xml:22:5-20
 	android:label
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:16:9-41
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:16:9-41
 	android:persistent
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:14:9-35
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:14:9-35
 	android:icon
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:15:9-45
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:15:9-45
 	android:allowBackup
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:13:9-36
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:13:9-36
 	android:theme
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:17:9-40
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:17:9-40
 	locale
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:12:18-32
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:12:18-32
 activity#com.domain17.glflight.FullscreenActivity
-ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:18:9-32:20
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:18:9-32:20
 	android:screenOrientation
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:21:13-50
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:21:13-50
 	android:label
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:22:13-45
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:22:13-45
 	android:excludeFromRecents
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:25:13-46
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:25:13-46
 	android:configChanges
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:20:13-62
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:20:13-62
 	android:theme
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:23:13-51
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:23:13-51
 	android:finishOnTaskLaunch
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:24:13-46
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:24:13-46
 	android:name
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:19:13-68
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:19:13-68
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:27:13-31:29
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:27:13-31:29
 action#android.intent.action.MAIN
-ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:28:17-69
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:28:17-69
 	android:name
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:28:25-66
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:28:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:30:17-77
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:30:17-77
 	android:name
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:30:27-74
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:30:27-74
 uses-permission#android.permission.READ_EXTERNAL_STORAGE
-ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:35:5-80
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:35:5-80
 	android:name
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:35:22-77
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:35:22-77
 uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:36:5-81
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:36:5-81
 	android:name
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:36:22-78
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:36:22-78
 uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:37:5-79
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:37:5-79
 	android:name
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:37:22-76
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:37:22-76
 uses-permission#android.permission.INTERNET
-ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:38:5-67
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:38:5-67
 	android:name
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:38:22-64
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:38:22-64
 uses-permission#android.permission.CHANGE_WIFI_MULTICAST_STATE
-ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:39:5-86
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:39:5-86
 	android:name
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:39:22-83
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:39:22-83
 uses-sdk
-INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
-INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
-MERGED from [com.android.support:appcompat-v7:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\appcompat-v7-23.4.0.aar\5e6f2eb26d1c5e1507b6dfcd694da0d8\AndroidManifest.xml:21:5-23:78
-MERGED from [com.android.support:appcompat-v7:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\appcompat-v7-23.4.0.aar\5e6f2eb26d1c5e1507b6dfcd694da0d8\AndroidManifest.xml:21:5-23:78
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\animated-vector-drawable-23.4.0.aar\195a3836f69fecc4f4d67be6e3a061f8\AndroidManifest.xml:5:5-44
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\animated-vector-drawable-23.4.0.aar\195a3836f69fecc4f4d67be6e3a061f8\AndroidManifest.xml:5:5-44
-MERGED from [com.android.support:support-vector-drawable:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\support-vector-drawable-23.4.0.aar\d7de96e86750ffa1dcefd6cf88ffadf9\AndroidManifest.xml:5:5-43
-MERGED from [com.android.support:support-vector-drawable:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\support-vector-drawable-23.4.0.aar\d7de96e86750ffa1dcefd6cf88ffadf9\AndroidManifest.xml:5:5-43
-MERGED from [com.android.support:support-v4:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\support-v4-23.4.0.aar\7df85308504901c14bab549a603f938f\AndroidManifest.xml:20:5-43
-MERGED from [com.android.support:support-v4:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\support-v4-23.4.0.aar\7df85308504901c14bab549a603f938f\AndroidManifest.xml:20:5-43
-INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
-INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
+MERGED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:animated-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/813980d27462849c6257c36bc5bb24de/AndroidManifest.xml:5:5-44
+MERGED from [com.android.support:animated-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/813980d27462849c6257c36bc5bb24de/AndroidManifest.xml:5:5-44
+MERGED from [com.android.support:support-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/c83f8317c61ee09b729fe95ec7f85958/AndroidManifest.xml:5:5-43
+MERGED from [com.android.support:support-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/c83f8317c61ee09b729fe95ec7f85958/AndroidManifest.xml:5:5-43
+MERGED from [com.android.support:support-v4:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/3f899c846fe63fbb7142e69f03ba3630/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/3f899c846fe63fbb7142e69f03ba3630/AndroidManifest.xml:20:5-43
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 	tools:overrideLibrary
-		ADDED from [com.android.support:appcompat-v7:23.4.0] C:\Users\Justin\.gradle\caches\transforms-1\files-1.1\appcompat-v7-23.4.0.aar\5e6f2eb26d1c5e1507b6dfcd694da0d8\AndroidManifest.xml:23:9-75
+		ADDED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:23:9-75
 	android:targetSdkVersion
-		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
-		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
+		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
-		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
+		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml

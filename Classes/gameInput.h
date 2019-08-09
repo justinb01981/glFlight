@@ -23,6 +23,10 @@ extern double bulletVel;
 extern quaternion_t bx, by, bz, b;
 extern double dc;
 extern float gyroSensitivityCAndroid;
+extern double deviceRoll, devicePitch, deviceYaw;
+extern double deviceRollFrac, devicePitchFrac, deviceYawFrac;
+extern int gyroStableCount, gyroStableCountThresh;
+const static float GYRO_GRAPHIC_S = 3.3;
 
 
 static unsigned int TOUCHES_MAX = 4;

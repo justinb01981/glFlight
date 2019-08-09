@@ -1041,14 +1041,6 @@ void gameInterfaceProcessAction()
             appWriteSettings();
             break;
             
-        case ACTION_SETTING_GYRO_FEEDBACK:
-            if(GYRO_FEEDBACK == 0.0) GYRO_FEEDBACK = 0.0005;
-            GYRO_FEEDBACK *= 2;
-            if(GYRO_FEEDBACK >= 0.2) GYRO_FEEDBACK = GYRO_FEEDBACK_DEFAULT;
-            console_write("GYRO_FEEDBACK:%f", GYRO_FEEDBACK);
-            appWriteSettings();
-            break;
-            
         case ACTION_SETTING_SHIP_TEXTURE:
             switch(texture_id_playership)
         {
@@ -1090,8 +1082,8 @@ void gameInterfaceProcessAction()
             break;
             
         case ACTION_SETTING_INPUT_SENSITIVITY:
-            GYRO_DC += GYRO_DC_DEFAULT/2;
-            if(GYRO_DC >= GYRO_DC_DEFAULT*2) GYRO_DC = GYRO_DC_DEFAULT/2;
+            GYRO_DC += 1;
+            if(GYRO_DC >= 10) GYRO_DC = 3;
             console_write("Input sensitivity: %f\n", GYRO_DC);
             appWriteSettings();
             break;

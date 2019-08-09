@@ -17,6 +17,7 @@
 #include "gameCamera.h"
 #include "models.h"
 #include "gameInterface.h"
+#include "gameInput.h"
 #include "world.h"
 #include "gameGlobals.h"
 #include "gameUtils.h"
@@ -826,13 +827,13 @@ void drawControls()
             {
                 if(bindTexture(TEXTURE_ID_CALIBRATE_CURSOR))
                 {
-                    extern double motionRollMotion, motionPitchMotion, motionYawMotion, roll_m, pitch_m, yaw_m;
-                    extern int gyroStableCount, gyroStableCountThresh;
+                    //extern double motionRollMotion, motionPitchMotion, motionYawMotion, roll_m, pitch_m, yaw_m;
                     float S = 0.2;
                     float g1 = gyroStableCount, g2 = gyroStableCountThresh;
+                    float O[] = {0.5, 0.5};
                     subElements[0].tex_id = TEXTURE_ID_CALIBRATE_CURSOR;
-                    subElements[0].x = 0.5 - S/2 + ((motionRollMotion) / M_PI)*(1.0 - ((float) 1.0/g2) * (float) g1);
-                    subElements[0].y = 0.5 - S/2 + ((motionPitchMotion) / M_PI)*(1.0 - ((float) 1.0/g2) * (float) g1);
+                    subElements[0].x = (O[0] + S/2) + devicePitchFrac;//*(O[0] + ((float) 1.0/g2) * (float) g1);
+                    subElements[0].y = (O[0] + S/2) + deviceYawFrac;//*(O[0] + ((float) 1.0/g2) * (float) g1);
                     subElements[0].xw = S;
                     subElements[0].yw = S;
                     subElementsN++;

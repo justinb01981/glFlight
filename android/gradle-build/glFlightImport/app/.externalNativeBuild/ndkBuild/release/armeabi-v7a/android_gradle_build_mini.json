@@ -1,17 +1,17 @@
 {
   "buildFiles": [
-    "C:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\app\\src\\main\\jni\\Android.mk",
-    "C:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\app\\src\\main\\jni\\Application.mk"
+    "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Android.mk",
+    "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Application.mk"
   ],
   "cleanCommands": [
-    "C:\\Users\\Justin\\AppData\\Local\\Android\\sdk\\ndk-bundle\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\app\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\app\\src\\main\\jni\\Application.mk APP_ABI\u003darmeabi-v7a NDK_ALL_ABIS\u003darmeabi-v7a NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-22 NDK_OUT\u003dC:/Users/Justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dC:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\app\\build\\intermediates\\ndkBuild\\release\\lib clean"
+    "/Users/justin/Library/Android/sdk/ndk-bundle/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Android.mk NDK_APPLICATION_MK\u003d/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Application.mk APP_ABI\u003darmeabi-v7a NDK_ALL_ABIS\u003darmeabi-v7a NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-22 NDK_OUT\u003d/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/lib clean"
   ],
   "libraries": {
     "glFlight-release-armeabi-v7a": {
       "artifactName": "glFlight",
-      "buildCommand": "C:\\Users\\Justin\\AppData\\Local\\Android\\sdk\\ndk-bundle\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\app\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\app\\src\\main\\jni\\Application.mk APP_ABI\u003darmeabi-v7a NDK_ALL_ABIS\u003darmeabi-v7a NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-22 NDK_OUT\u003dC:/Users/Justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dC:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\app\\build\\intermediates\\ndkBuild\\release\\lib C:/Users/Justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/obj/local/armeabi-v7a/libglFlight.so",
+      "buildCommand": "/Users/justin/Library/Android/sdk/ndk-bundle/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Android.mk NDK_APPLICATION_MK\u003d/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Application.mk APP_ABI\u003darmeabi-v7a NDK_ALL_ABIS\u003darmeabi-v7a NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-22 NDK_OUT\u003d/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/lib /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/obj/local/armeabi-v7a/libglFlight.so",
       "abi": "armeabi-v7a",
-      "output": "C:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\app\\build\\intermediates\\ndkBuild\\release\\obj\\local\\armeabi-v7a\\libglFlight.so"
+      "output": "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/obj/local/armeabi-v7a/libglFlight.so"
     }
   }
 }

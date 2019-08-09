@@ -42,6 +42,7 @@
 //
 
 #include <math.h>
+#include <limits.h>
 #include "quaternions.h"
 #include "gameInterface.h"
 #include "gameCamera.h"
@@ -62,7 +63,7 @@ int rm_count = 0;
 float sp = 0;
 int sched_input_action[] = {3,1};
 int sched_input_val = 1;
-double dz_roll, dz_pitch, dz_yaw;
+float dz_min = 0.001;
 double speed;
 double maxAccelDecel;
 double targetSpeed;
@@ -79,12 +80,11 @@ float rspin = 1;
 double yaw = 0;
 double pitch = 0;
 double roll = 0;
-float inputAvg[3][AVG_INPUTS_LENGTH];
-int inputAvg_i = 0;
 int initialized = 0;
 double motionRoll, motionPitch, motionYaw;
+double devicePitch, deviceYaw, deviceRoll;
+double devicePitchFrac, deviceYawFrac, deviceRollFrac;
 double motionRollMotion, motionPitchMotion, motionYawMotion;
-double roll_m, pitch_m, yaw_m;
 int trimCount = 0;
 int trimCountLast = 0;
 int trimStartTime = 0;
@@ -96,9 +96,11 @@ int gyroStableCountThresh = (GYRO_SAMPLE_RATE*4);
 float fcr = 0.0, fcp = 0.0, fcy = 0.0;
 //float gyroInputStableThresh = 0.01;
 //float gyroSensitivityCAndroid = 0.5;
-float gyroInputRange[3][2];
+double gyroInputRange[3][2];
+double gyroLastRange[3];
+double gyroAxisMinRange = 0.05;
 
-const float tex_pass_initial_sample = 60;
+const float tex_pass_initial_sample = 120;
 
 static double trim_dz[3];
 
@@ -113,6 +115,7 @@ struct
     float max[3];
     float avg[3];
 } gameInputStats;
+
 int gameInputStatsInited = 0;
 
 void
@@ -133,7 +136,10 @@ gameInputInit()
     needTrim = 1;
     needTrimLast = 0;
 
-    memset(gyroInputRange, 0, sizeof(gyroInputRange));
+    gyroInputRange[0][0] = gyroInputRange[1][0] = gyroInputRange[2][0] = INT_MAX;
+    gyroInputRange[0][1] = gyroInputRange[1][1] = gyroInputRange[2][1] = -INT_MAX;
+    
+    gyroLastRange[0] = gyroLastRange[1] = gyroLastRange[2] = 1.0;
     
     isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
 
@@ -257,32 +263,26 @@ gameInput()
 {
     static float deviceLast[3];
     
-    double devicePitch;
-    double deviceYaw;
-    double deviceRoll;
-    
 #if GAME_PLATFORM_IOS
     devicePitch = motionRoll;
     deviceYaw = -motionPitch;
     deviceRoll = -motionYaw;
     
-    float dz_m[3] = {1.01, 1.01, 1.01}; // deadzone-multiplier
 #else
     devicePitch = -motionPitch;
     deviceYaw = motionYaw;
     deviceRoll = motionRoll;
     
-    float dz_m[3] = {0.0, 0.0, 0.0}; // deadzone-multiplier
 #endif
 
-    float s[3] = {deviceRoll, devicePitch, deviceYaw};
+    float deviceO[3] = {deviceRoll, devicePitch, deviceYaw};
     
     if(!initialized)
     {
         return;
     }
     
-    gameInputStatsAppend(s);
+    gameInputStatsAppend(deviceO);
     
     if(!controlsCalibrated) {
         if (!needTrim && trimCountLast == trimCount) {
@@ -293,19 +293,6 @@ gameInput()
                 gameInputTrimBegin();
             }
         } else {
-
-            float deviceI[] = {deviceRoll, devicePitch, deviceYaw};
-
-            for(int r = 0; r < 3; r++) {
-                if(deviceI[r] < gyroInputRange[r][0]) {
-                    gyroInputRange[r][0] = deviceI[r];
-                    gyroStableCount = 0;
-                }
-                if(deviceI[r] > gyroInputRange[r][1]) {
-                    gyroInputRange[r][1] = deviceI[r];
-                    gyroStableCount = 0;
-                }
-            }
 
             gyro_calibrate_log((float) gyroStableCount / (float) (GYRO_SAMPLE_RATE * 4) * 100);
 
@@ -359,7 +346,7 @@ gameInput()
         }
     }
 
-    // trim collecting done
+    // MARK: -- trim collecting done
     if(!needTrim && needTrimLast)
     {
         DBPRINTF(("%s:%d", __FILE__, __LINE__));
@@ -372,9 +359,9 @@ gameInput()
             // TODO: could maybe store these in settings so they didnt have to calibrate every time
             // ... or just tell the user "hold still" and sample on startup...
             // best way would be to observe the values and wait for them to stabilize and use that...
-            dz_roll = trim_dz[0];
-            dz_pitch = trim_dz[1];
-            dz_yaw = trim_dz[2];
+            
+            // save last range in case trim is cut short
+            for(int i = 0; i < 3; i++) gyroLastRange[i] = gyroInputRange[i][1] - gyroInputRange[i][0];
 
             DBPRINTF(("%s:%d", __FILE__, __LINE__));
             if(!controlsCalibrated)
@@ -389,34 +376,58 @@ gameInput()
                 }
             }
             
-            float div = 6;
             gameInputStatsCalc();
-            trim_dz[0] = ((gameInputStats.max[0] - gameInputStats.min[0]) / div);
-            trim_dz[1] = ((gameInputStats.max[1] - gameInputStats.min[1]) / div);
-            trim_dz[2] = ((gameInputStats.max[2] - gameInputStats.min[2]) / div);
             
             controlsCalibrated = 1;
             
             gameInterfaceCalibrateDone();
         }
-        
-        roll_m = gyroInputRange[0][0] + (gyroInputRange[0][1]-gyroInputRange[0][0])/2;
-        pitch_m = gyroInputRange[1][0] + (gyroInputRange[1][1]-gyroInputRange[1][0])/2;
-        yaw_m = gyroInputRange[2][0] + (gyroInputRange[2][1]-gyroInputRange[2][0])/2;
-        
-        // zero out input-averaging buffer
-        for(int a = 0; a < AVG_INPUTS_LENGTH; a++)
+        // short trim-length, adjust range to current orientation
+        else
         {
-            inputAvg[0][a] = deviceRoll;
-            inputAvg[1][a] = devicePitch;
-            inputAvg[2][a] = deviceYaw;
+            for(int i = 0; i < 3; i++)
+            {
+                float R = gyroLastRange[i];
+
+                gyroInputRange[i][0] = deviceO[i] - R/2;
+                gyroInputRange[i][1] = deviceO[i] + R/2;
+            }
         }
     }
-
-    // trim collecting beginning
-    if(needTrim && !needTrimLast)
+    // MARK: -- trim collecting begin
+    else if(needTrim && !needTrimLast)
     {
         trimStartTime = tex_pass;
+        
+        for(int i = 0; i < 3; i++)
+        {
+            gyroInputRange[i][0] = deviceO[i]+0.00001;
+            gyroInputRange[i][1] = deviceO[i]-0.00001;
+        }
+    }
+    // MARK: -- trim collecting continue
+    else if(needTrim && needTrimLast)
+    {
+        for(int r = 0; r < 3; r++)
+        {
+            if(deviceO[r] < gyroInputRange[r][0])
+            {
+                gyroInputRange[r][0] = deviceO[r];
+                gyroStableCount = 0;
+            }
+            if(deviceO[r] > gyroInputRange[r][1])
+            {
+                gyroInputRange[r][1] = deviceO[r];
+                gyroStableCount = 0;
+            }
+            
+            if(gyroInputRange[r][1] - gyroInputRange[r][0] < gyroAxisMinRange)
+            {
+                gyroInputRange[r][1] += (gyroAxisMinRange/2);
+                gyroInputRange[r][0] -= (-gyroAxisMinRange/2);
+                gyroStableCount = 0;
+            }
+        }
     }
 
     // preserve last state for next pass
@@ -425,51 +436,37 @@ gameInput()
     // commented to out to allow game-input to continue while trimming
     //if(needTrim) return;
     
-    // average values between inputs
+    double C = 3;
+    double R[] = {
+        gyroInputRange[0][1] - gyroInputRange[0][0],
+        gyroInputRange[1][1] - gyroInputRange[1][0],
+        gyroInputRange[2][1] - gyroInputRange[2][0]
+    };
+    
+    
     /*
-    inputAvg[0][inputAvg_i] = deviceRoll;
-    inputAvg[1][inputAvg_i] = devicePitch;
-    inputAvg[2][inputAvg_i] = deviceYaw;
-    
-    deviceRoll = devicePitch = deviceYaw = 0;
-    for(int i = 0; i < AVG_INPUTS_LENGTH; i++)
-    {
-        deviceRoll += inputAvg[0][i];
-        devicePitch += inputAvg[1][i];
-        deviceYaw += inputAvg[2][i];
-    }
-    deviceRoll /= AVG_INPUTS_LENGTH;
-    devicePitch /= AVG_INPUTS_LENGTH;
-    deviceYaw /= AVG_INPUTS_LENGTH;
+                     Rmax-Rmin
+              Dr -  ------------
+                       2
+       R =   -----------------------
+                  C * (Rmax-Rmin)
+     
      */
+    deviceRollFrac = (deviceRoll - R[0] / 2) / (R[0]*C);
+    devicePitchFrac = (devicePitch - R[1] / 2) / (R[1]*C);
+    deviceYawFrac = (deviceYaw - R[2] / 2) / (R[2]*C);
     
-    // make relative to trimmed/center position
-    deviceRoll = (deviceRoll - gyroInputRange[0][0]) / ((gyroInputRange[0][1]-gyroInputRange[0][0])/2) / 10;
-    devicePitch = (devicePitch - gyroInputRange[1][0]) / ((gyroInputRange[1][1]-gyroInputRange[1][0])/2) / 10;
-    deviceYaw = (deviceYaw - gyroInputRange[2][0]) / ((gyroInputRange[2][1]-gyroInputRange[2][0])/2) / 10;
+    double input_roll = deviceRollFrac * (M_PI/GYRO_SAMPLE_RATE);
+    double input_pitch = devicePitchFrac * (M_PI/GYRO_SAMPLE_RATE);
+    double input_yaw = deviceYawFrac * (M_PI/GYRO_SAMPLE_RATE);
 
-    DBPRINTF((
-            "roll:%f\npitch:%f\nyaw:%f\n",
-            deviceRoll, devicePitch, deviceYaw
-            ));
-    
-    /*
-    float inputScale = 2.0;
-    deviceRoll = deviceRoll * fabs(deviceRoll) * inputScale;
-    devicePitch = devicePitch * fabs(devicePitch) * inputScale;
-    deviceYaw = deviceYaw * fabs(deviceYaw) * inputScale;
-     */
-    
-    inputAvg_i++;
-    if(inputAvg_i >= AVG_INPUTS_LENGTH) inputAvg_i = 0;
-        
-    // read device orientation/inputs
-    //double input_roll = deviceRoll - roll_m;
-    //double input_pitch = devicePitch - pitch_m; // pitch is inverted
-    //double input_yaw = deviceYaw - yaw_m;
-    double input_roll = deviceRoll;
-    double input_pitch = devicePitch;
-    double input_yaw = deviceYaw;
+    if(tex_pass % GAME_FRAME_RATE == 0)
+    {
+        DBPRINTF((
+                         "\nroll:%f\npitch:%f\nyaw:%f\n",
+                                 deviceRollFrac, devicePitchFrac, deviceYawFrac
+                 ));
+    }
     
     // periodically do some stuff
     if(rm_count <= 0)
@@ -486,11 +483,8 @@ gameInput()
     float tc = time_ms_wall - time_input_last;
     time_input_last = time_ms_wall;
     
-    if(!needTrim && !game_paused)
+    if(!needTrim && !needTrimLast && !game_paused)
     {
-        float cap = /*0.05*/ 0.1; // radians
-        static float ship_euler_last[3] = {0, 0, 0};
-
         // output response ampilfiers
         //float sm[] = /*{0.6, 0.8, 0.8}*/ {0.7, 0.8, 0.9};
         float sm[] = /*{0.6, 0.8, 0.8}*/ PLATFORM_INPUT_COEFFICIENTS;
@@ -501,7 +495,7 @@ gameInput()
             // drift toward level with the horizon
             float shipy[3], shipx[3], shipz[3];
             
-            input_roll = input_yaw*sm[2]*-1.5;
+            input_roll = input_yaw*sm[2]*-3.0;
             
             gameShip_unfakeRoll();
             
@@ -527,44 +521,35 @@ gameInput()
             }
         }
         
-        if(fabs(input_roll) > dz_roll*dz_m[0] && gameSettingsComplexControls)
+        if(fabs(input_roll) > dz_min && gameSettingsComplexControls)
         {
             //printf("-----------ROLLING-----------\n");
             
             double s = input_roll * fabs(input_roll*sm[0]) * GYRO_DC * tc;
-            
-            // apply capping
-            if(fabs(s) > cap) s = cap * (s/fabs(s));
 
             gameShip_roll(s);
         }
         
-        if(fabs(input_pitch) > dz_pitch*dz_m[1])
+        if(fabs(input_pitch) > dz_min)
         {
             //printf("-----------PITCHING-----------\n");
             
             double s = input_pitch * fabs(input_pitch*sm[1]) * GYRO_DC * tc;
-            
-            if(fabs(s) > cap) s = cap * (s/fabs(s));
 
             gameShip_pitch(s);
         }
         
-        if(fabs(input_yaw) > dz_yaw*dz_m[2])
+        if(fabs(input_yaw) > dz_min)
         {
             //printf("-----------YAWING-----------\n");
             
             double s = input_yaw * fabs(input_yaw*sm[2]) * GYRO_DC * tc;
-            
-            if(fabs(s) > cap) s = cap * (s/fabs(s));
 
             gameShip_yaw(s);
         }
         
         if(!gameSettingsComplexControls)
         {
-            gameShip_getEuler(&ship_euler_last[0], &ship_euler_last[1], &ship_euler_last[2]);
-            
             gameShip_fakeRoll(input_roll);
         }
     }
@@ -572,11 +557,6 @@ gameInput()
     deviceLast[0] = deviceRoll;
     deviceLast[1] = devicePitch;
     deviceLast[2] = deviceYaw;
-    
-    float cap_radians = M_PI/2;
-    if(fabs(roll_m) > cap_radians) /*roll_m -= roll_m/fabs(roll_m)*0.1*/ roll_m = 0;
-    if(fabs(pitch_m) > cap_radians) /*pitch_m -= pitch_m/fabs(pitch_m)*0.1*/ pitch_m = 0;
-    if(fabs(yaw_m) > cap_radians) /*yaw_m -= yaw_m/fabs(yaw_m)*0.1*/ yaw_m = 0;
                 
     // convert body axes to world-axes
     // http://en.wikipedia.org/wiki/Euler_angles

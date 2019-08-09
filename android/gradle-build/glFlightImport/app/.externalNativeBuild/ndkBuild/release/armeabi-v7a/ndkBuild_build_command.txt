@@ -1,14 +1,14 @@
-Executable : C:\Users\Justin\AppData\Local\Android\sdk\ndk-bundle\ndk-build.cmd
+Executable : /Users/justin/Library/Android/sdk/ndk-bundle/ndk-build
 arguments : 
 NDK_PROJECT_PATH=null
-APP_BUILD_SCRIPT=C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\jni\Android.mk
-NDK_APPLICATION_MK=C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\jni\Application.mk
+APP_BUILD_SCRIPT=/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Android.mk
+NDK_APPLICATION_MK=/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Application.mk
 APP_ABI=armeabi-v7a
 NDK_ALL_ABIS=armeabi-v7a
 NDK_DEBUG=0
 APP_PLATFORM=android-22
-NDK_OUT=C:/Users/Justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/obj
-NDK_LIBS_OUT=C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\build\intermediates\ndkBuild\release\lib
+NDK_OUT=/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/obj
+NDK_LIBS_OUT=/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/ndkBuild/release/lib
 APP_SHORT_COMMANDS=false
 LOCAL_SHORT_COMMANDS=false
 -B
