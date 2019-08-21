@@ -53,9 +53,9 @@
 
 #define AVG_INPUTS_LENGTH 5
 
-void gameInputStatsCollectStart();
+void gameInputStatsCollectStart(void);
 void gameInputStatsAppend(float ypr[3]);
-void gameInputStatsCalc();
+void gameInputStatsCalc(void);
 
 
 double rm[3][3];
@@ -82,6 +82,7 @@ double pitch = 0;
 double roll = 0;
 int initialized = 0;
 double motionRoll, motionPitch, motionYaw;
+double deviceRollOff, devicePitchOff, deviceYawOff;
 double devicePitch, deviceYaw, deviceRoll;
 double devicePitchFrac, deviceYawFrac, deviceRollFrac;
 double motionRollMotion, motionPitchMotion, motionYawMotion;
@@ -152,6 +153,11 @@ gameInputInit()
     gyroStableCount = 0;
     
     initialized = 1;
+    
+    // set offset based on current position
+    deviceRollOff = motionRoll;
+    deviceYawOff = motionYaw;
+    devicePitchOff = motionPitch;
 }
 
 void
@@ -264,14 +270,14 @@ gameInput()
     static float deviceLast[3];
     
 #if GAME_PLATFORM_IOS
-    devicePitch = motionRoll;
-    deviceYaw = -motionPitch;
-    deviceRoll = -motionYaw;
+    devicePitch = motionRoll - deviceRollOff;
+    deviceYaw = -motionPitch - devicePitchOff;
+    deviceRoll = -motionYaw - deviceYawOff;
     
 #else
-    devicePitch = -motionPitch;
-    deviceYaw = motionYaw;
-    deviceRoll = motionRoll;
+    devicePitch = -motionPitch - devicePitchOff;
+    deviceYaw = motionYaw - deviceYawOff;
+    deviceRoll = motionRoll - deviceRollOff;
     
 #endif
 
@@ -401,9 +407,13 @@ gameInput()
         
         for(int i = 0; i < 3; i++)
         {
-            gyroInputRange[i][0] = deviceO[i]+0.00001;
-            gyroInputRange[i][1] = deviceO[i]-0.00001;
+            gyroInputRange[i][0] = deviceO[i]+0.0001;
+            gyroInputRange[i][1] = deviceO[i]-0.0001;
         }
+        
+        deviceRollOff = motionRoll;
+        devicePitchOff = motionPitch;
+        deviceYawOff = motionYaw;
     }
     // MARK: -- trim collecting continue
     else if(needTrim && needTrimLast)
@@ -490,34 +500,40 @@ gameInput()
         float sm[] = /*{0.6, 0.8, 0.8}*/ PLATFORM_INPUT_COEFFICIENTS;
         // TODO: scale inversely based on angle relative to gravity
         
+        // drift toward level with the horizon
+        float shipy[3], shipx[3], shipz[3];
+        
         if(!gameSettingsComplexControls)
         {
-            // drift toward level with the horizon
-            float shipy[3], shipx[3], shipz[3];
-            
             input_roll = input_yaw*sm[2]*-3.0;
             
             gameShip_unfakeRoll();
+        }
             
-            gameShip_getYVector(shipy);
-            gameShip_getXVector(shipx);
-            gameShip_getZVector(shipz);
+        gameShip_getYVector(shipy);
+        gameShip_getXVector(shipx);
+        gameShip_getZVector(shipz);
+    
+        if(!gameSettingsComplexControls)
+        {
+            float angleGround = gameShip_calcRoll() - M_PI;
             
-            float a1 = atan2(shipx[2], shipx[0]);
-            float c1 = atan2(shipz[0], shipz[2]);
-            
-            float r = 0.01;
-            
-            if(a1 < 0) r *= -1;
-            if(c1 > 0) r *= -1;
-            if(atan2(shipx[1], shipx[0]) < 0) r *= -1;
-            
-            if(fabs(shipx[1]) > 0.02) gameShip_roll(r);
-            
-            // block pitch when gimbal lock near
-            if(dot(shipy[0], shipy[1], shipy[2], 0, 1, 0) <= 0.1)
+            if(fabs(angleGround) > 0.02)
             {
-                gameShip_roll(fabs(r)*2);
+                float r = 0.01;
+                
+                if(angleGround > 0)
+                {
+                    r = -r;
+                }
+                else
+                {
+                    r = r;
+                }
+                
+                if(shipy[1] < 0) r *= 4;
+                
+                gameShip_roll(r);
             }
         }
         

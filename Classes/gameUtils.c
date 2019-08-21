@@ -308,7 +308,7 @@ update_time_ms_frame_tick()
 
     if(ms_per_frame_avg >= (1000/GAME_FRAME_RATE)) ms_per_frame_avg = (1000/GAME_FRAME_RATE);
 
-    time_ms += ms_per_frame_avg;;
+    time_ms += ms_per_frame_avg;
 
     g_time_frames++;
 }

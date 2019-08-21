@@ -638,7 +638,7 @@ gameInterfaceHandleTouchBegin(float x, float y)
             if(gameInterfaceControls.dialogRect.d.dialogRectActionRight) gameInterfaceControls.dialogRect.d.dialogRectActionRight();
         }
         
-        glFlightDrawframeHook = gameDialogMuteCountdown;
+        if(glFlightDrawframeHook == NULL) glFlightDrawframeHook = gameDialogMuteCountdown;
     }
     
     if(touchedControl == &gameInterfaceControls.fireRectBoost)

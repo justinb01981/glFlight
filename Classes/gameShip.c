@@ -175,6 +175,7 @@ gameShip_getEulerGamma() {
 
 float gameShip_calcRoll()
 {
+    /*
     float trimR;
     
     quaternion_t qA, qB, qC;
@@ -234,6 +235,33 @@ float gameShip_calcRoll()
     if(qB.y > 0.0) trimR = -trimR + M_PI;
     
     return trimR;
+     */
+    float shipy[3], shipx[3], shipz[3];
+    
+    gameShip_getYVector(shipy);
+    gameShip_getXVector(shipx);
+    gameShip_getZVector(shipz);
+    
+    float T = atan2(shipx[2], fabs(shipx[0]));
+    // TODO: normalize T
+    printf("T=%f\n\n", T);
+    
+    float Hor[] = {cos(T), 0, sin(T)};
+    float U;
+    float V;
+    if(shipx[0] > 0) {
+        U = dot(shipx[0], shipx[1], shipx[2], Hor[0], Hor[1], Hor[2]);
+        V = dot(shipx[0], shipx[1], shipx[2], 0, 1, 0);
+    }
+    else {
+        U = dot(shipx[0], shipx[1], shipx[2], Hor[0], Hor[1], -Hor[2]);
+        V = dot(shipx[0], shipx[1], shipx[2], 0, 1, 0);
+    }
+    
+    if(shipz[2] < 0) U = -U;
+    
+    float L = atan2(U,V) + (M_PI/2);
+    return L;
 }
 
 void gameShip_fakeRoll(float r)
