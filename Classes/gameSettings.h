@@ -16,6 +16,7 @@
 #include "textures.h"
 #include "gamePlatform.h"
 #include "gameNetwork.h"
+#include "gameInput.h"
 
 typedef struct
 {
@@ -31,7 +32,7 @@ typedef struct
 } glFlightPrefs;
 
 // TODO:bump this every time settings change
-const static int settings_version = 37;
+const static int settings_version = 38;
 
 // HACK: externs built in .m files
 extern double dz_roll, dz_pitch, dz_yaw;
@@ -103,6 +104,8 @@ gameSettingsDefaults()
     gameStateSinglePlayer.lifetime_credits = 0;
     gameSettingsComplexControls = 0;
     strcpy(gameSettingsVersionStr, GAME_VERSION_STR);
+    
+    for(int i = 0; i < 3; i++) gyroLastRange[i] = PLATFORM_GYRO_RANGE_DEFAULT;
 }
 
 static void
@@ -151,6 +154,11 @@ gameSettingsWrite(const char *filename)
         fprintf(fp, "%s\n", GAME_VERSION_STR);
         fprintf(fp, "%s\n", gameSettingsKillHistory);
         
+        for(int i = 0; i < 3; i++)
+        {
+            fprintf(fp, "%lf\n", gyroLastRange[i]);
+        }
+        
         fclose(fp);
     }
     
@@ -192,6 +200,11 @@ gameSettingsRead(const char *filename)
         {
             strcpy(gameSettingsKillHistory, "");
         }
+        else if(settings_ver == 37 && settings_version == 38)
+        {
+            // added gyro-range to settings
+            for(int i = 0; i < 3; i++) gyroLastRange[i] = PLATFORM_GYRO_RANGE_DEFAULT;
+        }
         else
         // settings are from old binary, force defaults
         if(settings_ver != settings_version) break;
@@ -229,6 +242,11 @@ gameSettingsRead(const char *filename)
         if(fscanf(fp, "%d", &gameSettingsComplexControls) < 1) break;
         if(fscanf(fp, "%s", gameSettingsVersionStr) < 1) break;
         if(fscanf(fp, "%s", gameSettingsKillHistory) < 1) break;
+        
+        for(int i = 0; i < 3; i++)
+        {
+            if(fscanf(fp, "%lf", &gyroLastRange[i]) < 1) break;
+        }
         
         fclose(fp);
         

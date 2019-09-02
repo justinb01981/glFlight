@@ -136,11 +136,12 @@ gameDialogWelcomeRating()
     gameDialogWelcome();
 }
 
+static void gameDialogMenuCountdown(void);
+
 static void
 gameDialogWelcomeNoRating()
 {
-    gameSettingsRatingGiven = 1;
-    gameDialogWelcome();
+    glFlightDrawframeHook = gameDialogMenuCountdown;
 }
 
 static void
@@ -159,7 +160,7 @@ gameDialogVisitHomepage()
 
 #define WELCOMESTR                                  \
 "^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D\n"    \
-"^DWelcome to d0gf1ght!^D\n"                        \
+"^DWelcome to "GAMETITLE"!^D\n"                        \
 "^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D\n"
 
 static void
@@ -184,8 +185,8 @@ gameDialogMenuCountdown()
     
     if(AppDelegateIsMultiplayerEager())
     {
-        //actions_menu_set(ACTION_CONNECT_TO_GAME);
-        //fireAction = ACTION_CONNECT_TO_GAME;
+        actions_menu_set(ACTION_CONNECT_TO_GAME);
+        fireAction = ACTION_CONNECT_TO_GAME;
     }
 
     gameDialogWelcomeMenu();
@@ -224,10 +225,10 @@ gameDialogWelcome()
     if(/*gameSettingsLaunchCount % 2 == 1 &&  */ !gameSettingsRatingGiven && gameSettingsLaunchCount >= 2)
     {
         gameInterfaceModalDialog(WELCOMESTR
-                                 "Please rate d0gf1ght!\n"
+                                 "Please rate "GAMETITLE"!\n"
                                  "Unlock new vehicles in multiplayer!\n",
                                  "Sure", "No way",
-                                 gameDialogRating, /*gameDialogWelcomeNoRating*/ gameDialogWelcomeMenu);
+                                 gameDialogRating, gameDialogWelcomeNoRating);
     }
     else
     {
@@ -263,6 +264,37 @@ gameDialogCalibrate()
     gameInterfaceControls.calibrateRect.visible = 1;
 }
 
+// TODO: -- not using this for now
+static void
+gameDialogCalibrateFromSettings()
+{
+    gameDialogClose();
+    gameInterfaceModalDialogDequeue();
+    
+    gameInputInit();
+    
+    // this will cause a "short" calibrate to simply reset the reference point
+    // for the gyros, but reuse the previously captured range of motion
+    gameInputTrimAbort();
+    
+    needTrimLock = 1;
+    
+    gameInterfaceCalibrateDone();
+    
+    /*
+     gameInterfaceModalDialog(
+     "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
+     "^C                             ^C\n"
+     "^C                             ^C\n"
+     "^C   Calibrating controls..    ^C\n"
+     "^C                             ^C\n"
+     "^C                             ^C\n"
+     "^C                             ^C\n"
+     "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
+     "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
+     */
+}
+
 static void
 gameDialogInitial()
 {
@@ -272,8 +304,8 @@ gameDialogInitial()
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
                              "^C                             ^C\n"
                              "^C     Gently steer device     ^C\n"
-                             "^C         until cursor        ^C\n"
-                             "^C          is centered        ^C\n"
+                             "^C      until cursor is        ^C\n"
+                             "^C       easy to control       ^C\n"
                              "^C       (Tap to begin)        ^C\n"
                              "^C                             ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",

@@ -77,6 +77,8 @@ extern int fireActionQueuedAfterEdit;
 #define GYRO_SAMPLE_RATE (60)
 #define VISIBLE_DISTANCE_PLATFORM 200
 #define PLATFORM_INPUT_COEFFICIENTS {1.0, 1.0, 1.0}
+#define PLATFORM_GYRO_RANGE_DEFAULT 0.5
+#define PLATFORM_CALIBRATE_COEFF 0.5
 #else
 #define GAME_PLATFORM_IS_LANDSCAPE 0
 #define PLATFORM_TICK_RATE 60
@@ -85,6 +87,14 @@ extern int fireActionQueuedAfterEdit;
 #define VISIBLE_DISTANCE_PLATFORM 200
 //#define PLATFORM_INPUT_COEFFICIENTS {0.5, 0.6, 0.7}
 #define PLATFORM_INPUT_COEFFICIENTS {1.0, 1.0, 1.0}
+#define PLATFORM_GYRO_RANGE_DEFAULT (3.14159/10)
+#define PLATFORM_CALIBRATE_COEFF 0.5
+#endif
+
+#ifdef GAME_NAME_SC95
+#define GAMETITLE "space combat 95"
+#else
+#define GAMETITLE "d0gf1ght"
 #endif
 
 /* reducing friction influences this... should be MAX_THRUST really */
@@ -92,7 +102,7 @@ extern int fireActionQueuedAfterEdit;
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "1.7.1_core";
+const static char* GAME_VERSION_STR = "1.7.2_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 

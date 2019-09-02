@@ -831,9 +831,10 @@ void drawControls()
                     float S = 0.2;
                     float g1 = gyroStableCount, g2 = gyroStableCountThresh;
                     float O[] = {0.5, 0.5};
+                    float gyroCoefForCalibrate = PLATFORM_CALIBRATE_COEFF;
                     subElements[0].tex_id = TEXTURE_ID_CALIBRATE_CURSOR;
-                    subElements[0].x = (O[0] + S/2) + devicePitchFrac;//*(O[0] + ((float) 1.0/g2) * (float) g1);
-                    subElements[0].y = (O[0] + S/2) + deviceYawFrac;//*(O[0] + ((float) 1.0/g2) * (float) g1);
+                    subElements[0].x = (O[0] - S/2) + devicePitchFrac / (PLATFORM_CALIBRATE_COEFF/gyroSenseScale);//*(O[0] + ((float) 1.0/g2) * (float) g1);
+                    subElements[0].y = (O[0] - S/2) + deviceYawFrac / (PLATFORM_CALIBRATE_COEFF/gyroSenseScale);//*(O[0] + ((float) 1.0/g2) * (float) g1);
                     subElements[0].xw = S;
                     subElements[0].yw = S;
                     subElementsN++;
@@ -1379,6 +1380,9 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
                     T[1] = (Vi/Ve) * Tk;
                     
                     //terrain_height_y += ((int)floor(rand_in_range(0, 100)) % 2 == 0) ? 0.05: -0.05;
+                    float D = (Ue*2 / (WORLD_TERRAIN_COMPLEXITY));
+                    float R = Ue;
+                    terrain_height_y = *(gWorld->terrain_height_map + ((int) floor((Ui+R)/D) * (int) floor((Vi+R)/D)));
                     
                     tess_step(M, T, bgData->tess.S);
                 }

@@ -16,7 +16,7 @@ INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImpo
 		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 	android:versionName
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:5:5-34
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:5:5-35
 		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 	xmlns:android

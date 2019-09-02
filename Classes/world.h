@@ -25,6 +25,7 @@
 #define WORLD_MAX_PLANES 16
 #define WORLD_MAX_TRIANGLE_MESH 16
 #define WORLD_BOUNDING_SPHERE_STEPS ((float) 8)
+#define WORLD_TERRAIN_COMPLEXITY 64
 
 extern float visible_distance;
 
@@ -71,6 +72,8 @@ typedef struct
     float region_size;
     
     boundingRegion* boundingRegion;
+    
+    float *terrain_height_map;
     
     simple_hash_table_t *element_id_hash;
     

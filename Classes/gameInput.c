@@ -82,7 +82,6 @@ double pitch = 0;
 double roll = 0;
 int initialized = 0;
 double motionRoll, motionPitch, motionYaw;
-double deviceRollOff, devicePitchOff, deviceYawOff;
 double devicePitch, deviceYaw, deviceRoll;
 double devicePitchFrac, deviceYawFrac, deviceRollFrac;
 double motionRollMotion, motionPitchMotion, motionYawMotion;
@@ -97,9 +96,10 @@ int gyroStableCountThresh = (GYRO_SAMPLE_RATE*4);
 float fcr = 0.0, fcp = 0.0, fcy = 0.0;
 //float gyroInputStableThresh = 0.01;
 //float gyroSensitivityCAndroid = 0.5;
+float gyroSenseScale = 3;
 double gyroInputRange[3][2];
 double gyroLastRange[3];
-double gyroAxisMinRange = 0.05;
+double gyroAxisMinRange = 0.01;
 
 const float tex_pass_initial_sample = 120;
 
@@ -136,11 +136,6 @@ gameInputInit()
     bulletVel = MAX_SPEED*5;
     needTrim = 1;
     needTrimLast = 0;
-
-    gyroInputRange[0][0] = gyroInputRange[1][0] = gyroInputRange[2][0] = INT_MAX;
-    gyroInputRange[0][1] = gyroInputRange[1][1] = gyroInputRange[2][1] = -INT_MAX;
-    
-    gyroLastRange[0] = gyroLastRange[1] = gyroLastRange[2] = 1.0;
     
     isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
 
@@ -153,11 +148,6 @@ gameInputInit()
     gyroStableCount = 0;
     
     initialized = 1;
-    
-    // set offset based on current position
-    deviceRollOff = motionRoll;
-    deviceYawOff = motionYaw;
-    devicePitchOff = motionPitch;
 }
 
 void
@@ -270,15 +260,13 @@ gameInput()
     static float deviceLast[3];
     
 #if GAME_PLATFORM_IOS
-    devicePitch = motionRoll - deviceRollOff;
-    deviceYaw = -motionPitch - devicePitchOff;
-    deviceRoll = -motionYaw - deviceYawOff;
-    
+    devicePitch = motionRoll;
+    deviceYaw = -motionPitch;
+    deviceRoll = -motionYaw;
 #else
-    devicePitch = -motionPitch - devicePitchOff;
-    deviceYaw = motionYaw - deviceYawOff;
-    deviceRoll = motionRoll - deviceRollOff;
-    
+    devicePitch = -motionPitch;
+    deviceYaw = motionYaw;
+    deviceRoll = motionRoll;
 #endif
 
     float deviceO[3] = {deviceRoll, devicePitch, deviceYaw};
@@ -367,7 +355,10 @@ gameInput()
             // best way would be to observe the values and wait for them to stabilize and use that...
             
             // save last range in case trim is cut short
-            for(int i = 0; i < 3; i++) gyroLastRange[i] = gyroInputRange[i][1] - gyroInputRange[i][0];
+            for(int i = 0; i < 3; i++)
+            {
+                gyroLastRange[i] = gyroInputRange[i][1] - gyroInputRange[i][0];
+            }
 
             DBPRINTF(("%s:%d", __FILE__, __LINE__));
             if(!controlsCalibrated)
@@ -393,10 +384,10 @@ gameInput()
         {
             for(int i = 0; i < 3; i++)
             {
-                float R = gyroLastRange[i];
+                float R = gyroLastRange[i] / 2;
 
-                gyroInputRange[i][0] = deviceO[i] - R/2;
-                gyroInputRange[i][1] = deviceO[i] + R/2;
+                gyroInputRange[i][0] = deviceO[i] - R;
+                gyroInputRange[i][1] = deviceO[i] + R;
             }
         }
     }
@@ -407,13 +398,9 @@ gameInput()
         
         for(int i = 0; i < 3; i++)
         {
-            gyroInputRange[i][0] = deviceO[i]+0.0001;
-            gyroInputRange[i][1] = deviceO[i]-0.0001;
+            gyroInputRange[i][0] = INT_MAX;
+            gyroInputRange[i][1] = -INT_MAX;
         }
-        
-        deviceRollOff = motionRoll;
-        devicePitchOff = motionPitch;
-        deviceYawOff = motionYaw;
     }
     // MARK: -- trim collecting continue
     else if(needTrim && needTrimLast)
@@ -434,7 +421,7 @@ gameInput()
             if(gyroInputRange[r][1] - gyroInputRange[r][0] < gyroAxisMinRange)
             {
                 gyroInputRange[r][1] += (gyroAxisMinRange/2);
-                gyroInputRange[r][0] -= (-gyroAxisMinRange/2);
+                gyroInputRange[r][0] -= (gyroAxisMinRange/2);
                 gyroStableCount = 0;
             }
         }
@@ -446,7 +433,7 @@ gameInput()
     // commented to out to allow game-input to continue while trimming
     //if(needTrim) return;
     
-    double C = 3;
+    double C = gyroSenseScale;
     double R[] = {
         gyroInputRange[0][1] - gyroInputRange[0][0],
         gyroInputRange[1][1] - gyroInputRange[1][0],
@@ -455,16 +442,16 @@ gameInput()
     
     
     /*
-                     Rmax-Rmin
-              Dr -  ------------
-                       2
+                         (Rmax-Rmin)
+            Dr - Rmin + ------------
+                            2
        R =   -----------------------
-                  C * (Rmax-Rmin)
+          gyroSenseScale * (Rmax-Rmin)
      
      */
-    deviceRollFrac = (deviceRoll - R[0] / 2) / (R[0]*C);
-    devicePitchFrac = (devicePitch - R[1] / 2) / (R[1]*C);
-    deviceYawFrac = (deviceYaw - R[2] / 2) / (R[2]*C);
+    deviceRollFrac = (deviceRoll - (gyroInputRange[0][0] + R[0] / 2)) / (R[0] * C);
+    devicePitchFrac = (devicePitch - (gyroInputRange[1][0] + R[1] / 2)) / (R[1] * C);
+    deviceYawFrac = (deviceYaw - (gyroInputRange[2][0] + R[2] / 2)) / (R[2] * C);
     
     double input_roll = deviceRollFrac * (M_PI/GYRO_SAMPLE_RATE);
     double input_pitch = devicePitchFrac * (M_PI/GYRO_SAMPLE_RATE);

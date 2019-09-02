@@ -22,10 +22,11 @@ extern int isLandscape;
 extern double bulletVel;
 extern quaternion_t bx, by, bz, b;
 extern double dc;
-extern float gyroSensitivityCAndroid;
+extern float gyroSenseScale;
 extern double deviceRoll, devicePitch, deviceYaw;
 extern double deviceRollFrac, devicePitchFrac, deviceYawFrac;
 extern int gyroStableCount, gyroStableCountThresh;
+extern double gyroLastRange[3];
 const static float GYRO_GRAPHIC_S = 3.3;
 
 

@@ -20,8 +20,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a50eb0da-65bf-419f-8913-8200e34dda7e" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../Classes/action.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/action.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../Classes/gameUtils.c" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/gameUtils.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Classes/gameDialogs.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/gameDialogs.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Classes/gameGlobals.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/gameGlobals.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Classes/gameGraphics.c" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/gameGraphics.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Classes/gameInput.c" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/gameInput.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Classes/gameInput.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/gameInput.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Classes/gameInterface.c" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/gameInterface.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Classes/gameSettings.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/gameSettings.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Classes/gl_flightAppDelegate.m" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/gl_flightAppDelegate.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Classes/world.c" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/world.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Classes/world.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Classes/world.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.6/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/4.6/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.6/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/4.6/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.6/javaCompile/classAnalysis.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/4.6/javaCompile/classAnalysis.bin" afterDir="false" />
@@ -30,16 +38,22 @@
       <change beforePath="$PROJECT_DIR$/.gradle/4.6/taskHistory/taskHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/4.6/taskHistory/taskHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.6/taskHistory/taskHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/4.6/taskHistory/taskHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__android_android_28.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/generated/not_namespaced_r_class_sources/debug/processDebugResources/r/com/domain17/glflight/R.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/generated/not_namespaced_r_class_sources/debug/processDebugResources/r/com/domain17/glflight/R.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/generated/source/buildConfig/debug/com/domain17/glflight/BuildConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/generated/source/buildConfig/debug/com/domain17/glflight/BuildConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/apk_list/debug/mainApkListPersistenceDebug/apk-list.gson" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/apk_list/debug/mainApkListPersistenceDebug/apk-list.gson" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/instant_run_merged_manifests/debug/processDebugManifest/instant-run/output.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/instant_run_merged_manifests/debug/processDebugManifest/instant-run/output.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_manifests/debug/processDebugManifest/merged/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_manifests/debug/processDebugManifest/merged/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/merged_manifests/debug/processDebugManifest/merged/output.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/merged_manifests/debug/processDebugManifest/merged/output.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/intermediates/processed_res/debug/processDebugResources/out/output.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/processed_res/debug/processDebugResources/out/output.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build/intermediates/processed_res/debug/processDebugResources/out/resources-debug.ap_" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/processed_res/debug/processDebugResources/out/resources-debug.ap_" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/res/symbol-table-with-package/debug/package-aware-r.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/res/symbol-table-with-package/debug/package-aware-r.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/symbols/debug/R.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/symbols/debug/R.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build/outputs/logs/manifest-merger-debug-report.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/outputs/logs/manifest-merger-debug-report.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../gl_flight copy-Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/../../../gl_flight copy-Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../gl_flight-Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/../../../gl_flight-Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../gl_flight.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../../../gl_flight.xcodeproj/project.pbxproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../gl_flight.xcodeproj/project.xcworkspace/xcuserdata/justin.xcuserdatad/UserInterfaceState.xcuserstate" beforeDir="false" afterPath="$PROJECT_DIR$/../../../gl_flight.xcodeproj/project.xcworkspace/xcuserdata/justin.xcuserdatad/UserInterfaceState.xcuserstate" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../gl_flight.xcodeproj/xcuserdata/justin.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist" beforeDir="false" afterPath="$PROJECT_DIR$/../../../gl_flight.xcodeproj/xcuserdata/justin.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../texture107.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/../../../texture107.bmp" afterDir="false" />
     </list>
     <ignored path="glFlightImport.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -75,65 +89,6 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/building3_model.h">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/building2_model.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="21" column="35" selection-start-line="21" selection-start-column="35" selection-end-line="21" selection-end-column="35" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/action.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="266">
-              <caret line="84" column="10" selection-start-line="84" selection-start-column="10" selection-end-line="84" selection-end-column="10" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/jni/glFlightJNI.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="99">
-              <caret line="415" column="39" selection-start-line="415" selection-start-column="39" selection-end-line="415" selection-end-column="39" />
-              <folding>
-                <element signature="e#0#16#0" expanded="true" />
-                <element signature="e#197#227#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/glFlight.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="163">
-              <caret line="179" column="16" selection-start-line="179" selection-start-column="16" selection-end-line="179" selection-end-column="16" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameUtils.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="428">
-              <caret line="54" column="22" selection-start-line="54" selection-start-column="22" selection-end-line="54" selection-end-column="22" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/jni/Application.mk">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/jni/Android.mk">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="75">
@@ -142,14 +97,76 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="12" column="35" lean-forward="true" selection-start-line="12" selection-start-column="35" selection-end-line="12" selection-end-column="35" />
+            <state relative-caret-position="255">
+              <caret line="17" column="17" selection-start-line="17" selection-start-column="17" selection-end-line="17" selection-end-column="17" />
+              <folding>
+                <element signature="e#750#768#0" expanded="true" />
+              </folding>
             </state>
           </provider>
           <provider editor-type-id="android-manifest" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameGraphics.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-431">
+              <caret line="1339" column="31" selection-start-line="1339" selection-start-column="31" selection-end-line="1339" selection-end-column="31" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/cocoaGameInput.m">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameGlobals.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="174">
+              <caret line="80" column="34" selection-start-line="80" selection-start-column="34" selection-end-line="80" selection-end-column="34" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/world.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="209">
+              <caret line="1262" column="39" selection-start-line="1262" selection-start-column="28" selection-end-line="1262" selection-end-column="52" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/world.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="204">
+              <caret line="29" column="29" selection-start-line="29" selection-start-column="29" selection-end-line="29" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameInput.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="5460">
+              <caret line="364" column="13" selection-start-line="364" selection-start-column="13" selection-end-line="364" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameInterface.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17115">
+              <caret line="1141" column="29" selection-start-line="1141" selection-start-column="29" selection-end-line="1141" selection-end-column="29" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -161,12 +178,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>com.domain17.glflight</find>
-      <find>instant</find>
-      <find>glfli</find>
-      <find>PLATFORM</find>
-      <find>ntohl</find>
-      <find>ntohll</find>
       <find>GYRO_SAMPLE_RATE</find>
       <find>PLATFORM_INPUT_COEFFICIENTS</find>
       <find>sm</find>
@@ -191,6 +202,12 @@
       <find>DBPR</find>
       <find>update_time_ms_frame_tick</find>
       <find>update_ti</find>
+      <find>touchMo</find>
+      <find>TouchEnd</find>
+      <find>_height</find>
+      <find>Frac</find>
+      <find>terrain_he</find>
+      <find>height</find>
     </findStrings>
   </component>
   <component name="GenerateSignedApkSettings">
@@ -214,7 +231,6 @@
         <option value="$PROJECT_DIR$/app/src/main/jni/game/gamePlay.c" />
         <option value="$PROJECT_DIR$/app/src/main/jni/game/glFlight.c" />
         <option value="$PROJECT_DIR$/app/src/main/jni/game/gameInterface.h" />
-        <option value="$PROJECT_DIR$/app/src/main/jni/game/gameInterface.c" />
         <option value="$PROJECT_DIR$/app/src/main/jni/game/gameNetwork.c" />
         <option value="$PROJECT_DIR$/app/src/main/jni/game/textures.c" />
         <option value="$PROJECT_DIR$/app/src/main/res/values-v14/styles.xml" />
@@ -225,23 +241,27 @@
         <option value="$PROJECT_DIR$/app/src/main/java/domain17/glflight/GameResources.java" />
         <option value="$PROJECT_DIR$/app/src/main/jni/Android.mk" />
         <option value="$PROJECT_DIR$/app/src/main/jni/game/gameNetworkByteOrder.h" />
-        <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/jni/game/gameInput.h" />
         <option value="$PROJECT_DIR$/app/src/main/java/domain17/glflight/FullscreenActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/jni/glFlightJNI.cpp" />
-        <option value="$PROJECT_DIR$/app/src/main/jni/game/gameGlobals.h" />
         <option value="$PROJECT_DIR$/app/src/main/jni/game/gameDialogs.h" />
         <option value="$PROJECT_DIR$/app/src/main/jni/game/gameInput.c" />
         <option value="$PROJECT_DIR$/app/src/main/jni/game/action.h" />
         <option value="$PROJECT_DIR$/app/src/main/jni/game/gameUtils.c" />
+        <option value="$PROJECT_DIR$/app/src/main/jni/game/gameInterface.c" />
+        <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/jni/game/gameGlobals.h" />
+        <option value="$PROJECT_DIR$/app/src/main/jni/game/gameGraphics.c" />
+        <option value="$PROJECT_DIR$/app/src/main/jni/game/cocoaGameInput.m" />
+        <option value="$PROJECT_DIR$/app/src/main/jni/game/world.c" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="213" />
-    <option name="y" value="325" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="39" />
+    <option name="y" value="233" />
     <option name="width" value="1680" />
-    <option name="height" value="958" />
+    <option name="height" value="960" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -340,6 +360,12 @@
               <item name="glFlightImport" type="b2602c69:ProjectViewProjectNode" />
               <item name="glFlightImport" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="build" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="glFlightImport" type="b2602c69:ProjectViewProjectNode" />
+              <item name="glFlightImport" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -348,33 +374,6 @@
               <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="glFlightImport" type="b2602c69:ProjectViewProjectNode" />
-              <item name="glFlightImport" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="glFlightImport" type="b2602c69:ProjectViewProjectNode" />
-              <item name="glFlightImport" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="glflight" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="glFlightImport" type="b2602c69:ProjectViewProjectNode" />
-              <item name="glFlightImport" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="glflight" type="462c0819:PsiDirectoryNode" />
-              <item name="util" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="glFlightImport" type="b2602c69:ProjectViewProjectNode" />
@@ -390,16 +389,13 @@
               <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="res" type="462c0819:PsiDirectoryNode" />
+              <item name="jni" type="462c0819:PsiDirectoryNode" />
+              <item name="game" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="glFlightImport" type="b2602c69:ProjectViewProjectNode" />
               <item name="glFlightImport" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="gradle" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="glFlightImport" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
@@ -419,7 +415,7 @@
     <property name="android.project.structure.last.selected" value="app" />
     <property name="android.project.structure.proportion" value="0.15" />
     <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/sdk" />
-    <property name="device.picker.selection" value="TA39401SZW" />
+    <property name="device.picker.selection" value="Pixel_2_API_Q" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="not.eligible.for.single.variant.sync" value="true" />
     <property name="recentsLimit" value="5" />
@@ -813,7 +809,8 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="213" y="325" width="1680" height="958" extended-state="0" />
+    <frame x="0" y="23" width="1680" height="960" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4953917" visible="true" weight="0.2008547" />
       <window_info id="Structure" order="1" weight="0.24946696" />
@@ -835,12 +832,12 @@
       <window_info anchor="bottom" id="Gradle Console" order="8" sideWeight="0.525641" side_tool="true" weight="0.32603687" />
       <window_info anchor="bottom" id="Android" order="9" sideWeight="0.4884892" weight="0.32633054" />
       <window_info anchor="bottom" id="Android Profiler" order="10" />
-      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.52442" side_tool="true" visible="true" weight="0.3452656" />
+      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.525641" side_tool="true" visible="true" weight="0.34447005" />
       <window_info anchor="bottom" id="Logcat" order="12" sideWeight="0.45421246" weight="0.49769053" />
       <window_info anchor="bottom" id="Version Control" order="13" show_stripe_button="false" />
       <window_info anchor="bottom" id="Terminal" order="14" sideWeight="0.47008547" weight="0.32603687" />
       <window_info anchor="bottom" id="Messages" order="15" sideWeight="0.31929183" weight="0.32949308" />
-      <window_info anchor="bottom" id="Build" order="16" sideWeight="0.47557998" visible="true" weight="0.3452656" />
+      <window_info anchor="bottom" id="Build" order="16" sideWeight="0.47435898" visible="true" weight="0.34447005" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -880,19 +877,7 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="495">
-          <caret line="33" column="1" selection-start-line="33" selection-start-column="1" selection-end-line="33" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Library/Android/sdk/sources/android-28/java/lang/Thread.java" />
-    <entry file="file://$USER_HOME$/Library/Android/sdk/sources/android-28/java/lang/System.java" />
     <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/cocoaAudioThread.m">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/cocoaGameInput.m">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/cocoaGameAudio.h">
@@ -969,13 +954,6 @@
     <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/cocoaGameInput.h">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/world.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="57" column="30" selection-start-line="57" selection-start-column="30" selection-end-line="57" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/domain17/glflight/GameRunnable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="527">
@@ -998,16 +976,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameGlobals.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="915">
-          <caret line="61" column="27" selection-start-line="61" selection-start-column="27" selection-end-line="61" selection-end-column="27" />
-          <folding>
-            <element signature="e#2121#2457#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameNetworkByteOrder.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
@@ -1019,13 +987,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4125">
           <caret line="275" column="52" selection-start-line="275" selection-start-column="52" selection-end-line="275" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameInput.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="282">
-          <caret line="441" column="52" selection-start-line="441" selection-start-column="52" selection-end-line="441" selection-end-column="52" />
         </state>
       </provider>
     </entry>
@@ -1052,19 +1013,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/raw/texture80.bmp">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/action.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="84" column="10" selection-start-line="84" selection-start-column="10" selection-end-line="84" selection-end-column="10" />
+        <state relative-caret-position="1260">
+          <caret line="84" column="2" selection-start-line="84" selection-start-column="2" selection-end-line="84" selection-end-column="2" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/jni/glFlightJNI.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="99">
+        <state relative-caret-position="6225">
           <caret line="415" column="39" selection-start-line="415" selection-start-column="39" selection-end-line="415" selection-end-column="39" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
@@ -1075,14 +1033,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/glFlight.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="163">
+        <state relative-caret-position="2685">
           <caret line="179" column="16" selection-start-line="179" selection-start-column="16" selection-end-line="179" selection-end-column="16" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameUtils.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="428">
+        <state relative-caret-position="810">
           <caret line="54" column="22" selection-start-line="54" selection-start-column="22" selection-end-line="54" selection-end-column="22" />
         </state>
       </provider>
@@ -1097,11 +1055,62 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
-      <provider editor-type-id="android-manifest" />
+    <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameInput.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="35" lean-forward="true" selection-start-line="12" selection-start-column="35" selection-end-line="12" selection-end-column="35" />
+        <state relative-caret-position="5460">
+          <caret line="364" column="13" selection-start-line="364" selection-start-column="13" selection-end-line="364" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameInterface.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17115">
+          <caret line="1141" column="29" selection-start-line="1141" selection-start-column="29" selection-end-line="1141" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="17" selection-start-line="17" selection-start-column="17" selection-end-line="17" selection-end-column="17" />
+          <folding>
+            <element signature="e#750#768#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+      <provider editor-type-id="android-manifest" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/raw/texture80.bmp">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameGlobals.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="174">
+          <caret line="80" column="34" selection-start-line="80" selection-start-column="34" selection-end-line="80" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/cocoaGameInput.m">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/gameGraphics.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-431">
+          <caret line="1339" column="31" selection-start-line="1339" selection-start-column="31" selection-end-line="1339" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/world.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="1262" column="39" selection-start-line="1262" selection-start-column="28" selection-end-line="1262" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/jni/game/world.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="29" column="29" selection-start-line="29" selection-start-column="29" selection-end-line="29" selection-end-column="29" />
         </state>
       </provider>
     </entry>

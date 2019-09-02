@@ -1165,6 +1165,8 @@ void world_free()
         
         if(gWorld->elements_by_region) free(gWorld->elements_by_region);
         
+        if(gWorld->terrain_height_map) free(gWorld->terrain_height_map);
+        
         // release meshes
         WorldElemListNode* pHead = &gWorld->triangle_mesh_head;
         pCur = pHead->next;
@@ -1254,6 +1256,15 @@ void world_init(float radius)
     assert(floor(gWorld->regions_x) == gWorld->regions_x);
     assert(floor(gWorld->regions_y) == gWorld->regions_y);
     assert(floor(gWorld->regions_z) == gWorld->regions_z);
+    
+    // build height-map
+    gWorld->terrain_height_map = malloc(WORLD_TERRAIN_COMPLEXITY * WORLD_TERRAIN_COMPLEXITY * sizeof(float));
+    for(int i = WORLD_TERRAIN_COMPLEXITY/2; i >= 0; i--)
+        for(int j = 0; j <= WORLD_TERRAIN_COMPLEXITY/2; j++)
+    {
+        *(gWorld->terrain_height_map + i*(WORLD_TERRAIN_COMPLEXITY/2+j)) = /* sin((float) j/(WORLD_TERRAIN_COMPLEXITY/2)) * 10 */ 0;
+        *(gWorld->terrain_height_map + i*(WORLD_TERRAIN_COMPLEXITY/2-j)) = /* sin((float) j/(WORLD_TERRAIN_COMPLEXITY/2)) * 10 */ 0;
+     }
     
     // build bounding vectors (rectangle)
     /*
