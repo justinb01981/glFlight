@@ -446,6 +446,11 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             fm = 1.0;
         }
         
+        if(dist > min_patrol_distance*2)
+        {
+            leadVel = 1;
+        }
+        
         float leadv = (dist / leadVel);
         
         ax -= vx*leadv;

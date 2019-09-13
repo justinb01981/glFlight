@@ -424,7 +424,7 @@
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* gl_flightAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gl_flightAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* gl_flightAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = gl_flightAppDelegate.m; sourceTree = "<group>"; };
-		1D6058910D05DD3D006BFB54 /* d0gf1ght.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = d0gf1ght.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6058910D05DD3D006BFB54 /* d0gf1ght 95.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "d0gf1ght 95.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		2514C27910084DCA00A42282 /* Shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = Shader.fsh; path = Shaders/Shader.fsh; sourceTree = "<group>"; };
 		2514C27A10084DCA00A42282 /* Shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = Shader.vsh; path = Shaders/Shader.vsh; sourceTree = "<group>"; };
@@ -820,7 +820,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D6058910D05DD3D006BFB54 /* d0gf1ght.app */,
+				1D6058910D05DD3D006BFB54 /* d0gf1ght 95.app */,
 				D0BCC9CA2052EDC100094809 /* Space Combat 95.app */,
 			);
 			name = Products;
@@ -1102,7 +1102,7 @@
 			);
 			name = gl_flight;
 			productName = gl_flight;
-			productReference = 1D6058910D05DD3D006BFB54 /* d0gf1ght.app */;
+			productReference = 1D6058910D05DD3D006BFB54 /* d0gf1ght 95.app */;
 			productType = "com.apple.product-type.application";
 		};
 		D0BCC8FB2052EDC100094809 /* Space Combat 95 */ = {
@@ -1658,7 +1658,7 @@
 				INFOPLIST_FILE = "gl_flight-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
-				PRODUCT_NAME = d0gf1ght;
+				PRODUCT_NAME = "d0gf1ght 95";
 				PROVISIONING_PROFILE_SPECIFIER = "d0gfight2 Development";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1684,7 +1684,7 @@
 				INFOPLIST_FILE = "gl_flight-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
-				PRODUCT_NAME = d0gf1ght;
+				PRODUCT_NAME = "d0gf1ght 95";
 				PROVISIONING_PROFILE_SPECIFIER = "d0gfight2 Distribution";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -1732,7 +1732,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = d0gf1ght;
+				PRODUCT_NAME = "";
 				SDKROOT = iphoneos;
 				VALID_ARCHS = "arm64 armv7 arm7s";
 			};
@@ -1778,7 +1778,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				PRODUCT_NAME = d0gf1ght;
+				PRODUCT_NAME = "";
 				SDKROOT = iphoneos;
 			};
 			name = Release;

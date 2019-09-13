@@ -1380,9 +1380,9 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
                     T[1] = (Vi/Ve) * Tk;
                     
                     //terrain_height_y += ((int)floor(rand_in_range(0, 100)) % 2 == 0) ? 0.05: -0.05;
-                    float D = (Ue*2 / (WORLD_TERRAIN_COMPLEXITY));
-                    float R = Ue;
-                    terrain_height_y = *(gWorld->terrain_height_map + ((int) floor((Ui+R)/D) * (int) floor((Vi+R)/D)));
+                    //float D = (Ue*2 / (WORLD_TERRAIN_COMPLEXITY));
+                    //float R = Ue;
+                    //terrain_height_y = *(gWorld->terrain_height_map + ((int) floor((Ui+R)/D) * (int) floor((Vi+R)/D)));
                     
                     tess_step(M, T, bgData->tess.S);
                 }
