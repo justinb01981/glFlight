@@ -427,9 +427,9 @@ do_world_collision_handling(float tc)
                             {
                                 int obj_id =
                                 world_add_object(MODEL_ICOSAHEDRON,
-                                                 pCollisionA->elem->physics.ptr->x,
-                                                 pCollisionA->elem->physics.ptr->y,
-                                                 pCollisionA->elem->physics.ptr->z,
+                                                 pCollisionA->elem->physics.ptr->x + (pCollisionA->elem->physics.ptr->vx * -tc),
+                                                 pCollisionA->elem->physics.ptr->y + (pCollisionA->elem->physics.ptr->vy * -tc),
+                                                 pCollisionA->elem->physics.ptr->z + (pCollisionA->elem->physics.ptr->vz * -tc),
                                                  pCollisionA->elem->physics.ptr->alpha,
                                                  pCollisionA->elem->physics.ptr->beta,
                                                  pCollisionA->elem->physics.ptr->gamma,
@@ -458,9 +458,9 @@ do_world_collision_handling(float tc)
                             {
                                 int obj_id = 
                                 world_add_object(MODEL_ICOSAHEDRON,
-                                                 pCollisionB->elem->physics.ptr->x,
-                                                 pCollisionB->elem->physics.ptr->y,
-                                                 pCollisionB->elem->physics.ptr->z,
+                                                 pCollisionB->elem->physics.ptr->x + (pCollisionB->elem->physics.ptr->vx * -tc),
+                                                 pCollisionB->elem->physics.ptr->y + (pCollisionB->elem->physics.ptr->vy * -tc),
+                                                 pCollisionB->elem->physics.ptr->z + (pCollisionB->elem->physics.ptr->vz * -tc),
                                                  pCollisionB->elem->physics.ptr->alpha,
                                                  pCollisionB->elem->physics.ptr->beta,
                                                  pCollisionB->elem->physics.ptr->gamma,

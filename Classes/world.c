@@ -1262,8 +1262,8 @@ void world_init(float radius)
     for(int i = WORLD_TERRAIN_COMPLEXITY/2; i >= 0; i--)
         for(int j = 0; j <= WORLD_TERRAIN_COMPLEXITY/2; j++)
     {
-        *(gWorld->terrain_height_map + i*(WORLD_TERRAIN_COMPLEXITY/2+j)) = /* sin((float) j/(WORLD_TERRAIN_COMPLEXITY/2)) * 10 */ 0;
-        *(gWorld->terrain_height_map + i*(WORLD_TERRAIN_COMPLEXITY/2-j)) = /* sin((float) j/(WORLD_TERRAIN_COMPLEXITY/2)) * 10 */ 0;
+        *(gWorld->terrain_height_map + i*(WORLD_TERRAIN_COMPLEXITY/2+j)) = sin((float) j/(WORLD_TERRAIN_COMPLEXITY/2)) * 10;
+        *(gWorld->terrain_height_map + i*(WORLD_TERRAIN_COMPLEXITY/2-j)) = sin((float) j/(WORLD_TERRAIN_COMPLEXITY/2)) * 10;
      }
     
     // build bounding vectors (rectangle)
@@ -1362,7 +1362,7 @@ void world_init(float radius)
     }
     
     // boundary on the floor
-    boundingRegionAddVec(br, 0, 0.1, 0, 0, 1, 0);
+    boundingRegionAddVec(br, 0, 0.7, 0, 0, 1, 0);
     
     gWorld->boundingRegion = br;
     

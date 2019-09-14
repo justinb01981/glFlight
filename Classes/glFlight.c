@@ -131,6 +131,7 @@ glFlightFrameStage1()
     float spawn[6];
     
     glEnableClientState(GL_VERTEX_ARRAY);
+    glEnable(GL_DEPTH_TEST);
     
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -708,6 +709,8 @@ calibrate_bail:
     
     drawBillboard(&targetingReticleElem);
     
+    glDisable(GL_DEPTH_TEST);
+    
     drawRadar();
     drawControls();
     
@@ -738,6 +741,8 @@ calibrate_bail:
         
         if(l == 0) console_typewriter_lag += 1;
     }
+    
+    glEnable(GL_DEPTH_TEST);
     
     /****************************************
      * OpenGL frame is ready to be rendered *

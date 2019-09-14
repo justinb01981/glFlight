@@ -192,7 +192,7 @@ void drawText(char *str, float x, float y, float scale)
     float fmapheight = 512; // height of the font bitmap
     float rows = 6;
     float cols = 10;
-    float z = -2;
+    float z = -2.0;
     int maxLines = 20;
     gameGraphics_drawState2d *ds = &drawText_ds;
     
@@ -1373,16 +1373,16 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
 
                 if(step == step_generate)
                 {
+//                    terrain_height_y += ((int)floor(rand_in_range(0, 100)) % 2 == 0) ? 0.05: -0.05;
+//                    float D = (Ue*2 / (WORLD_TERRAIN_COMPLEXITY));
+//                    float R = Ue;
+//                    terrain_height_y = *(gWorld->terrain_height_map + ((int) floor((Ui+R)/D) * (int) floor((Vi+R)/D)));
+                    
                     M[0] = Ui;
                     M[1] = terrain_height_y;
                     M[2] = Vi;
                     T[0] = (Ui/Ue) * Tk;
                     T[1] = (Vi/Ve) * Tk;
-                    
-                    //terrain_height_y += ((int)floor(rand_in_range(0, 100)) % 2 == 0) ? 0.05: -0.05;
-                    //float D = (Ue*2 / (WORLD_TERRAIN_COMPLEXITY));
-                    //float R = Ue;
-                    //terrain_height_y = *(gWorld->terrain_height_map + ((int) floor((Ui+R)/D) * (int) floor((Vi+R)/D)));
                     
                     tess_step(M, T, bgData->tess.S);
                 }

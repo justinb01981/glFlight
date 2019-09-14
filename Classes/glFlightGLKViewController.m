@@ -38,6 +38,8 @@
     glView.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
     [glView.context setMultiThreaded:FALSE];
     
+    glView.drawableDepthFormat = GLKViewDrawableDepthFormat24;
+    
 //    effect = nil;
 }
 
