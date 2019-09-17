@@ -85,10 +85,12 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
             int config_count = num_config[0];
             configs = new EGLConfig[config_count];
 
-            if (!egl.eglChooseConfig(display, null, configs, config_count,
+            if (!egl.eglChooseConfig(display, config_attrs, configs, config_count,
                     num_config)) {
                 throw new IllegalArgumentException("eglChooseConfig failed");
             }
+
+
 
             return configs[0];
         }
