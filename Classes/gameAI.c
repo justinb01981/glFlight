@@ -446,16 +446,14 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             fm = 1.0;
         }
         
-        if(dist > min_patrol_distance*2)
+        if(dist < min_patrol_distance*2)
         {
-            leadVel = 1;
+            float leadv = (dist / leadVel);
+
+            ax -= vx * leadv * tc;
+            ay -= vy * leadv * tc;
+            az -= vz * leadv * tc;
         }
-        
-        float leadv = (dist / leadVel);
-        
-        ax -= vx*leadv;
-        ay -= vy*leadv;
-        az -= vz*leadv;
         
         // if distance is too great, forget target (switch to patrol)
         if(dist > elem->stuff.u.enemy.scan_distance && elem->stuff.u.enemy.changes_target)

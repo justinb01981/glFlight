@@ -225,7 +225,7 @@ gameDialogWelcome()
     if(/*gameSettingsLaunchCount % 2 == 1 &&  */ !gameSettingsRatingGiven && gameSettingsLaunchCount >= 2)
     {
         gameInterfaceModalDialog(WELCOMESTR
-                                 "Please rate "GAMETITLE"!\n"
+                                 "Please rate " GAMETITLE "!\n"
                                  "Unlock new vehicles in multiplayer!\n",
                                  "Sure", "No way",
                                  gameDialogRating, gameDialogWelcomeNoRating);
