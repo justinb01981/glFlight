@@ -1877,7 +1877,7 @@ drawTriangleMesh(struct mesh_opengl_t* glmesh, int tex_id)
 void
 gameGraphicsInit()
 {
-    drawBackgroundInit(texture_id_background, 0, 0, 0, 100, BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
+    drawBackgroundInit(texture_id_background, 0, 0, 0, gWorld->bound_radius, BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
 }
 
 void
