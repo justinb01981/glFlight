@@ -96,7 +96,7 @@ int gyroStableCountThresh = (GYRO_SAMPLE_RATE*4);
 float fcr = 0.0, fcp = 0.0, fcy = 0.0;
 //float gyroInputStableThresh = 0.01;
 //float gyroSensitivityCAndroid = 0.5;
-float gyroSenseScale = 3;
+float gyroSenseScale = PLATFORM_GYRO_SENSE_SCALE;
 double gyroInputRange[3][2];
 double gyroLastRange[3];
 double gyroAxisMinRange = 0.01;

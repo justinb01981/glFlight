@@ -1125,7 +1125,8 @@ gameInterfaceHandleTouchEnd(float x, float y) {
         touchedControl->touch_end_last = time_ms;
     }
 
-    if (touchedControl == &gameInterfaceControls.trim) {
+    if (touchedControl == &gameInterfaceControls.trim)
+    {
         needTrim = 0;
     }
 
@@ -1136,11 +1137,6 @@ gameInterfaceHandleTouchEnd(float x, float y) {
         {
             gameInterfaceControls.controlArray[i]->touch_began = 0;
             gameInterfaceControls.controlArray[i]->touch_end_last = time_ms;
-
-            if(gameInterfaceControls.controlArray[i] == &gameInterfaceControls.trim)
-            {
-                needTrim = 0;
-            }
         }
     }
     
