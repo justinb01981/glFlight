@@ -85,8 +85,7 @@ double motionRoll, motionPitch, motionYaw;
 double devicePitch, deviceYaw, deviceRoll;
 double devicePitchFrac, deviceYawFrac, deviceRollFrac;
 double motionRollMotion, motionPitchMotion, motionYawMotion;
-int trimCount = 0;
-int trimCountLast = 0;
+int firstCalibrate = 1;
 int trimStartTime = 0;
 unsigned int gyroInputCount = 0;
 unsigned long gyroInputCountLast = 0;
@@ -100,12 +99,11 @@ float gyroSenseScale = PLATFORM_GYRO_SENSE_SCALE;
 double gyroInputRange[3][2];
 double gyroLastRange[3];
 double gyroAxisMinRange = 0.01;
+void (*trimDoneCallback)(void);
 
 const float tex_pass_initial_sample = 120;
 
 static double trim_dz[3];
-
-int firstCalibrate = 1;
 
 struct
 {
@@ -140,14 +138,17 @@ gameInputInit()
     isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
 
     controlsCalibrated = 0;
-    firstCalibrate = 1;
     trimStartTime = 0;
     
     gameInputStatsCollectStart();
 
     gyroStableCount = 0;
     
+    firstCalibrate = 1;
+    
     initialized = 1;
+    
+    trimDoneCallback = NULL;
 }
 
 void
@@ -159,11 +160,16 @@ gameInputUninit()
 }
 
 void
-gameInputTrimBegin()
+gameInputTrimBegin(void (*callback)(void))
 {
     needTrim = 1;
     needTrimLast = 0;
-    trimCount++;
+    controlsCalibrated = 0;
+    trimStartTime = 0;
+    gyroStableCount = 0;
+    trimDoneCallback = callback;
+    
+    gameInputStatsCollectStart();
 }
 
 void
@@ -171,7 +177,6 @@ gameInputTrimAbort()
 {
     needTrim = 0;
     needTrimLast = 0;
-    trimCount = trimCountLast = 9999;
     gyroStableCount = 9999;
     controlsCalibrated = 1;
     
@@ -181,9 +186,9 @@ gameInputTrimAbort()
 }
 
 int
-gameInputTrimPending()
+gameInputInitialTrimPending()
 {
-    return trimCount != trimCountLast;
+    return !controlsCalibrated && firstCalibrate;
 }
 
 void
@@ -193,8 +198,6 @@ gameInputGyro(float roll, float pitch, float yaw)
     motionRoll = roll;
     motionPitch = pitch;
     motionYaw = yaw;
-    
-    trimCountLast = trimCount;
 }
 
 void
@@ -213,8 +216,6 @@ gameInputGyro2(float roll, float pitch, float yaw)
         motionPitch += pitch;
         motionYaw += yaw;
     }
-
-    trimCountLast = trimCount;
 }
 
 void
@@ -279,12 +280,12 @@ gameInput()
     gameInputStatsAppend(deviceO);
     
     if(!controlsCalibrated) {
-        if (!needTrim && trimCountLast == trimCount) {
+        if (!needTrim && firstCalibrate) {
             if (gyroStableCount == (GYRO_SAMPLE_RATE * 2)) {
                 console_clear();
                 console_write("calibrating...");
                 gameInterfaceSetInterfaceState(INTERFACE_STATE_TRIM_BLINKING);
-                gameInputTrimBegin();
+                gameInputTrimBegin(NULL);
             }
         } else {
 
@@ -294,16 +295,12 @@ gameInput()
                 DBPRINTF(("%s:%d", __FILE__, __LINE__));
                 console_append("\ndone\n");
                 needTrim = 0;
-                trimCountLast = 1;
                 gameInterfaceControls.trim.blinking = 0;
             }
         }
 
         gyroStableCount += 1;
     }
-
-    // input variance too wide for trimming, ignore
-    if(gameInputTrimPending()) return;
     
     if(gyroInputCount == gyroInputCountLast) return;
     gyroInputCountLast = gyroInputCount;
@@ -365,11 +362,14 @@ gameInput()
             {
                 //console_clear();
                 //console_write("Welcome to d0gf1ght %s\n    tap to re_center\n", GAME_VERSION_STR);
-                if(firstCalibrate)
+                
+                firstCalibrate = 0;
+                
+                if(trimDoneCallback)
                 {
                     DBPRINTF(("%s:%d", __FILE__, __LINE__));
-                    firstCalibrate = 0;
-                    gameDialogWelcome();
+                    trimDoneCallback();
+                    //gameDialogWelcome();
                 }
             }
             

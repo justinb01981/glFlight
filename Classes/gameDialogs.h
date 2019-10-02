@@ -249,6 +249,7 @@ gameDialogCalibrate()
     gameInterfaceModalDialogDequeue();
     
     gameInputInit();
+    gameInputTrimBegin(gameDialogWelcome);
     /*
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"

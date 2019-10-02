@@ -188,7 +188,8 @@ calibrate_bail:
 //#endif
     
     if(gameInterfaceControls.textMenuControl.visible ||
-       gameInterfaceControls.keyboardEntry.visible || !controlsCalibrated)
+       gameInterfaceControls.keyboardEntry.visible ||
+       gameInputInitialTrimPending())
     {
         game_paused = 1;
     }
@@ -354,7 +355,7 @@ calibrate_bail:
                              my_ship_alpha, my_ship_beta, my_ship_gamma,
                              1, texture_id_playership);
         world_get_last_object()->object_type = OBJ_PLAYER;
-        targetSpeed = minSpeed + 1.0;
+        targetSpeed = minSpeed + 3.0;
         speed = 6;
         update_object_velocity(my_ship_id, ship_z_vec[0]*speed, ship_z_vec[1]*speed, ship_z_vec[2]*speed, 0);
         world_get_last_object()->bounding_remain = 1;

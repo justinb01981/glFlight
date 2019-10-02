@@ -43,6 +43,11 @@ int game_map_custom_loaded = 0;
 int game_start_difficulty = 2;
 int game_start_score = 0;
 
+static void trimThenHideCalibrateRect(void)
+{
+    gameInterfaceControls.calibrateRect.visible = 0;
+}
+
 void
 gameInterfaceInit(double screenWidth, double screenHeight)
 {
@@ -373,10 +378,11 @@ gameInterfaceHandleTouchMove(float x, float y)
     }
     else if(touchedControl == &gameInterfaceControls.trim)
     {
-        gameInputTrimBegin();
+        gameInputTrimBegin(trimThenHideCalibrateRect);
         gyro_calibrate_log(100);
         gameInterfaceControls.trim.blinking = 0;
-        controlsCalibrated = 1;
+        gameInterfaceControls.calibrateRect.visible = 1;
+        //controlsCalibrated = 1;
     }
     else if(touchedControl == &gameInterfaceControls.look)
     {
@@ -1116,7 +1122,8 @@ void gameInterfaceProcessAction()
 }
 
 void
-gameInterfaceHandleTouchEnd(float x, float y) {
+gameInterfaceHandleTouchEnd(float x, float y)
+{
     controlRect *touchedControl = gameInterfaceFindControl(x, y);
 
     if (touchedControl) {
@@ -1127,7 +1134,7 @@ gameInterfaceHandleTouchEnd(float x, float y) {
 
     if (touchedControl == &gameInterfaceControls.trim)
     {
-        needTrim = 0;
+        //needTrim = 0;
     }
 
     // clear controls touched by this touchid

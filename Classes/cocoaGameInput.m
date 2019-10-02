@@ -66,7 +66,7 @@ int resumeCountDown = 0;
         return;
     }
     
-    if(!refMotion || gameInputTrimPending())
+    if(!refMotion)
     {
         //if(refMotion) [refMotion release];
         

@@ -39,7 +39,7 @@ void
 gameInputUninit();
 
 void
-gameInputTrimBegin();
+gameInputTrimBegin(void (*callback)(void));
 
 void
 gameInputTrimAbort();
@@ -57,7 +57,7 @@ void
 gameInput();
 
 int
-gameInputTrimPending();
+gameInputInitialTrimPending();
 
 void
 gyro_calibrate_log(float pct);
