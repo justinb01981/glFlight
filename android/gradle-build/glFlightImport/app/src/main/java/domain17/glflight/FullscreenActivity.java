@@ -49,7 +49,7 @@ import com.domain17.glflight.util.*;
 public class FullscreenActivity extends Activity implements SensorEventListener {
 
     public boolean running = false;
-    public boolean renderContinuously = false;
+    public boolean renderContinuously = true;
     Context appCtx;
     int accuracyLast = SensorManager.SENSOR_STATUS_UNRELIABLE;
 
@@ -198,7 +198,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     protected void onResume() {
         super.onResume();
 
-        mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_FASTEST);
         running = true;
     }
     
@@ -310,10 +310,9 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
             while (running) {
                 double delta = mRenderNext - java.lang.System.currentTimeMillis();
 
-                if (delta < 0) {
+                if (delta <= 0) {
                     mRenderNext = mRenderNext + (1000.0 / GameRenderer.fps);
 
-                    GameRunnable.runTimerThread();
                     gameRenderer.requestRender();
 
                     delta = mRenderNext - java.lang.System.currentTimeMillis(); //Instant.now().compareTo(mRenderNext);
