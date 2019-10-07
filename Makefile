@@ -29,7 +29,7 @@ FILES_RAW_SOUNDS=*.wav
 BUILD_DIR_IOS=build/ios
 BUILD_DIR_ANDROID=android/gradle-build/glFlightImport
 CMD_NDK_BUILD=ndk-build
-RAW_RES_EXCLUDED= Default-568h@2x.old.png Default-568h@2x.png Default-Landscape.png Default.png Default2.png Default@2x.png *copy.bmp enemydead-old1.wav *copy.bmp
+RAW_RES_EXCLUDED=texture81\ copy.bmp Default-568h@2x.old.png Default-Landscape.png Default.png Default2.png Default@2x.png enemydead-old1.wav
 
 all: gradle_workspace ios_workspace
 	echo "done"
@@ -75,10 +75,12 @@ GRADLE_DIR=${GRADLE_IMPORT_ROOT}/app/src/main
 android_workspace: base_ws
 	${CMD_LINK} ../../../../../../../Classes ${GRADLE_DIR}/jni/game
 	${CMD_COPY} *.png ${GRADLE_DIR}/res/raw
-	#$(foreach var,${RAW_RES_EXCLUDED},echo $(var); rm ${GRADLE_DIR}/res/raw/$(var);)
 	${CMD_COPY} *.jpg ${GRADLE_DIR}/res/raw
 	${CMD_COPY} texture*.bmp ${GRADLE_DIR}/res/raw
 	${CMD_COPY} *.wav ${GRADLE_DIR}/res/raw
+	echo "removing bad files"
+	${CMD_RM} $(foreach var,${RAW_RES_EXCLUDED},${GRADLE_DIR}/res/raw/$(var))
+	${CMD_RM} ${GRADLE_DIR}/res/raw/*copy.bmp
 	echo "android (studio gradle) workspace created: " ${BUILD_DIR_ANDROID}
 
 gradle_workspace: android_workspace
