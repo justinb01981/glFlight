@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-               BuildableName = "d0gf1ght.app"
+               BuildableName = "d0gf1ght 95.app"
                BlueprintName = "gl_flight"
                ReferencedContainer = "container:gl_flight.xcodeproj">
             </BuildableReference>
@@ -27,19 +27,17 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <Testables>
-      </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "d0gf1ght.app"
+            BuildableName = "d0gf1ght 95.app"
             BlueprintName = "gl_flight"
             ReferencedContainer = "container:gl_flight.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <Testables>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Release"
@@ -56,13 +54,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "d0gf1ght.app"
+            BuildableName = "d0gf1ght 95.app"
             BlueprintName = "gl_flight"
             ReferencedContainer = "container:gl_flight.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -75,7 +71,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "d0gf1ght.app"
+            BuildableName = "d0gf1ght 95.app"
             BlueprintName = "gl_flight"
             ReferencedContainer = "container:gl_flight.xcodeproj">
          </BuildableReference>

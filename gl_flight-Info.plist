@@ -34,8 +34,6 @@
 	<string>MainWindow</string>
 	<key>NSMainNibFile~ipad</key>
 	<string>MainWindow-iPad</string>
-	<key>UIApplicationExitsOnSuspend</key>
-	<true/>
 	<key>UIInterfaceOrientation</key>
 	<string>UIInterfaceOrientationLandscapeRight</string>
 	<key>UILaunchStoryboardName</key>

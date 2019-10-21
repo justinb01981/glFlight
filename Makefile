@@ -29,7 +29,7 @@ FILES_RAW_SOUNDS=*.wav
 BUILD_DIR_IOS=build/ios
 BUILD_DIR_ANDROID=android/gradle-build/glFlightImport
 CMD_NDK_BUILD=ndk-build
-RAW_RES_EXCLUDED=texture81\ copy.bmp Default-568h@2x.old.png Default-Landscape.png Default.png Default2.png Default@2x.png enemydead-old1.wav
+RAW_RES_EXCLUDED=texture81\ copy.bmp Default-568h@2x.png Default-568h@2x.old.png Default-Landscape.png Default.png Default2.png Default@2x.png enemydead-old1.wav
 
 all: gradle_workspace ios_workspace
 	echo "done"

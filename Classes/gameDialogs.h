@@ -262,7 +262,7 @@ gameDialogCalibrate()
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
                              "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
      */
-    gameInterfaceControls.calibrateRect.visible = 1;
+    //gameInterfaceControls.calibrateRect.visible = 1;
 }
 
 // TODO: -- not using this for now
@@ -305,8 +305,8 @@ gameDialogInitial()
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
                              "^C                             ^C\n"
                              "^C     Gently steer device     ^C\n"
-                             "^C      until cursor is        ^C\n"
-                             "^C       easy to control       ^C\n"
+                             "^C    to adjust sensitivity    ^C\n"
+                             "^C                             ^C\n"
                              "^C       (Tap to begin)        ^C\n"
                              "^C                             ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
@@ -361,8 +361,11 @@ gameDialogResumePausedNo()
 static void
 gameDialogResume()
 {
-    gameInterfaceModalDialog("Resume paused game?", "Yes", "No",
-                             gameDialogResumePaused, gameDialogResumePausedNo);
+    gameInterfaceControls.textMenuControl.visible = 1;
+    needTrimLock = 1;
+    
+//    gameInterfaceModalDialog("Resume paused game?", "Yes", "No",
+//                             gameDialogResumePaused, gameDialogResumePausedNo);
 }
 
 static void

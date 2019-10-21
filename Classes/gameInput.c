@@ -480,7 +480,7 @@ gameInput()
     float tc = time_ms_wall - time_input_last;
     time_input_last = time_ms_wall;
     
-    if(!needTrim && !needTrimLast && !game_paused)
+    if(!game_paused)
     {
         // output response ampilfiers
         //float sm[] = /*{0.6, 0.8, 0.8}*/ {0.7, 0.8, 0.9};

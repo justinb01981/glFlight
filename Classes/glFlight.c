@@ -187,9 +187,14 @@ calibrate_bail:
 //    time_ms = time_ms_wall;
 //#endif
     
+    if(gameInputInitialTrimPending())
+    {
+        speed = 0.0;
+    }
+    
     if(gameInterfaceControls.textMenuControl.visible ||
-       gameInterfaceControls.keyboardEntry.visible ||
-       gameInputInitialTrimPending())
+       gameInterfaceControls.keyboardEntry.visible /*||
+       gameInputInitialTrimPending()*/ )
     {
         game_paused = 1;
     }

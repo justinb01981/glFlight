@@ -437,22 +437,25 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     {
         // adjust target vector to intercept (with some fudge-factor)
         float fm = (1.0 + (1.0 / (float) rand_in_range(1, 100)));
-        float leadVel = bulletVel;
+        float bulletPredictTime = dist / bulletVel;
+        float interceptPredictTime = 2;
         
         // if not firing, intercept course
         if(!elem->stuff.u.enemy.fires)
         {
-            leadVel = elem->physics.ptr->velocity;
             fm = 1.0;
+            
+            ax += vx * interceptPredictTime * tc;
+            ay += vy * interceptPredictTime * tc;
+            az += vz * interceptPredictTime * tc;
         }
-        
-        if(dist < min_patrol_distance*2)
+        else
         {
-            float leadv = (dist / leadVel);
-
-            ax -= vx * leadv * tc;
-            ay -= vy * leadv * tc;
-            az -= vz * leadv * tc;
+            fm = 1.0;
+            
+            ax += vx * bulletPredictTime * tc;
+            ay += vy * bulletPredictTime * tc;
+            az += vz * bulletPredictTime * tc;
         }
         
         // if distance is too great, forget target (switch to patrol)
