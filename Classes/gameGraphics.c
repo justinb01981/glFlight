@@ -1340,13 +1340,14 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
 {
     float I_Mk = 25.0; // model - step size
     float Mk = I_Mk;
-    float Tk = 8; // texture - step-size multiplier
+    float Cr = 1.5;
+    float Tk = 1; // texture - step-size multiplier
     float terrain_height_y = 0;
     
-    float Ub = -gWorld->bound_radius*1.5;
-    float Vb = -gWorld->bound_radius*1.5;
-    float Ue = gWorld->bound_radius*1.5;
-    float Ve = gWorld->bound_radius*1.5;
+    float Ub = -gWorld->bound_radius*Cr;
+    float Vb = -gWorld->bound_radius*Cr;
+    float Ue = gWorld->bound_radius*Cr;
+    float Ve = gWorld->bound_radius*Cr;
     
     const int step_allocate = 0, step_generate = 1;
     int step = step_allocate;
@@ -1361,6 +1362,9 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
         
         float M[] = {Ui, 0, Vi};
         float T[] = {0, 0};
+        
+        #define TexU (((Ui/(Ue*2))- 0.5) * Tk)
+        #define TexV (((Vi/(Ve*2))- 0.5) * Tk)
         
         n_indices_last = n_indices;
         
@@ -1385,8 +1389,8 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
                     M[0] = Ui;
                     M[1] = terrain_height_y;
                     M[2] = Vi;
-                    T[0] = (Ui/Ue) * Tk;
-                    T[1] = (Vi/Ve) * Tk;
+                    T[0] = TexU;
+                    T[1] = TexV;
                     
                     tess_step(M, T, bgData->tess.S);
                 }
@@ -1403,8 +1407,8 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
             {
                 M[0] = Ui;
                 M[2] = Vi;
-                T[0] = Ui/Ue * Tk;
-                T[1] = Vi/Ve * Tk;
+                T[0] = TexU;
+                T[1] = TexV;
 
                 tess_step_row(M, T, bgData->tess.S);
             }

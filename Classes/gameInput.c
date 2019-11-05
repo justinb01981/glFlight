@@ -64,11 +64,11 @@ float sp = 0;
 int sched_input_action[] = {3,1};
 int sched_input_val = 1;
 float dz_min = 0.001;
-double speed;
-double maxAccelDecel;
-double targetSpeed;
-double maxSpeed;
-double minSpeed;
+double speed = 0;
+double maxAccelDecel = 0;
+double targetSpeed = 0;
+double maxSpeed = MAX_SPEED;
+double minSpeed = 0;
 double speedBoost = 0;
 double bulletVel;
 int needTrimLast;
@@ -128,7 +128,6 @@ gameInputInit()
     // movement speed
     speed = minSpeed;
     targetSpeed = speed;
-    maxSpeed = MAX_SPEED;
     maxAccelDecel = /*5*/ MAX_SPEED/2; // change per second
     minSpeed = MAX_SPEED / 20;
     bulletVel = MAX_SPEED*5;

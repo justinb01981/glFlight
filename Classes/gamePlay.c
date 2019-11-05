@@ -728,7 +728,7 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.max_enemies = 0;
     gameStateSinglePlayer.counter_enemies_spawned = 99999;
     gameStateSinglePlayer.n_turrets = 0;
-    gameStateSinglePlayer.n_asteroids = 30;
+    gameStateSinglePlayer.n_asteroids = 0;
     
     gameStateSinglePlayer.enemy_intelligence = gameStateSinglePlayer.ally_intelligence = difficulty;
     

@@ -224,7 +224,9 @@ calibrate_bail:
     // play engine sound
     const char* engine_sounds[] = {"engine", "engineslow"};
     const float engine_sounds_duration[] = {1250, 347};
-    if(time_ms >= time_engine_sound_next || time_engine_sound_next == 0)
+
+    if(time_ms >= time_engine_sound_next
+       && controlsCalibrated)
     {
         float minSpeed = 0.1;
         
