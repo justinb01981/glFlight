@@ -90,6 +90,11 @@ struct WorldElem {
         int normals;
     } bounding;
     
+    struct
+    {
+        model_coord_t last_coord[3];
+    } trail;
+    
     struct WorldElem* linked_elem;
     struct WorldElem* head_elem;
     

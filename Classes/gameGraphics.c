@@ -1340,7 +1340,7 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
 {
     float I_Mk = 25.0; // model - step size
     float Mk = I_Mk;
-    float Cr = 1.5;
+    float Cr = /*1.5*/ 2.2;
     float Tk = 1; // texture - step-size multiplier
     float terrain_height_y = 0;
     

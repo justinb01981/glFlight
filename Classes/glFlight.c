@@ -156,7 +156,9 @@ glFlightFrameStage1()
         gameGraphicsUninit();
         gameMapReRender();
         gameNetwork_worldInit();
+        
         my_ship_id = WORLD_ELEM_ID_INVALID;
+        
         gameStateSinglePlayer.started = 0;
         //gameStateSinglePlayer.game_type = GAME_TYPE_NONE;
         game_terminated_gracefully = 1;
@@ -183,9 +185,9 @@ glFlightFrameStage1()
     
 calibrate_bail:
 //    get_time_ms();
-//#if GAME_PLATFORM_ANDROID
-//    time_ms = time_ms_wall;
-//#endif
+#if GAME_PLATFORM_ANDROID
+    time_ms = time_ms_wall;
+#endif
     
     if(gameInputInitialTrimPending())
     {
@@ -265,7 +267,7 @@ calibrate_bail:
     
     // TODO: this is being called at most once every 1/60th of a second (16ms)
     do_game_network_world_update();
-    
+
     game_lock_lock(&gameNetworkState.msgQueue.lock);
     
     gameNetworkMessageQueued* pNetworkMsg = gameNetworkState.msgQueue.head.next;
@@ -282,7 +284,7 @@ calibrate_bail:
     game_lock_unlock(&gameNetworkState.msgQueue.lock);
     
     do_game_network_write();
-    
+
     paused_bail:
     
     if(glFlightDrawframeHook) glFlightDrawframeHook();
@@ -420,7 +422,7 @@ calibrate_bail:
                                                pCameraWatchNode->elem->physics.ptr->x - my_ship_x,
                                                pCameraWatchNode->elem->physics.ptr->y - my_ship_y,
                                                pCameraWatchNode->elem->physics.ptr->z - my_ship_z);
-                    gameCamera_MoveZ(-4);
+                    gameCamera_MoveZ(-5);
                     gameCamera_MoveY(1);
                 }
                 else

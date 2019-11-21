@@ -153,6 +153,12 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     hints.ai_protocol = 0;
     
     getaddrinfo(NULL, portnum, &hints, &addrResult);
+    if(!addrResult)
+    {
+        console_write("%s:%d %s\n", __func__, __LINE__, "getaddrinfo failure");
+        return -1;
+    }
+
     memcpy(addr6, addrResult->ai_addr, addrResult->ai_addrlen);
 
 #ifdef BSD_SOCKETS

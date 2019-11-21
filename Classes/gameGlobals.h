@@ -51,6 +51,7 @@ extern float my_ship_gamma;
 static const float brick_size = 1;
 extern int needFire;
 extern game_timeval_t firedLast;
+extern game_timeval_t player_fire_rate;
 extern float viewRotationDegrees;
 extern float drawDistanceFar;
 extern char consoleMessage[2048];
@@ -104,7 +105,7 @@ extern int fireActionQueuedAfterEdit;
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "1.7.4_core";
+const static char* GAME_VERSION_STR = "1.7.5_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 

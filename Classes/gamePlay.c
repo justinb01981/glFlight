@@ -64,6 +64,7 @@ char *game_status_string = game_status_string_;
 const float randH = 100000;
 
 game_timeval_t firedLast = 0, firedLastMissle = 0;
+game_timeval_t player_fire_rate = 200;
 float blr_last = 1;
 
 float game_variables_val[GAME_VARIABLES_MAX];
@@ -2211,7 +2212,7 @@ game_run()
         break;
     }
     
-    if(gameInterfaceControls.fire.touch_began && time_ms - firedLast > 200)
+    if(gameInterfaceControls.fire.touch_began && time_ms - firedLast > player_fire_rate)
     {
         firedLast = time_ms;
         fireBullet(ACTION_FIRE_BULLET);
@@ -2473,9 +2474,8 @@ fireBullet(int bulletAction)
 }
 
 int
-firePoopedCube(WorldElem *elem)
+addEngineExhaust(WorldElem *elem)
 {
-    int use_drawline = 0;
     quaternion_t qx, qy, qz;
     
     if(elem->physics.ptr->velocity <= 1) return WORLD_ELEM_ID_INVALID;
@@ -2483,89 +2483,121 @@ firePoopedCube(WorldElem *elem)
     get_body_vectors_for_euler(elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
                                &qx, &qy, &qz);
     
-    int texture_id = /*elem->texture_id*/ TEXTURE_ID_POOPED_CUBE_ENEMY;
-    int model = MODEL_CONTRAIL;
-    
-    if(elem->elem_id == my_ship_id)
-    {
-        texture_id = TEXTURE_ID_COLORMAP;
-        
-        if(speedBoost > 0)
-        {
-            texture_id = TEXTURE_ID_POOPED_CUBE_BOOST;
-        }
-        else
-        {
-            if(elem->durability <= DURABILITY_LOW) texture_id = TEXTURE_ID_POOPED_CUBE_SHIELDLOW;
-        }
-    }
-    else
-    {
-        texture_id = TEXTURE_ID_COLORMAP;
-    }
+    int texture_id = /*elem->texture_id*/ TEXTURE_ID_COLORMAP;
+    int model = MODEL_BULLET;
     
     //static float lineColorMine[8] = {0.01, 0.99, 0.02, 0.99, 0.03, 0.99, 0.04, 0.99};
-    static float lineColorMine[8] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
-    static float lineColorEnemy[8] = {1.0, 0.5, 0.95, 0.52, 0.95, 0.52, 1.0, 0.5};
-    static float lineColorEnemyAce[8] = {0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9};
+    static float lineColorExhaust[8] = {
+        0.9, 0.9,
+        0.9, 0.9,
+        0.9, 0.6,
+        0.9, 0.6};
+    int lineColorLen = 8;
+    float *lineColor = lineColorExhaust;
+    
+    int i;
+    
+    int obj =
+        world_add_object(model,
+                         elem->physics.ptr->x + qz.x*2,
+                         elem->physics.ptr->y + qz.y*2,
+                         elem->physics.ptr->z + qz.z*2,
+                         elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
+                         elem->physics.ptr->velocity / MAX_SPEED,
+                         texture_id);
+    WorldElem* pElem = world_get_last_object();
+    
+    for(i = 0; i < pElem->n_texcoords; i += 2)
+    {
+        pElem->texcoords[i] = lineColor[(i % lineColorLen)];
+        pElem->texcoords[i+1] = lineColor[(i % lineColorLen) + 1];
+    }
+    pElem->object_type = OBJ_POOPEDCUBE;
+    pElem->renderInfo.priority = 1;
+    pElem->destructible = 0;
+    pElem->physics.ptr->friction = 1;
+    world_object_set_lifetime(obj, /*pooped_cube_lifetime*/ 5);
+    
+     update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);
+    
+    return obj;
+}
+
+int
+firePoopedCube(WorldElem *elem)
+{
+    quaternion_t qx, qy, qz;
+    static float lineColorMine[8] = {0.1, 0.9,     0.1, 0.9,     0.1, 0.9,     0.1, 0.9};
+    static float lineColorEnemy[8] = {1.0, 0.5,     0.95, 0.52,    0.95, 0.52,    1.0, 0.5};
+    static float lineColorEnemyAce[8] = {0.9, 0.9,     0.9, 0.9,     0.9, 0.9,     0.9, 0.9};
     int lineColorLen = 8;
     float *lineColor = lineColorEnemy;
+    float Zm = 1.5;
+    int trailCoords[] = {6, 9, 18, 21, 30, 33, 42, 45};
+    int i;
+    
+    if(elem->physics.ptr->velocity <= 1) return WORLD_ELEM_ID_INVALID;
+    
+    get_body_vectors_for_euler(elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
+                               &qx, &qy, &qz);
+    
+    int texture_id = /*elem->texture_id*/ TEXTURE_ID_COLORMAP;
+    int model = MODEL_CONTRAIL;
     
     if(elem->elem_id == my_ship_id) lineColor = lineColorMine;
     if(elem->texture_id == TEXTURE_ID_ENEMYSHIP_ACE) lineColor = lineColorEnemyAce;
     //if(elem->durability <= DURABILITY_LOW) lineColor = lineColorLowShield;
     
-    if(!use_drawline)
-    {
-        int i;
-        
-        int obj =
-            world_add_object(model,
-                             elem->physics.ptr->x + qz.x*1,
-                             elem->physics.ptr->y + qz.y*1,
-                             elem->physics.ptr->z + qz.z*1,
-                             elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
-                             0.25,
-                             texture_id);
-        WorldElem* pElem = world_get_last_object();
-        
-        for(i = 0; i < pElem->n_texcoords; i += 2)
-        {
-            pElem->texcoords[i] = lineColor[(i % lineColorLen)];
-            pElem->texcoords[i+1] = lineColor[(i % lineColorLen) + 1];
-        }
-        pElem->object_type = OBJ_POOPEDCUBE;
-        pElem->renderInfo.priority = 1;
-        pElem->destructible = 0;
-        pElem->physics.ptr->friction = 1;
-        world_object_set_lifetime(obj, pooped_cube_lifetime);
-        
-        /*
-         update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);
-         */
-        
-        return obj;
-    }
-    else
-    {
-        float m = 0.1;
-        float n = -1.0;
-        float lineA[] = {
-            elem->physics.ptr->x - qz.x*n,
-            elem->physics.ptr->y - qz.y*n,
-            elem->physics.ptr->z - qz.z*n
-        };
-        float lineB[] = {
-            lineA[0]-elem->physics.ptr->vx*m,
-            lineA[1]-elem->physics.ptr->vy*m,
-            lineA[2]-elem->physics.ptr->vz*m
-        };
+    float V[] = {
+        qz.x * Zm,
+        qz.y * Zm,
+        qz.z * Zm
+    };
+    
+    int obj =
+        world_add_object(model,
+                         elem->physics.ptr->x + V[0],
+                         elem->physics.ptr->y + V[1],
+                         elem->physics.ptr->z + V[2],
+                         elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
+                         0.2,
+                         texture_id);
+    WorldElem* pElem = world_get_last_object();
 
-        
-        world_add_drawline(lineA, lineB, lineColor, 240);
-        
-        return WORLD_ELEM_ID_INVALID;
+    // modify the model coordinates
+    for(i = 0; i < pElem->n_texcoords; i += 2)
+    {
+        pElem->texcoords[i] = lineColor[(i % lineColorLen)];
+        pElem->texcoords[i+1] = lineColor[(i % lineColorLen) + 1];
     }
+    
+    if(elem->trail.last_coord[0] != 0
+       || elem->trail.last_coord[1] != 0
+       || elem->trail.last_coord[2] != 0)
+    {
+        for(i = 0; i < sizeof(trailCoords)/sizeof(int); i++)
+        {
+            pElem->coords[trailCoords[i]] -= pElem->physics.ptr->x - elem->trail.last_coord[0];
+            pElem->coords[trailCoords[i]+1] -= pElem->physics.ptr->y - elem->trail.last_coord[1];
+            pElem->coords[trailCoords[i]+2] -= pElem->physics.ptr->z - elem->trail.last_coord[2];
+        }
+    }
+    
+    elem->trail.last_coord[0] = pElem->physics.ptr->x;
+    elem->trail.last_coord[1] = pElem->physics.ptr->y;
+    elem->trail.last_coord[2] = pElem->physics.ptr->z;
+    
+    pElem->object_type = OBJ_POOPEDCUBE;
+    pElem->renderInfo.priority = 1;
+    pElem->destructible = 0;
+    pElem->physics.ptr->friction = 1;
+    world_object_set_lifetime(obj, pooped_cube_lifetime);
+    
+     //update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);
+    
+    addEngineExhaust(elem);
+    
+    return obj;
 }
 
 int

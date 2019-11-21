@@ -27,6 +27,7 @@ import android.hardware.*;
 import android.media.*;
 import android.opengl.GLSurfaceView.*;
 //import android.opengl.EGLDisplay;
+import android.opengl.EGLExt;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -71,7 +72,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
                     EGL10.EGL_ALPHA_SIZE, 8,
                     EGL10.EGL_DEPTH_SIZE, 16,
                     EGL10.EGL_RENDERABLE_TYPE, 4,
-                    EGL10.EGL_STENCIL_SIZE, 8,
+                    EGL10.EGL_STENCIL_SIZE, /*8*/ 0,
                     EGL10.EGL_SAMPLE_BUFFERS, 1,
                     EGL10.EGL_SAMPLES, 0,
                     EGL10.EGL_NONE
@@ -89,8 +90,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
                     num_config)) {
                 throw new IllegalArgumentException("eglChooseConfig failed");
             }
-
-
 
             return configs[0];
         }
@@ -132,7 +131,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         h.setFixedSize((int) sw, (int) sh);
 
         GameGLConfigChooser glConfigChooser = new GameGLConfigChooser();
-        gameRenderer.surfaceView.setEGLConfigChooser(false);
         gameRenderer.surfaceView.setEGLConfigChooser(glConfigChooser);
         gameRenderer.surfaceView.setDrawingCacheEnabled(false);
 
@@ -156,7 +154,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         running = true;
         mBGThread.start();
-        mRenderThread.start();
+        if(!renderContinuously) mRenderThread.start();
         //mTimerThread.start();
     }
 

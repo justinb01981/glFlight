@@ -5,8 +5,11 @@ import static android.opengl.GLES10.*;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
+import android.opengl.EGLExt;
+import android.view.Choreographer;
 
 public class GameRenderer implements Renderer {
 	
@@ -27,7 +30,7 @@ public class GameRenderer implements Renderer {
 
 	@Override
 	public void onDrawFrame(GL10 arg0) {
-			onDrawFrame();
+		onDrawFrame();
 	}
 
 	@Override
@@ -39,7 +42,11 @@ public class GameRenderer implements Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 arg0, EGLConfig arg1) {
 		onSurfaceCreated();
+
+		EGL14.eglSwapInterval(EGL14.eglGetCurrentDisplay(), 0);
 	}
 
-	public void requestRender() { if(surfaceView != null) surfaceView.requestRender(); }
+	public void requestRender() {
+		if(surfaceView != null) surfaceView.requestRender();
+	}
 }

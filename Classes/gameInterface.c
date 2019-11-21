@@ -971,9 +971,6 @@ void gameInterfaceProcessAction()
         fire_action_setting_game_name:
             gameInterfaceEditString(gameSettingGameTitle);
             break;
-        case ACTION_SETTING_UPDATE_FREQUENCY:
-            gameInterfaceEditInt(&gameSettingsNetworkFrequency);
-            break;
         case ACTION_SETTING_PORT_NUMBER:
             gameInterfaceEditInt(&gameSettingsPortNumber);
             break;
@@ -1084,13 +1081,6 @@ void gameInterfaceProcessAction()
             
             console_write("texture:%d\r", texture_id_playership);
             gameInterfaceControls.textMenuControl.hide_frames = 120;
-            appWriteSettings();
-            break;
-            
-        case ACTION_SETTING_INPUT_SENSITIVITY:
-            GYRO_DC += 1;
-            if(GYRO_DC >= 10) GYRO_DC = 3;
-            console_write("Input sensitivity: %f\n", GYRO_DC);
             appWriteSettings();
             break;
             

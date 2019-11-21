@@ -13,7 +13,7 @@
 #include "gameGlobals.h"
 #include "action.h"
 
-#define ACTIONS_CURSOR_STR "->"
+#define ACTIONS_CURSOR_STR "^? "
 typedef enum
 {
     ACTION_INVALID = -1,
@@ -55,12 +55,10 @@ typedef enum
     ACTION_SETTING_GAME_NAME,
     ACTION_SETTING_SHIP_MODEL,
     ACTION_SETTING_LOCK_CAMERA,
-    ACTION_SETTING_INPUT_SENSITIVITY,
     ACTION_SETTING_CONTROL_MODE,
     ACTION_SETTING_BOTINTELLIGENCE,
     ACTION_SETTING_AUDIO,
     ACTION_SETTING_SHIP_TEXTURE,
-    ACTION_SETTING_UPDATE_FREQUENCY,
     ACTION_SETTING_SHOW_DEBUG,
     ACTION_SETTING_TWEAK_PHYSICS,
     ACTION_SETTING_PORT_NUMBER,
@@ -73,20 +71,21 @@ typedef enum
 static int actions_sub[][ACTION_LAST] =
 {
     // main
-    {1,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {1,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // net
-    {0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // game
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    //{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // build
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    //{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // settings
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1},
 };
 
 extern int *actions_enabled;
 
-static const int actions_sub_last = 5;
+//static const int actions_sub_last = 5;
+static const int actions_sub_last = 3;
 extern int actions_sub_cur;
 
 static const char* action_strings[ACTION_LAST] =
@@ -121,16 +120,14 @@ static const char* action_strings[ACTION_LAST] =
     "edit: scale object",
     "edit: change object",
     "map: regenerate",
-    "player name",
+    "multiplayer name",
     "multiplayer game title",
     "ship type",
     "camera mode",
-    "input sensitivity",
     "3-axis control mode",
     "deathmatch bot skill",
     "mute audio",
     "ship appearance(texture)",
-    "net update interval(ms)",
     "show debug",
     "friction level",
     "port number",
@@ -209,18 +206,22 @@ static void actions_display_menu(char *dest)
 {
     dest[0] = '\0';
     int lines = 0;
-    int maxlines = 7;
+    int maxlines = 8;
     int i;
+    int beg, end;
+    char* trailer = "";
+    char* trailerSeeMore = "...";
     
     sprintf(dest,
-            "%s %s %s %s %s\n",
-            (actions_sub_cur == 0? ">MAIN<": "MAIN"),
-            (actions_sub_cur == 1? ">NET<": "NET"),
-            (actions_sub_cur == 2? ">GAME<": "GAME"),
-            (actions_sub_cur == 3? ">BUILD<": "BUILD"),
-            (actions_sub_cur == 4? ">SETTINGS<": "SETTINGS"));
-    int dlen = strlen(dest);
-    while(dlen > 0 ) { strcat(dest, "-"); dlen--; }
+            //"%s %s %s %s %s\n",
+            "%s         %s         %s\n",
+            (actions_sub_cur == 0? "^?MAIN^?": "MAIN"),
+            (actions_sub_cur == 1? "^?NET^?": "NET"),
+            (actions_sub_cur == 2? "^?SETTINGS^?": "SETTINGS"));
+    
+    size_t dlen = strlen(dest);
+    
+    while(dlen > 0 ) { strcat(dest, "^C"); dlen--; }
     strcat(dest, "\n");
     
     for(i = ACTION_FIRST; i < ACTION_LAST; i++)
@@ -228,16 +229,51 @@ static void actions_display_menu(char *dest)
         if(actions_enabled[i]) lines++;
     }
     
-    for(i = (lines <= maxlines? ACTION_FIRST: fireAction); i < ACTION_LAST && maxlines > 0; i++)
-    {    
+    switch(actions_sub_cur)
+    {
+        case 0:
+            beg = 0;
+            end = 11;
+            break;
+        case 1:
+            beg = 11;
+            end = 16;
+            break;
+        case 2:
+            {
+                int k = maxlines/2;
+                beg = 30 > fireAction-k ? 30 : fireAction-k;
+                end = ACTION_LAST < fireAction+k ? ACTION_LAST : fireAction+k;
+                
+                while(end-beg < maxlines && end != ACTION_LAST) end++;
+                
+                if(end < ACTION_LAST)
+                {
+                    trailer = trailerSeeMore;
+                    maxlines -= 1;
+                }
+            }
+            break;
+        default:
+            return;
+    }
+    
+    for(i = beg; maxlines > 0 && i < end; i++)
+    {
         if(actions_enabled[i])
         {
-            sprintf(dest+strlen(dest), "%s%s\n", (fireAction == i? ACTIONS_CURSOR_STR: ""), action_strings[i]);
+            sprintf(dest+strlen(dest), "%s%s%s\n", (fireAction == i? ACTIONS_CURSOR_STR: ""), action_strings[i], (fireAction == i? ACTIONS_CURSOR_STR: ""));
             maxlines--;
         }
     }
     
-    if(maxlines == 0) sprintf(dest+strlen(dest), "...");
+    while(maxlines > 0)
+    {
+        strcat(dest, " \n");
+        maxlines--;
+    }
+    
+    sprintf(dest+strlen(dest), "%s%s", dest+strlen(dest), trailer);
 }
 
 #endif
