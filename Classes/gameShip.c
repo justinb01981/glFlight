@@ -243,8 +243,6 @@ float gameShip_calcRoll()
     gameShip_getZVector(shipz);
     
     float T = atan2(shipx[2], fabs(shipx[0]));
-    // TODO: normalize T
-    printf("T=%f\n\n", T);
     
     float Hor[] = {cos(T), 0, sin(T)};
     float U;

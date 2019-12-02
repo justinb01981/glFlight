@@ -2079,9 +2079,12 @@ world_update(float tc)
                                     }
                                     
                                     // check if this was invalidated by the remove-callback
+                                    // TODO: -- I don't think this can happen anymore
                                     if(!gWorld->world_update_state.world_region_iterate_cur)
                                     {
-                                        gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead;
+                                        DBPRINTF(("gWorld->world_update_state.world_region_iterate_cur invalidated!"));
+                                        assert(0);
+                                        //gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead;
                                     }
                                     
                                     gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;

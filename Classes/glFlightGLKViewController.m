@@ -69,6 +69,12 @@
 }
 
 - (void)glkView: (GLKView*)glkView drawInRect: (CGRect)rect {
+    
+    if(self.initBlock != nil) {
+        printf("glkView drawInRect called before init done");
+        return;
+    }
+    
     [EAGLContext setCurrentContext:((GLKView*)self.view).context];
 
     gameInput();
