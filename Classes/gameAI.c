@@ -699,9 +699,9 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         {
             printf("gameAI.c: isnan (%p)\n", elem);
             /*
-            //*pFloatCheckIsNan[iF] = 0;
+            // *pFloatCheckIsNan[iF] = 0;
             
-            //*pFloatCheckIsNan[iF] = *pFloatCheckIsNanR[iF];
+            // *pFloatCheckIsNan[iF] = *pFloatCheckIsNanR[iF];
             
             // normalize body vectors
             xq = QX;

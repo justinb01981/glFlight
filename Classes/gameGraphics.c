@@ -1350,11 +1350,13 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
     float Ve = gWorld->bound_radius*Cr;
     
     const int step_allocate = 0, step_generate = 1;
-    int step = step_allocate;
+    
     size_t n_coords = 3*2;
     size_t n_indices = 3*2;
     size_t n_tcoords = 2*2;
     size_t n_indices_last;
+    
+    int step = step_allocate;
     
     do{
         float Vi = Vb;

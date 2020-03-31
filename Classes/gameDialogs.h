@@ -262,7 +262,7 @@ gameDialogCalibrate()
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
                              "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
      */
-    //gameInterfaceControls.calibrateRect.visible = 1;
+    gameInterfaceControls.calibrateRect.visible = 1;
 }
 
 // TODO: -- not using this for now

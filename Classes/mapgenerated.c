@@ -24,6 +24,7 @@ typedef struct {
 
 static float SCALE_MAX = 4;
 static int num_asteroids = 0;
+static int cube_groups = 16;
 
 WorldElemListNode*
 world_elem_list_find_nearest(WorldElemListNode* head, float A[3], float* result_distance)
@@ -138,7 +139,7 @@ world_build_run_program(float x, float y, float z)
     tCube.scale = 2.0;
     
     // MARK: seed some objects
-    for(int d = 0; d < 16; d++)
+    for(int d = 0; d < cube_groups; d++)
     {
         float R = gWorld->bound_radius;
         
@@ -166,6 +167,7 @@ world_build_run_program(float x, float y, float z)
     float Y = 2;
     int model_t[] = {MODEL_BUILDING3, MODEL_CBUILDING};
     int model_tex[] = {TEXTURE_ID_BUILDING3, TEXTURE_ID_BUILDING2};
+    int model_scales[] = {SCALE_MAX, SCALE_MAX*2};
     
     for(int iSet = 0; iSet < sizeof(model_t)/sizeof(int); iSet++)
     {
@@ -177,7 +179,7 @@ world_build_run_program(float x, float y, float z)
                 
                 if(world_elem_list_find_nearest(&head, C, &neardist) != NULL && neardist >= SCALE_MAX)
                 {
-                    world_add_object(model_t[iSet], C[0], C[1], C[2], M_PI/2, rand_in_range(-M_PI, M_PI), -M_PI/2, SCALE_MAX, model_tex[iSet]);
+                    world_add_object(model_t[iSet], C[0], C[1], C[2], M_PI/2, rand_in_range(-M_PI, M_PI), -M_PI/2, model_scales[iSet], model_tex[iSet]);
                     world_elem_list_add(world_get_last_object(), &head);
                 }
             }

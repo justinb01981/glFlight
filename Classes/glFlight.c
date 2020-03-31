@@ -195,8 +195,8 @@ calibrate_bail:
     }
     
     if(gameInterfaceControls.textMenuControl.visible ||
-       gameInterfaceControls.keyboardEntry.visible /*||
-       gameInputInitialTrimPending()*/ )
+       gameInterfaceControls.keyboardEntry.visible ||
+       gameInputInitialTrimPending() )
     {
         game_paused = 1;
     }
