@@ -66,8 +66,8 @@
             timestampString = "590711079.572192"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2921"
-            endingLineNumber = "2921"
+            startingLineNumber = "2924"
+            endingLineNumber = "2924"
             landmarkName = "gameNetwork_handle_destruction(elem)"
             landmarkType = "9">
          </BreakpointContent>
@@ -100,8 +100,8 @@
             timestampString = "590711079.572278"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2298"
-            endingLineNumber = "2298"
+            startingLineNumber = "2301"
+            endingLineNumber = "2301"
             landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
             landmarkType = "9">
          </BreakpointContent>
@@ -219,8 +219,8 @@
             timestampString = "590711079.572503"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3065"
-            endingLineNumber = "3065"
+            startingLineNumber = "3068"
+            endingLineNumber = "3068"
             landmarkName = "gameNetwork_onBonjourConnecting2(msg, srcAddr)"
             landmarkType = "9">
          </BreakpointContent>
@@ -236,8 +236,8 @@
             timestampString = "590711079.572547"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3076"
-            endingLineNumber = "3076"
+            startingLineNumber = "3079"
+            endingLineNumber = "3079"
             landmarkName = "gameNetwork_onBonjourConnecting2(msg, srcAddr)"
             landmarkType = "9">
          </BreakpointContent>
@@ -253,8 +253,8 @@
             timestampString = "590711079.572588"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1929"
-            endingLineNumber = "1929"
+            startingLineNumber = "1932"
+            endingLineNumber = "1932"
             landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
             landmarkType = "9">
          </BreakpointContent>
@@ -393,6 +393,31 @@
             endingLineNumber = "438"
             landmarkName = "gameInput()"
             landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B6BC583D-B1B9-4D13-964F-C603EB27523A"
+            shouldBeEnabled = "Yes"
+            nameForDebugger = "printtrimnumsamples"
+            ignoreCount = "0"
+            continueAfterRunningActions = "Yes"
+            filePath = "Classes/gameInput.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "323"
+            endingLineNumber = "323"
+            landmarkName = "gameInput()"
+            landmarkType = "9">
+            <Actions>
+               <BreakpointActionProxy
+                  ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
+                  <ActionContent
+                     consoleCommand = "po tex_pass-trimStartTime">
+                  </ActionContent>
+               </BreakpointActionProxy>
+            </Actions>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

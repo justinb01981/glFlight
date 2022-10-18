@@ -89,7 +89,7 @@ world_elem_clone(WorldElem* a)
         memset(&pNew->stuff, 0, sizeof(pNew->stuff));
         pNew->linked_elem = NULL;
         memset(&pNew->listRefHead, 0, sizeof(pNew->listRefHead));
-        pNew->stuff.btree_node = NULL;
+        pNew->btree_node = NULL;
         pNew->elem_id = WORLD_ELEM_ID_INVALID;
         
         world_elem_adjust_geometry_pointers(pNew);
@@ -137,7 +137,7 @@ world_elem_free(WorldElem* pElem)
 void
 world_elem_replace_fix(WorldElem* pElem)
 {
-    if(pElem->stuff.btree_node) ((world_elem_btree_node*) pElem->stuff.btree_node)->elem = pElem;
+    if(pElem->btree_node) ((world_elem_btree_node*) pElem->btree_node)->elem = pElem;
 }
 
 static int
@@ -595,7 +595,7 @@ world_elem_set_nametag(WorldElem* elem, char* tag)
 void
 world_elem_btree_insert(world_elem_btree_node* root, WorldElem* elem, float order)
 {
-    if(elem->stuff.btree_node != NULL) return;
+    if(elem->btree_node != NULL) return;
     
     if(order > root->order)
     {
@@ -609,7 +609,7 @@ world_elem_btree_insert(world_elem_btree_node* root, WorldElem* elem, float orde
                 root->left->right = NULL;
                 root->left->elem = elem;
                 root->left->order = order;
-                elem->stuff.btree_node = root->left;
+                elem->btree_node = root->left;
             }
         }
     }
@@ -624,7 +624,7 @@ world_elem_btree_insert(world_elem_btree_node* root, WorldElem* elem, float orde
                 root->right->right = NULL;
                 root->right->elem = elem;
                 root->right->order = order;
-                elem->stuff.btree_node = root->right;
+                elem->btree_node = root->right;
             }
         }
     }
@@ -658,7 +658,7 @@ world_elem_btree_destroy(world_elem_btree_node* root)
     
     if(root->elem)
     {
-        root->elem->stuff.btree_node = NULL;
+        root->elem->btree_node = NULL;
         root->elem = NULL;
     }
     
@@ -725,7 +725,7 @@ world_elem_btree_remove_fast_core(world_elem_btree_node* root, WorldElem* elem, 
                 }
                 
                 free(pFree);
-                elem->stuff.btree_node = NULL;
+                elem->btree_node = NULL;
             }
             else
             {
@@ -750,7 +750,7 @@ world_elem_btree_remove_fast_core(world_elem_btree_node* root, WorldElem* elem, 
                 }
                 
                 free(pFree);
-                elem->stuff.btree_node = NULL;
+                elem->btree_node = NULL;
             }
             else
             {
@@ -760,6 +760,7 @@ world_elem_btree_remove_fast_core(world_elem_btree_node* root, WorldElem* elem, 
     }
     else
     {
+        DBPRINTF(("WARNING / ASSERT: world_elem_btree_remove_fast_core - invalid order value in vis-btree: %f root->order: %f", order, root->order));
         assert(0);
     }
 }
@@ -768,7 +769,7 @@ void
 world_elem_btree_remove_fast(world_elem_btree_node* root, WorldElem* elem, float order)
 {
     world_elem_btree_remove_fast_core(root, elem, order);
-    if(elem->stuff.btree_node != NULL)
+    if(elem->btree_node != NULL)
     {
         assert(0);
     }
@@ -777,9 +778,9 @@ world_elem_btree_remove_fast(world_elem_btree_node* root, WorldElem* elem, float
 void
 world_elem_btree_remove(world_elem_btree_node* root, WorldElem* elem)
 {
-    if(!elem->stuff.btree_node) return;
+    if(!elem->btree_node) return;
     
-    float order = ((world_elem_btree_node*)elem->stuff.btree_node)->order;
+    float order = ((world_elem_btree_node*)elem->btree_node)->order;
     
     //if(isnan(order)) assert(0);
     

@@ -66,6 +66,8 @@ struct WorldElem {
     model_texcoord_t *texcoords;
 	model_texcoord_t texcoords_[MAX_ELEM];
 	GLint n_texcoords;
+    
+    void* btree_node;
 	
 	struct {
 		float distance;
@@ -208,8 +210,6 @@ struct WorldElem {
         } flags;
         
         int towed_elem_id;
-        
-        void* btree_node;
         
     } stuff;
     

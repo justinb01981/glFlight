@@ -467,7 +467,7 @@ gameInput()
     // periodically do some stuff
     if(rm_count <= 0)
     {
-        rm_count = 60;
+        rm_count = 256;
         
         // renormalize body vectors every so often
         gameCamera_normalize();
@@ -481,17 +481,12 @@ gameInput()
     
     if(!game_paused)
     {
-        // output response ampilfiers
-        //float sm[] = /*{0.6, 0.8, 0.8}*/ {0.7, 0.8, 0.9};
-        float sm[] = /*{0.6, 0.8, 0.8}*/ PLATFORM_INPUT_COEFFICIENTS;
-        // TODO: scale inversely based on angle relative to gravity
-        
         // drift toward level with the horizon
         float shipy[3], shipx[3], shipz[3];
         
         if(!gameSettingsComplexControls)
         {
-            input_roll = input_yaw*sm[2]*-3.0;
+            input_roll = input_yaw * -3.0;
             
             gameShip_unfakeRoll();
         }
@@ -527,7 +522,7 @@ gameInput()
         {
             //printf("-----------ROLLING-----------\n");
             
-            double s = input_roll * fabs(input_roll*sm[0]) * GYRO_DC * tc;
+            double s = input_roll * fabs(input_roll) * GYRO_DC * tc;
 
             gameShip_roll(s);
         }
@@ -536,7 +531,7 @@ gameInput()
         {
             //printf("-----------PITCHING-----------\n");
             
-            double s = input_pitch * fabs(input_pitch*sm[1]) * GYRO_DC * tc;
+            double s = input_pitch * fabs(input_pitch) * GYRO_DC * tc;
 
             gameShip_pitch(s);
         }
@@ -545,7 +540,7 @@ gameInput()
         {
             //printf("-----------YAWING-----------\n");
             
-            double s = input_yaw * fabs(input_yaw*sm[2]) * GYRO_DC * tc;
+            double s = input_yaw * fabs(input_yaw) * GYRO_DC * tc;
 
             gameShip_yaw(s);
         }
@@ -554,6 +549,19 @@ gameInput()
         {
             gameShip_fakeRoll(input_roll);
         }
+    }
+    
+    // HACK: in extreme cases the quaternion becomes NaN and we will crash - catch that here
+    if(isnan(gameShip_getEulerAlpha()) || isnan(gameShip_getEulerBeta()) || isnan(gameShip_getEulerGamma()))
+    {
+        // copy camera values
+        extern quaternion_t my_ship_bx, my_ship_by, my_ship_bz;
+        
+        my_ship_bx = cam_pos.bx;
+        my_ship_by = cam_pos.by;
+        my_ship_bz = cam_pos.bz;
+        
+        //assert(0);
     }
     
     deviceLast[0] = deviceRoll;

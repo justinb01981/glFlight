@@ -1124,7 +1124,7 @@ gameInterfaceHandleTouchEnd(float x, float y)
 
     if (touchedControl == &gameInterfaceControls.trim)
     {
-        //needTrim = 0;
+        needTrim = 0;
     }
 
     // clear controls touched by this touchid

@@ -2518,7 +2518,7 @@ addEngineExhaust(WorldElem *elem)
     pElem->physics.ptr->friction = 1;
     world_object_set_lifetime(obj, /*pooped_cube_lifetime*/ 5);
     
-     update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);
+    update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);
     
     return obj;
 }

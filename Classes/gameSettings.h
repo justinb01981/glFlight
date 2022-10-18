@@ -102,7 +102,7 @@ gameSettingsDefaults()
     gameSettingsNetworkFrequency = 50;
     gameSettingsPortNumber = 52000;
     gameStateSinglePlayer.lifetime_credits = 0;
-    gameSettingsComplexControls = 0;
+    gameSettingsComplexControls = 1;
     strcpy(gameSettingsVersionStr, GAME_VERSION_STR);
     
     for(int i = 0; i < 3; i++) gyroLastRange[i] = PLATFORM_GYRO_RANGE_DEFAULT;

@@ -953,6 +953,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
           gameNetworkState.hostInfo.stream_socket.s != -1 &&
           gameNetworkState.hostInfo.map_socket.s != -1)
     {
+        pSock = NULL;
         FD_ZERO(&rd_set);
         
         FD_SET(gameNetworkState.hostInfo.socket.s, &rd_set);
@@ -996,6 +997,8 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
                 pInfo = pInfo->next_connected;
             }
         }
+        
+        if(!pSock) return GAME_NETWORK_ERR_FAIL;
         
         memset(msg, 0, sizeof(*msg));
         

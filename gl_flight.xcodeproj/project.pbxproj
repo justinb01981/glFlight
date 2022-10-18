@@ -1133,7 +1133,7 @@
 				TargetAttributes = {
 					1D6058900D05DD3D006BFB54 = {
 						DevelopmentTeam = ZQVH66AQJ9;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 					};
 					D0BCC8FB2052EDC100094809 = {
 						DevelopmentTeam = ZQVH66AQJ9;
@@ -1529,7 +1529,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython2.7 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\npython2.7 tools/objconvert.py building3 models/building3.obj > Classes/building3_model.h;\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython3 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython3 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\npython3 tools/objconvert.py building3 models/building3.obj > Classes/building3_model.h;\n";
 		};
 		D097E2572226150000A19853 /* Run Script (convert models) */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1547,7 +1547,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython2.7 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython2.7 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\npython2.7 tools/objconvert.py building3 models/building3.obj > Classes/building3_model.h;\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython3 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython3 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\npython3 tools/objconvert.py building3 models/building3.obj > Classes/building3_model.h;\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1639,10 +1639,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Justin Brady (FP3HEP75WZ)";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
@@ -1661,7 +1662,7 @@
 				MARKETING_VERSION = 1.7.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
-				PROVISIONING_PROFILE_SPECIFIER = "d0gfight2 Development";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1672,7 +1673,8 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
@@ -1689,7 +1691,7 @@
 				MARKETING_VERSION = 1.7.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
-				PROVISIONING_PROFILE_SPECIFIER = "d0gfight2 Distribution";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1824,7 +1826,7 @@
 				PROVISIONING_PROFILE = "e3be0a42-dc41-4851-888c-78f70981119f";
 				PROVISIONING_PROFILE_SPECIFIER = "Space Combat 1995 - 8-5-2018";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 armv7 arm7s";
+				VALID_ARCHS = "arm64 armv7 arm7s x86_64";
 			};
 			name = Debug;
 		};
