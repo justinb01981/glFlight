@@ -238,11 +238,6 @@ gameDialogWelcome()
 }
 
 static void
-gameDialogCancelTrim()
-{
-}
-
-static void
 gameDialogCalibrate()
 {
     gameDialogClose();
@@ -263,37 +258,6 @@ gameDialogCalibrate()
                              "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
      */
     gameInterfaceControls.calibrateRect.visible = 1;
-}
-
-// TODO: -- not using this for now
-static void
-gameDialogCalibrateFromSettings()
-{
-    gameDialogClose();
-    gameInterfaceModalDialogDequeue();
-    
-    gameInputInit();
-    
-    // this will cause a "short" calibrate to simply reset the reference point
-    // for the gyros, but reuse the previously captured range of motion
-    gameInputTrimAbort();
-    
-    needTrimLock = 1;
-    
-    gameInterfaceCalibrateDone();
-    
-    /*
-     gameInterfaceModalDialog(
-     "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
-     "^C                             ^C\n"
-     "^C                             ^C\n"
-     "^C   Calibrating controls..    ^C\n"
-     "^C                             ^C\n"
-     "^C                             ^C\n"
-     "^C                             ^C\n"
-     "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
-     "", "cancel", gameDialogCancelTrim, gameDialogCancelTrim);
-     */
 }
 
 static void
@@ -346,23 +310,10 @@ gameDialogInitialCountdown()
 }
 
 static void
-gameDialogResumePaused()
-{
-    needTrimLock = 1;
-}
-
-static void
-gameDialogResumePausedNo()
-{
-    gameInterfaceControls.mainMenu.visible = 1;
-    controlsCalibrated = 0;
-}
-
-static void
 gameDialogResume()
 {
     gameInterfaceControls.textMenuControl.visible = 1;
-    needTrimLock = 1;
+    gameInput_trimLock();
     
 //    gameInterfaceModalDialog("Resume paused game?", "Yes", "No",
 //                             gameDialogResumePaused, gameDialogResumePausedNo);

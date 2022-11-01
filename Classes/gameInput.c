@@ -73,7 +73,6 @@ double speedBoost = 0;
 double bulletVel;
 int needTrimLast;
 int needTrim = 1;
-int needTrimLock = 0;
 int isLandscape;
 int controlsCalibrated = 0;
 float rspin = 1;
@@ -163,7 +162,6 @@ gameInputTrimBegin(void (*callback)(void))
 {
     needTrim = 1;
     needTrimLast = 0;
-    controlsCalibrated = 0;
     trimStartTime = 0;
     gyroStableCount = 0;
     trimDoneCallback = callback;
@@ -172,7 +170,7 @@ gameInputTrimBegin(void (*callback)(void))
 }
 
 void
-gameInputTrimAbort()
+gameInputInitialTrimAbort()
 {
     needTrim = 0;
     needTrimLast = 0;
@@ -182,6 +180,21 @@ gameInputTrimAbort()
     trim_dz[0] = trim_dz[1] = trim_dz[2] = 0;
     
     gameDialogWelcome();
+}
+
+void
+gameInputTrimCancel()
+{
+    needTrim = 0;
+}
+
+void
+gameInput_trimLock()
+{
+    needTrim = 0;
+    needTrimLast = 1;
+
+    trimStartTime = tex_pass - 1;
 }
 
 int
@@ -303,17 +316,6 @@ gameInput()
     
     if(gyroInputCount == gyroInputCountLast) return;
     gyroInputCountLast = gyroInputCount;
-
-    // don't collect trim inputs but realign to current position
-    if(needTrimLock)
-    {
-        needTrimLock = 0;
-        
-        needTrim = 0;
-        needTrimLast = 1;
-        
-        trimStartTime = tex_pass - 1;
-    }
     
     // indicate to user when sampling
     if(needTrimLast && controlsCalibrated)
@@ -339,7 +341,19 @@ gameInput()
     // MARK: -- trim collecting done
     if(!needTrim && needTrimLast)
     {
-        DBPRINTF(("%s:%d", __FILE__, __LINE__));
+        DBPRINTF(("%s:%d - trim collecting done", __FILE__, __LINE__));
+        
+        // if held long enough we will reset and re-sample the range of gyro movement
+        if(controlsCalibrated && tex_pass - trimStartTime >= 60)
+        {
+            controlsCalibrated = 0;
+            firstCalibrate = 1;
+            needTrim = 1;
+            needTrimLast = 0;
+            
+            gameInputStatsCollectStart();
+            return;
+        }
 
         gameInterfaceControls.calibrateRect.visible = 0;
         // short trim-length means few input values to calculate range, ignore
@@ -368,6 +382,7 @@ gameInput()
                 {
                     DBPRINTF(("%s:%d", __FILE__, __LINE__));
                     trimDoneCallback();
+                    trimDoneCallback = NULL;
                     //gameDialogWelcome();
                 }
             }
@@ -378,7 +393,7 @@ gameInput()
             
             gameInterfaceCalibrateDone();
         }
-        // short trim-length, adjust range to current orientation
+        // short trim-length, don't collect trim inputs but realign to current position
         else
         {
             for(int i = 0; i < 3; i++)
@@ -388,6 +403,8 @@ gameInput()
                 gyroInputRange[i][0] = deviceO[i] - R;
                 gyroInputRange[i][1] = deviceO[i] + R;
             }
+            
+            gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);
         }
     }
     // MARK: -- trim collecting begin
@@ -432,7 +449,6 @@ gameInput()
     // commented to out to allow game-input to continue while trimming
     //if(needTrim) return;
     
-    double C = gyroSenseScale;
     double R[] = {
         gyroInputRange[0][1] - gyroInputRange[0][0],
         gyroInputRange[1][1] - gyroInputRange[1][0],
@@ -448,9 +464,9 @@ gameInput()
           gyroSenseScale * (Rmax-Rmin)
      
      */
-    deviceRollFrac = (deviceRoll - (gyroInputRange[0][0] + R[0] / 2)) / (R[0] * C);
-    devicePitchFrac = (devicePitch - (gyroInputRange[1][0] + R[1] / 2)) / (R[1] * C);
-    deviceYawFrac = (deviceYaw - (gyroInputRange[2][0] + R[2] / 2)) / (R[2] * C);
+    deviceRollFrac = (deviceRoll - (gyroInputRange[0][0] + R[0] / 2)) / (R[0] * gyroSenseScale);
+    devicePitchFrac = (devicePitch - (gyroInputRange[1][0] + R[1] / 2)) / (R[1] * gyroSenseScale);
+    deviceYawFrac = (deviceYaw - (gyroInputRange[2][0] + R[2] / 2)) / (R[2] * gyroSenseScale);
     
     double input_roll = deviceRollFrac * (M_PI/GYRO_SAMPLE_RATE);
     double input_pitch = devicePitchFrac * (M_PI/GYRO_SAMPLE_RATE);

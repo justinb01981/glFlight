@@ -343,6 +343,12 @@ gameInterfaceHandleTouchMove(float x, float y)
         touchedControl->touch_ry = (y - touchedControl->y) / touchedControl->yw;
         //DBPRINTF(("touch_rx: %f touch_ry: %f", touchedControl->touch_rx, touchedControl->touch_ry));
     }
+    else
+    {
+        // HACK: cancel all touches
+        gameInterfaceHandleAllTouchEnd();
+        return;
+    }
     
     if(touchedControl == &gameInterfaceControls.accelerator)
     {
@@ -382,7 +388,6 @@ gameInterfaceHandleTouchMove(float x, float y)
         gyro_calibrate_log(100);
         gameInterfaceControls.trim.blinking = 0;
         gameInterfaceControls.calibrateRect.visible = 1;
-        //controlsCalibrated = 1;
     }
     else if(touchedControl == &gameInterfaceControls.look)
     {
@@ -1116,15 +1121,16 @@ gameInterfaceHandleTouchEnd(float x, float y)
 {
     controlRect *touchedControl = gameInterfaceFindControl(x, y);
 
-    if (touchedControl) {
+    if (touchedControl)
+    {
+        if (touchedControl == &gameInterfaceControls.trim)
+        {
+            gameInputTrimCancel();
+        }
+        
         touchedControl->touch_began = 0;
         //gameInterfaceHandleTouchMove(x, y);
         touchedControl->touch_end_last = time_ms;
-    }
-
-    if (touchedControl == &gameInterfaceControls.trim)
-    {
-        needTrim = 0;
     }
 
     // clear controls touched by this touchid
@@ -1152,7 +1158,10 @@ gameInterfaceHandleAllTouchEnd()
     
     for(int i = 0; controlSet[i] != NULL; i++)
     {
-        controlSet[i]->touch_began = 0;
+        if(controlSet[i]->touch_began)
+        {
+            gameInterfaceHandleTouchEnd(controlSet[i]->x, controlSet[i]->y);
+        }
     }
     
     gameInterfaceControls.touchUnmapped = 0;
@@ -1261,6 +1270,9 @@ gameInterfaceSetInterfaceState(InterfaceMiscState state)
         case INTERFACE_STATE_CLOSE_MENU:
             gameInterfaceControls.textMenuControl.visible = 0;
             gameInterfaceControls.menuControl.visible = 0;
+            gameInterfaceControls.calibrateRect.visible = 0;
+            gameInterfaceControls.textMenuButton.visible = 1;
+            gameInterfaceControls.trim.visible = 1;
             break;
             
         default:
@@ -1271,6 +1283,6 @@ gameInterfaceSetInterfaceState(InterfaceMiscState state)
 void
 gameInterfaceCalibrateDone()
 {
-    gameInterfaceControls.textMenuButton.visible = 1;
-    gameInterfaceControls.trim.visible = 1;
+//    gameInterfaceControls.textMenuButton.visible = 1;
+//    gameInterfaceControls.trim.visible = 1;
 }

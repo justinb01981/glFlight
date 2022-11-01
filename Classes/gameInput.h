@@ -17,7 +17,6 @@ extern double roll;
 extern float qw, qx, qy, qz;
 extern double speed, maxSpeed, targetSpeed;
 extern int needTrim;
-extern int needTrimLock;
 extern int isLandscape;
 extern double bulletVel;
 extern quaternion_t bx, by, bz, b;
@@ -42,7 +41,10 @@ void
 gameInputTrimBegin(void (*callback)(void));
 
 void
-gameInputTrimAbort();
+gameInput_trimLock();
+
+void
+gameInputTrimCancel();
 
 void
 gameInputGyro(float roll, float pitch, float yaw);

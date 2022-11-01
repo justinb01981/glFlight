@@ -149,7 +149,7 @@ glFlightFrameStage1()
     {
         bindTexture(TEXTURE_ID_FONTMAP2);
         bindTexture(TEXTURE_ID_FONTMAP);
-        if(controlsCalibrated) needTrimLock = 1;
+        if(controlsCalibrated) gameInput_trimLock();
         
         world_elem_btree_restart();
         
@@ -725,14 +725,7 @@ calibrate_bail:
     drawControls();
     
     if(!gameInterfaceControls.consoleHidden)
-    {
-        /*
-        if(time_ms - console_write_time > 5000 && !game_paused)
-        {
-            consoleMessage[0] = '\0';
-        }
-        */
-        
+    {        
         unsigned l = console_typewriter_lag+1;
         char* p = consoleMessage, *pdest = gameInterfaceControls.consoleTextRect.text;
         while(*p && l > 0)
