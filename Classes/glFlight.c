@@ -570,7 +570,7 @@ calibrate_bail:
         yfrust = 1;
         xfrust = yfrust * (viewWidth/viewHeight);
     }
-	glFrustumf(-xfrust, xfrust, -yfrust, yfrust, 2, drawDistanceFar);
+	glFrustumf(-xfrust, xfrust, -yfrust, yfrust, 2.0, drawDistanceFar);
     
     /*
     glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
@@ -837,7 +837,7 @@ clear_world_pending_removals()
 static void
 draw_btree_elements(WorldElem* pElem, float priority)
 {
-    if(priority < /*drawDistanceFar*/ 100 || pElem->renderInfo.priority)
+    if(priority < drawDistanceFar || pElem->renderInfo.priority)
     {
         if(pElem->renderInfo.wireframe || (pElem->head_elem && pElem->head_elem->renderInfo.wireframe))
         {

@@ -1336,12 +1336,12 @@ visible_list_remove(WorldElem* elem, unsigned int* n_visible, WorldElemListNode*
 }
 
 static void
-drawBackgroundBuildTerrain(DrawBackgroundData* bgData)
+drawBackgroundBuildTerrain(DrawBackgroundData* bgData, float Tk_)
 {
     float I_Mk = 25.0; // model - step size
     float Mk = I_Mk;
     float Cr = /*1.5*/ 2.2;
-    float Tk = 1; // texture - step-size multiplier
+    float Tk = Tk_; // texture - step-size multiplier
     float terrain_height_y = 0;
     
     float Ub = -gWorld->bound_radius*Cr;
@@ -1446,6 +1446,7 @@ static void
 drawBackgroundInit(int tex_id,
                    float alpha, float beta, float gamma,
                    float scale,
+                   float bgRepeatScale,
                    model_index_t* indices,
                    size_t indices_n)
 {
@@ -1516,7 +1517,7 @@ drawBackgroundInit(int tex_id,
                 bgData->coords[i+2] =  pt.z;
             }
             
-            drawBackgroundBuildTerrain(bgData);
+            drawBackgroundBuildTerrain(bgData, bgRepeatScale);
         }
     }
 }
@@ -1887,7 +1888,10 @@ drawTriangleMesh(struct mesh_opengl_t* glmesh, int tex_id)
 void
 gameGraphicsInit()
 {
-    drawBackgroundInit(texture_id_background, 0, 0, 0, gWorld->bound_radius, BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
+    drawBackgroundInit(texture_id_background, 0, 0, 0,
+                       gWorld->bound_radius,
+                       16.0,
+                       BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
 }
 
 void
