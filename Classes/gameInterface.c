@@ -73,7 +73,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.accelerator.visible = 1;
     
     gameInterfaceControls.trim.tex_id = 7;
-    gameInterfaceControls.trim.visible = 0;
+    gameInterfaceControls.trim.visible = 1;
     gameInterfaceControls.trim.x = screenWidth - (screenWidth*0.15);
     gameInterfaceControls.trim.y = screenHeight * 0.0;
     gameInterfaceControls.trim.xw = 0.15*screenWidth;
@@ -693,9 +693,7 @@ gameInterfaceBrowseFoundGame(char* name)
     {
         if(glFlightDrawframeHook)
         {
-            // add a portal which hosts a new game anyway
-            console_write("To host new game enter *HOST* portal\n");
-            game_add_network_portal(GAME_NETWORK_HOST_PORTAL_NAME);
+            // TODO: add a portal which hosts a new game anyway (now this is handled in gameNetwork.c)
             // cancel countdown
             glFlightDrawframeHook = NULL;
         }

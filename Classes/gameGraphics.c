@@ -829,7 +829,6 @@ void drawControls()
                 {
                     //extern double motionRollMotion, motionPitchMotion, motionYawMotion, roll_m, pitch_m, yaw_m;
                     float S = 0.2;
-                    float g1 = gyroStableCount, g2 = gyroStableCountThresh;
                     float O[] = {0.5, 0.5};
                     float gyroCoefForCalibrate = PLATFORM_CALIBRATE_COEFF;
                     subElements[0].tex_id = TEXTURE_ID_CALIBRATE_CURSOR;

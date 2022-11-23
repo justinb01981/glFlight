@@ -24,7 +24,6 @@ extern double dc;
 extern float gyroSenseScale;
 extern double deviceRoll, devicePitch, deviceYaw;
 extern double deviceRollFrac, devicePitchFrac, deviceYawFrac;
-extern int gyroStableCount, gyroStableCountThresh;
 extern double gyroLastRange[3];
 const static float GYRO_GRAPHIC_S = 3.3;
 

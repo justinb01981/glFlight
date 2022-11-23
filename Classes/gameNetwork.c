@@ -1891,6 +1891,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
     game_timeval_t t;
     int net_obj_id;
     int interp_velo = 1;
+    int object_type = OBJ_BLOCK;
     char* ptrStr;
     
     //DBPRINTF(("msg.cmd:%d (ntohl:%d", msg->cmd, ntohl(msg->cmd)));
@@ -2152,6 +2153,10 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                 playerInfo->shot_fired = 1;
             case GAME_NETWORK_MSG_ADD_OBJECT:
             case GAME_NETWORK_MSG_KILLED:
+                object_type = msg->params.f[15];
+                
+                if (object_type == OBJ_POOPEDCUBE) break;
+                
                 world_add_object(msg->params.f[0],
                                  msg->params.f[1], msg->params.f[2], msg->params.f[3],
                                  msg->params.f[4], msg->params.f[5], msg->params.f[6],
@@ -2159,7 +2164,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                 
                 //world_get_last_object()->stuff.player.player_id = playerInfo->player_id;
                 world_get_last_object()->stuff.affiliation = playerInfo->player_id;
-                world_get_last_object()->object_type = msg->params.f[15];
+                world_get_last_object()->object_type = object_type;
                 
                 if(msg->params.f[7] != 0 || msg->params.f[8] != 0 || msg->params.f[9] != 0)
                 {
@@ -2366,9 +2371,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                     {
                         if(msg->params.i[0] == gameNetworkState.my_player_id)
                         {
-                            strncat(gameSettingsKillHistory, playerInfo->name, sizeof(gameSettingsKillHistory)-1);
-                            strncat(gameSettingsKillHistory, ",", sizeof(gameSettingsKillHistory)-1);
-                            break;
+                            // no special handling needed here?
                         }
                         
                         playerInfo->stats.killed++;
@@ -2716,7 +2719,7 @@ gameNetwork_sendStatsAlert()
     char *pRowTop = NULL;
     static unsigned NAME_BREAK = 6;
     
-    str[0] = '\0';
+    memset(str, 0, sizeof(str));
     
     if(gameStateSinglePlayer.started)
     {
@@ -2749,9 +2752,9 @@ gameNetwork_sendStatsAlert()
         
         strncat(str, rows[row], sizeof(str)-1);
         
-        while(pInfo && strlen(str) < sizeof(str)-64)
+        while(pInfo && strlen(str) < sizeof(str)-256)
         {
-            while(row > 0 && *(pLastSep) && *(pLastSep) && *(pLastSep) != cSep[0])
+            while(row > 0 && pLastSep && *(pLastSep) && *pLastSep != cSep[0] && strlen(str) < sizeof(str)-256)
             {
                 strncat(str, " ", sizeof(str)-1);
                 pLastSep++;

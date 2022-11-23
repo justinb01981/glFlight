@@ -2503,7 +2503,7 @@ addEngineExhaust(WorldElem *elem)
                          elem->physics.ptr->y + qz.y*2,
                          elem->physics.ptr->z + qz.z*2,
                          elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
-                         elem->physics.ptr->velocity / MAX_SPEED,
+                         1.0,
                          texture_id);
     WorldElem* pElem = world_get_last_object();
     

@@ -37,7 +37,7 @@
 static void clear_world_pending_removals(void);
 static void draw_btree_elements(WorldElem* pElem, float priority);
 
-extern int isLandscape;
+int isLandscape;
 
 int world_inited = 0;
 int game_terminated_gracefully = 0;
@@ -173,12 +173,7 @@ glFlightFrameStage1()
         
         goto draw_bail;
     }
-    
-//    if(!gameDialogCalibrateDone && n_textures < TEXTURE_ID_PRELOAD+1)
-//    {
-//        gameDialogCalibrateDone = 1;
-//        gameDialogInitialCountdown();
-//    }
+
 
     extern void update_time_ms_frame_tick(void);
     update_time_ms_frame_tick();

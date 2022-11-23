@@ -376,7 +376,7 @@ gameDialogNetworkHostRegister()
 static void
 gameDialogNetworkCountdownEnded()
 {
-    static int passes = GAME_FRAME_RATE * 4;
+    static int passes = GAME_FRAME_RATE * 8;
     
     passes--;
     if(passes <= 0)
@@ -387,7 +387,7 @@ gameDialogNetworkCountdownEnded()
         
         fireAction = ACTION_HOST_GAME_OR_COMMIT;
         gameInterfaceProcessAction();
-        passes = GAME_FRAME_RATE * 4;
+        passes = GAME_FRAME_RATE * 8;
     }
 }
 
