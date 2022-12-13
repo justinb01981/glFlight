@@ -265,6 +265,7 @@ gameDialogInitial()
 {
     console_clear();
 
+    /*
     gameInterfaceModalDialog(
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
                              "^C                             ^C\n"
@@ -275,6 +276,8 @@ gameDialogInitial()
                              "^C                             ^C\n"
                              "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
                              "", "cancel", gameDialogCalibrate, gameDialogCalibrate);
+     */
+    gameDialogCalibrate();
 }
 
 static void
@@ -546,7 +549,7 @@ gameDialogNetworkGameStatus()
     // modal dialog if ALERT
     if(strstr(gameNetworkState.gameStatsMessage, "ALERT:"))
     {
-        if(gameDialogState.hideNetworkStatus || (pNextDialog && strstr(pNextDialog->text, "ALERT:"))) return;
+        if(gameDialogState.hideNetworkStatus /* || (pNextDialog && strstr(pNextDialog->text, "ALERT:")) */) return;
         
         gameInterfaceModalDialog(gameNetworkState.gameStatsMessage, "OK", "OK", gameDialogStopGameStatusMessages, gameDialogStopGameStatusMessages);
     }

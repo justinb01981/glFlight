@@ -704,7 +704,7 @@ calibrate_bail:
         drawTriangleMesh(mesh, cur->elem->texture_id);
         cur = cur->next;
     }
-    
+
     // actual drawing (happens asynchronouly)
     drawElemStart(pDrawCur);
     visibleBtreeDrawn = 0;

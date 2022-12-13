@@ -66,8 +66,8 @@
             timestampString = "590711079.572192"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2927"
-            endingLineNumber = "2927"
+            startingLineNumber = "2933"
+            endingLineNumber = "2933"
             landmarkName = "gameNetwork_handle_destruction(elem)"
             landmarkType = "9">
          </BreakpointContent>
@@ -100,8 +100,8 @@
             timestampString = "590711079.572278"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2306"
-            endingLineNumber = "2306"
+            startingLineNumber = "2304"
+            endingLineNumber = "2304"
             landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
             landmarkType = "9">
          </BreakpointContent>
@@ -117,8 +117,8 @@
             timestampString = "590103628.620787"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1320"
-            endingLineNumber = "1320"
+            startingLineNumber = "1325"
+            endingLineNumber = "1325"
             landmarkName = "world_init(radius)"
             landmarkType = "9">
          </BreakpointContent>
@@ -134,8 +134,8 @@
             timestampString = "590103628.621181"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1360"
-            endingLineNumber = "1360"
+            startingLineNumber = "1365"
+            endingLineNumber = "1365"
             landmarkName = "world_init(radius)"
             landmarkType = "9">
          </BreakpointContent>
@@ -219,8 +219,8 @@
             timestampString = "590711079.572503"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3071"
-            endingLineNumber = "3071"
+            startingLineNumber = "3077"
+            endingLineNumber = "3077"
             landmarkName = "gameNetwork_onBonjourConnecting2(msg, srcAddr)"
             landmarkType = "9">
          </BreakpointContent>
@@ -236,60 +236,9 @@
             timestampString = "590711079.572547"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3082"
-            endingLineNumber = "3082"
+            startingLineNumber = "3088"
+            endingLineNumber = "3088"
             landmarkName = "gameNetwork_onBonjourConnecting2(msg, srcAddr)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "F8EA1BE3-15E2-4F0C-9F59-8699197595DD"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/gameNetwork.c"
-            timestampString = "590711079.572588"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1933"
-            endingLineNumber = "1933"
-            landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "83DF64A2-DEEE-42EE-B2A1-97CB41150454"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/glFlight.c"
-            timestampString = "590103628.6219831"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "306"
-            endingLineNumber = "306"
-            landmarkName = "glFlightFrameStage1()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "795B2B87-65B8-48DE-A912-EBF2BF33FE64"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/glFlight.c"
-            timestampString = "590103628.6220419"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "309"
-            endingLineNumber = "309"
-            landmarkName = "glFlightFrameStage1()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -329,22 +278,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "0D76D6B4-94EF-45B5-B6C3-E37DD4C0F262"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/gameNetwork.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2765"
-            endingLineNumber = "2765"
-            landmarkName = "gameNetwork_sendStatsAlert()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "5DAA57DD-9DF4-415C-8F2B-5DED73D6D672"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -352,8 +285,8 @@
             filePath = "Classes/gameNetwork.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2828"
-            endingLineNumber = "2828"
+            startingLineNumber = "2834"
+            endingLineNumber = "2834"
             landmarkName = "gameNetwork_sendStatsAlert()"
             landmarkType = "9">
          </BreakpointContent>
@@ -361,31 +294,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5DBC3C59-A1A8-49D0-8195-2953AD7A693C"
-            shouldBeEnabled = "Yes"
+            uuid = "941AA372-797A-404F-85AA-D041DDD94051"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/gameNetwork.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2833"
-            endingLineNumber = "2833"
-            landmarkName = "gameNetwork_sendStatsAlert()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "96D73EF3-1355-4048-8B76-B55A4871CA0A"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/gameNetwork.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1966"
-            endingLineNumber = "1966"
+            startingLineNumber = "2344"
+            endingLineNumber = "2344"
             landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
             landmarkType = "9">
          </BreakpointContent>
@@ -393,16 +310,80 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "BBC97F99-827D-4A37-B0D6-14415483878D"
-            shouldBeEnabled = "Yes"
+            uuid = "01FE4BC1-3F9F-48E8-ADF2-DA9DC71ADDAC"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/gameNetwork.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1838"
-            endingLineNumber = "1838"
-            landmarkName = "do_game_network_world_update()"
+            startingLineNumber = "2339"
+            endingLineNumber = "2339"
+            landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D66624C0-3778-466D-81CD-4A746151770E"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/gameNetwork.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2358"
+            endingLineNumber = "2358"
+            landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D86BC2C9-8C83-4DF2-883D-8EC54783DDBF"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/gameGraphics.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "336"
+            endingLineNumber = "336"
+            landmarkName = "drawText(str, x, y, scale)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7EDB09C8-1C20-41C1-A991-CBADFBF6E4E4"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/gameNetwork.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2837"
+            endingLineNumber = "2837"
+            landmarkName = "gameNetwork_sendStatsAlert()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2021CB13-F099-453F-A18C-DC2927365D2F"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/gameDialogs.h"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "578"
+            endingLineNumber = "578"
+            landmarkName = "gameDialogNetworkGameEnded()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

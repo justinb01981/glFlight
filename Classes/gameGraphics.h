@@ -40,6 +40,14 @@ typedef struct
 
 typedef struct
 {
+    model_coord_t coords256[6194];
+    model_texcoord_t txcoords256[2048];
+    model_index_t indices256[2048];
+    int count;
+} DrawBoundingData;
+
+typedef struct
+{
     model_coord_t coords[12];
     model_texcoord_t texcoords[8];
     model_index_t indices[6];
@@ -66,6 +74,9 @@ drawRadar();
 
 void
 drawBackground();
+
+void
+drawBounding();
 
 void
 drawBillboardInit(float xVec[3], float yVec[3]);

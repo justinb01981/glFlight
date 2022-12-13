@@ -29,7 +29,7 @@ boundingRegionUninit(boundingRegion* rgn)
 }
 
 // takes point, and unit-vector
-void boundingRegionAddVec(boundingRegion* rgn, float x, float y, float z, float ux, float uy, float uz)
+void boundingRegionAddVec(boundingRegion* rgn, float x, float y, float z, float ux, float uy, float uz, float pvec[3])
 {
     int i = 0;
     rgn->v[rgn->nVectorsInited].f[i++] = x;
@@ -38,6 +38,7 @@ void boundingRegionAddVec(boundingRegion* rgn, float x, float y, float z, float 
     rgn->v[rgn->nVectorsInited].f[i++] = ux;
     rgn->v[rgn->nVectorsInited].f[i++] = uy;
     rgn->v[rgn->nVectorsInited].f[i++] = uz;
+    for(int i = 0; i < 3; i++) rgn->v[rgn->nVectorsInited].perpVec[i] = pvec[i];
     rgn->nVectorsInited++;
 }
 

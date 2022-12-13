@@ -1312,7 +1312,12 @@ void world_init(float radius)
                 U.z * Rad
             };
             
-            boundingRegionAddVec(br, P[0], P[1], P[2], -U.x, -U.y, -U.z);
+            float pvec[] = {
+                V.x,
+                V.y,
+                V.z
+            };
+            boundingRegionAddVec(br, P[0], P[1], P[2], -U.x, -U.y, -U.z, pvec);
             
             float s;
             
@@ -1362,7 +1367,8 @@ void world_init(float radius)
     }
     
     // boundary on the floor
-    boundingRegionAddVec(br, 0, 0.7, 0, 0, 1, 0);
+    float pvec[] = {1, 0, 0};
+    boundingRegionAddVec(br, 0, 0.7, 0, 0, 1, 0, pvec);
     
     gWorld->boundingRegion = br;
     

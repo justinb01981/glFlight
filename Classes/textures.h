@@ -109,7 +109,9 @@ enum
     TEXTURE_ID_BACKGROUND_SCENERY = 114,
     TEXTURE_ID_COLORMAP = 11,
     TEXTURE_ID_CALIBRATE_CURSOR = 6,
-    TEXTURE_ID_BUILDING3 = 116
+    TEXTURE_ID_BUILDING3 = 116,
+    TEXTURE_ID_BOUNDING_INTERNAL = 104,
+    TEXTURE_ID_LAST
 };
 
 const static int texture_id_table[] =
@@ -119,6 +121,8 @@ const static int texture_id_table[] =
     TEXTURE_ID_SPAWNPOINT,
     TEXTURE_ID_SHIP1
 };
+
+extern GLubyte* texture_data_table[MAX_TEXTURES];
 
 enum {
     TEXTURE_ID_TABLE_IDX_POOPEDCUBE = 0,
@@ -169,6 +173,9 @@ typedef unsigned char pixelRGBA[4];
 extern unsigned int texture_list[];
 extern int n_textures;
 extern int texture_preload_count;
+
+extern struct FrameBufInst gFrameBufSt;
+extern int gFrameBufId;
 
 extern int texture_id_playership;
 

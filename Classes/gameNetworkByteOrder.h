@@ -16,6 +16,8 @@
 #define ntohll(x) (x)
 #define htonll(x) (x)
 
+#define GAME_NETWORK_USE_NBO 0
+
 #endif
 
 static gameNetworkArgsType
@@ -63,6 +65,7 @@ gameMessage_args_for_type(int type)
 static void
 gameMessage_to_nbo(gameNetworkMessage* msg)
 {
+#if GAME_NETWORK_USE_NBO
     int i;
     
     gameNetworkArgsType t = gameMessage_args_for_type(msg->cmd);
@@ -106,11 +109,15 @@ gameMessage_to_nbo(gameNetworkMessage* msg)
             for(i = 0; i < sizeof(msg->params.i)/sizeof(int); i++) msg->params.i[i] = htonl(msg->params.i[i]);
             break;
     }
+#else
+    msg->is_nbo = 1;
+#endif
 }
 
 static void
 gameMessage_from_nbo(gameNetworkMessage* msg)
 {
+#if GAME_NETWORK_USE_NBO
     int i;
     
     unsigned int* nbo_long[] = {
@@ -154,6 +161,9 @@ gameMessage_from_nbo(gameNetworkMessage* msg)
             for(i = 0; i < sizeof(msg->params.i)/sizeof(int); i++) msg->params.i[i] = ntohl(msg->params.i[i]);
             break;
     }
+#else
+    msg->is_nbo = 0;
+#endif
 }
 
 #endif /* gameNetworkByteOrder_h */

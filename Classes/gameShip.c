@@ -242,24 +242,14 @@ float gameShip_calcRoll()
     gameShip_getXVector(shipx);
     gameShip_getZVector(shipz);
     
-    float T = atan2(shipx[2], fabs(shipx[0]));
     
-    float Hor[] = {cos(T), 0, sin(T)};
-    float U;
-    float V;
-    if(shipx[0] > 0) {
-        U = dot(shipx[0], shipx[1], shipx[2], Hor[0], Hor[1], Hor[2]);
-        V = dot(shipx[0], shipx[1], shipx[2], 0, 1, 0);
-    }
-    else {
-        U = dot(shipx[0], shipx[1], shipx[2], Hor[0], Hor[1], -Hor[2]);
-        V = dot(shipx[0], shipx[1], shipx[2], 0, 1, 0);
-    }
+    float T_ = (sqrt(my_ship_bx.z*my_ship_bx.z + my_ship_bx.x*my_ship_bx.x));
+    if(my_ship_by.y > 0) T_ = -T_;
+    float T = atan2(my_ship_bx.y, T_);
     
-    if(shipz[2] < 0) U = -U;
+    //printf("roll: T=%f, f(x)=%f\n", T, atan2(my_ship_bx.y, (sqrt(my_ship_bx.z*my_ship_bx.z + my_ship_bx.x*my_ship_bx.x)))  );
     
-    float L = atan2(U,V) + (M_PI/2);
-    return L;
+    return T;
 }
 
 void gameShip_fakeRoll(float r)

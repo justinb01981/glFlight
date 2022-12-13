@@ -76,11 +76,15 @@
         [EAGLContext setCurrentContext:context];
         
         // Create default framebuffer object.
-        glGenFramebuffers(1, &defaultFramebuffer);
+        glGenFramebuffers(1, &self.defaultFramebuffer);
+        gFramebufferId = self.defaultFramebuffer;
+        
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);
         
         // Create color render buffer and allocate backing store.
         glGenRenderbuffers(1, &colorRenderbuffer);
+        gColorRenderbufferId = colorRenderBuffer;
+        
         glBindRenderbuffer(GL_RENDERBUFFER, colorRenderbuffer);
         [context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
         glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &framebufferWidth);

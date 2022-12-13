@@ -541,6 +541,7 @@
 		D02D2CC317D5C5FF00C03EB5 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		D02D2CC717D67C9A00C03EB5 /* screenshot1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = screenshot1.jpg; sourceTree = "<group>"; };
 		D02D2CC817D67C9B00C03EB5 /* screenshot2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = screenshot2.jpg; sourceTree = "<group>"; };
+		D02D5BC1293EB15C00F62480 /* framebuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = framebuffer.h; sourceTree = "<group>"; };
 		D02DAC0D17C72E9700035601 /* engine2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engine2.wav; sourceTree = "<group>"; };
 		D02DAC0F17D145A000035601 /* bump.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = bump.wav; sourceTree = "<group>"; };
 		D02DAC1117D1478400035601 /* collect.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = collect.wav; sourceTree = "<group>"; };
@@ -732,6 +733,7 @@
 			children = (
 				D05AEDAB2201230300692833 /* DEAD */,
 				1D3623240D0F684500981E51 /* gl_flightAppDelegate.h */,
+				D02D5BC1293EB15C00F62480 /* framebuffer.h */,
 				1D3623250D0F684500981E51 /* gl_flightAppDelegate.m */,
 				D05AEDA321FD5F4800692833 /* glFlightGLKViewController.h */,
 				D05AEDA421FD5F4800692833 /* glFlightGLKViewController.m */,
@@ -1818,6 +1820,7 @@
 					GAME_PLATFORM_IOS,
 					DEVICEMOTION_USE_GYRO_DATA,
 					GAME_NAME_SC95,
+					GLES_SILENCE_DEPRECATION,
 				);
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "gl_flight copy-Info.plist";
@@ -1857,6 +1860,7 @@
 					GAME_PLATFORM_IOS,
 					DEVICEMOTION_USE_GYRO_DATA,
 					GAME_NAME_SC95,
+					GLES_SILENCE_DEPRECATION,
 				);
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "gl_flight copy-Info.plist";

@@ -2155,8 +2155,6 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
             case GAME_NETWORK_MSG_KILLED:
                 object_type = msg->params.f[15];
                 
-                if (object_type == OBJ_POOPEDCUBE) break;
-                
                 world_add_object(msg->params.f[0],
                                  msg->params.f[1], msg->params.f[2], msg->params.f[3],
                                  msg->params.f[4], msg->params.f[5], msg->params.f[6],
@@ -2346,12 +2344,17 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                     p[sizeof(msg->params.c)-1] = '\0';
                     if(strlen(gameNetworkState.gameStatsMessage) + strlen(p) < sizeof(gameNetworkState.gameStatsMessage))
                     {
+                        DBPRINTF(("ALERT_CONTINUE: appending\n%s", p));
                         strcat(gameNetworkState.gameStatsMessage, p);
                     }
+                    
+                    DBPRINTF(("recv alert continue:\n%s", msg->params.c));
+                    
                 }
                 break;
                 
             case GAME_NETWORK_MSG_ALERT_END:
+                DBPRINTF(("GAME_NETWORK_MSG_ALERT_END: completed\n%s", gameNetworkState.gameStatsMessage));
                 if((ptrStr = strstr(gameNetworkState.gameStatsMessage, REMAINING_TIME_STR)))
                 {
                     sscanf(ptrStr + strlen(REMAINING_TIME_STR), "%f", &gameNetworkState.time_game_remaining);
@@ -2713,7 +2716,7 @@ gameNetwork_sendStatsAlert()
     char str[4096];
     char tmp[128];
     int clear_stats = 0;
-    const char* decor = "^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L\n";
+    const char* decor = "^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L^L\n";
     char *rows[] = {"NAME   ","", "K^N   ", "D^M   ", "SHOTS", "PTS  ", "PING "};
     char *cSep = "|";
     char *pRowTop = NULL;
@@ -2752,12 +2755,15 @@ gameNetwork_sendStatsAlert()
         
         strncat(str, rows[row], sizeof(str)-1);
         
-        while(pInfo && strlen(str) < sizeof(str)-256)
+        while(pInfo)
         {
-            while(row > 0 && pLastSep && *(pLastSep) && *pLastSep != cSep[0] && strlen(str) < sizeof(str)-256)
+            int maxPad = 8;
+            while(row > 0 && maxPad > 0 && pLastSep && *(pLastSep) && *pLastSep != cSep[0])
             {
+                // TODO: bug here where this loop never exits - hack is to cap with maxPad
                 strncat(str, " ", sizeof(str)-1);
                 pLastSep++;
+                maxPad--;
             }
             
             if(row == 1) pLastSep++;

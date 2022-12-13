@@ -16,14 +16,18 @@
 #include "assert.h"
 
 #include "textures.h"
+#include "framebuffer.h"
 
 unsigned int texture_list[MAX_TEXTURES];
 unsigned int texture_list_loaded[MAX_TEXTURES];
+GLubyte* texture_data_table[MAX_TEXTURES];
 int n_textures = 0;
 int texture_preload_count = 12;
 const static unsigned char alpha_black = 0x00;
 const static unsigned char alpha_semitrans = 0xD0;
 char initTexturesPrefix[255];
+struct FrameBufInst gFrameBufSt;
+int gFrameBufId = -1;
 
 static u_int32_t
 convert_to_le_u32(u_int32_t v)
@@ -156,6 +160,8 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
                     offset += sizeof(pixel);
                 }
                 
+                texture_data_table[tex_id] = data;
+                
                 if(offset >= (pixel_size * width * height))
                 {
                     glGenTextures(1, &texture_list[tex_id]);
@@ -219,10 +225,6 @@ int bindTextureRequest(int tex_id)
 {
     int load_count = 2;
     
-    if(tex_id == 114)
-    {
-    }
-    
     if(!texture_list_loaded[tex_id])
     {
         extern void console_clear(void);
@@ -233,12 +235,16 @@ int bindTextureRequest(int tex_id)
         
         while(n_textures <= tex_id && load_count > 0)
         {
-            if(read_bitmap_to_gltexture(n_textures) != 0)
+            if(n_textures != gFrameBufId)
             {
-                printf("failed to load texture: %d\n", n_textures);
-                return 0;
+                if(read_bitmap_to_gltexture(n_textures) != 0)
+                {
+                    printf("failed to load texture: %d\n", n_textures);
+                    return 0;
+                }
             }
             n_textures++;
+            
             load_count--;
         }
     }

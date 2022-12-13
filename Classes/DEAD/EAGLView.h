@@ -29,6 +29,8 @@
     GLuint defaultFramebuffer, colorRenderbuffer;
 }
 
+extern GLuint gFramebufferId, gColorRenderbufferId;
+
 @property (nonatomic, retain) EAGLContext *context;
 
 - (void)setFramebuffer;

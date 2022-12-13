@@ -12,6 +12,7 @@
 struct boundingRegionVector
 {
     float f[6];
+    float perpVec[3];
 };
 
 struct boundingRegion
@@ -27,8 +28,8 @@ boundingRegionInit(int numVectors);
 void
 boundingRegionUninit(boundingRegion* rgn);
 
-// takes point, and unit-vector
-void boundingRegionAddVec(boundingRegion* rgn, float x, float y, float z, float ux, float uy, float uz);
+// takes point, and unit-vector, and perpendicular-vector
+void boundingRegionAddVec(boundingRegion* rgn, float x, float y, float z, float ux, float uy, float uz, float pvec[3]);
 
 int boundingRegionCheckPointInside(boundingRegion* rgn, float x, float y, float z, float vout[3]);
 

@@ -26,6 +26,8 @@
 #include "gameUtils.h"
 #include "gameNetwork.h"
 #include "mesh.h"
+#include "textures.h"
+#include "framebuffer.h"
 
 #define BACKGROUND_MODEL model_background
 #define BACKGROUND_MODEL_TEXCOORDS /*model_cube_texcoords_alt*/ model_background_texcoords
@@ -39,6 +41,7 @@ extern int game_target_objective_id;
 float viewWidth;
 float viewHeight;
 DrawBackgroundData* bgData = NULL;
+DrawBoundingData* boData = NULL;
 
 gameGraphics_drawState2d drawState_2d;
 gameGraphics_drawState2d drawControls_ds;
@@ -47,7 +50,7 @@ void* gl_vertex_ptr_last = 0;
 void* gl_texcoord_ptr_last = 0;
 
 int texture_id_playership = TEXTURE_ID_SHIP1;
-int texture_id_background = BACKGROUND_TEXTURE;
+int texture_id_background = CUBE_TEXTURE_3;
 
 int background_init_needed = 1;
 
@@ -162,6 +165,17 @@ static unsigned int drawn_texture_last;
 int
 bindTexture(unsigned int tex_id)
 {
+    if(tex_id == /*TEXTURE_ID_BOUNDING*/ TEXTURE_ID_BACKGROUND_SCENERY)
+    {
+        if(gFrameBufId < 0)
+        {
+            // prepare generated framebuffers for textures
+            gFrameBufId = frameBufGen(&gFrameBufSt);
+        }
+        glBindTexture(GL_TEXTURE_2D, gFrameBufId);
+        return 1;
+    }
+    
     if(!bindTextureRequest(tex_id))
     {
         glBindTexture(GL_TEXTURE_2D, TEXTURE_ID_UNKNOWN);
@@ -1034,7 +1048,6 @@ drawState2dSet(gameGraphics_drawState2d* state)
     
     glVertexPointer(3, GL_FLOAT, 0, drawState_2d.coords);
     glTexCoordPointer(2, GL_FLOAT, 0, drawState_2d.texcoords);
-
 }
 
 void
@@ -1454,71 +1467,182 @@ drawBackgroundInit(int tex_id,
     if(!bgData)
     {
         bgData = malloc(sizeof(*bgData));
+        boData = malloc(sizeof(*boData));
         
-        if(bgData)
+        if(!bgData || !boData)
         {
-            memset(bgData, 0, sizeof(*bgData));
-            
-            bgData->tex_id = tex_id;
-            
-            bgData->coords = malloc(sizeof(BACKGROUND_MODEL));
-            bgData->texcoords = malloc(sizeof(BACKGROUND_MODEL_TEXCOORDS));
-            bgData->indices = malloc(sizeof(model_index_t) * indices_n);
-            
-            // swap triangle indices
-            for(i = 0; i < indices_n; i += 3)
-            {
-                bgData->indices[i] = indices[i+2];
-                bgData->indices[i+1] = indices[i+1];
-                bgData->indices[i+2] = indices[i];
-                bgData->n_indices += 3;
-            }
-            
-            memcpy(bgData->texcoords, BACKGROUND_MODEL_TEXCOORDS, sizeof(BACKGROUND_MODEL_TEXCOORDS));
-            
-            float alpha = 0;
-            float beta = 0;
-            float gamma = 0;
-            
-            for(i = 0; i < sizeof(BACKGROUND_MODEL)/sizeof(model_coord_t); i += 3)
-            {
-                quaternion_t pt = {0, BACKGROUND_MODEL[i+0] * scale, BACKGROUND_MODEL[i+1] * scale, BACKGROUND_MODEL[i+2] * scale};
-                quaternion_t xq = {0, 1, 0, 0};
-                quaternion_t yq = {0, 0, 1, 0};
-                quaternion_t zq = {0, 0, 0, 1};
-                
-                // yaw
-                if(alpha != 0)
-                {
-                    quaternion_rotate_inplace(&pt, &zq, alpha);
-                    quaternion_rotate_inplace(&xq, &zq, alpha);
-                    quaternion_rotate_inplace(&yq, &zq, alpha);
-                }
-                
-                // pitch
-                if(beta != 0)
-                {
-                    quaternion_rotate_inplace(&pt, &xq, beta);
-                    quaternion_rotate_inplace(&yq, &xq, beta);
-                    quaternion_rotate_inplace(&zq, &xq, beta);
-                }
-                
-                // roll
-                if(gamma != 0)
-                {
-                    quaternion_rotate_inplace(&pt, &zq, gamma);
-                    quaternion_rotate_inplace(&xq, &zq, gamma);
-                    quaternion_rotate_inplace(&yq, &zq, gamma);
-                }
-                
-                bgData->coords[i+0] =  pt.x;
-                bgData->coords[i+1] =  pt.y;
-                bgData->coords[i+2] =  pt.z;
-            }
-            
-            drawBackgroundBuildTerrain(bgData, bgRepeatScale);
+            return;
         }
+        
+        memset(bgData, 0, sizeof(*bgData));
+        memset(boData, 0, sizeof(*boData));
+        
+        bgData->tex_id = tex_id;
+        
+        bgData->coords = malloc(sizeof(BACKGROUND_MODEL));
+        bgData->texcoords = malloc(sizeof(BACKGROUND_MODEL_TEXCOORDS));
+        bgData->indices = malloc(sizeof(model_index_t) * indices_n);
+        
+        // swap triangle indices
+        for(i = 0; i < indices_n; i += 3)
+        {
+            bgData->indices[i] = indices[i+2];
+            bgData->indices[i+1] = indices[i+1];
+            bgData->indices[i+2] = indices[i];
+            bgData->n_indices += 3;
+        }
+        
+        memcpy(bgData->texcoords, BACKGROUND_MODEL_TEXCOORDS, sizeof(BACKGROUND_MODEL_TEXCOORDS));
+        
+        float alpha = 0;
+        float beta = 0;
+        float gamma = 0;
+        
+        for(i = 0; i < sizeof(BACKGROUND_MODEL)/sizeof(model_coord_t); i += 3)
+        {
+            quaternion_t pt = {0, BACKGROUND_MODEL[i+0] * scale, BACKGROUND_MODEL[i+1] * scale, BACKGROUND_MODEL[i+2] * scale};
+            quaternion_t xq = {0, 1, 0, 0};
+            quaternion_t yq = {0, 0, 1, 0};
+            quaternion_t zq = {0, 0, 0, 1};
+            
+            // yaw
+            if(alpha != 0)
+            {
+                quaternion_rotate_inplace(&pt, &zq, alpha);
+                quaternion_rotate_inplace(&xq, &zq, alpha);
+                quaternion_rotate_inplace(&yq, &zq, alpha);
+            }
+            
+            // pitch
+            if(beta != 0)
+            {
+                quaternion_rotate_inplace(&pt, &xq, beta);
+                quaternion_rotate_inplace(&yq, &xq, beta);
+                quaternion_rotate_inplace(&zq, &xq, beta);
+            }
+            
+            // roll
+            if(gamma != 0)
+            {
+                quaternion_rotate_inplace(&pt, &zq, gamma);
+                quaternion_rotate_inplace(&xq, &zq, gamma);
+                quaternion_rotate_inplace(&yq, &zq, gamma);
+            }
+            
+            bgData->coords[i+0] =  pt.x;
+            bgData->coords[i+1] =  pt.y;
+            bgData->coords[i+2] =  pt.z;
+        }
+        
+        // -- MARK: background v2 - remove bgData and use instead the bounding coords for triangles
+        // TODO: boundingInit
+        int iC = 0, iV = 0, iT = 0;
+        float hackMinSize = 0.001, hackMinSizeTot = 0;
+        for(i = 0; i < gWorld->boundingRegion->nVectorsInited; i++)
+        {
+            float Vpad = 0.2;
+            float r = tan(M_PI / (WORLD_BOUNDING_SPHERE_STEPS))*gWorld->bound_radius*2 + Vpad; // sin((M_PI*2) / WORLD_BOUNDING_SPHERE_STEPS) * (gWorld->bound_radius);
+            struct boundingRegionVector *boundVec = &gWorld->boundingRegion->v[i];
+            
+            if(boundVec->f[3] == 0 && fabs(boundVec->f[4]) == 1 && boundVec->f[5] == 0) {
+                // don't display
+                continue;
+            }
+            
+            float V[3];
+            float V_[] = {
+                boundVec->f[3],
+                boundVec->f[4],
+                boundVec->f[5]};
+            // perpendicular
+            float U[] = {
+                boundVec->perpVec[0],
+                boundVec->perpVec[1],
+                boundVec->perpVec[2],
+            };
+            
+            vector_cross_product(U, V_, V);
+            
+            model_coord_t origin[3] = { boundVec->f[0], boundVec->f[1], boundVec->f[2] };
+            for(int k = 0; k < 3; k++) origin[k] -= U[k]*(r/2);
+            for(int k = 0; k < 3; k++) origin[k] -= V[k]*(r/2);
+            origin[0] -= V_[0] * Vpad;
+            origin[1] -= V_[1] * Vpad;
+            origin[2] -= V_[2] * Vpad;
+            
+            int iCn = iC/3; // save offset for later
+            boData->coords256[iC++] = origin[0];
+            boData->coords256[iC++] = origin[1] + hackMinSizeTot;
+            boData->coords256[iC++] = origin[2];
+            boData->coords256[iC++] = origin[0] + U[0] * r;
+            boData->coords256[iC++] = origin[1] + U[1] * r + hackMinSizeTot;
+            boData->coords256[iC++] = origin[2] + U[2] * r;
+            boData->coords256[iC++] = origin[0] + V[0] * r;
+            boData->coords256[iC++] = origin[1] + V[1] * r + hackMinSizeTot;
+            boData->coords256[iC++] = origin[2] + V[2] * r;
+            
+            boData->coords256[iC++] = (origin[0] + V[0] * r + U[0] * r);
+            boData->coords256[iC++] = (origin[1] + V[1] * r + U[1] * r) + hackMinSizeTot;
+            boData->coords256[iC++] = (origin[2] + V[2] * r + U[2] * r);
+            
+            int io = boData->count;
+            boData->count += 6;
+            
+            int indices[] = {
+                iCn+1,
+                iCn,
+                iCn+2,
+                //
+                iCn+2,
+                iCn+3,
+                iCn+1
+            };
+            
+            // merge coordinates
+            for(int ci=0; ci < iCn; ci+=3)
+            {
+                float* destm = &boData->coords256[iCn];
+                if(fabs(boData->coords256[ci] - destm[0]) < hackMinSize &&
+                   fabs(boData->coords256[ci+1] - destm[1]) < hackMinSize &&
+                   fabs(boData->coords256[ci+2] - destm[2]) < hackMinSize &&
+                   fabs(boData->coords256[ci+3] - destm[3]) < hackMinSize)
+                {
+                    // reuse coordinate-idx for coord @ same location
+                    indices[ci%3] = boData->indices256[ci/3];
+                }
+            }
+            
+            float texYmax = U[1] > 0 ? 1.0 : -1.0;
+            boData->txcoords256[iT++] = 0.0;
+            boData->txcoords256[iT++] = 0.0;
+            boData->txcoords256[iT++] = 1.0;
+            boData->txcoords256[iT++] = 0.0;
+            boData->txcoords256[iT++] = 0.0;
+            boData->txcoords256[iT++] = texYmax;
+            boData->txcoords256[iT++] = 1.0;
+            boData->txcoords256[iT++] = texYmax;
+
+            boData->indices256[iV++] = indices[0];
+            boData->indices256[iV++] = indices[1];
+            boData->indices256[iV++] = indices[2];
+
+            boData->indices256[iV++] = indices[3];
+            boData->indices256[iV++] = indices[4];
+            boData->indices256[iV++] = indices[5];
+            
+            hackMinSizeTot += hackMinSize;
+            
+            
+        }
+        
+        drawBackgroundBuildTerrain(bgData, bgRepeatScale);
     }
+}
+
+void
+graphics_add_boundary(float origin[], float vec[])
+{
+    
 }
 
 static void
@@ -1538,6 +1662,14 @@ drawBackgroundUninit()
         if(pFree->tess.texcoords) free(pFree->tess.texcoords);
         free(bgData);
     }
+    
+    // TODDO: free openGL framebuffer
+    DrawBoundingData* pBoFree;
+    if(boData)
+    {
+        free(boData);
+        boData = NULL;
+    }
 }
 
 void
@@ -1546,7 +1678,7 @@ drawBackground_tess(float* modelC, float* textureC, unsigned int* indicesC, unsi
     glVertexPointer(3, GL_FLOAT, 0, modelC);
     glTexCoordPointer(2, GL_FLOAT, 0, textureC);
 
-    bindTexture(TEXTURE_ID_TERRAIN);
+    bindTexture(TEXTURE_ID_BACKGROUND_SCENERY);
     glDrawElements(GL_TRIANGLES, (int)indicesN, index_type_enum, indicesC);
 }
 
@@ -1594,6 +1726,17 @@ drawBackgroundCore()
 void drawBackground()
 {
     drawBackgroundCore();
+}
+
+void drawBounding()
+{
+    glVertexPointer(3, GL_FLOAT, 0, boData->coords256);
+    glTexCoordPointer(2, GL_FLOAT, 0, boData->txcoords256);
+
+    bindTexture(TEXTURE_ID_BOUNDING);
+
+    glDrawElements(GL_TRIANGLES, boData->count,
+        index_type_enum, boData->indices256);
 }
 
 struct
@@ -1906,4 +2049,6 @@ gameGraphicsUninit()
     for(i = 0; i < 3; i++) { if(*(freeBuffers[i])) { free(*(freeBuffers[i])); *freeBuffers[i] = NULL; } }
     
     drawBackgroundUninit();
+    
+    frameBufCleanup(boData);
 }
