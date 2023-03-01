@@ -223,7 +223,7 @@ void initTextures(const char *prefix)
 
 int bindTextureRequest(int tex_id)
 {
-    int load_count = 2;
+    int load_count = 6;
     
     if(!texture_list_loaded[tex_id])
     {
