@@ -1536,6 +1536,7 @@ drawBackgroundInit(int tex_id,
         
         // -- MARK: background v2 - remove bgData and use instead the bounding coords for triangles
         // TODO: boundingInit
+#ifdef EXPERIMENTAL
         int iC = 0, iV = 0, iT = 0;
         float hackMinSize = 0.001, hackMinSizeTot = 0;
         for(i = 0; i < gWorld->boundingRegion->nVectorsInited; i++)
@@ -1633,6 +1634,7 @@ drawBackgroundInit(int tex_id,
             
             
         }
+#endif
         
         drawBackgroundBuildTerrain(bgData, bgRepeatScale);
     }
@@ -1711,9 +1713,11 @@ drawBackgroundCore()
     glTexCoordPointer(2, GL_FLOAT, 0, bgData->texcoords);
 
     bindTexture(bgData->tex_id);
+#ifndef EXPERIMENTAL
     glDrawElements(GL_TRIANGLES, bgData->n_indices,
-        index_type_enum, bgData->indices);
-    
+                   index_type_enum, bgData->indices);
+#endif
+        
     glPopMatrix();
     
     glMatrixMode(GL_TEXTURE);

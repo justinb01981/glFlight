@@ -12,13 +12,14 @@
 #define FRAMEBUFFER_H_INCLUDED 1
 
 #include <assert.h>
+#include <math.h>
 #define GLES_SILENCE_DEPRECATION
 #include <OpenGLES/ES1/gl.h>
 #include <OpenGLES/ES1/glext.h>
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 
-#define TEXTURE_ID_BOUNDING (104)
+#define TEXTURE_ID_BOUNDING (104) // TODO:  HEY NUMBNUTS THIS COLLIDES WITH TEXTURES.H
 
 extern void glDrawBuffers(GLuint, GLenum*);
 extern int bindTexture(unsigned int);
@@ -115,23 +116,35 @@ static GLuint frameBufGen(struct FrameBufInst* s)
     
     int t = 0;
     GLfloat m = 1.0;
+    /*
     s->colors[t++] = m;
     s->colors[t++] = 0.0;
     s->colors[t++] = 0.0;
     s->colors[t++] = 1.0;
+     
     s->colors[t++] = 0.0;
     s->colors[t++] = m;
     s->colors[t++] = 0.0;
     s->colors[t++] = 1.0;
+     
     s->colors[t++] = 0.0;
     s->colors[t++] = 0.0;
     s->colors[t++] = m;
     s->colors[t++] = 1.0;
+     
     s->colors[t++] = m;
     s->colors[t++] = 0.0;
     s->colors[t++] = 0.0;
     s->colors[t++] = 1.0;
+    */
     
+    // lets gradiate...
+    static float mg = 1.0;
+    for(int t = 0; t <= 4; t++) for(int ti = 0; ti < 4; ti++) {
+        s->colors[t*4+ti] = sin(t) - cos(t) * mg;
+    }
+    mg *= -1;
+//    static_fb_phase = fmod(static_fb_phase+0.1, M_PI*2);
     s->count = i;
     
     glEnableClientState(GL_COLOR_ARRAY);
