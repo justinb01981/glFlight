@@ -37,7 +37,7 @@ extern void glBlitFramebuffer(
 struct FrameBufInst {
     GLfloat coords[512];
     GLuint indices[256];
-    GLfloat texcoords[256];
+    GLfloat colors[256];
     size_t count;
 };
 
@@ -46,18 +46,10 @@ static GLuint gFramebufferId, gColorRenderbufferId;
 static GLuint FramebufferName;
 static GLuint renderedTexture;
 
-static void frameBufPrepareProgram(struct FrameBufInst* s)
-{
-    //glCreateProgram -- see eaglview.h
-}
-
 static GLuint frameBufGen(struct FrameBufInst* s)
 {
-    int width = 1024, height = 1024;
-    float a = width, b = -height;
+    int width = 128, height = 128;
     int tex_id = 3;
-    
-    frameBufPrepareProgram(s);
     
     glGenFramebuffers(1, &FramebufferName);
     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
@@ -98,49 +90,51 @@ static GLuint frameBufGen(struct FrameBufInst* s)
      */
     
     // draw triangles
-    GLfloat o3[] = {-484, height/2, 0};
+    GLfloat o3[] = {-width/2, -height/2, 0};
     int c = 0;
     s->coords[c++] = o3[0];//
     s->coords[c++] = o3[1];
     s->coords[c++] = o3[2];
-    s->coords[c++] = o3[0]+a;//
+    s->coords[c++] = o3[0]+width;//
     s->coords[c++] = o3[1];
     s->coords[c++] = o3[2];
     s->coords[c++] = o3[0];//
-    s->coords[c++] = o3[1]+b;
+    s->coords[c++] = o3[1]+height;
+    s->coords[c++] = o3[2];
+    s->coords[c++] = o3[0]+width;//
+    s->coords[c++] = o3[1]+height;
     s->coords[c++] = o3[2];
     
     int i = 0;
     s->indices[i++] = 0;
+    s->indices[i++] = 1;
+    s->indices[i++] = 2;
+    s->indices[i++] = 3;
     s->indices[i++] = 2;
     s->indices[i++] = 1;
     
     int t = 0;
-    s->texcoords[t++] = 0.0;
-    s->texcoords[t++] = 0.0;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 0.0;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 0.5;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 0.5;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 0.5;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 1.0;
-    s->texcoords[t++] = 1.0;
-    
+    GLfloat m = 1.0;
+    s->colors[t++] = m;
+    s->colors[t++] = 0.0;
+    s->colors[t++] = 0.0;
+    s->colors[t++] = 1.0;
+    s->colors[t++] = 0.0;
+    s->colors[t++] = m;
+    s->colors[t++] = 0.0;
+    s->colors[t++] = 1.0;
+    s->colors[t++] = 0.0;
+    s->colors[t++] = 0.0;
+    s->colors[t++] = m;
+    s->colors[t++] = 1.0;
+    s->colors[t++] = m;
+    s->colors[t++] = 0.0;
+    s->colors[t++] = 0.0;
+    s->colors[t++] = 1.0;
     
     s->count = i;
     
-//    glEnableClientState(GL_COLOR_ARRAY);
-//    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
     
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
@@ -150,23 +144,15 @@ static GLuint frameBufGen(struct FrameBufInst* s)
     glPushMatrix();
     glLoadIdentity();
     
-//    glOrthof(-width/2, width/2,
-//             -height/2, height/2,
-//             1, -1);
+    glOrthof(-width/2, width/2,
+             -height/2, height/2,
+             1, -1);
+    glTranslatef(0, 0, 0);
     
-    glVertexPointer(2, GL_FLOAT, 0, s->coords);
-    glTexCoordPointer(2, GL_FLOAT, 0, s->texcoords);
+    glVertexPointer(3, GL_FLOAT, 0, s->coords);
 
-    glColorPointer(4, GL_FLOAT, 0, s->texcoords);
+    glColorPointer(4, GL_FLOAT, 0, s->colors);
     glDrawElements(GL_TRIANGLES, s->count, GL_UNSIGNED_INT, s->indices);
-    
-    extern void drawLineWithColorAndWidth(float a[3], float b[3], float color[3], float width);
-    GLfloat line[3][3] = {
-        {-width/2-1, -height/2-1, 0},
-        {width/2+1, height/2+1, 0},
-        {1.0, 0.0, 0.0}
-    };
-    drawLineWithColorAndWidth(&line[0], &line[1], &line[2], 8);
     
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
     
@@ -176,8 +162,7 @@ static GLuint frameBufGen(struct FrameBufInst* s)
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     
-//    glDisableClientState(GL_COLOR_ARRAY);
-//    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
     
     // restore original screen framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

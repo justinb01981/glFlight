@@ -50,7 +50,7 @@ void* gl_vertex_ptr_last = 0;
 void* gl_texcoord_ptr_last = 0;
 
 int texture_id_playership = TEXTURE_ID_SHIP1;
-int texture_id_background = CUBE_TEXTURE_3;
+int texture_id_background = -1;
 
 int background_init_needed = 1;
 
@@ -165,7 +165,7 @@ static unsigned int drawn_texture_last;
 int
 bindTexture(unsigned int tex_id)
 {
-    if(tex_id == /*TEXTURE_ID_BOUNDING*/ TEXTURE_ID_BACKGROUND_SCENERY)
+    if(tex_id == TEXTURE_ID_BOUNDING)
     {
         if(gFrameBufId < 0)
         {
@@ -1580,7 +1580,6 @@ drawBackgroundInit(int tex_id,
             boData->coords256[iC++] = origin[0] + V[0] * r;
             boData->coords256[iC++] = origin[1] + V[1] * r + hackMinSizeTot;
             boData->coords256[iC++] = origin[2] + V[2] * r;
-            
             boData->coords256[iC++] = (origin[0] + V[0] * r + U[0] * r);
             boData->coords256[iC++] = (origin[1] + V[1] * r + U[1] * r) + hackMinSizeTot;
             boData->coords256[iC++] = (origin[2] + V[2] * r + U[2] * r);
@@ -1678,7 +1677,7 @@ drawBackground_tess(float* modelC, float* textureC, unsigned int* indicesC, unsi
     glVertexPointer(3, GL_FLOAT, 0, modelC);
     glTexCoordPointer(2, GL_FLOAT, 0, textureC);
 
-    bindTexture(TEXTURE_ID_BACKGROUND_SCENERY);
+    bindTexture(texture_id_background);
     glDrawElements(GL_TRIANGLES, (int)indicesN, index_type_enum, indicesC);
 }
 
@@ -1726,6 +1725,8 @@ drawBackgroundCore()
 void drawBackground()
 {
     drawBackgroundCore();
+    
+    drawBounding();
 }
 
 void drawBounding()

@@ -701,7 +701,6 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.stats.score_last = 0;
         gameStateSinglePlayer.stats.score = 0;
         gameStateSinglePlayer.stats.level_last = 0;
-        texture_id_background = BACKGROUND_TEXTURE;
     }
     else
     {
