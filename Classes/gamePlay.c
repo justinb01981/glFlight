@@ -372,7 +372,8 @@ game_add_powerup(float x, float y, float z, int type, int lifetime)
     world_add_object(MODEL_SPRITE,
                      spawn[0], spawn[1], spawn[2],
                      spawn[3], spawn[4], spawn[5],
-                     2.0, tex_id);
+                     3.0,   // scale of bounding box is important for collisions
+                     tex_id);
     
     world_get_last_object()->durability = 0;
     world_get_last_object()->destructible = 1;
@@ -2587,7 +2588,6 @@ firePoopedCube(WorldElem *elem)
     elem->trail.last_coord[2] = pElem->physics.ptr->z;
     
     pElem->object_type = OBJ_POOPEDCUBE;
-    pElem->renderInfo.priority = 1;
     pElem->destructible = 0;
     pElem->physics.ptr->friction = 1;
     world_object_set_lifetime(obj, pooped_cube_lifetime);

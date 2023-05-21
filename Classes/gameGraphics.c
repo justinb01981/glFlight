@@ -32,6 +32,7 @@
 #define BACKGROUND_MODEL model_background
 #define BACKGROUND_MODEL_TEXCOORDS /*model_cube_texcoords_alt*/ model_background_texcoords
 #define BACKGROUND_MODEL_INDICES1 model_background_indices1
+#define gFramebufferId (0) // yeah
 
 extern int isLandscape;
 
@@ -45,6 +46,8 @@ DrawBoundingData* boData = NULL;
 
 gameGraphics_drawState2d drawState_2d;
 gameGraphics_drawState2d drawControls_ds;
+
+struct FrameBufInst gFrameBufSt;
 
 void* gl_vertex_ptr_last = 0;
 void* gl_texcoord_ptr_last = 0;
@@ -153,11 +156,44 @@ setupGLTextureView()
     glRotatef(90, 0, 0, 1);
 }
 
-void
+static void
 setupGLTextureViewDone()
 {
     glMatrixMode(GL_TEXTURE);
     glPopMatrix();
+}
+
+void
+setupGLFramebufferView()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+
+    glMatrixMode(GL_TEXTURE);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glOrthof(-FB_TEXTURE_WIDTHHEIGHT/2, FB_TEXTURE_WIDTHHEIGHT/2,
+             -FB_TEXTURE_WIDTHHEIGHT/2, FB_TEXTURE_WIDTHHEIGHT/2,
+             1, -1);
+    glTranslatef(0, 0, 0);
+
+    // see framebuffer.h
+}
+
+void
+setupGLFramebufferViewDone()
+{
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+
+    glMatrixMode(GL_TEXTURE);
+    glPopMatrix();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, gFramebufferId);
 }
 
 static unsigned int drawn_texture_last;
@@ -165,17 +201,6 @@ static unsigned int drawn_texture_last;
 int
 bindTexture(unsigned int tex_id)
 {
-    if(tex_id == TEXTURE_ID_BOUNDING)
-    {
-        if(gFrameBufId < 0)
-        {
-            // prepare generated framebuffers for textures
-            gFrameBufId = frameBufGen(&gFrameBufSt);
-        }
-        glBindTexture(GL_TEXTURE_2D, gFrameBufId);
-        return 1;
-    }
-    
     if(!bindTextureRequest(tex_id))
     {
         glBindTexture(GL_TEXTURE_2D, TEXTURE_ID_UNKNOWN);
@@ -2033,16 +2058,18 @@ drawTriangleMesh(struct mesh_opengl_t* glmesh, int tex_id)
 }
 
 void
-gameGraphicsInit()
+gameGraphicsInit(void)
 {
     drawBackgroundInit(texture_id_background, 0, 0, 0,
                        gWorld->bound_radius,
                        16.0,
                        BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
+
+    frameBufInit(&gFrameBufSt);
 }
 
 void
-gameGraphicsUninit()
+gameGraphicsUninit(void)
 {
     int i;
     void** freeBuffers[] = {
@@ -2055,5 +2082,5 @@ gameGraphicsUninit()
     
     drawBackgroundUninit();
     
-    frameBufCleanup(boData);
+    frameBufCleanup(&gFrameBufSt);
 }

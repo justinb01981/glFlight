@@ -6,12 +6,16 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+
+
+THIS FILE IS DEAD -- REMOVE IT
+
 #import <QuartzCore/QuartzCore.h>
 
 #import <sys/time.h>
 
 #import "gl_flightViewController.h"
-#import "EAGLView.h"
+#import "EAGLView.h" // remove
 #import "cocoaGameAudio.h"
 
 #include "object.h"

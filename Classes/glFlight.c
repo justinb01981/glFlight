@@ -149,7 +149,7 @@ glFlightFrameStage1()
     {
         bindTexture(TEXTURE_ID_FONTMAP2);
         bindTexture(TEXTURE_ID_FONTMAP);
-        if(controlsCalibrated) gameInput_trimLock();
+//        if(controlsCalibrated) gameInput_trimLock();
         
         world_elem_btree_restart();
         
@@ -184,14 +184,15 @@ calibrate_bail:
     time_ms = time_ms_wall;
 #endif
     
-    if(gameInputInitialTrimPending())
-    {
-        speed = 0.0;
-    }
+//    if(gameInputInitialTrimPending())
+//    {
+//        speed = 0.0;
+//    }
     
     if(gameInterfaceControls.textMenuControl.visible ||
-       gameInterfaceControls.keyboardEntry.visible ||
-       gameInputInitialTrimPending() )
+       gameInterfaceControls.keyboardEntry.visible
+//       || gameInputInitialTrimPending()
+       )
     {
         game_paused = 1;
     }
@@ -223,7 +224,8 @@ calibrate_bail:
     const float engine_sounds_duration[] = {1250, 347};
 
     if(time_ms >= time_engine_sound_next
-       && controlsCalibrated)
+//       && controlsCalibrated
+       )
     {
         float minSpeed = 0.1;
         

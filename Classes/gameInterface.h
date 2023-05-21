@@ -168,7 +168,4 @@ gameInterfaceEditString(char *ptr);
 void
 gameInterfaceProcessAction();
 
-void
-gameInterfaceCalibrateDone();
-
 #endif

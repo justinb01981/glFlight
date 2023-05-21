@@ -1818,6 +1818,7 @@ world_update(float tc)
         
         if(!pElem->head_elem) // not a child elem
         {
+#if 0
             float* pFloatCheckIsNan[] = {
                 &pElem->physics.ptr->vx,
                 &pElem->physics.ptr->vy,
@@ -1832,6 +1833,7 @@ world_update(float tc)
                     printf("isnan: %p\n", pElem);
                 }
             }
+#endif
             
             if(pElem->physics.ptr->vx != 0 || pElem->physics.ptr->vy+Fmin != 0 || pElem->physics.ptr->vz != 0 || pElem->physics.ptr->gravity)
             {

@@ -129,8 +129,6 @@ const static float GAME_AI_UPDATE_INTERVAL_MS = 50;
 #define GAME_FRAME_RATE_TIMES_10 600
 #define GAME_TICK_RATE PLATFORM_TICK_RATE
 
-extern int controlsCalibrated;
-
 extern game_timeval_t time_engine_sound_next;
 
 #endif

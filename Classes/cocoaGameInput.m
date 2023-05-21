@@ -43,9 +43,10 @@
 
 
 @implementation cocoaGyroManager
-
-CMDeviceMotion* refMotion = nil;
-int resumeCountDown = 0;
+{
+    int resumeCountDown;
+    CMAttitude *attitudeTmp, *attitudeRef;
+}
 
 +(cocoaGyroManager*) instance
 {
@@ -58,29 +59,42 @@ int resumeCountDown = 0;
 	return gameInputSingleton;
 }
 
-+(void) handleDeviceMotionUpdate: (CMDeviceMotion*) motion withError:(NSError*) err
+-(void) handleDeviceMotionUpdate: (CMDeviceMotion*) motion withError:(NSError*) err
 {
-    if(resumeCountDown > 0)
-    {
-        resumeCountDown--;
-        return;
-    }
-    
-    if(!refMotion)
-    {
-        //if(refMotion) [refMotion release];
-        
-        refMotion = [motion copy];
-    }
-    
-    CMAttitude *attitude = [motion attitude];
+//    if(resumeCountDown > 0) // ignore initial N motion events (working around bug)
+//    {
+//        resumeCountDown--;
+//        return;
+//    }
 
-    if(attitude && refMotion && [refMotion attitude])
-    {
-        [attitude multiplyByInverseOfAttitude:[refMotion attitude]];
-        
-        gameInputGyro([attitude roll], [attitude pitch], [attitude yaw]);
-    }
+
+    CMAttitude* attitudeDev = [[motion attitude] copy];
+
+    // switch to main queue?
+    dispatch_sync(dispatch_get_main_queue(), ^{
+
+        if(attitudeDev)
+        {
+            NSLog(@"attitudeRef: %@ attitude device: %@\n",
+                  [attitudeRef debugDescription], [attitudeDev debugDescription]);
+
+            CMAttitude* attitude = [(CMAttitude*) attitudeDev copy]; // mutable attitude modified in-place
+            if(attitudeRef != nil) [attitude multiplyByInverseOfAttitude: attitudeRef];
+
+            if(needTrim)
+            {
+                needTrim = 0;
+
+                NSLog(@"handleDeviceMotionUpdate: dispatch_async - needTrim ");
+
+                attitudeRef = (CMAttitude*) attitudeDev; // last recorded attitude is now our reference applied after
+            }
+            else
+            {
+                gameInputGyro([attitude roll], [attitude pitch], [attitude yaw]);
+            }
+        }
+    });
 
     CMRotationRate r = [motion rotationRate];
     
@@ -92,7 +106,8 @@ int resumeCountDown = 0;
 	[self init];
     
 	initialized = false;
-    refMotion = NULL;
+
+    resumeCountDown = 0;
     
     self.showsDeviceMovementDisplay = YES;
     
@@ -105,11 +120,21 @@ int resumeCountDown = 0;
 {
     CMDeviceMotionHandler handler = ^(CMDeviceMotion *motion, NSError *error)
     {
-        [cocoaGyroManager handleDeviceMotionUpdate:motion withError:error];
+        if(motion != nil && error == nil) {
+            [[cocoaGyroManager instance] handleDeviceMotionUpdate:motion withError:error];
+        }
+        else {
+            printf("cocoaGyroManager: device motion handler got nil motion");
+        }
     };
     
     [self startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXArbitraryCorrectedZVertical
-                                              toQueue:[[NSOperationQueue alloc] init] withHandler:handler];
+                                              toQueue:[[NSOperationQueue alloc] init] withHandler: handler];
+}
+
+-(void) stopUpdates
+{
+    [self stopDeviceMotionUpdates];
 }
 
 -(void) resumeUpdates

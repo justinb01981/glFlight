@@ -11,6 +11,7 @@
 #import "cocoaGameInput.h"
 #import "cocoaAudioThread.h"
 #import "GameNetworkBonjourManager.h"
+#import <FirebaseCore/FirebaseCore.h>
 
 #include "glFlight.h"
 #include "world.h"
@@ -123,6 +124,8 @@ void glFlightResume(time_t time_last_suspend)
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [FIRApp configure];
+
     [application setIdleTimerDisabled:TRUE];
     
     [(glFlightGLKViewController*) UIApplication.sharedApplication.keyWindow.rootViewController viewInitialized: ^(CGSize size){

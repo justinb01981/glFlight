@@ -287,7 +287,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
 }
 
 void
-gameInterfaceReset()
+gameInterfaceReset(void)
 {
     gameInterfaceControls.menuControl.visible = 0;
     
@@ -455,7 +455,7 @@ gameInterfaceEditInt(int *ptr)
 }
 
 void
-gameInterfaceEditDone()
+gameInterfaceEditDone(void)
 {
     gameInterfaceControls.keyboardEntry.visible = 0;
     
@@ -812,7 +812,7 @@ gameInterfaceMultiplayerConfigure(int action)
     return 0;
 }
 
-void gameInterfaceProcessAction()
+void gameInterfaceProcessAction(void)
 {
     char *mapBuffer = NULL;
     char strTmp[256];
@@ -1121,10 +1121,11 @@ gameInterfaceHandleTouchEnd(float x, float y)
 
     if (touchedControl)
     {
-        if (touchedControl == &gameInterfaceControls.trim)
-        {
-            gameInputTrimCancel();
-        }
+        // removed: trim is now a touchdown-only button, not held
+//        if (touchedControl == &gameInterfaceControls.trim)
+//        {
+//            gameInputTrimCancel();
+//        }
         
         touchedControl->touch_began = 0;
         //gameInterfaceHandleTouchMove(x, y);
@@ -1150,7 +1151,7 @@ gameInterfaceHandleTouchEnd(float x, float y)
 }
 
 void
-gameInterfaceHandleAllTouchEnd()
+gameInterfaceHandleAllTouchEnd(void)
 {
     controlRect** controlSet = gameInterfaceControls.controlArray;
     
@@ -1210,7 +1211,7 @@ gameInterfaceModalDialogEnqueue(const char* msg, const char *buttonLeft, const c
 }
 
 void
-gameInterfaceModalDialogDequeue()
+gameInterfaceModalDialogDequeue(void)
 {
     if(gameInterfaceControls.dialogRect.visible) return;
     
@@ -1230,7 +1231,7 @@ gameInterfaceModalDialog(const char* msg, const char *buttonLeft, const char *bu
 }
 
 controlRect*
-gameInterfaceModalDialogPeek()
+gameInterfaceModalDialogPeek(void)
 {
     return gameInterfaceControls.dialogRect.pnext;
 }
@@ -1276,11 +1277,4 @@ gameInterfaceSetInterfaceState(InterfaceMiscState state)
         default:
             break;
     }
-}
-
-void
-gameInterfaceCalibrateDone()
-{
-//    gameInterfaceControls.textMenuButton.visible = 1;
-//    gameInterfaceControls.trim.visible = 1;
 }

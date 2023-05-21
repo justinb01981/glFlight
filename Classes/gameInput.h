@@ -31,19 +31,16 @@ const static float GYRO_GRAPHIC_S = 3.3;
 static unsigned int TOUCHES_MAX = 4;
 
 void
-gameInputInit();
+gameInputInit(void);
 
 void
-gameInputUninit();
+gameInputUninit(void);
 
 void
 gameInputTrimBegin(void (*callback)(void));
 
 void
-gameInput_trimLock();
-
-void
-gameInputTrimCancel();
+gameInput_trimLock(void);
 
 void
 gameInputGyro(float roll, float pitch, float yaw);
@@ -55,10 +52,7 @@ void
 gameInputMotion(float roll, float pitch, float yaw);
 
 void
-gameInput();
-
-int
-gameInputInitialTrimPending();
+gameInput(void);
 
 void
 gyro_calibrate_log(float pct);

@@ -26,8 +26,6 @@ int texture_preload_count = 12;
 const static unsigned char alpha_black = 0x00;
 const static unsigned char alpha_semitrans = 0xD0;
 char initTexturesPrefix[255];
-struct FrameBufInst gFrameBufSt;
-int gFrameBufId = -1;
 
 static u_int32_t
 convert_to_le_u32(u_int32_t v)
@@ -235,19 +233,35 @@ int bindTextureRequest(int tex_id)
         
         while(n_textures <= tex_id && load_count > 0)
         {
-            if(n_textures != gFrameBufId)
+            // TODO: ignore TEXTURE_ID_BOUNDING
+
+            if(read_bitmap_to_gltexture(n_textures) != 0)
             {
-                if(read_bitmap_to_gltexture(n_textures) != 0)
-                {
-                    printf("failed to load texture: %d\n", n_textures);
-                    return 0;
-                }
+                printf("failed to load texture: %d\n", n_textures);
+                return 0;
             }
+
             n_textures++;
-            
+
             load_count--;
         }
     }
     
     return texture_list_loaded[tex_id];
+}
+
+void textures_hack_framebuffer(GLuint newtx) {
+    // accept new texture rendered from framebuf
+    texture_list_loaded[TEXTURE_ID_FRAMEBUFFER] = 1;
+    texture_list[TEXTURE_ID_FRAMEBUFFER] = newtx;
+}
+
+void textures_hack_framebuffer_cleanup(void) {
+    // accept new texture rendered from framebuf
+    texture_list_loaded[TEXTURE_ID_FRAMEBUFFER] = 0;
+    texture_list[TEXTURE_ID_FRAMEBUFFER] = GL_NONE;
+}
+
+int textures_hack_framebuffer_inited(void) {
+    return texture_list_loaded[TEXTURE_ID_FRAMEBUFFER] ? 1 : 0;
 }

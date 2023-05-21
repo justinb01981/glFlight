@@ -68,7 +68,6 @@ double minSpeed = 0;
 double speedBoost = 0;
 double bulletVel;
 int needTrim = 1;
-int controlsCalibrated = 0;
 int initialized = 0;
 double motionRoll, motionPitch, motionYaw;
 double devicePitch, deviceYaw, deviceRoll;
@@ -118,7 +117,7 @@ gameInputInit()
     
     isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
 
-    controlsCalibrated = 0;
+//    controlsCalibrated = 0;
     
     gameInputStatsCollectStart();
 
@@ -147,23 +146,6 @@ gameInputTrimBegin(void (*callback)(void))
 }
 
 void
-gameInputInitialTrimAbort()
-{
-    needTrim = 0;
-    controlsCalibrated = 1;
-    
-    trim_dz[0] = trim_dz[1] = trim_dz[2] = 0;
-    
-    gameDialogWelcome();
-}
-
-void
-gameInputTrimCancel()
-{
-    needTrim = 0;
-}
-
-void
 gameInput_trimLock()
 {
     needTrim = 0;
@@ -172,7 +154,7 @@ gameInput_trimLock()
 int
 gameInputInitialTrimPending()
 {
-    return !controlsCalibrated && firstCalibrate;
+    return 0;
 }
 
 // values in range -M_PI - M_PI
@@ -259,27 +241,31 @@ gameInput()
     {
         return;
     }
+
+//
+//    gameInputStatsAppend(deviceO);
+//
+//    if(needTrim)
+//    {
+//        rollOffset = deviceRoll;
+//        pitchOffset = devicePitch;
+//        yawOffset = deviceYaw;
+//        needTrim = 0;
+//
+//        gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);
+//
+////        if(!controlsCalibrated)
+////        {
+////            controlsCalibrated = 1;
+////            if(trimDoneCallback) trimDoneCallback();
+////        }
+//
+//        trimDoneCallback();
+//    }
     
-    gameInputStatsAppend(deviceO);
-    
-    if(needTrim)
-    {
-        rollOffset = deviceRoll;
-        pitchOffset = devicePitch;
-        yawOffset = deviceYaw;
-        needTrim = 0;
-        
-        gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);
-        
-        if(!controlsCalibrated)
-        {
-            controlsCalibrated = 1;
-            if(trimDoneCallback) trimDoneCallback();
-        }
+    if(needTrim) {
+        trimDoneCallback();
     }
-    
-    // commented to out to allow game-input to continue while trimming
-    //if(needTrim) return;
     
     /*
                          (Rmax-Rmin)
@@ -390,7 +376,7 @@ gameInput()
     }
     
     // HACK: in extreme cases the quaternion becomes NaN and we will crash - catch that here
-    if(isnan(gameShip_getEulerAlpha()) || isnan(gameShip_getEulerBeta()) || isnan(gameShip_getEulerGamma()))
+    if(!isnormal(gameShip_getEulerAlpha()) || !isnormal(gameShip_getEulerBeta()) || !isnormal(gameShip_getEulerGamma()))
     {
         // copy camera values
         extern quaternion_t my_ship_bx, my_ship_by, my_ship_bz;
@@ -399,7 +385,7 @@ gameInput()
         my_ship_by = cam_pos.by;
         my_ship_bz = cam_pos.bz;
         
-        //assert(0);
+//        assert(0); // okay this has beeen fixed
     }
     
     deviceLast[0] = deviceRoll;

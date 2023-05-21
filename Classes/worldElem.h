@@ -14,6 +14,7 @@
 #include "simple_list.h"
 #include "simple_hash.h"
 #include "gameTimeval.h"
+#include "quaternions.h"
 
 #define MAX_ELEM 256
 #define MODEL_EXTENSION_MAX 1024
@@ -216,6 +217,8 @@ struct WorldElem {
     Object object_type;
     
     void* pVoid;
+    
+    quaternion_t xq, yq, zq;
     
     struct ListNode_t listRefHead;
     

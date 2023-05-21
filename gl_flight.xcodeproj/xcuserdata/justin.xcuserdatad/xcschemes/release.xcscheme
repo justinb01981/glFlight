@@ -37,6 +37,17 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D0CEC6B229F1CEAD009BFF62"
+               BuildableName = "FirebaseWrapperTests.xctest"
+               BlueprintName = "FirebaseWrapperTests"
+               ReferencedContainer = "container:gl_flight.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

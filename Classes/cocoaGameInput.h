@@ -23,6 +23,8 @@
 
 -(void) startUpdates;
 
+-(void) stopUpdates;
+
 -(void) resumeUpdates;
 
 @end

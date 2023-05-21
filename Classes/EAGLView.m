@@ -10,6 +10,8 @@
 
 #import "EAGLView.h"
 
+THIS FILE IS DEAD -- REMOVE IT
+
 @interface EAGLView (PrivateMethods)
 - (void)createFramebuffer;
 - (void)deleteFramebuffer;

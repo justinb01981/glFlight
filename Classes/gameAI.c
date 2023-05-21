@@ -61,8 +61,13 @@ game_ai_init()
 void
 game_ai_setup(WorldElem* pNewElem)
 {
+    
     pNewElem->stuff.u.enemy.time_last_run = time_ms;
     pNewElem->stuff.u.enemy.time_next_retarget = time_ms;
+    
+    pNewElem->xq = (quaternion_t){1, 1, 0, 0};
+    pNewElem->yq = (quaternion_t){1, 0, 1, 0};
+    pNewElem->zq = (quaternion_t){1, 0, 0, 1};
 }
 
 static int
@@ -419,13 +424,19 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     quaternion_t zqOrigin, xqOrigin;
     
+    // TODO: -- use stored quaternions instead of euler (at least for AI)
     // find current object heading vector
-    get_body_vectors_for_euler(elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
-                               &xq, &yq, &zq);
     
+    //get_body_vectors_for_euler(elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
+    //                           &xq, &yq, &zq);
+
+    xq = elem->xq;
+    yq = elem->yq;
+    zq = elem->zq;
+
     zqOrigin = zq;
     xqOrigin = xq;
-    
+
     float zdot = zq.x*(ax/dist) + zq.y*(ay/dist) + zq.z*(az/dist);
     
     unsigned long prev_state = elem->stuff.u.enemy.enemy_state;
@@ -667,7 +678,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
 
         if (isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
         {
-            z1q = zq;
+            assert(0);  // z1q = zq;
         }
     }
     
@@ -683,6 +694,13 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     float alpha, beta, gamma;
     get_euler_from_body_vectors(&xq, &yq, &zq, &alpha, &beta, &gamma);
     
+    // copy back quaternions for next time
+    elem->xq = xq;
+    elem->yq = yq;
+    elem->zq = zq;
+    
+#if 0
+    // TODO: re-apply a,b,g to elem body vectors or store the whole quaternion - no more drift to NaN
     float* pFloatCheckIsNan[] = {
         &alpha,
         &beta,
@@ -730,6 +748,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             return;
         }
     }
+#endif
     
     world_replace_object(elem->elem_id, elem->type,
                          elem->physics.ptr->x, elem->physics.ptr->y, elem->physics.ptr->z,

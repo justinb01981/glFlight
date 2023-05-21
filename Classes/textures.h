@@ -110,6 +110,8 @@ enum
     TEXTURE_ID_COLORMAP = 11,
     TEXTURE_ID_CALIBRATE_CURSOR = 6,
     TEXTURE_ID_BUILDING3 = 116,
+    TEXTURE_ID_BOUNDING = 80,
+    TEXTURE_ID_FRAMEBUFFER = 901,
     TEXTURE_ID_LAST
 };
 
@@ -173,8 +175,7 @@ extern unsigned int texture_list[];
 extern int n_textures;
 extern int texture_preload_count;
 
-extern struct FrameBufInst gFrameBufSt;
-extern int gFrameBufId;
+//extern struct FrameBufInst gFrameBufSt;
 
 extern int texture_id_playership;
 
@@ -183,5 +184,9 @@ extern int texture_id_background;
 void initTextures(const char *prefix);
 
 int bindTextureRequest(int tex_id);
+
+void textures_hack_framebuffer(GLuint);
+int textures_hack_framebuffer_inited(void);
+void textures_hack_framebuffer_cleanup(void);
 
 #endif
