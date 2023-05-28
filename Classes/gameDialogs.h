@@ -117,7 +117,7 @@ gameDialogWelcomeMenu()
     gameInterfaceControls.textMenuControl.visible = 1;
 }
 
-static void gameDialogWelcome();
+static void gameDialogWelcome(void);
 
 static void
 gameDialogRating()

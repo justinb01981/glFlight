@@ -1056,7 +1056,8 @@ int world_object_set_lifetime(int object_id, int tex_passes)
     if (pElemNode)
     {
         WorldElem* pElem = pElemNode->elem;
-        
+        pElem->lifetime = tex_passes;
+
         if (!world_elem_list_find_elem(pElem, &gWorld->elements_expiring))
         {
             world_elem_list_add(pElem, &gWorld->elements_expiring);
@@ -1065,8 +1066,7 @@ int world_object_set_lifetime(int object_id, int tex_passes)
         {
             // already in list
         }
-        pElem->lifetime = tex_passes;
-        
+
         return object_id;
     }
     return WORLD_ELEM_ID_INVALID;

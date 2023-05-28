@@ -32,7 +32,7 @@ typedef struct
 } glFlightPrefs;
 
 // TODO:bump this every time settings change
-const static int settings_version = 39;
+const static int settings_version = 41; // previously 39
 
 // HACK: externs built in .m files
 extern double dz_roll, dz_pitch, dz_yaw;
@@ -194,7 +194,7 @@ gameSettingsRead(const char *filename)
         }
         else if(settings_version == 33 && settings_ver == 32)
         {
-            gameSettingsComplexControls = 0;
+            gameSettingsComplexControls = 1; // must match defaults! move default value to a const
         }
         else if(settings_version == 37 && settings_ver == 36)
         {

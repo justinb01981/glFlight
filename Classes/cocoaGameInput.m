@@ -41,10 +41,12 @@
 #include "gameUtils.h"
 #include "gameDialogs.h"
 
+extern void (*trimDoneCallback)(void);
+
+static void ignore(void) {}
 
 @implementation cocoaGyroManager
 {
-    int resumeCountDown;
     CMAttitude *attitudeTmp, *attitudeRef;
 }
 
@@ -55,19 +57,13 @@
 	if(!gameInputSingleton)
 	{
 		gameInputSingleton = [[cocoaGyroManager alloc] initialize];
+        trimDoneCallback = ignore;
 	}
 	return gameInputSingleton;
 }
 
 -(void) handleDeviceMotionUpdate: (CMDeviceMotion*) motion withError:(NSError*) err
 {
-//    if(resumeCountDown > 0) // ignore initial N motion events (working around bug)
-//    {
-//        resumeCountDown--;
-//        return;
-//    }
-
-
     CMAttitude* attitudeDev = [[motion attitude] copy];
 
     // switch to main queue?
@@ -75,8 +71,8 @@
 
         if(attitudeDev)
         {
-            NSLog(@"attitudeRef: %@ attitude device: %@\n",
-                  [attitudeRef debugDescription], [attitudeDev debugDescription]);
+//            NSLog(@"attitudeRef: %@ attitude device: %@\n",
+//                  [attitudeRef debugDescription], [attitudeDev debugDescription]);
 
             CMAttitude* attitude = [(CMAttitude*) attitudeDev copy]; // mutable attitude modified in-place
             if(attitudeRef != nil) [attitude multiplyByInverseOfAttitude: attitudeRef];
@@ -88,6 +84,8 @@
                 NSLog(@"handleDeviceMotionUpdate: dispatch_async - needTrim ");
 
                 attitudeRef = (CMAttitude*) attitudeDev; // last recorded attitude is now our reference applied after
+
+                trimDoneCallback();
             }
             else
             {
@@ -105,9 +103,7 @@
 {
 	[self init];
     
-	initialized = false;
-
-    resumeCountDown = 0;
+    initialized = false;
     
     self.showsDeviceMovementDisplay = YES;
     
@@ -139,7 +135,6 @@
 
 -(void) resumeUpdates
 {
-    resumeCountDown = 120;
 }
 
 @end

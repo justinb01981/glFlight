@@ -795,6 +795,8 @@ glFlightFrameStage2()
 static void
 clear_vis_btree_removed(WorldElem* headElem)
 {
+    assert(visibleBtreeRootBuilding);
+
     while(headElem)
     {
         
@@ -809,7 +811,7 @@ clear_vis_btree_removed(WorldElem* headElem)
 }
 
 static void
-clear_world_pending_removals()
+clear_world_pending_removals(void)
 {
 	WorldElemListNode* pRemovedPtr = gWorld->elements_to_be_freed.next;
 	while(pRemovedPtr)

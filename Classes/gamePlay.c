@@ -1663,9 +1663,11 @@ game_run()
                         }
                         else
                         {
+                            /*
                             game_add_turret(pCur->elem->physics.ptr->x, pCur->elem->physics.ptr->y, pCur->elem->physics.ptr->z);
                             world_get_last_object()->stuff.u.enemy.intelligence =
                             pCur->elem->stuff.u.spawnpoint.spawn_intelligence;
+                             */
                         }
                         
                         world_get_last_object()->stuff.affiliation = pCur->elem->stuff.affiliation;
@@ -1736,12 +1738,13 @@ game_run()
                                                &bx, &by, &bz);
                     float tow_v[] =
                     {
-                        pCur->elem->physics.ptr->x + (bz.x*4.0 - by.x*1) - listNodeTowed->elem->physics.ptr->x,
-                        pCur->elem->physics.ptr->y + (bz.y*4.0 - by.y*1) - listNodeTowed->elem->physics.ptr->y,
-                        pCur->elem->physics.ptr->z + (bz.z*4.0 - by.z*1) - listNodeTowed->elem->physics.ptr->z
+                        // determines ideal tow location relative to tower (TODO: tie this to enemy bounding box size smarterly)
+                        pCur->elem->physics.ptr->x + (bz.x*TOW_DISTANCE_MIN + by.x*0.5) - listNodeTowed->elem->physics.ptr->x,
+                        pCur->elem->physics.ptr->y + (bz.y*TOW_DISTANCE_MIN + by.y*0.5) - listNodeTowed->elem->physics.ptr->y,
+                        pCur->elem->physics.ptr->z + (bz.z*TOW_DISTANCE_MIN + by.z*0.5) - listNodeTowed->elem->physics.ptr->z
                     };
-                    float tow_d = sqrt(tow_v[0]*tow_v[0] + tow_v[1]*tow_v[1] + tow_v[2]*tow_v[2]);
-                    float tow_m = tow_d * /*4.5*/ 1.0;
+                    float tow_d = sqrt(tow_v[0]*tow_v[0] + tow_v[1]*tow_v[1] + tow_v[2]*tow_v[2]); // dist
+                    float tow_m = tow_d * /*4.5*/ 1.0; // multiple
                     
                     tow_v[0] = (tow_v[0]/tow_d);
                     tow_v[1] = (tow_v[1]/tow_d);
@@ -1818,6 +1821,7 @@ game_run()
                         case OBJ_POWERUP_GENERIC:
                             if(pCur->elem->stuff.subtype == GAME_SUBTYPE_COLLECT)
                             {
+                                // draw an arrow indicating the next collection point
                                 if(pMyShipNode->elem->stuff.towed_elem_id == WORLD_ELEM_ID_INVALID)
                                 {
                                     if(time_ms - gameInterfaceControls.textMenuButton.touch_end_last > 1000)
@@ -2005,20 +2009,17 @@ game_run()
                 collision_actions_set_player_vuln();
             }
             
-            if(!gameSettingsComplexControls)
-            {                
-                if(gameStateSinglePlayer.boost_charge < 1.0)
+            if(gameStateSinglePlayer.boost_charge < 1.0)
+            {
+                if(!gameInterfaceControls.fireRectBoost.visible)
                 {
-                    if(!gameInterfaceControls.fireRectBoost.visible)
-                    {
-                        gameStateSinglePlayer.boost_charge += game_boost_recharge_rate;
-                    }
+                    gameStateSinglePlayer.boost_charge += game_boost_recharge_rate;
                 }
-                else
-                {
-                    gameStateSinglePlayer.boost_charge = 0;
-                    gameInterfaceSetInterfaceState(INTERFACE_STATE_BOOST_AVAIL);
-                }
+            }
+            else
+            {
+                gameStateSinglePlayer.boost_charge = 0;
+                gameInterfaceSetInterfaceState(INTERFACE_STATE_BOOST_AVAIL);
             }
             
             gameStateSinglePlayer.enemy_intelligence += gameStateSinglePlayer.rate_enemy_skill_increase;

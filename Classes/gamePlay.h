@@ -176,7 +176,7 @@ const static float game_variables_default[] = {
     /*25*/25,    // ENEMY1_JUKE_PCT
     2,           // ENEMY1_COLLECT_DURABILITY
     20,          // ENEMY_RUN_DISTANCE
-    PLATFORM_TICK_RATE*60,       // COLLECT_POINT_LIFETIME
+    PLATFORM_TICK_RATE*300,       // COLLECT_POINT_LIFETIME
     0,0,0,0,0,0,0,0,0,0,0,0,
     0            // END
 };

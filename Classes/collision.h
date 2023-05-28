@@ -391,15 +391,6 @@ do_world_collision_handling(float tc)
                                                    1);
                         }
                     }
-
-                    if(isnan(pCollisionA->elem->physics.ptr->x))
-                    {
-                        printf("collision_handling: isNan: %ptr\n", pCollisionA->elem);
-                    }
-                    if(isnan(pCollisionB->elem->physics.ptr->x))
-                    {
-                        printf("collision_handling: isNan: %ptr\n", pCollisionB->elem);
-                    }
                     
                     game_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
                     gameNetwork_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
@@ -514,17 +505,23 @@ do_world_collision_handling(float tc)
                 break;
                     
             case COLLISION_ACTION_PORTAL_TELEPORT:
-                console_clear();
-                gameNetwork_disconnectSignal();
-                if(strcmp(pCollisionA->elem->stuff.nametag, GAME_NETWORK_HOST_PORTAL_NAME) == 0)
                 {
-                    gameNetwork_host(gameSettingGameTitle, load_map_and_host_game);
+                    char* nametag = pCollisionA->elem->stuff.nametag;
+
+                    console_clear();
+                    gameNetwork_disconnectSignal();
+                    if(nametag != NULL) {
+                        if(strcmp(nametag, GAME_NETWORK_HOST_PORTAL_NAME) == 0)
+                        {
+                            gameNetwork_host(gameSettingGameTitle, load_map_and_host_game);
+                        }
+                        else
+                        {
+                            gameNetwork_connect(nametag, NULL);
+                        }
+                    }
+                    world_remove_object(pCollisionA->elem->elem_id);
                 }
-                else
-                {
-                     gameNetwork_connect(pCollisionA->elem->stuff.nametag, NULL);
-                }
-                world_remove_object(pCollisionA->elem->elem_id);
                 break;
             }
         }

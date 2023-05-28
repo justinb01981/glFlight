@@ -56,6 +56,7 @@
 void gameInputStatsCollectStart(void);
 void gameInputStatsAppend(float ypr[3]);
 void gameInputStatsCalc(void);
+void trimDoneIgnore(void);
 
 int rm_count = 0;
 
@@ -125,7 +126,7 @@ gameInputInit()
     
     initialized = 1;
     
-    trimDoneCallback = NULL;
+    trimDoneCallback = trimDoneIgnore;
 }
 
 void
@@ -263,10 +264,6 @@ gameInput()
 //        trimDoneCallback();
 //    }
     
-    if(needTrim) {
-        trimDoneCallback();
-    }
-    
     /*
                          (Rmax-Rmin)
             Dr - Rmin + ------------
@@ -307,35 +304,37 @@ gameInput()
             gameShip_unfakeRoll();
         }
             
-        if(!gameSettingsComplexControls)
-        {
-            float angleGround = gameShip_calcRoll() - M_PI;
-            
-            if(fabs(angleGround) > 0.02)
-            {
-                float shipy[3];
-                gameShip_getYVector(shipy);
-                
-                float r = 0.01;
-                
-                if(angleGround > 0)
-                {
-                    r = -r;
-                }
-                else
-                {
-                    r = r;
-                }
-                
-                if(shipy[1] < 0) r *= 4;
-                
-                gameShip_roll(r);
-            }
-        }
+//        if(!gameSettingsComplexControls)
+//        {
+//            float angleGround = gameShip_calcRoll() - M_PI;
+//
+//            if(fabs(angleGround) > 0.02)
+//            {
+//                float shipy[3];
+//                gameShip_getYVector(shipy);
+//
+//                float r = 0.01;
+//
+//                if(angleGround > 0)
+//                {
+//                    r = -r;
+//                }
+//                else
+//                {
+//                    r = r;
+//                }
+//
+//                if(shipy[1] < 0) r *= 4;
+//
+//                gameShip_roll(r);
+//            }
+//        }
         
-        if(fabs(input_roll) > dz_min && gameSettingsComplexControls)
+        if(fabs(input_roll) > dz_min
+//           && gameSettingsComplexControls
+           )
         {
-            //printf("-----------ROLLING-----------\n");
+//            printf("-----------ROLLING-----------\n");
             
             double s = input_roll * fabs(input_roll) * GYRO_DC * tc;
 
@@ -347,7 +346,7 @@ gameInput()
         
         if(fabs(input_pitch) > dz_min)
         {
-            //printf("-----------PITCHING-----------\n");
+//            printf("-----------PITCHING-----------\n");
             
             double s = input_pitch * fabs(input_pitch) * GYRO_DC * tc;
 
@@ -359,7 +358,7 @@ gameInput()
         
         if(fabs(input_yaw) > dz_min)
         {
-            //printf("-----------YAWING-----------\n");
+//            printf("-----------YAWING-----------\n");
             
             double s = input_yaw * fabs(input_yaw) * GYRO_DC * tc;
 
@@ -451,4 +450,9 @@ gameInputStatsCalc()
     printf("gameInputStats avg:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.avg[j]); printf("\n");
     printf("gameInputStats min:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.min[j]); printf("\n");
     printf("gameInputStats max:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.max[j]); printf("\n");
+}
+
+void trimDoneIgnore(void)
+{
+
 }

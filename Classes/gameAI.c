@@ -699,23 +699,26 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     elem->yq = yq;
     elem->zq = zq;
     
-#if 0
+#if 1
     // TODO: re-apply a,b,g to elem body vectors or store the whole quaternion - no more drift to NaN
     float* pFloatCheckIsNan[] = {
         &alpha,
         &beta,
-        &gamma
-    };
-    float* pFloatCheckIsNanR[] = {
-        &elem->physics.ptr->alpha,
-        &elem->physics.ptr->beta,
-        &elem->physics.ptr->gamma
+        &gamma,
+        &elem->physics.ptr->x,
+        &elem->physics.ptr->y,
+        &elem->physics.ptr->z
     };
     for(iF = 0; iF < sizeof(pFloatCheckIsNan)/sizeof(float*); iF++)
     {
         if(isnan(*pFloatCheckIsNan[iF]))
         {
             printf("gameAI.c: isnan (%p)\n", elem);
+
+            alpha = beta = gamma = 0.0;
+            *pFloatCheckIsNan[iF] = 1.0;
+
+            break;
             /*
             // *pFloatCheckIsNan[iF] = 0;
             
@@ -741,11 +744,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             
             get_euler_from_body_vectors(&resx, &resy, &resz, &alpha, &beta, &gamma);
             */
-            
-            // assuming gimbal lock is the problem, retry after minor euler alpha change
-            elem->physics.ptr->alpha *= 0.95;
-            elem->stuff.u.enemy.time_last_run = time_ms - elem->stuff.u.enemy.time_run_interval;
-            return;
         }
     }
 #endif
