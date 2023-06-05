@@ -13,7 +13,6 @@
 
 #include "gameIncludes.h"
 
-#include "gameGraphics.h"
 #include "gameCamera.h"
 #include "models.h"
 #include "gameInterface.h"
@@ -193,7 +192,9 @@ setupGLFramebufferViewDone()
     glMatrixMode(GL_TEXTURE);
     glPopMatrix();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, gFramebufferId);
+    extern int FramebufferNameInitial;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferNameInitial);
 }
 
 static unsigned int drawn_texture_last;
@@ -2079,8 +2080,7 @@ gameGraphicsUninit(void)
     };
     
     for(i = 0; i < 3; i++) { if(*(freeBuffers[i])) { free(*(freeBuffers[i])); *freeBuffers[i] = NULL; } }
-    
-    drawBackgroundUninit();
-    
+
     frameBufCleanup(&gFrameBufSt);
+    drawBackgroundUninit();
 }

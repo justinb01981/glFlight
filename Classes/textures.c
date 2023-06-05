@@ -11,12 +11,18 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <sys/types.h>
+
 #include "gameIncludes.h"
 #include "gameDebug.h"
 #include "assert.h"
 
 #include "textures.h"
 #include "framebuffer.h"
+
+// remove this hack but requires .h dependency redo
+#ifndef GL_NONE
+#define GL_NONE 0
+#endif
 
 unsigned int texture_list[MAX_TEXTURES];
 unsigned int texture_list_loaded[MAX_TEXTURES];
@@ -222,6 +228,8 @@ void initTextures(const char *prefix)
 int bindTextureRequest(int tex_id)
 {
     int load_count = 6;
+
+
     
     if(!texture_list_loaded[tex_id])
     {
@@ -230,11 +238,14 @@ int bindTextureRequest(int tex_id)
         
         //console_clear();
         //console_write("loading texture: %d", tex_id);
+
+        if(tex_id == TEXTURE_ID_BOUNDING) tex_id = TEXTURE_ID_FRAMEBUFFER;
         
         while(n_textures <= tex_id && load_count > 0)
         {
             // TODO: ignore TEXTURE_ID_BOUNDING
 
+            if(n_textures != TEXTURE_ID_FRAMEBUFFER)
             if(read_bitmap_to_gltexture(n_textures) != 0)
             {
                 printf("failed to load texture: %d\n", n_textures);

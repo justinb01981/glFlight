@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "40513D7D-2412-44F0-9975-3E201BA90425"
+   type = "0"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "93FC79D2-A898-43D7-9040-6224456066A0"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/gamePlay.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1291"
+            endingLineNumber = "1291"
+            landmarkName = "game_handle_collision(elemA, elemB, collision_action)"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "93FC79D2-A898-43D7-9040-6224456066A0 - 48f09a688354cc7e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "game_handle_collision"
+                  moduleName = "d0gf1ght 95"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gamePlay.c"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1291"
+                  endingLineNumber = "1291"
+                  offsetFromSymbolStart = "804">
+               </Location>
+               <Location
+                  uuid = "93FC79D2-A898-43D7-9040-6224456066A0 - 48f09a688354cc7e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "game_handle_collision"
+                  moduleName = "d0gf1ght 95"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gamePlay.c"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1291"
+                  endingLineNumber = "1291"
+                  offsetFromSymbolStart = "808">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C67FE31A-EA2A-49B7-AB86-C61FB1D6697A"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/gameAI.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "716"
+            endingLineNumber = "716"
+            landmarkName = "object_pursue(x, y, z, vx, vy, vz, elem, target_objtype)"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "C67FE31A-EA2A-49B7-AB86-C61FB1D6697A - 4153510190faffa3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "object_pursue"
+                  moduleName = "d0gf1ght 95"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameAI.c"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "718"
+                  endingLineNumber = "718"
+                  offsetFromSymbolStart = "1640">
+               </Location>
+               <Location
+                  uuid = "C67FE31A-EA2A-49B7-AB86-C61FB1D6697A - 4153510190faffa3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "object_pursue"
+                  moduleName = "d0gf1ght 95"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameAI.c"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "718"
+                  endingLineNumber = "718"
+                  offsetFromSymbolStart = "1636">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

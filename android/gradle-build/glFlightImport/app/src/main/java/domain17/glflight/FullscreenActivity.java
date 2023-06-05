@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 //import android.opengl.EGLConfig;
+import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
@@ -146,7 +147,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         contentView.setOnTouchListener(mOnTouchListener);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         // sensor registerListener called in onResume
 
@@ -155,7 +156,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         running = true;
         mBGThread.start();
         if(!renderContinuously) mRenderThread.start();
-        //mTimerThread.start();
     }
 
     @Override
@@ -205,13 +205,24 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
      */
 
     public void onSensorChanged(SensorEvent e) {
+
+        // thanks to
+        // https://github.com/tutsplus/android-sensors-in-depth-proximity-and-gyroscope/blob/master/app/src/main/java/com/tutsplus/sensorstutorial/RotationVectorActivity.java
+
+        float[] Rm = new float[16];
+        SensorManager.getRotationMatrixFromVector(Rm, e.values);
+
+        float[] orientations = new float[3];
+        SensorManager.getOrientation(Rm, orientations);
+
     	if(e.sensor == mSensorGyro)
     	{
-    	    // TODO: use mSensorManager.getOrientation();
-            GameRunnable.glFlightSensorInput(e.values);
+//            System.out.println("orientations: " + orientations[0] + "," + orientations [1] + "," + orientations[2]);
+
+            GameRunnable.glFlightSensorInput(orientations);
     	}
     }
-    
+
     public void onAccuracyChanged(Sensor s, int a) {
     	accuracyLast = a;
 		//System.out.println("onAccuracyChanged\n");
@@ -232,7 +243,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
 		for(int i = 0; i < motionEvent.getPointerCount(); i++)
         {
-
             int pointerID = motionEvent.getPointerId(i);
 			double tX = (motionEvent.getX(i) / dev.getMotionRange(InputDevice.MOTION_RANGE_X).getMax()) * (viewWidthScaled+hackNavBar);
 			double tY = (motionEvent.getY(i) / dev.getMotionRange(InputDevice.MOTION_RANGE_Y).getMax()) * viewHeightScaled;
@@ -283,7 +293,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     	return super.onTouchEvent(motionEvent);
     }
 
-
     /**
      * Touch listener to use for in-layout UI controls to delay hiding the
      * system UI. This is to prevent the jarring behavior of controls going away
@@ -324,30 +333,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
             }
         }
     });
-
-    /*
-	class GameTimer extends TimerTask {
-		Timer t;
-		public GameTimer() {
-			t = new Timer();
-			t.scheduleAtFixedRate(this, 0, 1000 / (GameRenderer.fps));
-		}
-
-		public void run() {
-            if(running) {
-			    GameRunnable.runTimerThread();
-
-			    gameRenderer.requestRender();
-            }
-		}
-
-		public void start() {
-		}
-	}
-
-	GameTimer mTimerThread = new GameTimer();
-
-	*/
 
     Thread mBGThread = new Thread(new Runnable() {
     		public void run() {

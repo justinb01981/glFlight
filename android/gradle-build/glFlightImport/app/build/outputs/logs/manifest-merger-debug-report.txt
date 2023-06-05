@@ -1,114 +1,172 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
-INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
-INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
-INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
-MERGED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:17:1-27:12
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/813980d27462849c6257c36bc5bb24de/AndroidManifest.xml:2:1-9:12
-MERGED from [com.android.support:support-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/c83f8317c61ee09b729fe95ec7f85958/AndroidManifest.xml:2:1-9:12
-MERGED from [com.android.support:support-v4:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/3f899c846fe63fbb7142e69f03ba3630/AndroidManifest.xml:17:1-24:12
-INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
-INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
-INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-41:12
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-44:12
+MERGED from [com.android.support:appcompat-v7:28.0.0] /Users/justin/.gradle/caches/transforms-3/300ac46e32a15d0f2d2ca6c50221c00f/transformed/appcompat-v7-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-fragment:28.0.0] /Users/justin/.gradle/caches/transforms-3/227b640e2330dcaa10a6a8044db1dc70/transformed/support-fragment-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:animated-vector-drawable:28.0.0] /Users/justin/.gradle/caches/transforms-3/7e1f741b4f97bc902427baeb6a5eecc1/transformed/animated-vector-drawable-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-ui:28.0.0] /Users/justin/.gradle/caches/transforms-3/de26ffc625652ace3f9a08cfb2c2714b/transformed/support-core-ui-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-utils:28.0.0] /Users/justin/.gradle/caches/transforms-3/1ed8faf83f52eab2923be1b141125756/transformed/support-core-utils-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-vector-drawable:28.0.0] /Users/justin/.gradle/caches/transforms-3/0491bfb45464c697105c9ad38cb2506f/transformed/support-vector-drawable-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:loader:28.0.0] /Users/justin/.gradle/caches/transforms-3/d46002d673293b8641d53efb4b4b7cbb/transformed/loader-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:viewpager:28.0.0] /Users/justin/.gradle/caches/transforms-3/363ce9cbb828ca14a2cffcc199bef4e4/transformed/viewpager-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:coordinatorlayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/fef70e3fd3f0f0f11d7eeba5bc5b1817/transformed/coordinatorlayout-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:drawerlayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/2482124ce1ce105252e41eb2ccaad1b3/transformed/drawerlayout-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:slidingpanelayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/b8bce6ec54f09f94e3d099e000f653c6/transformed/slidingpanelayout-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:customview:28.0.0] /Users/justin/.gradle/caches/transforms-3/a59d2ed736addfa1f1c5cac28933ac5d/transformed/customview-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:swiperefreshlayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/873a14975032137475b068ad5605458b/transformed/swiperefreshlayout-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:asynclayoutinflater:28.0.0] /Users/justin/.gradle/caches/transforms-3/5a4e2189f453e8522240f7f454953465/transformed/asynclayoutinflater-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-compat:28.0.0] /Users/justin/.gradle/caches/transforms-3/7c54e921e588af704a051b53e2c7eae7/transformed/support-compat-28.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/justin/.gradle/caches/transforms-3/d8490773b4c26c38eedfe8e45d3fab2c/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:17:1-25:12
+MERGED from [com.android.support:cursoradapter:28.0.0] /Users/justin/.gradle/caches/transforms-3/81064fb3eff3abfd7e101ba740a2a614/transformed/cursoradapter-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:runtime:1.1.1] /Users/justin/.gradle/caches/transforms-3/4412b68ee44ca2c3e0f8a466613528de/transformed/runtime-1.1.1/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:documentfile:28.0.0] /Users/justin/.gradle/caches/transforms-3/f3074970ce28c0b78142693af1204aa3/transformed/documentfile-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:localbroadcastmanager:28.0.0] /Users/justin/.gradle/caches/transforms-3/8c4e770c391d0e1c38906cc4f5197873/transformed/localbroadcastmanager-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:print:28.0.0] /Users/justin/.gradle/caches/transforms-3/98d36c54bc510f5e25b9c64eb03d1e9f/transformed/print-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:viewmodel:1.1.1] /Users/justin/.gradle/caches/transforms-3/f66ebbcd075837ef73dc7381212b8869/transformed/viewmodel-1.1.1/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:livedata:1.1.1] /Users/justin/.gradle/caches/transforms-3/c2b667d43c7b70ddf4b0c5d26d1226c4/transformed/livedata-1.1.1/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:livedata-core:1.1.1] /Users/justin/.gradle/caches/transforms-3/03b5e4a356f00c21888f78b182ccad32/transformed/livedata-core-1.1.1/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.core:runtime:1.1.1] /Users/justin/.gradle/caches/transforms-3/999acc5fa695b02991bad019af172c53/transformed/runtime-1.1.1/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:interpolator:28.0.0] /Users/justin/.gradle/caches/transforms-3/795e76abf8f0d3e76b409adf2566a618/transformed/interpolator-28.0.0/AndroidManifest.xml:17:1-22:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-44:12
 	package
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:3:5-36
 		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:1-44:12
 		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 	android:versionName
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:5:5-34
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:4:5-34
 		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 	xmlns:android
 		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:2:11-69
 	android:versionCode
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:4:5-35
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:3:5-35
 		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
-application
-ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:12:5-33:19
-MERGED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/813980d27462849c6257c36bc5bb24de/AndroidManifest.xml:7:5-20
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/813980d27462849c6257c36bc5bb24de/AndroidManifest.xml:7:5-20
-MERGED from [com.android.support:support-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/c83f8317c61ee09b729fe95ec7f85958/AndroidManifest.xml:7:5-20
-MERGED from [com.android.support:support-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/c83f8317c61ee09b729fe95ec7f85958/AndroidManifest.xml:7:5-20
-MERGED from [com.android.support:support-v4:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/3f899c846fe63fbb7142e69f03ba3630/AndroidManifest.xml:22:5-20
-MERGED from [com.android.support:support-v4:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/3f899c846fe63fbb7142e69f03ba3630/AndroidManifest.xml:22:5-20
-	android:label
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:16:9-41
-	android:persistent
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:14:9-35
-	android:icon
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:15:9-45
-	android:allowBackup
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:13:9-36
-	android:theme
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:17:9-40
-	locale
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:12:18-32
-activity#com.domain17.glflight.FullscreenActivity
-ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:18:9-32:20
-	android:screenOrientation
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:21:13-50
-	android:label
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:22:13-45
-	android:excludeFromRecents
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:25:13-46
-	android:configChanges
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:20:13-62
-	android:theme
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:23:13-51
-	android:finishOnTaskLaunch
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:24:13-46
-	android:name
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:19:13-68
-intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:27:13-31:29
-action#android.intent.action.MAIN
-ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:28:17-69
-	android:name
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:28:25-66
-category#android.intent.category.LAUNCHER
-ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:30:17-77
-	android:name
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:30:27-74
-uses-permission#android.permission.READ_EXTERNAL_STORAGE
-ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:35:5-80
-	android:name
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:35:22-77
-uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:36:5-81
-	android:name
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:36:22-78
-uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:37:5-79
-	android:name
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:37:22-76
 uses-permission#android.permission.INTERNET
-ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:38:5-67
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:11:5-67
 	android:name
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:38:22-64
-uses-permission#android.permission.CHANGE_WIFI_MULTICAST_STATE
-ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:39:5-86
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:11:22-64
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:12:5-79
 	android:name
-		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:39:22-83
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:12:22-76
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:13:5-80
+	android:name
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:13:22-77
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:14:5-81
+	android:name
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:14:22-78
+application
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:16:5-42:19
+MERGED from [com.android.support:support-compat:28.0.0] /Users/justin/.gradle/caches/transforms-3/7c54e921e588af704a051b53e2c7eae7/transformed/support-compat-28.0.0/AndroidManifest.xml:22:5-94
+MERGED from [com.android.support:support-compat:28.0.0] /Users/justin/.gradle/caches/transforms-3/7c54e921e588af704a051b53e2c7eae7/transformed/support-compat-28.0.0/AndroidManifest.xml:22:5-94
+MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/justin/.gradle/caches/transforms-3/d8490773b4c26c38eedfe8e45d3fab2c/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:22:5-23:19
+MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/justin/.gradle/caches/transforms-3/d8490773b4c26c38eedfe8e45d3fab2c/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:22:5-23:19
+	android:appComponentFactory
+		ADDED from [com.android.support:support-compat:28.0.0] /Users/justin/.gradle/caches/transforms-3/7c54e921e588af704a051b53e2c7eae7/transformed/support-compat-28.0.0/AndroidManifest.xml:22:18-91
+	android:label
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:20:9-41
+	android:persistent
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:18:9-35
+	android:icon
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:19:9-45
+	android:allowBackup
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:17:9-36
+	android:theme
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:21:9-40
+	locale
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:16:18-32
+activity#com.domain17.glflight.FullscreenActivity
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:22:9-39:20
+	android:screenOrientation
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:25:13-50
+	android:label
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:26:13-45
+	android:exported
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:29:13-36
+	android:configChanges
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:24:13-62
+	android:theme
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:27:13-51
+	android:finishOnTaskLaunch
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:28:13-46
+	android:name
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:23:13-68
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:31:13-34:29
+action#android.intent.action.MAIN
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:32:17-69
+	android:name
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:32:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:33:17-77
+	android:name
+		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml:33:27-74
 uses-sdk
 INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
-MERGED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:21:5-23:78
-MERGED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:21:5-23:78
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/813980d27462849c6257c36bc5bb24de/AndroidManifest.xml:5:5-44
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/813980d27462849c6257c36bc5bb24de/AndroidManifest.xml:5:5-44
-MERGED from [com.android.support:support-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/c83f8317c61ee09b729fe95ec7f85958/AndroidManifest.xml:5:5-43
-MERGED from [com.android.support:support-vector-drawable:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/c83f8317c61ee09b729fe95ec7f85958/AndroidManifest.xml:5:5-43
-MERGED from [com.android.support:support-v4:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/3f899c846fe63fbb7142e69f03ba3630/AndroidManifest.xml:20:5-43
-MERGED from [com.android.support:support-v4:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/3f899c846fe63fbb7142e69f03ba3630/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:appcompat-v7:28.0.0] /Users/justin/.gradle/caches/transforms-3/300ac46e32a15d0f2d2ca6c50221c00f/transformed/appcompat-v7-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:appcompat-v7:28.0.0] /Users/justin/.gradle/caches/transforms-3/300ac46e32a15d0f2d2ca6c50221c00f/transformed/appcompat-v7-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:28.0.0] /Users/justin/.gradle/caches/transforms-3/227b640e2330dcaa10a6a8044db1dc70/transformed/support-fragment-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:28.0.0] /Users/justin/.gradle/caches/transforms-3/227b640e2330dcaa10a6a8044db1dc70/transformed/support-fragment-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:28.0.0] /Users/justin/.gradle/caches/transforms-3/7e1f741b4f97bc902427baeb6a5eecc1/transformed/animated-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:28.0.0] /Users/justin/.gradle/caches/transforms-3/7e1f741b4f97bc902427baeb6a5eecc1/transformed/animated-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:28.0.0] /Users/justin/.gradle/caches/transforms-3/de26ffc625652ace3f9a08cfb2c2714b/transformed/support-core-ui-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:28.0.0] /Users/justin/.gradle/caches/transforms-3/de26ffc625652ace3f9a08cfb2c2714b/transformed/support-core-ui-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:28.0.0] /Users/justin/.gradle/caches/transforms-3/1ed8faf83f52eab2923be1b141125756/transformed/support-core-utils-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:28.0.0] /Users/justin/.gradle/caches/transforms-3/1ed8faf83f52eab2923be1b141125756/transformed/support-core-utils-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:28.0.0] /Users/justin/.gradle/caches/transforms-3/0491bfb45464c697105c9ad38cb2506f/transformed/support-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:28.0.0] /Users/justin/.gradle/caches/transforms-3/0491bfb45464c697105c9ad38cb2506f/transformed/support-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:loader:28.0.0] /Users/justin/.gradle/caches/transforms-3/d46002d673293b8641d53efb4b4b7cbb/transformed/loader-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:loader:28.0.0] /Users/justin/.gradle/caches/transforms-3/d46002d673293b8641d53efb4b4b7cbb/transformed/loader-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:viewpager:28.0.0] /Users/justin/.gradle/caches/transforms-3/363ce9cbb828ca14a2cffcc199bef4e4/transformed/viewpager-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:viewpager:28.0.0] /Users/justin/.gradle/caches/transforms-3/363ce9cbb828ca14a2cffcc199bef4e4/transformed/viewpager-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:coordinatorlayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/fef70e3fd3f0f0f11d7eeba5bc5b1817/transformed/coordinatorlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:coordinatorlayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/fef70e3fd3f0f0f11d7eeba5bc5b1817/transformed/coordinatorlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:drawerlayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/2482124ce1ce105252e41eb2ccaad1b3/transformed/drawerlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:drawerlayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/2482124ce1ce105252e41eb2ccaad1b3/transformed/drawerlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:slidingpanelayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/b8bce6ec54f09f94e3d099e000f653c6/transformed/slidingpanelayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:slidingpanelayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/b8bce6ec54f09f94e3d099e000f653c6/transformed/slidingpanelayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:customview:28.0.0] /Users/justin/.gradle/caches/transforms-3/a59d2ed736addfa1f1c5cac28933ac5d/transformed/customview-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:customview:28.0.0] /Users/justin/.gradle/caches/transforms-3/a59d2ed736addfa1f1c5cac28933ac5d/transformed/customview-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:swiperefreshlayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/873a14975032137475b068ad5605458b/transformed/swiperefreshlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:swiperefreshlayout:28.0.0] /Users/justin/.gradle/caches/transforms-3/873a14975032137475b068ad5605458b/transformed/swiperefreshlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:asynclayoutinflater:28.0.0] /Users/justin/.gradle/caches/transforms-3/5a4e2189f453e8522240f7f454953465/transformed/asynclayoutinflater-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:asynclayoutinflater:28.0.0] /Users/justin/.gradle/caches/transforms-3/5a4e2189f453e8522240f7f454953465/transformed/asynclayoutinflater-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:28.0.0] /Users/justin/.gradle/caches/transforms-3/7c54e921e588af704a051b53e2c7eae7/transformed/support-compat-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:28.0.0] /Users/justin/.gradle/caches/transforms-3/7c54e921e588af704a051b53e2c7eae7/transformed/support-compat-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/justin/.gradle/caches/transforms-3/d8490773b4c26c38eedfe8e45d3fab2c/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/justin/.gradle/caches/transforms-3/d8490773b4c26c38eedfe8e45d3fab2c/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:cursoradapter:28.0.0] /Users/justin/.gradle/caches/transforms-3/81064fb3eff3abfd7e101ba740a2a614/transformed/cursoradapter-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:cursoradapter:28.0.0] /Users/justin/.gradle/caches/transforms-3/81064fb3eff3abfd7e101ba740a2a614/transformed/cursoradapter-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:runtime:1.1.1] /Users/justin/.gradle/caches/transforms-3/4412b68ee44ca2c3e0f8a466613528de/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:runtime:1.1.1] /Users/justin/.gradle/caches/transforms-3/4412b68ee44ca2c3e0f8a466613528de/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:documentfile:28.0.0] /Users/justin/.gradle/caches/transforms-3/f3074970ce28c0b78142693af1204aa3/transformed/documentfile-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:documentfile:28.0.0] /Users/justin/.gradle/caches/transforms-3/f3074970ce28c0b78142693af1204aa3/transformed/documentfile-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:localbroadcastmanager:28.0.0] /Users/justin/.gradle/caches/transforms-3/8c4e770c391d0e1c38906cc4f5197873/transformed/localbroadcastmanager-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:localbroadcastmanager:28.0.0] /Users/justin/.gradle/caches/transforms-3/8c4e770c391d0e1c38906cc4f5197873/transformed/localbroadcastmanager-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:print:28.0.0] /Users/justin/.gradle/caches/transforms-3/98d36c54bc510f5e25b9c64eb03d1e9f/transformed/print-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:print:28.0.0] /Users/justin/.gradle/caches/transforms-3/98d36c54bc510f5e25b9c64eb03d1e9f/transformed/print-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:viewmodel:1.1.1] /Users/justin/.gradle/caches/transforms-3/f66ebbcd075837ef73dc7381212b8869/transformed/viewmodel-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:viewmodel:1.1.1] /Users/justin/.gradle/caches/transforms-3/f66ebbcd075837ef73dc7381212b8869/transformed/viewmodel-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata:1.1.1] /Users/justin/.gradle/caches/transforms-3/c2b667d43c7b70ddf4b0c5d26d1226c4/transformed/livedata-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata:1.1.1] /Users/justin/.gradle/caches/transforms-3/c2b667d43c7b70ddf4b0c5d26d1226c4/transformed/livedata-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata-core:1.1.1] /Users/justin/.gradle/caches/transforms-3/03b5e4a356f00c21888f78b182ccad32/transformed/livedata-core-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata-core:1.1.1] /Users/justin/.gradle/caches/transforms-3/03b5e4a356f00c21888f78b182ccad32/transformed/livedata-core-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.core:runtime:1.1.1] /Users/justin/.gradle/caches/transforms-3/999acc5fa695b02991bad019af172c53/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.core:runtime:1.1.1] /Users/justin/.gradle/caches/transforms-3/999acc5fa695b02991bad019af172c53/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:interpolator:28.0.0] /Users/justin/.gradle/caches/transforms-3/795e76abf8f0d3e76b409adf2566a618/transformed/interpolator-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:interpolator:28.0.0] /Users/justin/.gradle/caches/transforms-3/795e76abf8f0d3e76b409adf2566a618/transformed/interpolator-28.0.0/AndroidManifest.xml:20:5-44
 INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
-	tools:overrideLibrary
-		ADDED from [com.android.support:appcompat-v7:23.4.0] /Users/justin/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/2419538b22473ed2ac9a3f7b14d7bf66/AndroidManifest.xml:23:9-75
 	android:targetSdkVersion
 		INJECTED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml
 		ADDED from /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/AndroidManifest.xml

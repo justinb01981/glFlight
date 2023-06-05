@@ -24,6 +24,7 @@ public class GameRunnable  {
 	}
 	
 	public static void sensorInput(float f[]) {
+		
 		glFlightSensorInput(f);
 	}
 	

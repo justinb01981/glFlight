@@ -297,13 +297,13 @@ gameInput()
     
     if(!game_paused)
     {
-        if(!gameSettingsComplexControls)
-        {
-            input_roll = input_yaw * -3.0;
-            
-            gameShip_unfakeRoll();
-        }
-            
+//        if(!gameSettingsComplexControls)
+//        {
+//            input_roll = input_yaw * -3.0;
+//
+//            gameShip_unfakeRoll();
+//        }
+//
 //        if(!gameSettingsComplexControls)
 //        {
 //            float angleGround = gameShip_calcRoll() - M_PI;
@@ -368,10 +368,10 @@ gameInput()
             gameShip_yaw(s);
         }
         
-        if(!gameSettingsComplexControls)
-        {
-            gameShip_fakeRoll(input_roll);
-        }
+//        if(!gameSettingsComplexControls)
+//        {
+//            gameShip_fakeRoll(input_roll);
+//        }
     }
     
     // HACK: in extreme cases the quaternion becomes NaN and we will crash - catch that here

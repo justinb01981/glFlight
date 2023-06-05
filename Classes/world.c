@@ -1769,10 +1769,14 @@ void
 world_update_elem_removed_hook(WorldElem* pElem)
 {
     world_update_state_t *state = &gWorld->world_update_state;
-    if(state->world_region_iterate_cur && state->world_region_iterate_cur->elem == pElem)
+    if(!state->world_region_iterate_cur) return;
+
+    WorldElemListNode *tmp = state->world_region_iterate_cur->elem, *next = tmp->next;
+
+    if(tmp && tmp->elem == pElem)
     {
         // our position in the list was invalidated
-        state->world_region_iterate_cur = state->world_region_iterate_cur->next;
+        state->world_region_iterate_cur = next;
     }
     
     if(state->ptr_objects_moving && state->ptr_objects_moving->elem == pElem)

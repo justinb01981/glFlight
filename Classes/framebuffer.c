@@ -8,8 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <OpenGLES/ES2/gl.h>
-
+#include "gameIncludes.h"
 #include "framebuffer.h"
 #include "textures.h"
 
@@ -17,19 +16,23 @@ int gTextureFramebuffer = -1;
 
 GLuint FramebufferName = GL_NONE;
 GLuint renderedTexture = GL_NONE;
-
+GLuint FramebufferNameInitial = GL_NONE;
 
 void frameBufUpdate(struct FrameBufInst* s) {
 
+    goto abort_this;
+    
     setupGLFramebufferView();
 
     glBindTexture(GL_TEXTURE_2D, renderedTexture);
+
+
 
     // Render to our framebuffer
     glViewport(0, 0, s->width, s->height); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
     // adding binding/drawing here
-   // glClearColor(0.0, 0.4, 0.0, 1.0);
+    glClearColor(0.0, 0.4, 0.0, 1.0);
     //glClear(GL_COLOR_BUFFER_BIT);
 
     float width = s->width;
@@ -107,8 +110,9 @@ void frameBufUpdate(struct FrameBufInst* s) {
 
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
+    abort_this:
     glDisableClientState(GL_COLOR_ARRAY);
-
+    
     setupGLFramebufferViewDone();
 }
 
@@ -165,4 +169,6 @@ void frameBufInit(struct FrameBufInst* s)
     frameBufUpdate(s);
 
     textures_hack_framebuffer(renderedTexture);
+
+    // restore our initial framebuffer outside
 }

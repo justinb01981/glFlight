@@ -678,7 +678,9 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
 
         if (isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
         {
-            assert(0);  // z1q = zq;
+            printf("WARN: gameAI.c isNan in object_pursue is a BUG!");
+
+            zq.w = z1q.w = 1; zq.x = z1q.x = 0; zq.y = z1q.y = 0; zq.z = z1q.z = 1;
         }
     }
     
