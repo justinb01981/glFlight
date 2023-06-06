@@ -48,6 +48,8 @@ gameGraphics_drawState2d drawControls_ds;
 
 struct FrameBufInst gFrameBufSt;
 
+static unsigned int drawn_texture_last;
+
 void* gl_vertex_ptr_last = 0;
 void* gl_texcoord_ptr_last = 0;
 
@@ -160,6 +162,8 @@ setupGLTextureViewDone()
 {
     glMatrixMode(GL_TEXTURE);
     glPopMatrix();
+
+    glMatrixMode(GL_MODELVIEW); // ?
 }
 
 void
@@ -167,13 +171,15 @@ setupGLFramebufferView()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
     glLoadIdentity();
 
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
+
 
     glOrthof(-FB_TEXTURE_WIDTHHEIGHT/2, FB_TEXTURE_WIDTHHEIGHT/2,
              -FB_TEXTURE_WIDTHHEIGHT/2, FB_TEXTURE_WIDTHHEIGHT/2,
@@ -197,7 +203,6 @@ setupGLFramebufferViewDone()
     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferNameInitial);
 }
 
-static unsigned int drawn_texture_last;
 
 int
 bindTexture(unsigned int tex_id)
@@ -2066,7 +2071,7 @@ gameGraphicsInit(void)
                        16.0,
                        BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
 
-    frameBufInit(&gFrameBufSt);
+    //frameBufInit(&gFrameBufSt);
 }
 
 void
@@ -2081,6 +2086,6 @@ gameGraphicsUninit(void)
     
     for(i = 0; i < 3; i++) { if(*(freeBuffers[i])) { free(*(freeBuffers[i])); *freeBuffers[i] = NULL; } }
 
-    frameBufCleanup(&gFrameBufSt);
+    //frameBufCleanup(&gFrameBufSt);
     drawBackgroundUninit();
 }

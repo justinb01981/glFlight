@@ -19,8 +19,6 @@ GLuint renderedTexture = GL_NONE;
 GLuint FramebufferNameInitial = GL_NONE;
 
 void frameBufUpdate(struct FrameBufInst* s) {
-
-    goto abort_this;
     
     setupGLFramebufferView();
 
@@ -109,8 +107,6 @@ void frameBufUpdate(struct FrameBufInst* s) {
     glDrawElements(GL_TRIANGLES, (int) s->count, GL_UNSIGNED_INT, s->indices);
 
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-    abort_this:
     glDisableClientState(GL_COLOR_ARRAY);
     
     setupGLFramebufferViewDone();
@@ -166,7 +162,7 @@ void frameBufInit(struct FrameBufInst* s)
      */
 
     // TODO: relocate to draw loop
-    frameBufUpdate(s);
+    //frameBufUpdate(s);
 
     textures_hack_framebuffer(renderedTexture);
 
