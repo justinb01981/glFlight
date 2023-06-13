@@ -51,7 +51,7 @@ import com.domain17.glflight.util.*;
 public class FullscreenActivity extends Activity implements SensorEventListener {
 
     public boolean running = false;
-    public boolean renderContinuously = true;
+    public boolean renderContinuously = false;        // near as I can tell this makes no difference now  more testing needed
     Context appCtx;
     int accuracyLast = SensorManager.SENSOR_STATUS_UNRELIABLE;
 
@@ -211,6 +211,10 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         float[] Rm = new float[16];
         SensorManager.getRotationMatrixFromVector(Rm, e.values);
+
+        // no need to do remapCoordinateSystem but do change order and invert z
+        int col_sz = 4;
+        //Rm[2*col_sz] *= -1; Rm[2*col_sz+1] *= -1; Rm[2*col_sz+2] *= -1; // invert-z
 
         float[] orientations = new float[3];
         SensorManager.getOrientation(Rm, orientations);

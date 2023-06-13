@@ -23,7 +23,7 @@ typedef enum {
     OBJ_POOPEDCUBE,
     OBJ_WRECKAGE,
     OBJ_POWERUP_GENERIC,
-    OBJ_CAPTURE,
+    OBJ_DEPRECATED, // unused presently
     OBJ_BASE,
     OBJ_MISSLE,
     OBJ_SPAWNPOINT_ENEMY,

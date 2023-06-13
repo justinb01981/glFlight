@@ -72,7 +72,10 @@ int needTrim = 1;
 int initialized = 0;
 double motionRoll, motionPitch, motionYaw;
 double devicePitch, deviceYaw, deviceRoll;
-double deviceInputDiv = 16.0;
+double deviceInputDiv =
+        // TODO: this is a hack - all devices are using the same orientations for input? -- means some calculation in the sensor input pipeline is wrong
+16.0;
+
 double motionRollMotion, motionPitchMotion, motionYawMotion;
 static const float maxInputShipRotate = 0.2;
 float yprResponse[3] = {0, 0, 0}, yprD = maxInputShipRotate/360.0;

@@ -99,8 +99,8 @@ collision_actions_set_grab_powerup()
 static void
 collision_actions_set_ship_grab_powerup()
 {
-    collision_actions[OBJ_SHIP][OBJ_POWERUP_GENERIC] = COLLISION_ACTION_DAMAGE;
-    collision_actions[OBJ_POWERUP_GENERIC][OBJ_SHIP] = COLLISION_ACTION_DAMAGE;
+    collision_actions[OBJ_SHIP][OBJ_POWERUP_GENERIC] = COLLISION_ACTION_POWERUP_GRAB;
+    collision_actions[OBJ_POWERUP_GENERIC][OBJ_SHIP] = COLLISION_ACTION_POWERUP_GRAB;
 }
 
 static void
@@ -145,6 +145,13 @@ do_world_collision_handling(float tc)
         // TODO: if both elements are moving... who knows?
         WorldElemListNode* pCollisionA = state->collision_recs_iterate_cur;
         WorldElemListNode* pCollisionB =  state->collision_recs_iterate_cur->next;
+
+        // a,b ordered by object-id ascending
+        if(pCollisionA->elem->object_type > pCollisionB->elem->object_type) {
+            WorldElem *tmp = pCollisionB->elem;
+            pCollisionB->elem = pCollisionA->elem;
+            pCollisionA->elem = tmp;
+        }
         
         if(pCollisionB)
         {
@@ -399,6 +406,12 @@ do_world_collision_handling(float tc)
                     if(object_damage)
                     {
                         float durability_tmp = pCollisionA->elem->durability;
+
+                        if(pCollisionB->elem->object_type == OBJ_SHIP
+                           && pCollisionA->elem->object_type == OBJ_POWERUP_GENERIC)
+                        {
+                            assert(0);
+                        }
                         
                         pCollisionA->elem->durability -= pCollisionB->elem->durability;
                         pCollisionB->elem->durability -= durability_tmp;
