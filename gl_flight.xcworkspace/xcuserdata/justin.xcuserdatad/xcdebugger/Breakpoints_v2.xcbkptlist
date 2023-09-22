@@ -49,6 +49,21 @@
                   endingLineNumber = "1291"
                   offsetFromSymbolStart = "808">
                </Location>
+               <Location
+                  uuid = "93FC79D2-A898-43D7-9040-6224456066A0 - 48f09a688354cc1d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "game_handle_collision"
+                  moduleName = "d0gf1ght 95"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gamePlay.c"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1292"
+                  endingLineNumber = "1292"
+                  offsetFromSymbolStart = "900">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -96,6 +111,21 @@
                   startingLineNumber = "718"
                   endingLineNumber = "718"
                   offsetFromSymbolStart = "1636">
+               </Location>
+               <Location
+                  uuid = "C67FE31A-EA2A-49B7-AB86-C61FB1D6697A - 4153510190faffe1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "object_pursue"
+                  moduleName = "d0gf1ght 95"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameAI.c"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "716"
+                  endingLineNumber = "716"
+                  offsetFromSymbolStart = "1668">
                </Location>
             </Locations>
          </BreakpointContent>

@@ -1,0 +1,6 @@
+framework module Pods_gl_flight {
+  umbrella header "Pods-gl_flight-umbrella.h"
+
+  export *
+  module * { export * }
+}

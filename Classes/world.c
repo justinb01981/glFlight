@@ -49,7 +49,7 @@ world_t *gWorld = NULL;
 game_lock_t gWorldLock;
 
 float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
-float C_FRICTION = /*0.04*/ 0.030; // higher values = more friction
+float C_FRICTION = /*0.04*/ 0.020; // higher values = more friction
 float GYRO_FEEDBACK = 0;
 float GYRO_DC = 3;
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
@@ -85,7 +85,7 @@ world_add_object_core(Model type,
     WorldElem* pElem;
     
     MODEL_POLY_COMPONENTS_DECLARE();
-    
+
     MODEL_POLY_COMPONENTS_INIT();
     
     if(type >= MODEL_LAST) return WORLD_ELEM_ID_INVALID;
@@ -143,7 +143,6 @@ world_add_object_core(Model type,
     pElem->type = type;
     pElem->texture_id = texture_id;
     pElem->scale = scale;
-    pElem->destructible = 1;
     pElem->renderInfo.visible = 1;
     pElem->spans_regions = 1;
 
@@ -515,6 +514,8 @@ world_add_object_core(Model type,
     pElem->bounding.normals = model_normals_sizeof;
     //memcpy(pElem->bounding.pnorm, model_normals, model_normals_sizeof * sizeof(model_coord_t));
     //model_normals = pElem->bounding.pnorm;
+
+    pElem->object_type = OBJ_BLOCK; // HACK: default when not inferred from model
     
     // HACK: make some decisions based off model-type
     if(replace_id < 0)
@@ -523,15 +524,18 @@ world_add_object_core(Model type,
         case MODEL_ICOSAHEDRON:
             //pElem->renderInfo.priority = 1;
             new_durability = DURABILITY_ASTEROID;
+            pElem->object_type = OBJ_BLOCK;
             break;
           
         case MODEL_CUBE:
     	case MODEL_CUBE2:
             new_durability = DURABILITY_BLOCK;
+            pElem->object_type = OBJ_BLOCK;
             break;
             
         case MODEL_PYRAMID:
             new_durability = DURABILITY_BLOCK;
+            pElem->object_type = OBJ_BLOCK;
             break;
             
         case MODEL_SHIP1:
@@ -541,6 +545,7 @@ world_add_object_core(Model type,
             pElem->bounding_remain = 0;
             pElem->bounding_wrap = 0;
             pElem->stuff.radar_visible = 1;
+            pElem->object_type = OBJ_SHIP;
             break;
             
         case MODEL_SHIP2:
@@ -550,6 +555,7 @@ world_add_object_core(Model type,
             pElem->spans_regions = 0;
             pElem->bounding_remain = 0;
             pElem->stuff.radar_visible = 1;
+            pElem->object_type = OBJ_SHIP;
             break;
             
         case MODEL_TURRET:
@@ -557,22 +563,22 @@ world_add_object_core(Model type,
             new_durability = 5;
             pElem->spans_regions = 0;
             pElem->bounding_remain = 1;
+            pElem->object_type = OBJ_TURRET;
             break;
             
         case MODEL_BULLET:
-            pElem->destructible = 1;
             pElem->spans_regions = 0;
             pElem->object_type = OBJ_BULLET;
             break;
             
         case MODEL_MISSLE:
-            pElem->destructible = 1;
             pElem->spans_regions = 0;
             pElem->object_type = OBJ_MISSLE;
             break;
             
         case MODEL_SURFACE:
             pElem->renderInfo.priority = 1;
+            pElem->object_type = OBJ_DISPLAYONLY;
             break;
             
         case MODEL_BUILDING3:
@@ -580,17 +586,20 @@ world_add_object_core(Model type,
         case MODEL_CBUILDING:
             pElem->renderInfo.concavepoly = 1;
             new_durability = DURABILITY_BLOCK;
+            pElem->object_type = OBJ_BLOCK;
             break;
             
         case MODEL_ENEMY_BASE:
             pElem->renderInfo.priority = 1;
             pElem->renderInfo.concavepoly = 1;
+            pElem->object_type = OBJ_BASE;
             break;
             
         case MODEL_FLATTENED_CUBE:
             //pElem->renderInfo.concavepoly = 1;
             pElem->renderInfo.priority = 1;
             new_durability = DURABILITY_BLOCK;
+            pElem->object_type = OBJ_BLOCK;
             break;
             
         case MODEL_MESH:
@@ -598,19 +607,20 @@ world_add_object_core(Model type,
             break;
             
         case MODEL_TELEPORTER:
-            pElem->destructible = 0;
             new_durability = 100;
             break;
             
         case MODEL_SCENERY:
             pElem->renderInfo.visible = 1;
             pElem->renderInfo.priority = 1;
+            pElem->object_type = OBJ_DISPLAYONLY;
             break;
             
         case MODEL_LINE:
         case MODEL_CONTRAIL:
             pElem->renderInfo.visible = 1;
             //pElem->renderInfo.priority = 1;
+            pElem->object_type = OBJ_DISPLAYONLY;
             break;
 
         default:
@@ -847,7 +857,6 @@ world_add_object_core(Model type,
 
 int world_add_object(Model type, float x, float y, float z, float yaw, float pitch, float roll, float scale, int texture_id)
 {
-    if(gWorld->ignore_add) return WORLD_ELEM_ID_INVALID;
     return world_add_object_core(type, x, y, z, yaw, pitch, roll, scale, texture_id, WORLD_ELEM_ID_INVALID);
 }
 
@@ -855,8 +864,6 @@ void
 world_remove_object(int elem_id)
 {
     WorldElem* pElem = NULL;
-    
-    if(gWorld->ignore_remove) return;
     
     WorldElemListNode* pRemoveNode;
     pRemoveNode = world_elem_list_find(elem_id, &gWorld->elements_list);
@@ -1631,13 +1638,6 @@ check_collision(WorldElem* pElemA, WorldElem* pElemB)
     }
     
     return 0;
-    
-    /*
-    get_element_bounding_box(pElemA, boxA);
-    get_element_bounding_box(pElemB, boxB);
-    
-    return check_bounding_box_overlap(boxA, boxB);
-     */
 }
 
 WorldElemListNode*
@@ -1792,7 +1792,7 @@ world_update(float tc)
     int do_check_collisions = 1;
     int do_sound_checks = 1;
     float FRdiv = 64;
-    // HACK: -- apply min velocity "wobble back/forth"
+    // HACK: -- so jank! apply min velocity "vibrate" or "wobble back/forth" to avoid divide-by-zero
     float Fmin = 0.01 * (tex_pass % 2) - 1;
     int iF;
     WorldElemListNode* pOOBListElem = NULL;
@@ -1806,8 +1806,7 @@ world_update(float tc)
     gWorld->world_update_state.ptr_objects_moving = &gWorld->elements_moving;
     while(gWorld->world_update_state.ptr_objects_moving && gWorld->world_update_state.ptr_objects_moving->next)
     {
-        WorldElem* pElem;
-        
+
         if(gWorld->world_update_state.ptr_objects_moving) gWorld->world_update_state.ptr_objects_moving = gWorld->world_update_state.ptr_objects_moving->next;
         
         if(pOOBListElem)
@@ -1818,27 +1817,11 @@ world_update(float tc)
         
         //remove_retry:
         
-        pElem = gWorld->world_update_state.ptr_objects_moving->elem;
+        const WorldElem* pElem = gWorld->world_update_state.ptr_objects_moving->elem,
+                **pElemNode = &gWorld->world_update_state.ptr_objects_moving->elem;
         
         if(!pElem->head_elem) // not a child elem
         {
-#if 0
-            float* pFloatCheckIsNan[] = {
-                &pElem->physics.ptr->vx,
-                &pElem->physics.ptr->vy,
-                &pElem->physics.ptr->vz
-            };
-            for(iF = 0; iF < sizeof(pFloatCheckIsNan)/sizeof(float*); iF++)
-            {
-                if(isnan(*pFloatCheckIsNan[iF]))
-                {
-                    // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
-                    *pFloatCheckIsNan[iF] = 0;
-                    printf("isnan: %p\n", pElem);
-                }
-            }
-#endif
-            
             if(pElem->physics.ptr->vx != 0 || pElem->physics.ptr->vy+Fmin != 0 || pElem->physics.ptr->vz != 0 || pElem->physics.ptr->gravity)
             {
                 int out_of_bounds_remove = 0;
@@ -1882,7 +1865,7 @@ world_update(float tc)
                         
                         if(time_ms >= next_play)
                         {
-                            pElem->stuff.sound.time_last_emit = time_ms;
+                            ((WorldElem*) pElem)->stuff.sound.time_last_emit = time_ms;
                             
                             gameAudioPlaySoundAtLocation(soundName,
                                                          pElem->physics.ptr->x,
@@ -1893,7 +1876,7 @@ world_update(float tc)
                 }
                 
                 // apply boundary enforcement, which takes priority over object-collision
-                if(pElem->object_type != OBJ_DISPLAYONLY)
+                if(object_enforce_bounding(pElem->object_type))
                 {
                     int bounding_enforced = 0;
                     int i;
@@ -1957,7 +1940,7 @@ world_update(float tc)
                         
                         collision_action_table_t *collision_actions_cur = &collision_actions;
                         
-                        if(do_check_collisions && pElem->collision_start_time <= time_ms)
+                        if(do_check_collisions)
                         {
                             int sound_played = 0;
                             
@@ -1969,48 +1952,57 @@ world_update(float tc)
 
                             if(pRegionElemsHead)
                             {
-                                WorldElem* pRegionElem;
+
                                 
                                 //region_collision_retry:
-                                
+
                                 gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead->next;
                                 
                                 while(gWorld->world_update_state.world_region_iterate_cur)
                                 {
-                                    pRegionElem = gWorld->world_update_state.world_region_iterate_cur->elem;
-                                    
-                                    if(pRegionElem != pElem)
+                                    const WorldElem *pElemTmp = pElem, *pElem2 = gWorld->world_update_state.world_region_iterate_cur->elem;
+                                    const WorldElem** hElem2 = &gWorld->world_update_state.world_region_iterate_cur->elem;
+
+                                    // re-scope after ordinalizing
+                                    const WorldElem *pElem = pElemTmp;
+
+                                    if(*hElem2 != pElem)
                                     {
-                                        if(check_collision(pElem, pRegionElem))
+                                        // MARK: -- enforce ordinality of objects colliding
+                                        if(pElem->object_type > (*hElem2)->object_type) {
+                                            pElem2 = pElem;
+                                            pElem = *hElem2;
+                                        }
+
+                                        if(check_collision(pElem, pElem2))
                                         {
-                                            WorldElem* pElemCollided = pRegionElem;
+                                            WorldElem* pElemCollided = pElem2;
                                             
                                             // record collision
-                                            collision_action_t colact = (*collision_actions_cur)[pElemCollided->object_type][pElem->object_type];
+                                            collision_action_t colact = (*collision_actions_cur)[pElem->object_type][pElemCollided->object_type];
+
+                                            // TODO: testing remove this
+                                            if(pElem->object_type == OBJ_BULLET) {
+                                                printf("collision action:%d from types %d/%d\n", colact,
+                                                       pElem->object_type,
+                                                       pElemCollided->object_type);
+                                            }
                                             
-                                            if(
-                                               (!pElemCollided->destructible || !pElem->destructible) ||
-                                               colact == COLLISION_ACTION_NONE
-                                               )
+                                            if(colact == COLLISION_ACTION_NONE)
                                             {
+                                                switch(pElemCollided->object_type) {
+                                                    case OBJ_BLOCK:
+                                                        DBPRINTF(("collision!"));
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
+                                                DBPRINTF(("ignoring player collision with type %d", gWorld->world_update_state.world_region_iterate_cur->elem->object_type));
                                                 gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;
                                                 continue;
                                             }
-                                            
-                                            //pElem->physics.ptr->x = collision_rollback_coord[0];
-                                            //pElem->physics.ptr->y = collision_rollback_coord[1];
-                                            //pElem->physics.ptr->z = collision_rollback_coord[2];
-//                                                pElem->physics.ptr->velocity = collision_rollback_velocity;
-//
-//                                                // move all coordinates (for bounding boxes)
-//                                                if(!rollback_done)
-//                                                {
-//                                                    move_elem_relative(pElem, -vm[0] * tc, vm[1] * tc, vm[2] * tc);
-//                                                    rollback_done = 1;
-//                                                }
 
-                                            // HACK: removed a hack that enforced elemA had higher velocity than B and swapped
-                                            
                                             if(colact == COLLISION_ACTION_REPULSE)
                                             {
                                                 momentum = 0;
@@ -2033,41 +2025,28 @@ world_update(float tc)
                                                 
                                                 nA = world_elem_list_find_elem(pElem, &gWorld->elements_collided);
                                                 nB = world_elem_list_find_elem(pElemCollided, &gWorld->elements_collided);
-                                                
-                                                if(!nA && !nB)
+
+                                                // TODO: easily fixed limitation here when element needs to be in list 2x for 2 collided op
+                                                if(!nA || !nB)
                                                 {
-                                                    WorldElemListNode* pNodeA, *pNodeB;
+                                                    // HACK: order by object ordinal - see collision.h
+
+                                                    if(!nB) nB = world_elem_list_add(pElemCollided, &gWorld->elements_collided);
+                                                    if(!nA) nA = world_elem_list_add(pElem, &gWorld->elements_collided);
                                                     
-                                                    // HACK: order by durability to make collision-list parsing simpler (list is LIFO)
-                                                    if(pElem->durability <= pElemCollided->durability)
-                                                    {
-                                                        pNodeB = world_elem_list_add(pElemCollided, &gWorld->elements_collided);
-                                                    }
-                                                    else
-                                                    {
-                                                        pNodeA = world_elem_list_add(pElem, &gWorld->elements_collided);
-                                                    }
+                                                    nA->elem_collided = nB->elem;
+                                                    nB->elem_collided = nA->elem;
+                                                    nA->userarg = colact;
+                                                    nB->userarg = colact;
                                                     
-                                                    if(pElem->durability <= pElemCollided->durability)
-                                                    {
-                                                        pNodeA = world_elem_list_add(pElem, &gWorld->elements_collided);
-                                                    }
-                                                    else
-                                                    {
-                                                        pNodeB = world_elem_list_add(pElemCollided, &gWorld->elements_collided);
-                                                    }
-                                                    
-                                                    pNodeA->elem_collided = pNodeB->elem;
-                                                    pNodeB->elem_collided = pNodeA->elem;
-                                                    pNodeA->userarg = colact;
-                                                    pNodeB->userarg = colact;
-                                                    
-                                                    //game_handle_collision(pElem, pElemCollided, colact);
-                                                    //gameNetwork_handle_collision(pElem, pElemCollided, colact);
-                                                    //game_ai_collision(pElem, pElemCollided, colact);
+                                                    game_handle_collision(pElem, pElemCollided, colact);
+                                                    gameNetwork_handle_collision(pElem, pElemCollided, colact);
+                                                    game_ai_collision(pElem, pElemCollided, colact);
                                                 }
                                                 else
                                                 {
+                                                    // TODO: already collided previously - overwrite values when new collision object is smaller (or ordinal?
+                                                    /*
                                                     if((nA && nA->userarg < colact) ||
                                                        (nB && nB->userarg < colact))
                                                     {
@@ -2085,18 +2064,10 @@ world_update(float tc)
                                                         
                                                         goto collision_list_add_retry;
                                                     }
+                                                     */
                                                 }
                                             }
                                         }
-                                    }
-                                    
-                                    // check if this was invalidated by the remove-callback
-                                    // TODO: -- I don't think this can happen anymore
-                                    if(!gWorld->world_update_state.world_region_iterate_cur)
-                                    {
-                                        DBPRINTF(("gWorld->world_update_state.world_region_iterate_cur invalidated!"));
-                                        assert(0);
-                                        //gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead;
                                     }
                                     
                                     gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;
@@ -2123,6 +2094,8 @@ world_update(float tc)
                         {
                             world_elem_list_add(pCurRemoveElem, &gWorld->elements_to_be_freed);
                         }
+
+                        assert(pOOBListElem == NULL)      ;
                         
                         pOOBListElem = gWorld->world_update_state.ptr_objects_moving;
                     }
@@ -2186,7 +2159,6 @@ convert_mesh_to_world_elems_helper(struct mesh_t* mesh, unsigned int texture_id,
     
     pElem->n_indices = pElem->n_coords = pElem->n_texcoords = 0;
     pElem->texture_id = texture_id;
-    pElem->destructible = 0;
     
     // first copy over mesh coordinates
     for(int row = row_start; row <= row_start+max_rows; row++)

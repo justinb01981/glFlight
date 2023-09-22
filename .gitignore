@@ -3,3 +3,4 @@
 .idea
 .gradle
 android/gradle-build/glFlightImport/app/build/intermediates/
+android/gradle-build/*

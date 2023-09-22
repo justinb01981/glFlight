@@ -9,6 +9,7 @@
 #ifndef gl_flight_gameDialogs_h
 #define gl_flight_gameDialogs_h
 
+#include "object.h"
 #include "gameGlobals.h"
 #include "gameInterface.h"
 #include "gameSettings.h"
@@ -483,12 +484,12 @@ gameDialogStartNetworkGameNewMap()
     extern unsigned int maps_list_idx;
     
     maps_list_idx++;
-    if(maps_list[maps_list_idx] == NULL) maps_list_idx = 0;
+    //if(maps_list[maps_list_idx] == NULL) maps_list_idx = 0;
     
     gameDialogStartNetworkGame();
     
     gameMapSetMap(maps_list[maps_list_idx]);
-    
+
     gameStateSinglePlayer.map_use_current = 1;
     
     console_append((char*) "MAP: %s\n", maps_list_names[maps_list_idx]);

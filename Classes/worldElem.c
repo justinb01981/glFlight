@@ -326,7 +326,7 @@ world_elem_list_remove(WorldElem* pElem, WorldElemListNode* pHeadNode)
     
     if(removed > 1)
     {
-        printf("%s:%d WARNING: Object in list TWICE!\n", __FILE__, __LINE__);
+        DBPRINTF(("%s:%d WARNING: Object in list TWICE!\n", __FILE__, __LINE__));
     }
 }
 

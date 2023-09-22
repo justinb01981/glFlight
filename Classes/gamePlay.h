@@ -56,7 +56,7 @@ enum
     GAME_SUBTYPE_NONE = 0,
     GAME_SUBTYPE_MISSLE = 1,
     GAME_SUBTYPE_POINTS1,
-    GAME_SUBTYPE_COLLECT,
+    //GAME_SUBTYPE_COLLECT,
     GAME_SUBTYPE_ASTEROID,
     GAME_SUBTYPE_LIFE,
     GAME_SUBTYPE_TURRET,
@@ -164,7 +164,7 @@ const static float game_variables_default[] = {
     50,          // ENEMY1_FORGET_DISTANCE
     30,          // ENEMY1_PURSUE_DISTANCE
     MAX_SPEED,   // MAX_SPEED
-    1.2,         // MAX_TURN_RADIANS
+    0.7,         // MAX_TURN_RADIANS
     0,           // FIRES MISSLES
     1,           // FIRES LASERS
     1,           // CHANGES_TARGET

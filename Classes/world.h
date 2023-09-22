@@ -99,8 +99,6 @@ typedef struct
     
     float vec[6];
     
-    int ignore_add:1;
-    int ignore_remove:1;
     int visible_list_change:1;
     
     float vis_regions_x, vis_regions_y, vis_regions_z;

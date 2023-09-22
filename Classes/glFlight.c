@@ -33,6 +33,7 @@
 #include "collision.h"
 #include "gamePlay.h"
 #include "gameGlobals.h"
+#include "gameDialogs.h"
 
 static void clear_world_pending_removals(void);
 static void draw_btree_elements(WorldElem* pElem, float priority);

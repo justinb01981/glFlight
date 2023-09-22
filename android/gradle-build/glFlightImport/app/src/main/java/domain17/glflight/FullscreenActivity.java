@@ -168,7 +168,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         try {
             mBGThread.join();
-            mRenderThread.join();
+            if(!renderContinuously) mRenderThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

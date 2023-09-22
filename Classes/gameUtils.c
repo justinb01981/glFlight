@@ -24,6 +24,8 @@
 #include "gameUtils.h"
 #include "action.h"
 #include "gameInterface.h"
+#include "object.h"
+#include "maps.h"
 #include "gameDialogs.h"
 
 

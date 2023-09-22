@@ -168,7 +168,9 @@ setupGLTextureViewDone()
 int
 bindTexture(unsigned int tex_id)
 {
-    if(tex_id != drawn_texture_last)
+    extern int bindTextureRequestCore(int);
+
+    if(tex_id != drawn_texture_last && tex_id != TEXTURE_ID_BOUNDING)
     if(!bindTextureRequestCore(tex_id))
     {
         //assert(tex_id == TEXTURE_ID_BOUNDING);       /**/
@@ -186,7 +188,9 @@ bindTexture(unsigned int tex_id)
     }
     else if(tex_id == drawn_texture_last)
     {
-
+        if(tex_id == TEXTURE_ID_BOUNDING) {
+            assert(0);
+        }
     }
     else
     {
@@ -1733,13 +1737,15 @@ void drawBackground()
 {
     drawBackgroundCore();
     
-    drawBounding();
+    //drawBounding();
 }
 
 void drawBounding()
 {
     glVertexPointer(3, GL_FLOAT, 0, boData->coords256);
     glTexCoordPointer(2, GL_FLOAT, 0, boData->txcoords256);
+
+    frameBufUpdate(&gFrameBufSt);
 
     //bindTexture(TEXTURE_ID_BOUNDING);
     glBindTexture(GL_TEXTURE_2D, texture_list[TEXTURE_ID_BOUNDING]);
@@ -2059,7 +2065,6 @@ gameGraphicsUninit(void)
     
     for(i = 0; i < 3; i++) { if(*(freeBuffers[i])) { free(*(freeBuffers[i])); *freeBuffers[i] = NULL; } }
 
-
-    drawBackgroundUninit();
     frameBufCleanup(&gFrameBufSt);
+    drawBackgroundUninit();
 }

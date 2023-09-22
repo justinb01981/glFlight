@@ -16,7 +16,11 @@
 void
 setupGLFramebufferView()
 {
-    glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glMatrixMode(GL_TEXTURE);
     glPushMatrix();
     glLoadIdentity();
     
@@ -25,27 +29,30 @@ setupGLFramebufferView()
              1, -1);
 
     glTranslatef(0, 0, 0);
-
+    
     // see framebuffer.h
 }
 
 void
 setupGLFramebufferViewDone()
 {
-    glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+
+    glMatrixMode(GL_TEXTURE);
     glPopMatrix();
 }
 
+int colorBg = 1;
 void frameBufUpdate(struct FrameBufInst* s) {
 
     setupGLFramebufferView();
 
     DBPRINTF(("frameBufUpdate: renderedTexture = %d\n", s->texture));
-    
-    // Render to our framebuffer - glViewport necessary?
 
     // adding binding/drawing here
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(colorBg / 3, colorBg % 2, 0.0, 1.0);
+    colorBg += 1;
     glClear(GL_COLOR_BUFFER_BIT);
 
     float width = s->width;
@@ -53,12 +60,12 @@ void frameBufUpdate(struct FrameBufInst* s) {
     
     const int T = 4;
     int idx = 0;
-    
+
     while (idx < (width-T) * (height-T)  )
     {
         // set origin
 
-        GLfloat o3[] = {-width/2, -height/2, -1};
+        GLfloat o3[] = {-width/2, -height/2, 0};
         o3[0] += idx % (int) width;
         o3[1] += idx / width;
 
@@ -136,55 +143,52 @@ void frameBufUpdate(struct FrameBufInst* s) {
             }
         }
         idx += 1;
+
+        glDisableClientState(GL_COLOR_ARRAY);
     }
-    
-    glDisableClientState(GL_COLOR_ARRAY);
     
     setupGLFramebufferViewDone();
 }
 
 void frameBufCleanup(struct FrameBufInst* s)
 {
-    if(s->name >= 0)
-        glDeleteFramebuffers(1, &s->name);
-    s->name = -1;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &s->name);
+    s->name = 0;
 
-    // hack: retain texture due to a problem releasing/recreating
-//    if (s->texture > 0)
-//        glDeleteTextures(1, &s->texture);
-//    s->texture = -1;
-//
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // TODO: having problems on 2nd draw into texture
+//    glDeleteTextures(1, &s->texture);
+//    s->texture = 0;
+
 //    textures_hack_framebuffer_cleanup();
-
-    s->width = s->height = 0;
 }
 
 void frameBufInit(struct FrameBufInst* s)
 {
-    //if(s->width != 0) return;
-    
     s->width = s->height = FB_TEXTURE_WIDTHHEIGHT;
 
+    s->name = 0;
     glGenFramebuffers(1, &s->name);
-    glBindFramebuffer(GL_FRAMEBUFFER, s->name);
 
+    glBindFramebuffer(GL_FRAMEBUFFER, s->name);
     // Set the list of draw buffers.
     GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
     glDrawBuffers(1, DrawBuffers);
 
     // The texture we're going to render to
     glGenTextures(1, &s->texture);
-
-    // "Bind" the newly created texture : all future texture functions will modify this texture
     glBindTexture(GL_TEXTURE_2D, s->texture);
 
-    // Give an empty image to OpenGL ( the last "0" )
+    // Give an empty image to OpenGL ( the last "0"  )
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, s->width, s->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
     // Poor filtering. Needed !
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+    
     // Set "renderedTexture" as our colour attachement #0
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, s->texture, 0);
 
@@ -197,12 +201,16 @@ void frameBufInit(struct FrameBufInst* s)
      */
     textures_hack_framebuffer(s->texture);
 
-    // TODO: relocate to draw loop
-    frameBufUpdate(s);
+//    // TODO: relocate to draw loop
+//    frameBufUpdate(s);
+
+    // TODO: how to release texture binding to framebuffer? 2nd draw is not visible in new renderedTexture
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
     
     // ToDO: can we release framebuffer here now that tex is rendered?
     // release
-    glBindTexture(GL_TEXTURE_2D, 0);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     
 }

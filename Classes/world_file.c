@@ -706,8 +706,7 @@ char* world_write_buffer()
                     /* exclude the player ship */
                 }
                 else if(object_is_static(pElemListNode->elem->object_type) &&
-                       pElemListNode->elem->physics.ptr->velocity == 0)
-                {
+                       pElemListNode->elem->physics.ptr->velocity == 0) {
                     params[i++] = pElemListNode->elem->type;
                     params[i++] = pElemListNode->elem->physics.ptr->x;
                     params[i++] = pElemListNode->elem->physics.ptr->y;
@@ -717,22 +716,23 @@ char* world_write_buffer()
                     params[i++] = pElemListNode->elem->physics.ptr->gamma;
                     params[i++] = pElemListNode->elem->scale;
                     params[i++] = pElemListNode->elem->texture_id;
-                    
+
                     map_write_line(line, "add_object", params, i);
                     buffer_len += strlen(line);
                     p = realloc(p, buffer_len);
-                    if(!p) return NULL;
+                    if (!p) return NULL;
                     strcat(p, line);
-                    
-                    if(pElemListNode->elem->object_type != OBJ_UNKNOWN)
-                    {
+
+                    if (pElemListNode->elem->object_type != OBJ_UNKNOWN) {
                         i = 0;
                         params[i++] = pElemListNode->elem->object_type;
                         map_write_line(line, "object_set_info", params, i);
                         buffer_len += strlen(line);
                         p = realloc(p, buffer_len);
-                        if(!p) return NULL;
+                        if (!p) return NULL;
                         strcat(p, line);
+                    } else {
+                        DBPRINTF(("world_write_buffer: ignoring OBJ_UNKNOWN"));
                     }
                     
                     printf("%s:%d(%s): %s\n", __FILE__, __LINE__, __FUNCTION__, line);

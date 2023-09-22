@@ -154,6 +154,7 @@
 		D09A5F3E208174EB009F9618 /* texture111.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3D208174EB009F9618 /* texture111.bmp */; };
 		D09E3BE22207A95900131247 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D05AEDA121FD5DE300692833 /* GLKit.framework */; };
 		D09E7FC816EFBFC500343CE6 /* texture27.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09E7FC716EFBFC400343CE6 /* texture27.bmp */; };
+		D09EFB592ABA725E004E7583 /* maps.c in Sources */ = {isa = PBXBuildFile; fileRef = D09EFB582ABA725D004E7583 /* maps.c */; };
 		D0A5039A1A43EF8C00C4BBD1 /* engineslow.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A503991A43EF8C00C4BBD1 /* engineslow.wav */; };
 		D0A5039C1A43EF9400C4BBD1 /* enginefast.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A5039B1A43EF9400C4BBD1 /* enginefast.wav */; };
 		D0A5535C189868B800F7E798 /* texture48.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A5535B189868B800F7E798 /* texture48.bmp */; };
@@ -312,9 +313,8 @@
 		6DF655DC15E6CFF70015D5DF /* gameCamera.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gameCamera.c; sourceTree = "<group>"; };
 		6DF655DE15E6D0000015D5DF /* gameCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameCamera.h; sourceTree = "<group>"; };
 		6DF655E315EAB3EE0015D5DF /* texture8.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture8.bmp; sourceTree = "<group>"; };
-		7DC329340B541AFE5F822D0E /* Pods-gl_flight.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-gl_flight.debug.xcconfig"; path = "Target Support Files/Pods-gl_flight/Pods-gl_flight.debug.xcconfig"; sourceTree = "<group>"; };
+		789CCFE9222A77D6C6D63811 /* Pods-gl_flight.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-gl_flight.debug.xcconfig"; path = "Target Support Files/Pods-gl_flight/Pods-gl_flight.debug.xcconfig"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* gl_flight-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "gl_flight-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
-		A9D011A81240F92C49698C65 /* Pods-gl_flight.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-gl_flight.release.xcconfig"; path = "Target Support Files/Pods-gl_flight/Pods-gl_flight.release.xcconfig"; sourceTree = "<group>"; };
 		D0017FC41C62B524003F0368 /* texture95.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture95.bmp; sourceTree = "<group>"; };
 		D0017FC61C62B9D4003F0368 /* texture96.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture96.bmp; sourceTree = "<group>"; };
 		D00D78C919FB18EC00E701B9 /* flyby.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = flyby.wav; sourceTree = "<group>"; };
@@ -435,6 +435,7 @@
 		D09A5F3A208172D8009F9618 /* texture110.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture110.bmp; sourceTree = "<group>"; };
 		D09A5F3D208174EB009F9618 /* texture111.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture111.bmp; sourceTree = "<group>"; };
 		D09E7FC716EFBFC400343CE6 /* texture27.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture27.bmp; sourceTree = "<group>"; };
+		D09EFB582ABA725D004E7583 /* maps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = maps.c; sourceTree = "<group>"; };
 		D0A503991A43EF8C00C4BBD1 /* engineslow.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engineslow.wav; sourceTree = "<group>"; };
 		D0A5039B1A43EF9400C4BBD1 /* enginefast.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = enginefast.wav; sourceTree = "<group>"; };
 		D0A5535B189868B800F7E798 /* texture48.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture48.bmp; sourceTree = "<group>"; };
@@ -509,6 +510,7 @@
 		D0FE6D0C1859C871007D67CF /* texture55.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture55.bmp; sourceTree = "<group>"; };
 		D0FE6D0E1859C97B007D67CF /* texture56.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture56.bmp; sourceTree = "<group>"; };
 		E9EB3FB0B47BB3AAF50651D8 /* Pods_gl_flight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_gl_flight.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1F02E1F3ADC8F9AA2351878 /* Pods-gl_flight.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-gl_flight.release.xcconfig"; path = "Target Support Files/Pods-gl_flight/Pods-gl_flight.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -565,6 +567,7 @@
 				6DF655DE15E6D0000015D5DF /* gameCamera.h */,
 				6DF655DC15E6CFF70015D5DF /* gameCamera.c */,
 				6D512E1215EC1BB10064DF49 /* worldElem.h */,
+				D09EFB582ABA725D004E7583 /* maps.c */,
 				6D512E1A15EC21A20064DF49 /* worldElem.c */,
 				6D4F2F351617300F00286C16 /* gameAudio.h */,
 				6D91DEA4166C0EF100362864 /* gameAudio.c */,
@@ -661,7 +664,7 @@
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				D0BCC9CB2052EDC500094809 /* gl_flight copy-Info.plist */,
 				D0432C3A29AF201C00C8DBF4 /* GoogleService-Info.plist */,
-				74F616FCD7F17E3E4335D3CC /* Pods */,
+				83854A0E310FC94D7DAFDEF7 /* Pods */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -856,11 +859,11 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		74F616FCD7F17E3E4335D3CC /* Pods */ = {
+		83854A0E310FC94D7DAFDEF7 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				7DC329340B541AFE5F822D0E /* Pods-gl_flight.debug.xcconfig */,
-				A9D011A81240F92C49698C65 /* Pods-gl_flight.release.xcconfig */,
+				789CCFE9222A77D6C6D63811 /* Pods-gl_flight.debug.xcconfig */,
+				F1F02E1F3ADC8F9AA2351878 /* Pods-gl_flight.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -1239,6 +1242,7 @@
 				D062FE1F1FEB702C00ABE435 /* GameNetworkBonjourManager.m in Sources */,
 				6D91DEA3166C0DB300362864 /* cocoaGameAudio.m in Sources */,
 				6D91DEA5166C0EF100362864 /* gameAudio.c in Sources */,
+				D09EFB592ABA725E004E7583 /* maps.c in Sources */,
 				6D91DEAC1675556300362864 /* gameBounding.c in Sources */,
 				6D53C4D71693FDB4009D6C3C /* cocoaAudioThread.m in Sources */,
 				D062ED5A16E0279B00CA4374 /* glFlight.c in Sources */,
@@ -1256,7 +1260,7 @@
 /* Begin XCBuildConfiguration section */
 		1D6058940D05DD3E006BFB54 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7DC329340B541AFE5F822D0E /* Pods-gl_flight.debug.xcconfig */;
+			baseConfigurationReference = 789CCFE9222A77D6C6D63811 /* Pods-gl_flight.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD)";
@@ -1297,7 +1301,7 @@
 		};
 		1D6058950D05DD3E006BFB54 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A9D011A81240F92C49698C65 /* Pods-gl_flight.release.xcconfig */;
+			baseConfigurationReference = F1F02E1F3ADC8F9AA2351878 /* Pods-gl_flight.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
