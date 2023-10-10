@@ -11,6 +11,10 @@
 
 #include "textures.h"
 #include "mapgenerated.h"
+#include "object.h"
+#include "models.h"
+
+/********************************************************/
 
 /*
  * models
@@ -39,11 +43,7 @@
 #define MAPMODEL_SPRITE_SCENERY "22"
 
 
-/*
- (Model type, float x, float y, float z, float yaw, float pitch, float roll, float scale, int texture_id)
-*/
-#define WORLD_ADD_OBJECT(model, x, y, z, yaw, pitch, roll, scale, tx_id) \
-"add_object "#model" "#x" "#y" "#z" "#yaw" "#pitch" "#roll" "#scale" "#tx_id"\n"
+#include "maps_macro.h"
 
 #define MESH_CUBES_1(tex, scale)                                 \
 "mesh_manip_add wx0.0 " " 5" " wz0" " 5 0 0" " 0 0 5" " 40 40\n" \
@@ -1247,7 +1247,7 @@ BASE_FRIENDLY_INVISIBLE(100, 20, 100)
 BASE_ENEMY_1
 
 // add ball
-WORLD_ADD_OBJECT(15, 0, 0, 0, 0, 0, 0, 4, 105)
+WORLD_ADD_OBJECT(MODEL_BALL, 0, 0, 0, 0, 0, 0, 4, 105)
 "object_set_info 17\n"
 ;
 
@@ -1307,36 +1307,8 @@ BUILDING_1(rndx, 0, rndz, 0)
 ; // map_trench
 
 
-const static char* maps_list[] =
-{
-    initial_map_collection,
-    initial_map_deathmatch,
-    /*
-    initial_map_200x100x200,
-    map_400x100x400,
-    map_portal_lobby,
-     */
-    map_200x100x200_pits,
-    initial_map_turret,
-    pokeball_map,
-    map_speedrun,
-    NULL
-};
-
-const static char* maps_list_names[] =
-{
-    "map hack-grid",
-    "map asteroidfield",
-    /*"map canvas",
-    "map bigcanvas",
-    "lobby",
-     */
-    "pit",
-    "map turret-defense",
-    "ball-throwing test",
-    "speedrun",
-    NULL
-};
+extern const char* maps_list[];
+extern const char* maps_list_names[];
 
 const static char* initial_map = ""                         \
 "set_background_info " BACKGROUND_TEXTURE_STR "\n" \
@@ -1346,6 +1318,17 @@ MAP_GENERATED_MACRO \
 WORLD_ADD_OBJECT(12, -2, 5, -4, 0, 0, 0, 1.0 , 24)          \
 WORLD_ADD_OBJECT(14, 2, 5, -4, 0, 0, 0, 1.0 , 71)           \
 "";
+
+// this map should instantly cause a collision with player and a block
+#define chillBMacro(x) (#x-MODELS_FIRST)
+const static char* initial_map_test = ""                           \
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"                 \
+WORLD_SCALED_FRAME(1, /*57*/28, 4) \
+BUILDING_3(-0.01, -1, 0.0, 0) "\n" \
+"object_set_info 6\n" \
+"";
+
+
 
 
 #endif

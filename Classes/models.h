@@ -6,8 +6,6 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#include "string.h"
-
 /*
 #import <Foundation/Foundation.h>
 #import <OpenGLES/EAGL.h>
@@ -16,6 +14,9 @@
 
 #ifndef __MODELS_H__
 #define __MODELS_H__
+
+#include <string.h>
+#include <stdlib.h>
 
 #include "gameIncludes.h"
 
@@ -114,6 +115,15 @@ typedef enum {
     MODEL_BUILDING3,
     MODEL_LAST,
 } Model;
+
+/********************************************************/
+static inline const char*
+model_str(Model m)
+{
+	static char result[255];
+	sprintf(result, "%d", m);
+	return (const char*) result;
+}
 
 /********************************************************/
 static model_coord_t model_pyramid[] = 

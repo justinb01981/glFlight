@@ -113,7 +113,7 @@ extern float C_FRICTION;
 extern float GYRO_FEEDBACK;
 extern float GYRO_DC;
 
-const static int pooped_cube_interval_ms = 50;
+const static int pooped_cube_interval_ms = /*50*/ 1000;
 const static int pooped_cube_lifetime = 100;
 
 const static float collision_repulsion_coeff = 1.1;

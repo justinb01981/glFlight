@@ -139,12 +139,11 @@ glFlightJNIInit()
 
 	gameMapFilePrefix(glFlightGameResourceInfo.pathPrefix);
 	gameMapFileName("temp");
-	gameMapSetMap(initial_map);
+	gameMapSetMap(/*initial_map */ initial_map_test);
 
     // HACK: touch inputs are in portrait mode
 	gameInterfaceInit(viewWidth, viewHeight);
     gameInterfaceControls.trim.blinking = 1;
-
 }
 
 JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightResourcesInit(JNIEnv *e, jobject o)
@@ -181,15 +180,9 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 	viewWidth = f[0]*xscale;
 	viewHeight = f[1]*yscale;
 
-	if(viewWidth == 0 || viewHeight == 0) return;
-
-	DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
-
-	assert(!glFlightInited);
-	
-	glFlightJNIInit();
-
-	glFlightInited = true;
+	if(viewWidth == 0 || viewHeight == 0) {
+		return;
+	}
 }
 
 static game_timeval_t gameInputTimeLast = 0;
@@ -198,8 +191,13 @@ static game_timeval_t gameDrawTimeLast = 0;
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jobject o)
 {
     // TODO: draw a 'wait...loading' status string each frame until load
-	if(!glFlightInited) return;
 
+	if(!glFlightInited) {
+		DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
+		glFlightJNIInit();
+		glFlightInited = 1;
+	}
+	
 	if(time_ms_wall - gameInputTimeLast >= (1000/GYRO_SAMPLE_RATE))
 	{
 		gameInput();

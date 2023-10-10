@@ -5,7 +5,6 @@ android {
     defaultConfig {
         applicationId "com.domain17.glflight"
         minSdkVersion 22
-        targetSdkVersion 33
 
         ndk {
             moduleName "glFlight"
@@ -21,6 +20,8 @@ android {
         }
     }
     defaultConfig {
+
+        targetSdk 23
         sourceSets.main {
             jniLibs.srcDir 'src/main/libs'
             jni.srcDirs = []

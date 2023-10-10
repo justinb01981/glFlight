@@ -58,46 +58,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     double viewWidthScaled;
     double viewHeightScaled;
 
-    public class GameGLConfigChooser implements EGLConfigChooser {
-
-        @Override
-        public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
-
-            /* http://www.khronos.org/registry/egl/sdk/docs/man/html/eglChooseConfig.xhtml */
-            int[] config_attrs = {
-                    EGL10.EGL_LEVEL, 0,
-                    EGL10.EGL_COLOR_BUFFER_TYPE, EGL10.EGL_RGB_BUFFER,
-                    EGL10.EGL_RED_SIZE, 8,
-                    EGL10.EGL_GREEN_SIZE, 8,
-                    EGL10.EGL_BLUE_SIZE, 8,
-                    EGL10.EGL_ALPHA_SIZE, 8,
-                    EGL10.EGL_DEPTH_SIZE, 16,
-                    EGL10.EGL_RENDERABLE_TYPE, 4,
-                    EGL10.EGL_STENCIL_SIZE, /*8*/ 0,
-                    EGL10.EGL_SAMPLE_BUFFERS, 1,
-                    EGL10.EGL_SAMPLES, 0,
-                    EGL10.EGL_NONE
-            };
-            num_config = new int[1];
-            if (!egl.eglChooseConfig(display, config_attrs, null, 0,
-                    num_config)) {
-                throw new IllegalArgumentException("eglChooseConfig failed");
-            }
-
-            int config_count = num_config[0];
-            configs = new EGLConfig[config_count];
-
-            if (!egl.eglChooseConfig(display, config_attrs, configs, config_count,
-                    num_config)) {
-                throw new IllegalArgumentException("eglChooseConfig failed");
-            }
-
-            return configs[0];
-        }
-
-        public EGLConfig[] configs;
-        int[] num_config;
-    }
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,17 +80,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         gameRenderer.surfaceView = new GLSurfaceView(this);
-
-        SurfaceHolder h = gameRenderer.surfaceView.getHolder();
-
-        /* iOS on iPhone5:320/568 */
-        double sh = 640;
-        double sw = sh * 1.5;
-
-        viewWidthScaled = sw;
-        viewHeightScaled = sh;
-
-        h.setFixedSize((int) sw, (int) sh);
 
         GameGLConfigChooser glConfigChooser = new GameGLConfigChooser();
         gameRenderer.surfaceView.setEGLConfigChooser(glConfigChooser);
@@ -168,7 +118,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         try {
             mBGThread.join();
-            mRenderThread.join();
+            if(!renderContinuously) mRenderThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

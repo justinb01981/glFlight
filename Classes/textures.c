@@ -77,7 +77,7 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
     unsigned char* data;
     int width = max_bitmap_dim;
     int height = max_bitmap_dim;
-    
+
     sprintf(file_name, "%s""texture%d.bmp", initTexturesPrefix, n_textures);
 
     /*
@@ -272,6 +272,6 @@ void textures_hack_framebuffer(GLuint newtx) {
 
 void textures_hack_framebuffer_cleanup(void) {
     // accept new texture rendered from framebuf
-//    texture_list_loaded[TEXTURE_ID_BOUNDING] = 0;
-//    texture_list[TEXTURE_ID_BOUNDING] = -1;
+    texture_list_loaded[TEXTURE_ID_BOUNDING] = 0;
+    texture_list[TEXTURE_ID_BOUNDING] = -1;
 }

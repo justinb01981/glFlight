@@ -108,7 +108,6 @@ struct WorldElem {
     int elem_id;
     int map_id;
     
-    unsigned char destructible;
     int destroyed_by_id;
     float durability;
     int lifetime;
@@ -126,8 +125,7 @@ struct WorldElem {
     int visible_list_by_region_sorted:1;
     int collision_handle_remove:1;
     int remove_pending:1;
-    int moving:1;
-    game_timeval_t collision_start_time;
+    int moving:1;    // TODO: REMOVE THIS
     
     struct
     {

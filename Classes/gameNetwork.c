@@ -1441,7 +1441,7 @@ get_world_elem_info(int elem_id, gameNetworkMessage* msg)
         msg->params.f[i++] = pElem->physics.ptr->vy;
         msg->params.f[i++] = pElem->physics.ptr->vz;
         msg->params.f[i++] = pElem->lifetime;
-        msg->params.f[i++] = pElem->destructible;
+        i++; // removed: // msg->params.f[i++] = pElem->destructible;
         msg->params.f[i++] = pElem->scale;
         msg->params.f[i++] = pElem->texture_id;
         msg->params.f[i++] = pElem->stuff.bullet.action; // action f[14]
@@ -1763,8 +1763,6 @@ do_game_network_world_update()
     {
         return;
     }
-    
-    collision_actions_set_grab_powerup();
     
     //get_time_ms_wall();
     
@@ -2113,6 +2111,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                         
                         if(firePoopedCube(pPlayerElem) != WORLD_ELEM_ID_INVALID)
                         {
+                            // behave like a static light-bridge, or smoke?
                             WorldElem *pCube = world_get_last_object();
                             pCube->physics.ptr->vx = pCube->physics.ptr->vy = pCube->physics.ptr->vz = 0;
                         }
@@ -2162,7 +2161,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                     game_elem_setup_missle(world_get_last_object());
                     world_get_last_object()->stuff.u.enemy.target_id = object_target;
                     world_object_set_lifetime(world_get_last_object()->elem_id, msg->params.f[10]);
-                    world_get_last_object()->destructible = msg->params.f[11];
+//                    world_get_last_object()->destructible = msg->params.f[11];
                     world_get_last_object()->stuff.network_created = 1;
 
                     if(msg->params.f[7] != 0 || msg->params.f[8] != 0 || msg->params.f[9] != 0)
@@ -2206,7 +2205,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                     world_object_set_lifetime(world_get_last_object()->elem_id, msg->params.f[10]);
                 }
                 
-                world_get_last_object()->destructible = msg->params.f[11];
+//                world_get_last_object()->destructible = msg->params.f[11];
                 
                 world_get_last_object()->stuff.network_created = 1;
                 
@@ -2284,7 +2283,7 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                         // hack to map model-id to an object_type
                         // TODO: what about POWERUP?
                         world_get_last_object()->object_type = msg->params.f[15];
-                        world_get_last_object()->destructible = msg->params.f[11];
+                        //world_get_last_object()->destructible = msg->params.f[11];
                         world_get_last_object()->durability = msg->params.f[17];
                         world_get_last_object()->stuff.affiliation = msg->params.f[18];
                         world_get_last_object()->stuff.subtype = msg->params.f[19];
@@ -2940,7 +2939,7 @@ gameNetwork_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_a
          */
     }
     
-    // network client, special case some collisions
+    // network client, special case some collisions applied locally
     if(gameNetworkState.connected && !gameStateSinglePlayer.started)
     {
         if(pElemMyShip && pElemC->object_type == OBJ_POWERUP_GENERIC)

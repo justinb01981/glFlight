@@ -810,7 +810,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     
     // leave trail
     if(elem->stuff.u.enemy.leaves_trail &&
-       time_ms - elem->stuff.u.enemy.time_last_trail >= pooped_cube_interval_ms)
+       time_ms - elem->stuff.u.enemy.time_last_trail == pooped_cube_interval_ms)
     {
         firePoopedCube(elem);
         elem->stuff.u.enemy.time_last_trail = time_ms;

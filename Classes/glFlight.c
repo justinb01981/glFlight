@@ -33,6 +33,7 @@
 #include "collision.h"
 #include "gamePlay.h"
 #include "gameGlobals.h"
+#include "gameDialogs.h"
 
 static void clear_world_pending_removals(void);
 static void draw_btree_elements(WorldElem* pElem, float priority);
@@ -133,7 +134,7 @@ glFlightFrameStage1()
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnable(GL_DEPTH_TEST);
     
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	// turn off bilinear filtering
@@ -153,7 +154,7 @@ glFlightFrameStage1()
         
         world_elem_btree_restart();
         
-        gameGraphicsUninit();
+        //gameGraphicsUninit();
         gameMapReRender();
         gameNetwork_worldInit();
         
