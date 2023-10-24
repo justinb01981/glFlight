@@ -1,11 +1,9 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdk 30
+    compileSdk 25
     defaultConfig {
         applicationId "com.domain17.glflight"
-        minSdkVersion 22
-        targetSdkVersion 33
 
         ndk {
             moduleName "glFlight"
@@ -18,9 +16,14 @@ android {
         }
         debug {
             jniDebuggable true
+            debuggable true
         }
     }
     defaultConfig {
+
+
+        minSdk 25
+        targetSdk 25
         sourceSets.main {
             jniLibs.srcDir 'src/main/libs'
             jni.srcDirs = []
@@ -37,15 +40,12 @@ android {
     }
     ndkVersion '25.2.9519653'
     compileOptions {
-        targetCompatibility JavaVersion.VERSION_11
-        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
     }
     namespace 'com.domain17.glflight'
-    buildToolsVersion '28.0.3'
 
 
 }
 
-dependencies {
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-}
+

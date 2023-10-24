@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <EGL/egl.h>
 #include <map>
 
 #include <android/log.h>
@@ -152,9 +153,6 @@ JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightResources
     return 0;
 }
 
-static float xscale = 1;
-static float yscale = 1;
-
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	/* http://developer.android.com/training/articles/perf-jni.html */
@@ -178,18 +176,15 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 	float f[16];
 	int l = env_float_copy(e, arr, f);
 
-	viewWidth = f[0]*xscale;
-	viewHeight = f[1]*yscale;
+	viewWidth = f[0];
+	viewHeight = f[1];
 
 	if(viewWidth == 0 || viewHeight == 0) return;
 
 	DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
 
-	assert(!glFlightInited);
-	
-	glFlightJNIInit();
+    glViewport(0, 0, viewWidth, viewHeight);
 
-	glFlightInited = true;
 }
 
 static game_timeval_t gameInputTimeLast = 0;
@@ -198,7 +193,14 @@ static game_timeval_t gameDrawTimeLast = 0;
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jobject o)
 {
     // TODO: draw a 'wait...loading' status string each frame until load
-	if(!glFlightInited) return;
+	if(!glFlightInited) {
+        glFlightJNIInit();
+
+        glFlightInited = true;
+		return;
+	}
+
+    assert(eglGetCurrentContext() != NULL);
 
 	if(time_ms_wall - gameInputTimeLast >= (1000/GYRO_SAMPLE_RATE))
 	{
@@ -218,7 +220,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIEnv *e, jobject o)
 {
-    glFlightInited = false;
+	assert(!glFlightInited);
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNIEnv *e, jobject o)
