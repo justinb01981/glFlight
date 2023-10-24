@@ -143,8 +143,6 @@ glFlightJNIInit()
 	gameMapSetMap(initial_map);
 
     // HACK: touch inputs are in portrait mode
-	gameInterfaceInit(viewWidth, viewHeight);
-    gameInterfaceControls.trim.blinking = 1;
 
 }
 
@@ -179,12 +177,12 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 	viewWidth = f[0];
 	viewHeight = f[1];
 
-	if(viewWidth == 0 || viewHeight == 0) return;
-
 	DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
 
     glViewport(0, 0, viewWidth, viewHeight);
 
+	gameInterfaceInit(viewWidth, viewHeight);
+	gameInterfaceControls.trim.blinking = 1;
 }
 
 static game_timeval_t gameInputTimeLast = 0;
@@ -194,9 +192,6 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 {
     // TODO: draw a 'wait...loading' status string each frame until load
 	if(!glFlightInited) {
-        glFlightJNIInit();
-
-        glFlightInited = true;
 		return;
 	}
 
@@ -220,7 +215,10 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIEnv *e, jobject o)
 {
-	assert(!glFlightInited);
+	glFlightJNIInit();
+
+	glFlightInited = true;
+
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNIEnv *e, jobject o)
@@ -320,7 +318,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 		return;
 	}
 
-	if(time_ms >= sensorInputNext)
+	if(/*time_ms >= sensorInputNext*/1)
     {
 		if(time_ms - sensorInputNext > 1000) {
 			sensorInputNext = time_ms;
@@ -330,7 +328,8 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
         // Z reversed
 //		gameInputGyro(-sumroll, sumyaw, -sumpitch);
 		gameInputGyro(-sumroll, sumpitch, -sumyaw);
-		sensorInputNext += 1000 / PLATFORM_TICK_RATE;
+		//sensorInputNext += 1000 / PLATFORM_TICK_RATE;
+		sensorInputNext = time_ms + (1000 / PLATFORM_TICK_RATE);
 	}
 
 	//gameInputMotion(sumroll, sumpitch, sumyaw);

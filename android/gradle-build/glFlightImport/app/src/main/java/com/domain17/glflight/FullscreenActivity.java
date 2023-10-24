@@ -46,12 +46,9 @@ import com.domain17.glflight.util.*;
 public class FullscreenActivity extends Activity implements SensorEventListener {
 
     public boolean running = false;
-    public boolean renderContinuously = true;        // near as I can tell this makes no difference now  more testing needed
+    public boolean renderContinuously = false;        // near as I can tell this makes no difference now  more testing needed
     Context appCtx;
     int accuracyLast = SensorManager.SENSOR_STATUS_UNRELIABLE;
-
-    double viewWidthScaled;
-    double viewHeightScaled;
 
 
 ////////////////////////////////////////////////////
@@ -122,18 +119,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         gameRenderer.surfaceView = new GLSurfaceView(this);
 
-        SurfaceHolder h = gameRenderer.surfaceView.getHolder();
-
-        double sh = 640;
-        double sw = sh * 1.5;
-
-        viewWidthScaled = sw;
-        viewHeightScaled = sh;
-
-        h.setFixedSize((int) sw, (int) sh);
-
         gameRenderer.surfaceView.setEGLConfigChooser(new GameGLConfigChooser());
-        //gameRenderer.surfaceView.setEGLConfigChooser(true);
 
         setContentView(gameRenderer.surfaceView);
         gameRenderer.surfaceView.setRenderer(gameRenderer);
@@ -148,19 +134,18 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
             System.out.println("GameResources.init succeeded\n");
         }
 
-        if (!renderContinuously)
-            gameRenderer.surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         // sensor registerListener called in onResume
 
-
-
         running = true;
         mBGThread.start();
-        //if(!renderContinuously) mRenderThread.start();
+
+        gameRenderer.surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
+        GameRunnable.glFlightInit(gameRenderer);
+
     }
 
     @Override
@@ -185,26 +170,22 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     @Override
     protected void onPause() {
         super.onPause();
-        if (true) {
-            gameRenderer.surfaceView.onPause();
-            mSensorManager.unregisterListener(this);
-        }
+        gameRenderer.surfaceView.onPause();
+        mSensorManager.unregisterListener(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (true) {
-            initGraphicsEtc();
+        initGraphicsEtc();
 
-            GameRunnable.glFlightInit(gameRenderer);
-            gameRenderer.surfaceView.onResume();
-            mRenderThread.start();
+        gameRenderer.surfaceView.onResume();
 
-            mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_FASTEST);
-            running = true;
-        }
+        if(!renderContinuously) mRenderThread.start();
+
+        assert( mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_UI) );
+        running = true;
     }
     
     /**
@@ -248,15 +229,15 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     	float action = 0;
     	float x = 0;
     	float y = 0;
-    	float hackNavBar = (float) viewWidthScaled*0.065f; // from gameInterfaceInit (gameInterface.c)
 
 		InputDevice dev = motionEvent.getDevice();
 
 		for(int i = 0; i < motionEvent.getPointerCount(); i++)
         {
             int pointerID = motionEvent.getPointerId(i);
-			double tX = (motionEvent.getX(i) / dev.getMotionRange(InputDevice.MOTION_RANGE_X).getMax()) * (viewWidthScaled+hackNavBar);
-			double tY = (motionEvent.getY(i) / dev.getMotionRange(InputDevice.MOTION_RANGE_Y).getMax()) * viewHeightScaled;
+            //float hackNavBar = (float) viewWidthScaled*0.065f; // from gameInterfaceInit (gameInterface.c)
+			double tX = motionEvent.getX(i); //(motionEvent.getX(i) / dev.getMotionRange(InputDevice.MOTION_RANGE_X).getMax()) * (viewWidthScaled+hackNavBar);
+			double tY = motionEvent.getY(i); //(motionEvent.getY(i) / dev.getMotionRange(InputDevice.MOTION_RANGE_Y).getMax()) * viewHeightScaled;
 
 			System.out.println("touched at [" + tX + "," + tY +
 					"] action:" + motionEvent.getActionMasked() + "\n");
@@ -331,7 +312,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
                 if (delta <= 0) {
                     mRenderNext = mRenderNext + (1000.0 / GameRenderer.fps);
 
-                    //gameRenderer.requestRender();
+                    gameRenderer.requestRender();   // this is not a race :-P
 
                     delta = mRenderNext - java.lang.System.currentTimeMillis(); //Instant.now().compareTo(mRenderNext);
                     //System.out.println("delta="+delta);

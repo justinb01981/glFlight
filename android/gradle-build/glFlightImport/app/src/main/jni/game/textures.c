@@ -136,7 +136,7 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
                     data[offset+0] = pixel[2];
                     data[offset+1] = pixel[1];
                     data[offset+2] = pixel[0];
-                    
+
                     // set alpha channel, (0, 0, 0 color is transparent)
                     if(pixel[2] == 0 && pixel[1] == 0 && pixel[0] == 0)
                     {

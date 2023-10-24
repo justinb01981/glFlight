@@ -1718,10 +1718,9 @@ drawBackgroundCore()
     glTexCoordPointer(2, GL_FLOAT, 0, bgData->texcoords);
 
     bindTexture(bgData->tex_id);
-#ifndef EXPERIMENTAL
-    glDrawElements(GL_TRIANGLES, bgData->n_indices,
-                   index_type_enum, bgData->indices);
-#endif
+
+//    glDrawElements(GL_TRIANGLES, bgData->n_indices,
+//                   index_type_enum, bgData->indices);
         
     glPopMatrix();
     
@@ -1733,7 +1732,7 @@ drawBackgroundCore()
 
 void drawBackground()
 {
-    drawBackgroundCore();
+    //drawBackgroundCore();
     
     drawBounding();
 }

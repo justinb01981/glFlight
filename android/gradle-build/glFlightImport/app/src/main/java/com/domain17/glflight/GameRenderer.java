@@ -42,8 +42,6 @@ public class GameRenderer implements Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 arg0, EGLConfig arg1) {
 		onSurfaceCreated();
-
-		//EGL14.eglSwapInterval(EGL14.eglGetCurrentDisplay(), 0);
 	}
 
 	public void requestRender() {
