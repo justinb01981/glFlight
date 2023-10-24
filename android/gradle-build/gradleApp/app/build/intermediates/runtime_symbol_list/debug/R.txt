@@ -1,0 +1,2 @@
+int mipmap ic_launcher 0x7f010000
+int string gles3jni_activity 0x7f020000

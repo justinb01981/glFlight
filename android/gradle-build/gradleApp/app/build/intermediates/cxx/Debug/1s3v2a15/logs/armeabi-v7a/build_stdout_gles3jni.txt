@@ -1,0 +1,2 @@
+ninja: Entering directory `/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/armeabi-v7a'
+ninja: no work to do.

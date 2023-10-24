@@ -1,0 +1,7 @@
+#Tue Oct 10 19:09:29 PDT 2023
+base.1=/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/dex/debug/mergeProjectDexDebug/9/classes.dex
+path.1=9/classes.dex
+base.0=/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
+renamed.1=classes2.dex
+renamed.0=classes.dex
+path.0=0/classes.dex

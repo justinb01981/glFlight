@@ -1,0 +1,33 @@
+{
+  "buildFiles": [
+    "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/justin/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja",
+      "-C",
+      "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/cmake/debug/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/justin/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja",
+    "-C",
+    "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/cmake/debug/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "gles3jni-Debug-x86": {
+      "artifactName": "gles3jni",
+      "buildCommandComponents": [
+        "/Users/justin/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja",
+        "-C",
+        "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/cmake/debug/x86",
+        "gles3jni"
+      ],
+      "abi": "x86",
+      "output": "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/cmake/debug/obj/x86/libgles3jni.so",
+      "runtimeFiles": []
+    }
+  }
+}

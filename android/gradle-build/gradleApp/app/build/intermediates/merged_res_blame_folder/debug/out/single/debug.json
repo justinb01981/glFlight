@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "com.android.gles3jni.app-merged_res-5:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.android.gles3jni.app-main-7:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.android.gles3jni.app-merged_res-5:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.android.gles3jni.app-main-7:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.android.gles3jni.app-merged_res-5:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.android.gles3jni.app-main-7:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.android.gles3jni.app-merged_res-5:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.android.gles3jni.app-main-7:/mipmap-hdpi/ic_launcher.png"
+    }
+]

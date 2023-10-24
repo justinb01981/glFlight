@@ -1,0 +1,73 @@
+CMAKE SERVER: 
+
+CMAKE SERVER: [== "CMake Server" ==[
+
+CMAKE SERVER: {"supportedProtocolVersions":[{"isExperimental":true,"major":1,"minor":1}],"type":"hello"}
+
+CMAKE SERVER: ]== "CMake Server" ==]
+
+CMAKE SERVER: [== "CMake Server" ==[
+
+CMAKE SERVER: {
+  "type": "handshake",
+  "cookie": "gradle-cmake-cookie",
+  "protocolVersion": {
+    "isExperimental": true,
+    "major": 1,
+    "minor": 1
+  },
+  "sourceDirectory": "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni",
+  "buildDirectory": "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/cmake/debug/armeabi-v7a",
+  "generator": "Ninja"
+}
+
+CMAKE SERVER: ]== "CMake Server" ==]
+
+CMAKE SERVER: 
+
+CMAKE SERVER: [== "CMake Server" ==[
+
+CMAKE SERVER: {"cookie":"gradle-cmake-cookie","inReplyTo":"handshake","type":"reply"}
+
+CMAKE SERVER: ]== "CMake Server" ==]
+
+CMAKE SERVER: [== "CMake Server" ==[
+
+CMAKE SERVER: {
+  "type": "configure",
+  "cacheArguments": [
+    "",
+    "-DCMAKE_FIND_ROOT_PATH\u003d/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/cmake/debug/prefab/armeabi-v7a/prefab",
+    "-DCMAKE_BUILD_TYPE\u003dDebug",
+    "-DCMAKE_TOOLCHAIN_FILE\u003d/Users/justin/Library/Android/sdk/ndk/21.4.7075529/build/cmake/android.toolchain.cmake",
+    "-DANDROID_ABI\u003darmeabi-v7a",
+    "-DANDROID_NDK\u003d/Users/justin/Library/Android/sdk/ndk/21.4.7075529",
+    "-DANDROID_PLATFORM\u003dandroid-28",
+    "-DCMAKE_ANDROID_ARCH_ABI\u003darmeabi-v7a",
+    "-DCMAKE_ANDROID_NDK\u003d/Users/justin/Library/Android/sdk/ndk/21.4.7075529",
+    "-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON",
+    "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003d/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/cmake/debug/obj/armeabi-v7a",
+    "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003d/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/cmake/debug/obj/armeabi-v7a",
+    "-DCMAKE_MAKE_PROGRAM\u003d/Users/justin/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja",
+    "-DCMAKE_SYSTEM_NAME\u003dAndroid",
+    "-DCMAKE_SYSTEM_VERSION\u003d28",
+    "-DANDROID_STL\u003dc++_static -lGLESv2"
+  ]
+}
+
+CMAKE SERVER: ]== "CMake Server" ==]
+
+CMAKE SERVER: 
+
+CMAKE SERVER: [== "CMake Server" ==[
+
+CMAKE SERVER: {"cookie":"","inReplyTo":"configure","message":"CMake Error at /Users/justin/Library/Android/sdk/ndk/21.4.7075529/build/cmake/android.toolchain.cmake:377 (message):\n  Invalid Android STL: c++_static -lGLESv2.\nCall Stack (most recent call first):\n  /Users/justin/Library/Android/sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake:94 (include)\n  CMakeLists.txt\n\n","title":"Error","type":"message"}
+
+CMAKE SERVER: ]== "CMake Server" ==]
+
+CMAKE SERVER: CMake Error at /Users/justin/Library/Android/sdk/ndk/21.4.7075529/build/cmake/android.toolchain.cmake:377 (message):
+  Invalid Android STL: c++_static -lGLESv2.
+Call Stack (most recent call first):
+  /Users/justin/Library/Android/sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake:94 (include)
+  CMakeLists.txt
+

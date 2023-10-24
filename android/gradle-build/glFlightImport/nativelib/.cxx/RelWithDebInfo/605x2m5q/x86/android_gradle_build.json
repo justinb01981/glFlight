@@ -1,0 +1,38 @@
+{
+  "buildFiles": [
+    "C:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\nativelib\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\Justin\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "C:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\nativelib\\.cxx\\RelWithDebInfo\\605x2m5q\\x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\Justin\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "C:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\nativelib\\.cxx\\RelWithDebInfo\\605x2m5q\\x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "nativelib::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "nativelib",
+      "output": "C:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\nativelib\\build\\intermediates\\cxx\\RelWithDebInfo\\605x2m5q\\obj\\x86\\libnativelib.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "C:\\Users\\Justin\\AppData\\Local\\Android\\sdk\\ndk\\23.1.7779620\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe",
+      "cppCompilerExecutable": "C:\\Users\\Justin\\AppData\\Local\\Android\\sdk\\ndk\\23.1.7779620\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

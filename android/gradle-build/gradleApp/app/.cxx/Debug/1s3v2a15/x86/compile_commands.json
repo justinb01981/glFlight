@@ -1,0 +1,17 @@
+[
+{
+  "directory": "/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/x86",
+  "command": "/Users/justin/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=i686-none-linux-android24 --sysroot=/Users/justin/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dgles3jni_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=c++11 -fno-rtti -fno-exceptions -Wall -fno-limit-debug-info  -fPIC -o CMakeFiles/gles3jni.dir/gles3jni.cpp.o -c /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/gles3jni.cpp",
+  "file": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/gles3jni.cpp"
+},
+{
+  "directory": "/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/x86",
+  "command": "/Users/justin/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=i686-none-linux-android24 --sysroot=/Users/justin/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dgles3jni_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=c++11 -fno-rtti -fno-exceptions -Wall -fno-limit-debug-info  -fPIC -o CMakeFiles/gles3jni.dir/RendererES2.cpp.o -c /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/RendererES2.cpp",
+  "file": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/RendererES2.cpp"
+},
+{
+  "directory": "/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/x86",
+  "command": "/Users/justin/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=i686-none-linux-android24 --sysroot=/Users/justin/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dgles3jni_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=c++11 -fno-rtti -fno-exceptions -Wall -fno-limit-debug-info  -fPIC -o CMakeFiles/gles3jni.dir/RendererES3.cpp.o -c /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/RendererES3.cpp",
+  "file": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/RendererES3.cpp"
+}
+]

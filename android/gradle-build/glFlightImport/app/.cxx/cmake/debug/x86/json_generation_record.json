@@ -1,0 +1,23 @@
+[
+  {
+    "level": "INFO",
+    "message": "Start JSON generation. Platform version: 28 min SDK version: x86",
+    "file": "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/CMakeLists.txt",
+    "tag": "debug|x86",
+    "diagnosticCode": "UNKNOWN"
+  },
+  {
+    "level": "INFO",
+    "message": "JSON \u0027/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/cmake/debug/x86/android_gradle_build.json\u0027 was up-to-date",
+    "file": "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/CMakeLists.txt",
+    "tag": "debug|x86",
+    "diagnosticCode": "UNKNOWN"
+  },
+  {
+    "level": "INFO",
+    "message": "JSON generation completed without problems",
+    "file": "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/CMakeLists.txt",
+    "tag": "debug|x86",
+    "diagnosticCode": "UNKNOWN"
+  }
+]

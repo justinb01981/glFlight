@@ -1,0 +1,5 @@
+# ninja log v5
+0	138	1696964276	CMakeFiles/gles3jni.dir/RendererES2.cpp.o	4bdd3a260643ac59
+0	138	1696964276	CMakeFiles/gles3jni.dir/RendererES3.cpp.o	c08be1c32b4f51e4
+0	194	1696964276	CMakeFiles/gles3jni.dir/gles3jni.cpp.o	dfa0fc45bbbf544c
+194	294	1696964276	/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cxx/Debug/1s3v2a15/obj/arm64-v8a/libgles3jni.so	4c3a2c46edbbe18f

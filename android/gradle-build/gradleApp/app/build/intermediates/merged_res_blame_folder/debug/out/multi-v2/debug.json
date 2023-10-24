@@ -1,0 +1,26 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.android.gles3jni.app-merged_res-5:/values_values.arsc.flat",
+            "map": [
+                {
+                    "source": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/res/values/strings.xml",
+                    "from": {
+                        "startLines": "21",
+                        "startColumns": "4",
+                        "startOffsets": "851",
+                        "endColumns": "54",
+                        "endOffsets": "901"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "54",
+                        "endOffsets": "105"
+                    }
+                }
+            ]
+        }
+    ]
+}

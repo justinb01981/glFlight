@@ -1,0 +1,3 @@
+/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/Debug/272n5e17/x86/CMakeFiles/rebuild_cache.dir
+/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/Debug/272n5e17/x86/CMakeFiles/edit_cache.dir
+/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/Debug/272n5e17/x86/CMakeFiles/gles3jni.dir

@@ -1,0 +1,2 @@
+com.android.gles3jni:string/gles3jni_activity = 0x7f020000
+com.android.gles3jni:mipmap/ic_launcher = 0x7f010000

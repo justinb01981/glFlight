@@ -1,0 +1,40 @@
+{
+  "buildFiles": [
+    "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/justin/Library/Android/sdk/cmake/3.18.1/bin/ninja",
+      "-C",
+      "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/Debug/p2s5y4o2/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/justin/Library/Android/sdk/cmake/3.18.1/bin/ninja",
+    "-C",
+    "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/Debug/p2s5y4o2/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "gles3jni::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "gles3jni",
+      "output": "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/cxx/Debug/p2s5y4o2/obj/arm64-v8a/libgles3jni.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/Users/justin/Library/Android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/Users/justin/Library/Android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [
+    "c"
+  ],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

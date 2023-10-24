@@ -1,0 +1,3 @@
+C:/Users/Justin/workspace/glFlight/android/gradle-build/glFlightImport/nativelib/.cxx/Debug/c4d6b3a2/arm64-v8a/CMakeFiles/nativelib.dir
+C:/Users/Justin/workspace/glFlight/android/gradle-build/glFlightImport/nativelib/.cxx/Debug/c4d6b3a2/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/Justin/workspace/glFlight/android/gradle-build/glFlightImport/nativelib/.cxx/Debug/c4d6b3a2/arm64-v8a/CMakeFiles/rebuild_cache.dir

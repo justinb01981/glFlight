@@ -1,0 +1,25 @@
+                    Executable : /Users/justin/Library/Android/sdk/cmake/3.10.2.4988404/bin/cmake
+arguments : 
+-H/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni
+-DCMAKE_FIND_ROOT_PATH=/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/cmake/release/prefab/x86/prefab
+-DCMAKE_BUILD_TYPE=Release
+-DCMAKE_TOOLCHAIN_FILE=/Users/justin/Library/Android/sdk/ndk/21.4.7075529/build/cmake/android.toolchain.cmake
+-DANDROID_ABI=x86
+-DANDROID_NDK=/Users/justin/Library/Android/sdk/ndk/21.4.7075529
+-DANDROID_PLATFORM=android-28
+-DCMAKE_ANDROID_ARCH_ABI=x86
+-DCMAKE_ANDROID_NDK=/Users/justin/Library/Android/sdk/ndk/21.4.7075529
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/cmake/release/obj/x86
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/cmake/release/obj/x86
+-DCMAKE_MAKE_PROGRAM=/Users/justin/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_SYSTEM_VERSION=28
+-DANDROID_STL=c++_static
+-B/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/cmake/release/x86
+-GNinja
+jvmArgs : 
+
+
+                    Build command args: []
+                    Version: 1

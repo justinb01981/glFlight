@@ -1,0 +1,8 @@
+com.android.gles3jni.app-pngs-0 /Users/justin/workspace/ndk-samples/gles3jni/app/build/generated/res/pngs/debug
+com.android.gles3jni.app-resValues-1 /Users/justin/workspace/ndk-samples/gles3jni/app/build/generated/res/resValues/debug
+com.android.gles3jni.app-rs-2 /Users/justin/workspace/ndk-samples/gles3jni/app/build/generated/res/rs/debug
+com.android.gles3jni.app-mergeDebugResources-3 /Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
+com.android.gles3jni.app-mergeDebugResources-4 /Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
+com.android.gles3jni.app-merged_res-5 /Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/merged_res/debug
+com.android.gles3jni.app-debug-6 /Users/justin/workspace/ndk-samples/gles3jni/app/src/debug/res
+com.android.gles3jni.app-main-7 /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/res

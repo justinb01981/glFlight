@@ -1,0 +1,184 @@
+[
+  {
+    "level_": 0,
+    "message_": "Start JSON generation. Platform version: 24 min SDK version: arm64-v8a",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1778342910
+  },
+  {
+    "level_": 0,
+    "message_": "rebuilding JSON /Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a/android_gradle_build.json due to:",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -2105297959
+  },
+  {
+    "level_": 0,
+    "message_": "- expected json /Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a/android_gradle_build.json file is not present, will remove stale json folder",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1356713523
+  },
+  {
+    "level_": 0,
+    "message_": "- missing previous command file /Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a/metadata_generation_command.txt, will remove stale json folder",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 568667275
+  },
+  {
+    "level_": 0,
+    "message_": "- command changed from previous, will remove stale json folder",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1062213265
+  },
+  {
+    "level_": 0,
+    "message_": "removing stale contents from \u0027/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a\u0027",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 254194714
+  },
+  {
+    "level_": 0,
+    "message_": "created folder \u0027/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a\u0027",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 1599210382
+  },
+  {
+    "level_": 0,
+    "message_": "executing cmake /Users/justin/Library/Android/sdk/cmake/3.18.1/bin/cmake \\\n  -H/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp \\\n  -DCMAKE_SYSTEM_NAME\u003dAndroid \\\n  -DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON \\\n  -DCMAKE_SYSTEM_VERSION\u003d24 \\\n  -DANDROID_PLATFORM\u003dandroid-24 \\\n  -DANDROID_ABI\u003darm64-v8a \\\n  -DCMAKE_ANDROID_ARCH_ABI\u003darm64-v8a \\\n  -DANDROID_NDK\u003d/Users/justin/Library/Android/sdk/ndk/25.1.8937393 \\\n  -DCMAKE_ANDROID_NDK\u003d/Users/justin/Library/Android/sdk/ndk/25.1.8937393 \\\n  -DCMAKE_TOOLCHAIN_FILE\u003d/Users/justin/Library/Android/sdk/ndk/25.1.8937393/build/cmake/android.toolchain.cmake \\\n  -DCMAKE_MAKE_PROGRAM\u003d/Users/justin/Library/Android/sdk/cmake/3.18.1/bin/ninja \\\n  -DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003d/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cxx/Debug/1s3v2a15/obj/arm64-v8a \\\n  -DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003d/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cxx/Debug/1s3v2a15/obj/arm64-v8a \\\n  -DCMAKE_BUILD_TYPE\u003dDebug \\\n  -B/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a \\\n  -GNinja \\\n  -DANDROID_STL\u003dc++_static\n",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1076600709
+  },
+  {
+    "level_": 0,
+    "message_": "/Users/justin/Library/Android/sdk/cmake/3.18.1/bin/cmake \\\n  -H/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp \\\n  -DCMAKE_SYSTEM_NAME\u003dAndroid \\\n  -DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON \\\n  -DCMAKE_SYSTEM_VERSION\u003d24 \\\n  -DANDROID_PLATFORM\u003dandroid-24 \\\n  -DANDROID_ABI\u003darm64-v8a \\\n  -DCMAKE_ANDROID_ARCH_ABI\u003darm64-v8a \\\n  -DANDROID_NDK\u003d/Users/justin/Library/Android/sdk/ndk/25.1.8937393 \\\n  -DCMAKE_ANDROID_NDK\u003d/Users/justin/Library/Android/sdk/ndk/25.1.8937393 \\\n  -DCMAKE_TOOLCHAIN_FILE\u003d/Users/justin/Library/Android/sdk/ndk/25.1.8937393/build/cmake/android.toolchain.cmake \\\n  -DCMAKE_MAKE_PROGRAM\u003d/Users/justin/Library/Android/sdk/cmake/3.18.1/bin/ninja \\\n  -DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003d/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cxx/Debug/1s3v2a15/obj/arm64-v8a \\\n  -DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003d/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cxx/Debug/1s3v2a15/obj/arm64-v8a \\\n  -DCMAKE_BUILD_TYPE\u003dDebug \\\n  -B/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a \\\n  -GNinja \\\n  -DANDROID_STL\u003dc++_static\n",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 1675863034
+  },
+  {
+    "level_": 0,
+    "message_": "Exiting generation of /Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a/compile_commands.json.bin normally",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 411744627
+  },
+  {
+    "level_": 0,
+    "message_": "done executing cmake",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1374559516
+  },
+  {
+    "level_": 0,
+    "message_": "write command file /Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a/metadata_generation_command.txt",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1749292573
+  },
+  {
+    "level_": 0,
+    "message_": "JSON generation completed without problems",
+    "file_": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 563513568
+  }
+]

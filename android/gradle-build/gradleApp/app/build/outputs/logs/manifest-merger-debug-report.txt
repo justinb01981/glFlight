@@ -1,0 +1,61 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:17:1-35:12
+INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:17:1-35:12
+INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:17:1-35:12
+	package
+		INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:17:1-35:12
+		INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:17:11-69
+uses-feature#0x00030000
+ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:18:3-51
+	android:glEsVersion
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:18:17-49
+application
+ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:19:3-34:17
+	android:label
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:23:7-48
+	android:fullBackupContent
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:21:7-40
+	android:icon
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:22:7-41
+	android:allowBackup
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:20:7-34
+activity#com.android.gles3jni.GLES3JNIActivity
+ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:24:5-33:16
+	android:launchMode
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:26:15-46
+	android:exported
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:28:9-32
+	android:configChanges
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:27:15-65
+	android:theme
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:25:15-73
+	android:name
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:24:15-46
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:29:7-32:23
+action#android.intent.action.MAIN
+ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:30:9-61
+	android:name
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:30:17-58
+category#android.intent.category.LAUNCHER
+ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:31:17-77
+	android:name
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:31:27-74
+uses-sdk
+INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+		ADDED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml

@@ -1,0 +1,1 @@
+Android NDK: Your APP_BUILD_SCRIPT points to an unknown file: /Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Android.mk    

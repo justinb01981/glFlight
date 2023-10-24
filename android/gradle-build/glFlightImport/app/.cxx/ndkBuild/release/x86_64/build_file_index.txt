@@ -1,0 +1,2 @@
+/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Android.mk
+/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Application.mk

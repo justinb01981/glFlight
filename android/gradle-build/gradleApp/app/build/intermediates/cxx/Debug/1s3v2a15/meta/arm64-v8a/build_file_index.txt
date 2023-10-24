@@ -1,0 +1,1 @@
+/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt

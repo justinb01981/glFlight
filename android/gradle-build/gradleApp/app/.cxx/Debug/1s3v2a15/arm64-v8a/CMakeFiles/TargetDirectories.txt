@@ -1,0 +1,3 @@
+/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a/CMakeFiles/gles3jni.dir

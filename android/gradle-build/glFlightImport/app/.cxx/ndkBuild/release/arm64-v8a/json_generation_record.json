@@ -1,0 +1,23 @@
+[
+  {
+    "level": "INFO",
+    "message": "Start JSON generation. Platform version: 23 min SDK version: arm64-v8a",
+    "file": "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Android.mk",
+    "tag": "release|arm64-v8a",
+    "diagnosticCode": "UNKNOWN"
+  },
+  {
+    "level": "INFO",
+    "message": "JSON \u0027/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/ndkBuild/release/arm64-v8a/android_gradle_build.json\u0027 was up-to-date",
+    "file": "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Android.mk",
+    "tag": "release|arm64-v8a",
+    "diagnosticCode": "UNKNOWN"
+  },
+  {
+    "level": "INFO",
+    "message": "JSON generation completed without problems",
+    "file": "/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni/Android.mk",
+    "tag": "release|arm64-v8a",
+    "diagnosticCode": "UNKNOWN"
+  }
+]

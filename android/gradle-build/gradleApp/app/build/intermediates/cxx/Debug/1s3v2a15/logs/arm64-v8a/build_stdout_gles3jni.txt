@@ -1,0 +1,5 @@
+ninja: Entering directory `/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/arm64-v8a'
+[1/4] Building CXX object CMakeFiles/gles3jni.dir/RendererES2.cpp.o
+[2/4] Building CXX object CMakeFiles/gles3jni.dir/RendererES3.cpp.o
+[3/4] Building CXX object CMakeFiles/gles3jni.dir/gles3jni.cpp.o
+[4/4] Linking CXX shared library /Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cxx/Debug/1s3v2a15/obj/arm64-v8a/libgles3jni.so

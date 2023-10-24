@@ -1,0 +1,7 @@
+[
+{
+  "directory": "C:/Users/Justin/workspace/glFlight/android/gradle-build/glFlightImport/nativelib/.cxx/Debug/c4d6b3a2/armeabi-v7a",
+  "command": "C:\\Users\\Justin\\AppData\\Local\\Android\\sdk\\ndk\\23.1.7779620\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=armv7-none-linux-androideabi24 --sysroot=C:/Users/Justin/AppData/Local/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dnativelib_EXPORTS -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security -fexceptions -frtti -stdlib=libc++ -g  -fno-limit-debug-info -fPIC -o CMakeFiles\\nativelib.dir\\nativelib.cpp.o -c C:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\nativelib\\src\\main\\cpp\\nativelib.cpp",
+  "file": "C:\\Users\\Justin\\workspace\\glFlight\\android\\gradle-build\\glFlightImport\\nativelib\\src\\main\\cpp\\nativelib.cpp"
+}
+]

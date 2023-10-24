@@ -1,0 +1,19 @@
+                    -H/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/src/main/jni
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_SYSTEM_VERSION=24
+-DANDROID_PLATFORM=android-24
+-DANDROID_ABI=arm64-v8a
+-DCMAKE_ANDROID_ARCH_ABI=arm64-v8a
+-DANDROID_NDK=/Users/justin/Library/Android/sdk/ndk/25.2.9519653
+-DCMAKE_ANDROID_NDK=/Users/justin/Library/Android/sdk/ndk/25.2.9519653
+-DCMAKE_TOOLCHAIN_FILE=/Users/justin/Library/Android/sdk/ndk/25.2.9519653/build/cmake/android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=/Users/justin/Library/Android/sdk/cmake/3.18.1/bin/ninja
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/cxx/Debug/256qf361/obj/arm64-v8a
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/build/intermediates/cxx/Debug/256qf361/obj/arm64-v8a
+-DCMAKE_BUILD_TYPE=Debug
+-B/Users/justin/workspace/glFlight/android/gradle-build/glFlightImport/app/.cxx/Debug/256qf361/arm64-v8a
+-GNinja
+-DANDROID_STL=c++_static
+                    Build command args: []
+                    Version: 2

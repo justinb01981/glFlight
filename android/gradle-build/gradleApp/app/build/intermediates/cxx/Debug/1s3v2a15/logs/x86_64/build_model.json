@@ -1,0 +1,170 @@
+{
+  "abi": "X86_64",
+  "info": {
+    "abi": "X86_64",
+    "bitness": 64,
+    "deprecated": false,
+    "default": true
+  },
+  "cxxBuildFolder": "/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/x86_64",
+  "soFolder": "/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cxx/Debug/1s3v2a15/obj/x86_64",
+  "soRepublishFolder": "/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cmake/debug/obj/x86_64",
+  "abiPlatformVersion": 24,
+  "cmake": {
+    "effectiveConfiguration": {
+      "inheritEnvironments": [],
+      "variables": []
+    }
+  },
+  "variant": {
+    "buildSystemArgumentList": [
+      "-DANDROID_STL\u003dc++_static"
+    ],
+    "cFlagsList": [],
+    "cppFlagsList": [],
+    "variantName": "debug",
+    "isDebuggableEnabled": true,
+    "validAbiList": [
+      "ARMEABI_V7A",
+      "ARM64_V8A",
+      "X86",
+      "X86_64"
+    ],
+    "buildTargetSet": [],
+    "implicitBuildTargetSet": [],
+    "cmakeSettingsConfiguration": "android-gradle-plugin-predetermined-name",
+    "module": {
+      "cxxFolder": "/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx",
+      "intermediatesBaseFolder": "/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates",
+      "intermediatesFolder": "/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cxx",
+      "gradleModulePathName": ":app",
+      "moduleRootFolder": "/Users/justin/workspace/ndk-samples/gles3jni/app",
+      "moduleBuildFile": "/Users/justin/workspace/ndk-samples/gles3jni/app/build.gradle",
+      "makeFile": "/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp/CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "ndkFolder": "/Users/justin/Library/Android/sdk/ndk/25.1.8937393",
+      "ndkVersion": "25.1.8937393",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultStl": "LIBCXX_STATIC",
+      "ndkMetaPlatforms": {
+        "min": 19,
+        "max": 33,
+        "aliases": {
+          "20": 19,
+          "25": 24,
+          "J": 16,
+          "J-MR1": 17,
+          "J-MR2": 18,
+          "K": 19,
+          "L": 21,
+          "L-MR1": 22,
+          "M": 23,
+          "N": 24,
+          "N-MR1": 24,
+          "O": 26,
+          "O-MR1": 27,
+          "P": 28,
+          "Q": 29,
+          "R": 30,
+          "S": 31,
+          "Sv2": 32,
+          "Tiramisu": 33
+        }
+      },
+      "ndkMetaAbiList": [
+        {
+          "abi": "ARMEABI_V7A",
+          "bitness": 32,
+          "deprecated": false,
+          "default": true
+        },
+        {
+          "abi": "ARM64_V8A",
+          "bitness": 64,
+          "deprecated": false,
+          "default": true
+        },
+        {
+          "abi": "X86",
+          "bitness": 32,
+          "deprecated": false,
+          "default": true
+        },
+        {
+          "abi": "X86_64",
+          "bitness": 64,
+          "deprecated": false,
+          "default": true
+        }
+      ],
+      "cmakeToolchainFile": "/Users/justin/Library/Android/sdk/ndk/25.1.8937393/build/cmake/android.toolchain.cmake",
+      "cmake": {
+        "isValidCmakeAvailable": true,
+        "cmakeExe": "/Users/justin/Library/Android/sdk/cmake/3.18.1/bin/cmake",
+        "minimumCmakeVersion": "3.18.1"
+      },
+      "stlSharedObjectMap": {
+        "LIBCXX_SHARED": {
+          "ARMEABI_V7A": "/Users/justin/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so",
+          "ARM64_V8A": "/Users/justin/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so",
+          "X86": "/Users/justin/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/i686-linux-android/libc++_shared.so",
+          "X86_64": "/Users/justin/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/x86_64-linux-android/libc++_shared.so"
+        },
+        "LIBCXX_STATIC": {},
+        "NONE": {},
+        "SYSTEM": {}
+      },
+      "project": {
+        "rootBuildGradleFolder": "/Users/justin/workspace/ndk-samples/gles3jni",
+        "sdkFolder": "/Users/justin/Library/Android/sdk",
+        "isBuildOnlyTargetAbiEnabled": true,
+        "isCmakeBuildCohabitationEnabled": false,
+        "isPrefabEnabled": false
+      },
+      "outputOptions": [],
+      "ninjaExe": "/Users/justin/Library/Android/sdk/cmake/3.18.1/bin/ninja"
+    },
+    "prefabClassPaths": [],
+    "prefabPackages": [],
+    "prefabPackageConfigurations": [],
+    "stlType": "c++_static",
+    "optimizationTag": "Debug"
+  },
+  "buildSettings": {
+    "environmentVariables": []
+  },
+  "prefabFolder": "/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/prefab/x86_64",
+  "isActiveAbi": true,
+  "fullConfigurationHash": "1s3v2a151xd4r5f1k42n3q4g4m144j5z5p44q3z9c6y911s3o1so1g5b",
+  "configurationArguments": [
+    "-H/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/cpp",
+    "-DCMAKE_SYSTEM_NAME\u003dAndroid",
+    "-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON",
+    "-DCMAKE_SYSTEM_VERSION\u003d24",
+    "-DANDROID_PLATFORM\u003dandroid-24",
+    "-DANDROID_ABI\u003dx86_64",
+    "-DCMAKE_ANDROID_ARCH_ABI\u003dx86_64",
+    "-DANDROID_NDK\u003d/Users/justin/Library/Android/sdk/ndk/25.1.8937393",
+    "-DCMAKE_ANDROID_NDK\u003d/Users/justin/Library/Android/sdk/ndk/25.1.8937393",
+    "-DCMAKE_TOOLCHAIN_FILE\u003d/Users/justin/Library/Android/sdk/ndk/25.1.8937393/build/cmake/android.toolchain.cmake",
+    "-DCMAKE_MAKE_PROGRAM\u003d/Users/justin/Library/Android/sdk/cmake/3.18.1/bin/ninja",
+    "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003d/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cxx/Debug/1s3v2a15/obj/x86_64",
+    "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003d/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cxx/Debug/1s3v2a15/obj/x86_64",
+    "-DCMAKE_BUILD_TYPE\u003dDebug",
+    "-B/Users/justin/workspace/ndk-samples/gles3jni/app/.cxx/Debug/1s3v2a15/x86_64",
+    "-GNinja",
+    "-DANDROID_STL\u003dc++_static"
+  ],
+  "intermediatesParentFolder": "/Users/justin/workspace/ndk-samples/gles3jni/app/build/intermediates/cxx/Debug/1s3v2a15"
+}

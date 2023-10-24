@@ -1,0 +1,68 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<!--
+3 Copyright 2013 The Android Open Source Project
+4
+5     Licensed under the Apache License, Version 2.0 (the "License");
+6     you may not use this file except in compliance with the License.
+7     You may obtain a copy of the License at
+8
+9          http://www.apache.org/licenses/LICENSE-2.0
+10
+11     Unless required by applicable law or agreed to in writing, software
+12     distributed under the License is distributed on an "AS IS" BASIS,
+13     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+14     See the License for the specific language governing permissions and
+15     limitations under the License.
+16-->
+17<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+18    package="com.android.gles3jni" >
+19
+20    <uses-sdk
+21        android:minSdkVersion="24"
+21-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+22        android:targetSdkVersion="33" />
+22-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml
+23
+24    <uses-feature android:glEsVersion="0x00030000" />
+24-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:18:3-51
+24-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:18:17-49
+25
+26    <application
+26-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:19:3-34:17
+27        android:allowBackup="false"
+27-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:20:7-34
+28        android:debuggable="true"
+29        android:extractNativeLibs="false"
+30        android:fullBackupContent="false"
+30-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:21:7-40
+31        android:icon="@mipmap/ic_launcher"
+31-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:22:7-41
+32        android:label="@string/gles3jni_activity"
+32-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:23:7-48
+33        android:testOnly="true" >
+34        <activity
+34-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:24:5-33:16
+35            android:name="com.android.gles3jni.GLES3JNIActivity"
+35-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:24:15-46
+36            android:configChanges="orientation|keyboardHidden"
+36-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:27:15-65
+37            android:exported="true"
+37-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:28:9-32
+38            android:launchMode="singleTask"
+38-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:26:15-46
+39            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+39-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:25:15-73
+40            <intent-filter>
+40-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:29:7-32:23
+41                <action android:name="android.intent.action.MAIN" />
+41-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:30:9-61
+41-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:30:17-58
+42
+43                <category android:name="android.intent.category.LAUNCHER" />
+43-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:31:17-77
+43-->/Users/justin/workspace/ndk-samples/gles3jni/app/src/main/AndroidManifest.xml:31:27-74
+44            </intent-filter>
+45        </activity>
+46    </application>
+47
+48</manifest>
