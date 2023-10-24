@@ -44,6 +44,7 @@ DrawBoundingData* boData = NULL;
 
 gameGraphics_drawState2d drawState_2d;
 gameGraphics_drawState2d drawControls_ds;
+gameGraphics_drawState2d drawBillboard_ds;
 
 struct FrameBufInst gFrameBufSt;
 
@@ -1312,7 +1313,7 @@ drawElemStart(WorldElemListNode* pVisibleList)
     
     if(!drawElem_indicesBatchBuffer)
     {
-        drawElem_BatchBuffer_max = 50000;
+        drawElem_BatchBuffer_max = 5000000;
         drawElem_indicesBatchBuffer = malloc(drawElem_BatchBuffer_max * sizeof(model_index_t));
         drawElem_vertexBatchBuffer = malloc(drawElem_BatchBuffer_max * sizeof(model_coord_t));
         drawElem_textCoordBatchBuffer = malloc(drawElem_BatchBuffer_max * sizeof(model_texcoord_t));
@@ -1742,8 +1743,7 @@ void drawBounding()
     glVertexPointer(3, GL_FLOAT, 0, boData->coords256);
     glTexCoordPointer(2, GL_FLOAT, 0, boData->txcoords256);
 
-    //bindTexture(TEXTURE_ID_BOUNDING);
-    glBindTexture(GL_TEXTURE_2D, texture_list[TEXTURE_ID_BOUNDING]);
+    bindTexture(TEXTURE_ID_BOUNDING);
 
     glDrawElements(GL_TRIANGLES, boData->count,
         index_type_enum, boData->indices256);
@@ -1787,8 +1787,6 @@ drawBillboardInit(float xVec[3], float yVec[3])
     for(i = 0; i < 4; i++)
         for(j = 0; j < 3; j++) drawBillboardData.coord_offsets[i][j] = coords[i][j];
 }
-
-static gameGraphics_drawState2d drawBillboard_ds;
 
 void
 drawBillboard(WorldElem* pElem)
