@@ -78,7 +78,6 @@ extern int fireActionQueuedAfterEdit;
 #define GYRO_SAMPLE_RATE (60)
 #define VISIBLE_DISTANCE_PLATFORM 200
 #define PLATFORM_GYRO_RANGE_DEFAULT 0.5
-#define PLATFORM_CALIBRATE_COEFF 0.5
 #define PLATFORM_GYRO_SENSE_SCALE 1
 #else
 #define GAME_PLATFORM_IS_LANDSCAPE 0
@@ -87,7 +86,7 @@ extern int fireActionQueuedAfterEdit;
 #define GYRO_SAMPLE_RATE (30)
 #define VISIBLE_DISTANCE_PLATFORM 200
 #define PLATFORM_GYRO_RANGE_DEFAULT (3.14159/10)
-#define PLATFORM_CALIBRATE_COEFF 0.5
+
 #define PLATFORM_GYRO_SENSE_SCALE 1.5
 #endif
 
@@ -102,7 +101,7 @@ extern int fireActionQueuedAfterEdit;
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "1.7.7_core";
+const static char* GAME_VERSION_STR = "1.9.8_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 
@@ -110,7 +109,6 @@ const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2);
 const static float SPEED_BOOST_FRAMES = 60 * 5;
 extern float C_THRUST;
 extern float C_FRICTION;
-extern float GYRO_FEEDBACK;
 extern float GYRO_DC;
 
 const static int pooped_cube_interval_ms = 50;
@@ -125,9 +123,7 @@ const static float TOW_DISTANCE_MIN = 1.0;
 
 const static float GAME_AI_UPDATE_INTERVAL_MS = 33;
 
-#define GAME_FRAME_RATE 60
-#define GAME_FRAME_RATE_TIMES_4 240
-#define GAME_FRAME_RATE_TIMES_10 600
+#define GAME_FRAME_RATE 30
 #define GAME_TICK_RATE PLATFORM_TICK_RATE
 
 extern game_timeval_t time_engine_sound_next;

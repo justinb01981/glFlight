@@ -133,7 +133,7 @@ glFlightFrameStage1()
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnable(GL_DEPTH_TEST);
     
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	// turn off bilinear filtering
@@ -148,7 +148,6 @@ glFlightFrameStage1()
     if(!world_inited && world_data)
     {
 //        if(controlsCalibrated) gameInput_trimLock();
-        
         world_elem_btree_restart();
         
         gameGraphicsUninit();

@@ -13,6 +13,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.debug
         }
         debug {
             jniDebuggable true
@@ -22,8 +23,8 @@ android {
     defaultConfig {
 
 
-        minSdk 25
-        targetSdk 25
+        minSdk 28
+
         sourceSets.main {
             jniLibs.srcDir 'src/main/libs'
             jni.srcDirs = []

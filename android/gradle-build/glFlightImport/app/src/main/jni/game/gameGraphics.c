@@ -32,6 +32,8 @@
 #define BACKGROUND_MODEL_TEXCOORDS /*model_cube_texcoords_alt*/ model_background_texcoords
 #define BACKGROUND_MODEL_INDICES1 model_background_indices1
 
+#define PLATFORM_CALIBRATE_COEFF 0.5
+
 extern int isLandscape;
 
 extern int game_target_missle_id;
@@ -54,7 +56,7 @@ void* gl_vertex_ptr_last = 0;
 void* gl_texcoord_ptr_last = 0;
 
 int texture_id_playership = TEXTURE_ID_SHIP1;
-int texture_id_background = -1;
+int texture_id_background = TEXTURE_ID_TERRAIN;
 
 int background_init_needed = 1;
 
@@ -175,14 +177,17 @@ bindTexture(unsigned int tex_id)
     if(!bindTextureRequestCore(tex_id))
     {
         //assert(tex_id == TEXTURE_ID_BOUNDING);       /**/
-        tex_id = TEXTURE_ID_BOUNDING;
+        tex_id = TEXTURE_ID_TERRAIN;
         glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
         drawn_texture_last = tex_id;
         return 1;
     }
     
-    if((tex_id != drawn_texture_last))
+    if(tex_id != drawn_texture_last)
     {
+        if(tex_id == 47) {
+            // terrain
+        }
         glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
         drawn_texture_last = tex_id;
         return 1;
@@ -769,7 +774,7 @@ void drawControls()
         else if(r.visible)
         {
             game_timeval_t blink_d = time_ms - blink_time_last;
-            if(blink_d < 200 && controls[i]->blinking)
+            if(/*blink_d < 200 && controls[i]->blinking*/ 0)
             {
                 tex_id_controls = 0;
             }
@@ -1552,10 +1557,10 @@ drawBackgroundInit(int tex_id,
             float r = tan(M_PI / (WORLD_BOUNDING_SPHERE_STEPS))*gWorld->bound_radius*2 + Vpad; // sin((M_PI*2) / WORLD_BOUNDING_SPHERE_STEPS) * (gWorld->bound_radius);
             struct boundingRegionVector *boundVec = &gWorld->boundingRegion->v[i];
             
-            if(boundVec->f[3] == 0 && fabs(boundVec->f[4]) == 1 && boundVec->f[5] == 0) {
-                // don't display
-                continue;
-            }
+//            if(boundVec->f[3] == 0 && fabs(boundVec->f[4]) == 1 && boundVec->f[5] == 0) {
+//                // this is just for drawing to avoid overlap I think
+//                continue;
+//            }
             
             float V[3];
             float V_[] = {
@@ -1638,18 +1643,12 @@ drawBackgroundInit(int tex_id,
             boData->indices256[iV++] = indices[5];
             
             hackMinSizeTot += hackMinSize;
-            
-            
+
+
         }
         
         drawBackgroundBuildTerrain(bgData, bgRepeatScale);
     }
-}
-
-void
-graphics_add_boundary(float origin[], float vec[])
-{
-    
 }
 
 static void
@@ -1719,15 +1718,16 @@ drawBackgroundCore()
 
     bindTexture(bgData->tex_id);
 
-//    glDrawElements(GL_TRIANGLES, bgData->n_indices,
-//                   index_type_enum, bgData->indices);
+    glDrawElements(GL_TRIANGLES, bgData->n_indices,
+                   index_type_enum, bgData->indices);
+
+    // TODO: remove this and refactor terrain/bounding
+//    tess_walk(bgData->tess.S, drawBackground_tess);
         
     glPopMatrix();
-    
+
     glMatrixMode(GL_TEXTURE);
     glPopMatrix();
-    
-    tess_walk(bgData->tess.S, drawBackground_tess);
 }
 
 void drawBackground()
@@ -2038,8 +2038,9 @@ void
 gameGraphicsInit(void)
 {
     assert(gWorld->bound_radius > 0);
+    assert(texture_id_background > 0);
 
-    drawBackgroundInit(/*texture_id_background*/ TEXTURE_ID_TERRAIN, 0, 0, 0,
+    drawBackgroundInit(texture_id_background, 0, 0, 0,
                        gWorld->bound_radius,
                        16.0,
                        BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));

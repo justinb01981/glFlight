@@ -20,7 +20,6 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.view.ViewGroup.LayoutParams;
 import android.view.*;
-import android.hardware.*;
 import android.media.*;
 import android.opengl.GLSurfaceView.*;
 import android.opengl.EGLExt;
@@ -30,6 +29,11 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
+
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 
 import com.domain17.glflight.GameRenderer;
 import com.domain17.glflight.util.*;
@@ -57,9 +61,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     private View contentView;
     private SensorManager mSensorManager;
     private Sensor mSensorGyro;
-
-
-
 
     ////////////////////////////////////////////////////
 
@@ -111,7 +112,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         appCtx = this.getApplicationContext();
 
         // terminate when leaving front
-        this.getIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //this.getIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         //this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
@@ -124,6 +125,10 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         setContentView(gameRenderer.surfaceView);
         gameRenderer.surfaceView.setRenderer(gameRenderer);
 
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
+        startSensor();
     }
 
     protected void initGraphicsEtc() {
@@ -134,25 +139,16 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
             System.out.println("GameResources.init succeeded\n");
         }
 
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-
         // sensor registerListener called in onResume
-
-        running = true;
-        mBGThread.start();
 
         gameRenderer.surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
         GameRunnable.glFlightInit(gameRenderer);
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        mSensorManager.unregisterListener(this);
 
         running = false;
 
@@ -163,7 +159,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
             e.printStackTrace();
         }
 
-
         GameRunnable.glFlightUninit();
     }
 
@@ -171,21 +166,33 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     protected void onPause() {
         super.onPause();
         gameRenderer.surfaceView.onPause();
-        mSensorManager.unregisterListener(this);
+
+        running = false;
     }
+
+    boolean onResumeDone = false;
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        initGraphicsEtc();
+        if (!onResumeDone) {
+            onResumeDone = true;
+            gameRenderer.surfaceView.onResume();
 
-        gameRenderer.surfaceView.onResume();
+            initGraphicsEtc();
 
-        if(!renderContinuously) mRenderThread.start();
+            running = true;
 
-        assert( mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_UI) );
-        running = true;
+            if(!renderContinuously) mRenderThread.start();
+            sleepSome(100);
+            mBGThread.start();  // after paths are set for sound effects?
+
+        }
+        else {
+            gameRenderer.surfaceView.onResume();     // just resume
+        }
+
     }
     
     /**
@@ -197,27 +204,27 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         // thanks to
         // https://github.com/tutsplus/android-sensors-in-depth-proximity-and-gyroscope/blob/master/app/src/main/java/com/tutsplus/sensorstutorial/RotationVectorActivity.java
 
+
         float[] Rm = new float[16];
-        SensorManager.getRotationMatrixFromVector(Rm, e.values);
+        mSensorManager.getRotationMatrixFromVector(Rm, e.values);
+
+        double delt = System.currentTimeMillis() - e.timestamp;
 
         // no need to do remapCoordinateSystem but do change order and invert z
         int col_sz = 4;
         //Rm[2*col_sz] *= -1; Rm[2*col_sz+1] *= -1; Rm[2*col_sz+2] *= -1; // invert-z
 
         float[] orientations = new float[3];
-        SensorManager.getOrientation(Rm, orientations);
+        mSensorManager.getOrientation(Rm, orientations);
 
-    	if(e.sensor == mSensorGyro)
-    	{
-//            System.out.println("orientations: " + orientations[0] + "," + orientations [1] + "," + orientations[2]);
+        //System.out.println("orientations: " + orientations[0] + "," + orientations [1] + "," + orientations[2]);
 
-            GameRunnable.glFlightSensorInput(orientations);
-    	}
+        GameRunnable.glFlightSensorInput(orientations);
     }
 
     public void onAccuracyChanged(Sensor s, int a) {
     	accuracyLast = a;
-		//System.out.println("onAccuracyChanged\n");
+		System.out.println("onAccuracyChanged: "+a+"\n");
     }
     
     float touchLastX = 0;
@@ -297,7 +304,26 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         }
     };
 
-    double mRenderNext = (double) java.lang.System.currentTimeMillis();
+    private void sleepSome(long lenms) {
+        try {
+            java.lang.Thread.sleep((long) lenms);
+        } catch (InterruptedException e) {
+        }
+    }
+
+    private void startSensor() {
+        assert( mSensorManager.registerListener(this, mSensorGyro, 1000, 100000) );
+    }
+
+    private void stopSensor() {
+        mSensorManager.unregisterListener(this);
+    }
+
+    private void flushSensor(){
+        mSensorManager.flush(this);
+    }
+
+    double mRenderNext;
 
     /**
      * render scheduler
@@ -307,47 +333,35 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         public void run() {
 
             while (running) {
-                double delta = mRenderNext - java.lang.System.currentTimeMillis();
 
-                if (delta <= 0) {
-                    mRenderNext = mRenderNext + (1000.0 / GameRenderer.fps);
-
-                    gameRenderer.requestRender();   // this is not a race :-P
-
-                    delta = mRenderNext - java.lang.System.currentTimeMillis(); //Instant.now().compareTo(mRenderNext);
-                    //System.out.println("delta="+delta);
-                }
-
-                try {
-                    if(delta > 0) java.lang.Thread.sleep((long) delta);
-                } catch (InterruptedException e) {
-                }
+                gameRenderer.requestRender();   // this is not a race :-P
+                sleepSome(1000/ GameRenderer.fps);
             }
         }
     });
 
     Thread mBGThread = new Thread(new Runnable() {
     		public void run() {
-    			long sleep_ms = 1000/(GameRenderer.fps/2);
+                // this thread serves the network socket so should run more frequently than FPS
 
     			while(running) {
 
 					GameRunnable.runBGThread();
-	    			
-	    			while(true) {
-	    				String sndName = GameRunnable.nextSoundEvent();
-	    				if(sndName.length() <= 0) break;
 
-	    				GameResources.playSound(sndName);
-	    			}
+                    while(true) {
+                        String sndName = GameRunnable.nextSoundEvent();
+                        if (sndName.length() == 0) break;
 
-	        		try 
-	        		{
-	        			java.lang.Thread.sleep(sleep_ms); 
-	        		}
-	        		catch (InterruptedException e)
-	        		{
-	        		}
+                        GameResources.playSound(sndName);
+                    }
+
+                    if(GameRunnable.glFlightSensorNeedsCalibrate()) {
+                        sleepSome(10);
+                        flushSensor();
+                    }
+
+                    sleepSome(20);
+//                    System.out.println(("bgThread (heartbeat)"));
     			}
     		}
     	});

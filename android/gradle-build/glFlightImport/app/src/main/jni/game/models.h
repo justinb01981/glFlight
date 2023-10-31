@@ -24,6 +24,7 @@ const static int MODEL_PRIMITIVES_NONE = 0;
 typedef GLfloat model_coord_t;
 // keep these in-sync
 // 10-22-2023 - changing these to GL_UNSIGNED_SHORT fixed problems drawing - also removed glext.h from gameIncludes - wtf
+// https://www.khronos.org/opengl/wiki/OpenGL_Type
 #define index_type_enum GL_UNSIGNED_SHORT
 typedef GLushort model_index_t;
 typedef GLfloat model_texcoord_t;

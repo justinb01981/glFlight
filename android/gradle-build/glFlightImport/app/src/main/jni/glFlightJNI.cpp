@@ -89,8 +89,6 @@ glFlightSettingsPath()
 inline static const char*
 glFlightDefaultGameName()
 {
-
-
 	sprintf(glFlightDefaultGameName_, "android%d", rand() % 1024);
 	return glFlightDefaultGameName_;
 }
@@ -197,13 +195,8 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 
     assert(eglGetCurrentContext() != NULL);
 
-	if(time_ms_wall - gameInputTimeLast >= (1000/GYRO_SAMPLE_RATE))
-	{
-		gameInput();
-
-		gameInputTimeLast = time_ms_wall;
-		//DBPRINTF(("gameInput"));
-	}
+    // NOTE: 10-25 - removing timing for input events since drawframe is being paced at 60fps // ??
+    gameInput();
 
 	glFlightFrameStage1();
 	glFlightFrameStage2();
@@ -318,26 +311,16 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 		return;
 	}
 
-	if(/*time_ms >= sensorInputNext*/1)
-    {
-		if(time_ms - sensorInputNext > 1000) {
-			sensorInputNext = time_ms;
-			return;
-		}
-
-        // Z reversed
-//		gameInputGyro(-sumroll, sumyaw, -sumpitch);
-		gameInputGyro(-sumroll, sumpitch, -sumyaw);
-		//sensorInputNext += 1000 / PLATFORM_TICK_RATE;
-		sensorInputNext = time_ms + (1000 / PLATFORM_TICK_RATE);
-	}
+	// Z reversed
+	//		gameInputGyro(-sumroll, sumyaw, -sumpitch); // remove this - these agree across all devices
+	gameInputGyro(-sumroll, sumpitch, -sumyaw);
 
 	//gameInputMotion(sumroll, sumpitch, sumyaw);
 }
 
-JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorNeedsCalibrate(JNIEnv *e, jobject o)
+JNIEXPORT jboolean JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorNeedsCalibrate(JNIEnv *e, jobject o)
 {
-	return needTrim;
+    return needTrim;
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInput(JNIEnv *e, jobject o, jfloatArray arr)

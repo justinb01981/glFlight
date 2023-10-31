@@ -20,10 +20,6 @@ public class GameRenderer implements Renderer {
 	static native void onSurfaceCreated();
 	static native void onSurfaceChanged(float f[]);
 	static native void onDrawFrame();
-	
-	public static int clientVersion = 1;
-
-	public static long lastDrawTime = 0;
 	public static long fps = 60;
 
 	public GLSurfaceView surfaceView;

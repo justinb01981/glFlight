@@ -77,7 +77,7 @@ double deviceInputDiv =
 16.0;
 
 double motionRollMotion, motionPitchMotion, motionYawMotion;
-static const float maxInputShipRotate = 0.2;
+static const float maxInputShipRotate = /*0.2*/0.8;
 float yprResponse[3] = {0, 0, 0}, yprD = maxInputShipRotate/360.0;
 float rollOffset = 0, pitchOffset = 0, yawOffset = 0;
 double devicePitchFrac = 0, deviceYawFrac = 0;

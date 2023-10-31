@@ -353,8 +353,8 @@ TESS_BEGIN_FUNCTION
     S->Icur = S->Is;
     S->Mcur = S->Ms;
     S->Tcur = S->Ts;
-    S->Imir = (unsigned int) *(S->Icur);
-    
+    S->Imir = (S->Icur);  // ignore compiler warnings - this is fine
+
     S->Ist = NULL;
     
     // current direction = U+
