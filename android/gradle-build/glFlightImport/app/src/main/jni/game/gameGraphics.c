@@ -1556,9 +1556,9 @@ drawBackgroundInit(int tex_id,
             float Vpad = 0.2;
             float r = tan(M_PI / (WORLD_BOUNDING_SPHERE_STEPS))*gWorld->bound_radius*2 + Vpad; // sin((M_PI*2) / WORLD_BOUNDING_SPHERE_STEPS) * (gWorld->bound_radius);
             struct boundingRegionVector *boundVec = &gWorld->boundingRegion->v[i];
-            
+
+            // TODO: uncomment this if you want to not render the floor/ceil
 //            if(boundVec->f[3] == 0 && fabs(boundVec->f[4]) == 1 && boundVec->f[5] == 0) {
-//                // this is just for drawing to avoid overlap I think
 //                continue;
 //            }
             

@@ -129,6 +129,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         startSensor();
+
+        sleepSome(1000);    // hack to show splash screen because onRender called too quickly
     }
 
     protected void initGraphicsEtc() {
@@ -194,6 +196,10 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         }
 
     }
+
+    private double getTimeMs() {
+        return System.currentTimeMillis();
+    }
     
     /**
      * SensorEventListener
@@ -208,7 +214,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         float[] Rm = new float[16];
         mSensorManager.getRotationMatrixFromVector(Rm, e.values);
 
-        double delt = System.currentTimeMillis() - e.timestamp;
+        double delt = getTimeMs() - e.timestamp;
 
         // no need to do remapCoordinateSystem but do change order and invert z
         int col_sz = 4;
@@ -329,13 +335,20 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
      * render scheduler
      */
     Thread mRenderThread = new Thread(new Runnable() {
+        double frame = 1000/gameRenderer.fps;
 
         public void run() {
 
-            while (running) {
+            mRenderNext = getTimeMs() + frame;
 
-                gameRenderer.requestRender();   // this is not a race :-P
-                sleepSome(1000/ GameRenderer.fps);
+            while (running) {
+                if(getTimeMs() >= mRenderNext) {
+                    mRenderNext += frame;
+
+                    gameRenderer.requestRender();   // this is not a race :-P
+                }
+
+                sleepSome(1);
             }
         }
     });
