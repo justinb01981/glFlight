@@ -1278,7 +1278,7 @@ void world_init(float radius)
     gWorld->boundingRegion = br;
     */
     
-    // build spherical bounding
+    // build hemispherical bounding
     float Ty, Tx;
     float I = WORLD_BOUNDING_SPHERE_STEPS;
     float R = M_PI*2;
@@ -1302,8 +1302,8 @@ void world_init(float radius)
         quaternion_rotate_inplace(&U, &Qy, Ty);
         quaternion_rotate_inplace(&V, &Qy, Ty);
         
-        // bounding vectors only for top hemisphere
-        for(Tx = 0; Tx < R/2; Tx += R/I)
+        // bounding vectors for both hemispheres 11-6-23 fml
+        for(Tx = 0; Tx < R; Tx += R/I)
         {
             int d;
             float P[] = {
@@ -1334,8 +1334,9 @@ void world_init(float radius)
                 
                 vector_cross_product(&UVcross[0], &UVcross[3], &(UVcross[9]));
                 vector_cross_product(&UVcross[0], &UVcross[6], &(UVcross[12]));
-                
-                float L = tan(RL/2)*Rad * 2;
+
+                // bounding vectors for both hemispheres 11-6-23 fml
+                float L = tan(RL)*Rad * 2;
                 
                 for(d = 0; d < 3; d++)
                 {
@@ -1366,9 +1367,9 @@ void world_init(float radius)
         }
     }
     
-    // boundary on the floor
-    float pvec[] = {1, 0, 0};
-    boundingRegionAddVec(br, 0, 0.7, 0, 0, 1, 0, pvec);
+    // boundary on the floor ?
+    //float pvec[] = {1, 0, 0};
+    //boundingRegionAddVec(br, 0, 0.7, 0, 0, 1, 0, pvec);
     
     gWorld->boundingRegion = br;
     

@@ -357,6 +357,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     		public void run() {
                 // this thread serves the network socket so should run more frequently than FPS
 
+                sleepSome(100); // hack: avoid a race
+
     			while(running) {
 
 					GameRunnable.runBGThread();
@@ -369,7 +371,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
                     }
 
                     if(GameRunnable.glFlightSensorNeedsCalibrate()) {
-                        sleepSome(10);
                         flushSensor();
                     }
 

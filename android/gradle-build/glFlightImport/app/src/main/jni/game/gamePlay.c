@@ -383,7 +383,6 @@ game_add_powerup(float x, float y, float z, int type, int lifetime)
     world_get_last_object()->stuff.affiliation = AFFILIATION_POWERUP;
     world_get_last_object()->bounding_remain = 1;
     world_get_last_object()->physics.ptr->friction = 1;
-    world_get_last_object()->physics.ptr->gravity = 1;
     update_object_velocity(obj_id, 0, 1, 0, 0);
     game_elem_setup_powerup(world_get_last_object());
     
@@ -1870,7 +1869,6 @@ game_run()
                         -gWorld->bound_radius + (rand() % (int) gWorld->bound_radius*2)
                     };
                     game_add_asteroid(asteroid[0], asteroid[1], asteroid[2], asteroid[0], 0, asteroid[2]);
-                    world_get_last_object()->physics.ptr->gravity = 1;
                 }
                 
                 if(gameStateSinglePlayer.game_type == GAME_TYPE_COLLECT)
@@ -2561,7 +2559,7 @@ firePoopedCube(WorldElem *elem)
                          elem->physics.ptr->y + V[1],
                          elem->physics.ptr->z + V[2],
                          elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
-                         0.2,
+                         0.02,
                          texture_id);
     WorldElem* pElem = world_get_last_object();
 
