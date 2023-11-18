@@ -51,7 +51,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2933"
             endingLineNumber = "2933"
-            landmarkName = "gameNetwork_handle_destruction(elem)"
+            landmarkName = "gameNetwork_handle_collision(elemA, elemB, collision_action)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -170,7 +170,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "867"
             endingLineNumber = "867"
-            landmarkName = "gameNetwork_send_player_core(msg, playerInfoTarget)"
+            landmarkName = "gameNetwork_startGame(sec)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -187,7 +187,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3077"
             endingLineNumber = "3077"
-            landmarkName = "gameNetwork_onBonjourConnecting2(msg, srcAddr)"
+            landmarkName = "gameNetwork_onBonjourConnecting3(msg, srcAddr)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -204,8 +204,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3088"
             endingLineNumber = "3088"
-            landmarkName = "gameNetwork_onBonjourConnecting2(msg, srcAddr)"
-            landmarkType = "9">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

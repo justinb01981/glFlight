@@ -189,7 +189,7 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     }
 
 #ifdef BSD_SOCKETS
-    setsockopt(sock, sol_socket, so_nosigpipe, &so_arg, sizeof(so_arg));
+    setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &so_arg, sizeof(so_arg));
 #endif
 
     //setsockopt(sock, sol_socket, so_reuseaddr, &so_arg, sizeof(so_arg));
@@ -377,7 +377,7 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
 
     addrInfoResultp = NULL;
     
-#if BSD_SOCKETS
+#ifdef BSD_SOCKETS
     int aret =    getaddrinfo(name, portnum, &hints, &addrInfoResultp);
     if(aret != 0) {
         DBPRINTF(("getaddrinfo failed: %s\n", gai_strerror(aret)));
