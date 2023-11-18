@@ -221,15 +221,18 @@ void initTextures(const char *prefix)
     // load the first N textures
     for(i = 0; i < texture_preload_count; i++)
     {
-        bindTextureRequest(i);
+        bindTextureRequestCore(i);
     }
 }
 
-int bindTextureRequest(int tex_id)
+int bindTextureRequestCore(int tex_id)
 {
     int load_count = 6;
 
-
+    if(tex_id == TEXTURE_ID_BOUNDING)
+    {
+        return 0;
+    }
     
     if(!texture_list_loaded[tex_id])
     {
@@ -238,8 +241,6 @@ int bindTextureRequest(int tex_id)
         
         //console_clear();
         //console_write("loading texture: %d", tex_id);
-
-        if(tex_id == TEXTURE_ID_BOUNDING) tex_id = TEXTURE_ID_FRAMEBUFFER;
         
         while(n_textures <= tex_id && load_count > 0)
         {
@@ -263,16 +264,14 @@ int bindTextureRequest(int tex_id)
 
 void textures_hack_framebuffer(GLuint newtx) {
     // accept new texture rendered from framebuf
-    texture_list_loaded[TEXTURE_ID_FRAMEBUFFER] = 1;
-    texture_list[TEXTURE_ID_FRAMEBUFFER] = newtx;
+    if(!texture_list_loaded[TEXTURE_ID_BOUNDING]) {
+        texture_list_loaded[TEXTURE_ID_BOUNDING] = 1;
+        texture_list[TEXTURE_ID_BOUNDING] = newtx;
+    }
 }
 
 void textures_hack_framebuffer_cleanup(void) {
     // accept new texture rendered from framebuf
-    texture_list_loaded[TEXTURE_ID_FRAMEBUFFER] = 0;
-    texture_list[TEXTURE_ID_FRAMEBUFFER] = GL_NONE;
-}
-
-int textures_hack_framebuffer_inited(void) {
-    return texture_list_loaded[TEXTURE_ID_FRAMEBUFFER] ? 1 : 0;
+//    texture_list_loaded[TEXTURE_ID_BOUNDING] = 0;
+//    texture_list[TEXTURE_ID_BOUNDING] = -1;
 }

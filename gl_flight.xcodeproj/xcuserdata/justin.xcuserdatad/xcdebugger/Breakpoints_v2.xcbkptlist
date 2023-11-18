@@ -317,7 +317,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "361"
             endingLineNumber = "361"
-            landmarkName = "drawText(str, x, y, scale)"
+            landmarkName = "drawRadar()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

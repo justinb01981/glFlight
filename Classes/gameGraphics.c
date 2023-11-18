@@ -31,7 +31,6 @@
 #define BACKGROUND_MODEL model_background
 #define BACKGROUND_MODEL_TEXCOORDS /*model_cube_texcoords_alt*/ model_background_texcoords
 #define BACKGROUND_MODEL_INDICES1 model_background_indices1
-#define gFramebufferId (0) // yeah
 
 extern int isLandscape;
 
@@ -166,58 +165,32 @@ setupGLTextureViewDone()
     glMatrixMode(GL_MODELVIEW); // ?
 }
 
-void
-setupGLFramebufferView()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
-    glMatrixMode(GL_TEXTURE);
-    glPushMatrix();
-    glLoadIdentity();
-
-
-
-    glOrthof(-FB_TEXTURE_WIDTHHEIGHT/2, FB_TEXTURE_WIDTHHEIGHT/2,
-             -FB_TEXTURE_WIDTHHEIGHT/2, FB_TEXTURE_WIDTHHEIGHT/2,
-             1, -1);
-    glTranslatef(0, 0, 0);
-
-    // see framebuffer.h
-}
-
-void
-setupGLFramebufferViewDone()
-{
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
-
-    glMatrixMode(GL_TEXTURE);
-    glPopMatrix();
-
-    extern int FramebufferNameInitial;
-
-    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferNameInitial);
-}
-
-
 int
 bindTexture(unsigned int tex_id)
 {
-    if(!bindTextureRequest(tex_id))
+    if(tex_id != drawn_texture_last)
+    if(!bindTextureRequestCore(tex_id))
     {
-        glBindTexture(GL_TEXTURE_2D, TEXTURE_ID_UNKNOWN);
-        return 0;
+        //assert(tex_id == TEXTURE_ID_BOUNDING);       /**/
+        tex_id = TEXTURE_ID_BOUNDING;
+        glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
+        drawn_texture_last = tex_id;
+        return 1;
     }
     
-    if(tex_id != drawn_texture_last && tex_id < n_textures)
+    if((tex_id != drawn_texture_last && tex_id < n_textures))
     {
         glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
         drawn_texture_last = tex_id;
         return 1;
+    }
+    else if(tex_id == drawn_texture_last)
+    {
+
+    }
+    else
+    {
+        assert(0);  // unknow tex-id?
     }
     
     return 0;
@@ -1694,8 +1667,7 @@ drawBackgroundUninit()
         if(pFree->tess.texcoords) free(pFree->tess.texcoords);
         free(bgData);
     }
-    
-    // TODDO: free openGL framebuffer
+
     DrawBoundingData* pBoFree;
     if(boData)
     {
@@ -1769,7 +1741,8 @@ void drawBounding()
     glVertexPointer(3, GL_FLOAT, 0, boData->coords256);
     glTexCoordPointer(2, GL_FLOAT, 0, boData->txcoords256);
 
-    bindTexture(TEXTURE_ID_BOUNDING);
+    //bindTexture(TEXTURE_ID_BOUNDING);
+    glBindTexture(GL_TEXTURE_2D, texture_list[TEXTURE_ID_BOUNDING]);
 
     glDrawElements(GL_TRIANGLES, boData->count,
         index_type_enum, boData->indices256);
@@ -2071,7 +2044,7 @@ gameGraphicsInit(void)
                        16.0,
                        BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
 
-    //frameBufInit(&gFrameBufSt);
+    frameBufInit(&gFrameBufSt);
 }
 
 void
@@ -2086,6 +2059,7 @@ gameGraphicsUninit(void)
     
     for(i = 0; i < 3; i++) { if(*(freeBuffers[i])) { free(*(freeBuffers[i])); *freeBuffers[i] = NULL; } }
 
-    //frameBufCleanup(&gFrameBufSt);
+
     drawBackgroundUninit();
+    frameBufCleanup(&gFrameBufSt);
 }
