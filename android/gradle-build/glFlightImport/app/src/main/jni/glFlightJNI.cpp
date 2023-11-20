@@ -103,7 +103,7 @@ glFlightDefaultPlayerName()
 inline static void
 glFlightJNIInit()
 {
-	DBPRINTF(("glFlightJNIInit (%d)\n", 0));
+	DBPRINTF(("glFlightJNIInit called\n"));
 
 	gameCamera_init(0, 0, 0, 0, 0, 0);
 
@@ -174,8 +174,6 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 
 	viewWidth = f[0];
 	viewHeight = f[1];
-
-	DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
 
     glViewport(0, 0, viewWidth, viewHeight);
 

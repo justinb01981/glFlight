@@ -123,14 +123,11 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         gameRenderer.surfaceView.setEGLConfigChooser(new GameGLConfigChooser());
 
         setContentView(gameRenderer.surfaceView);
-        gameRenderer.surfaceView.setRenderer(gameRenderer);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         startSensor();
-
-        sleepSome(1000);    // hack to show splash screen because onRender called too quickly
     }
 
     protected void initGraphicsEtc() {
@@ -141,11 +138,11 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
             System.out.println("GameResources.init succeeded\n");
         }
 
+        GameRunnable.glFlightInit(gameRenderer);    // init glFlight JNI before graphics calls it
+
         // sensor registerListener called in onResume
-
+        gameRenderer.surfaceView.setRenderer(gameRenderer);
         gameRenderer.surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-
-        GameRunnable.glFlightInit(gameRenderer);
     }
 
     @Override
@@ -180,19 +177,23 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         if (!onResumeDone) {
             onResumeDone = true;
-            gameRenderer.surfaceView.onResume();
 
             initGraphicsEtc();
 
-            running = true;
+            gameRenderer.surfaceView.onResume();
 
             if(!renderContinuously) mRenderThread.start();
-            sleepSome(100);
+
+            running = true;
+
             mBGThread.start();  // after paths are set for sound effects?
 
         }
         else {
-            gameRenderer.surfaceView.onResume();     // just resume
+            assert(false);  // this is not being used ATM!
+
+            gameRenderer.surfaceView.onResume();     // just resume surf
+
         }
 
     }
@@ -339,9 +340,11 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         public void run() {
 
-            mRenderNext = getTimeMs() + frame;
+            mRenderNext = getTimeMs() + frame * GameRenderer.fps;
+            // TODO: delay render so splash screen can remain
 
             while (running) {
+
                 if(getTimeMs() >= mRenderNext) {
                     mRenderNext += frame;
 
@@ -357,14 +360,13 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     		public void run() {
                 // this thread serves the network socket so should run more frequently than FPS
 
-                sleepSome(100); // hack: avoid a race
-
     			while(running) {
 
 					GameRunnable.runBGThread();
 
                     while(true) {
                         String sndName = GameRunnable.nextSoundEvent();
+                        // HACK: derp fix this in the jni
                         if (sndName.length() == 0) break;
 
                         GameResources.playSound(sndName);
