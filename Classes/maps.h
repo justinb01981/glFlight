@@ -223,7 +223,7 @@ ADD_OBJ_END(4, 40) \
 "object_set_info 8\n"
 
 #define BASE_ENEMY_1                           \
-"add_object " MAPMODEL_ENEMYBASE " rndx 50 rndz 0 0 0 4 " BASE_TEXTURE_ID_ENEMY "\n"       \
+"add_object " MAPMODEL_ENEMYBASE " rndx 20 rndz 0 0 0 4 " BASE_TEXTURE_ID_ENEMY "\n"       \
 "object_set_info 15\n"
 
 #define BASE_TURRET_1                        \
@@ -805,10 +805,10 @@ WORLD_SCALED_FRAME(1, /*57*/28, 4)
 
 // MARK: -- map - debugging collisions
 const static char map_debug[] = ""
-"set_world_size 50"
+"set_world_size 100\n"
 COLLECT_POINT_ADD(0.0, 0.0, 0.0)
 BASE_ENEMY_1
-WORLD_ADD_OBJECT(MODEL_CUBE, 0.0, 0.0, 0.0, 0.25, 0.25, -0.66, scale, tx_id)
+WORLD_ADD_OBJECT(2, 0.0, 1.0, 0.0, 0.25, 0.25, -0.66, 4.0, 72)
 ;
 
 // MARK: -- map - survival

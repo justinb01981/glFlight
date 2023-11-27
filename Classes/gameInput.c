@@ -339,7 +339,7 @@ gameInput()
         {
 //            printf("-----------ROLLING-----------\n");
             
-            double s = input_roll * fabs(input_roll) * GYRO_DC * tc;
+            double s = input_roll * fabs(input_roll) * GYRO_DC * tc * (speed/MAX_SPEED) * (speed/MAX_SPEED*1.5); // "roll dominant"
 
             if(fabs(yprResponse[0]) < maxInputShipRotate) yprResponse[0] += yprD /* * (s/fabs(s)) */;
             s = s / (1.0 - yprResponse[0]);
@@ -351,7 +351,7 @@ gameInput()
         {
 //            printf("-----------PITCHING-----------\n");
             
-            double s = input_pitch * fabs(input_pitch) * GYRO_DC * tc;
+            double s = input_pitch * fabs(input_pitch) * GYRO_DC * tc * (speed/MAX_SPEED);
 
             if(fabs(yprResponse[1]) < maxInputShipRotate) yprResponse[1] += yprD /* * (s/fabs(s)) */;
             s = s / (1.0 - yprResponse[1]);
@@ -363,7 +363,7 @@ gameInput()
         {
 //            printf("-----------YAWING-----------\n");
             
-            double s = input_yaw * fabs(input_yaw) * GYRO_DC * tc;
+            double s = input_yaw * fabs(input_yaw) * GYRO_DC * tc * (speed/MAX_SPEED);
 
             if(fabs(yprResponse[2]) < maxInputShipRotate) yprResponse[2] += yprD /* * (s/fabs(s)) */;
             s = s / (1.0 - yprResponse[2]);
@@ -386,8 +386,6 @@ gameInput()
         my_ship_bx = cam_pos.bx;
         my_ship_by = cam_pos.by;
         my_ship_bz = cam_pos.bz;
-        
-//        assert(0); // okay this has beeen fixed
     }
     
     deviceLast[0] = deviceRoll;

@@ -189,7 +189,6 @@
 		D0CB80E31BFB9F5500E52F43 /* texture90.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0CB80E21BFB9F5500E52F43 /* texture90.bmp */; };
 		D0CB80E51BFD9F0100E52F43 /* texture91.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0CB80E41BFD9F0100E52F43 /* texture91.bmp */; };
 		D0CB80E71BFF9A5C00E52F43 /* texture92.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0CB80E61BFF9A5C00E52F43 /* texture92.bmp */; };
-		D0CF62B714A919D600E08151 /* object.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CF62B614A919D600E08151 /* object.m */; };
 		D0D661B417EA6C4B00E44885 /* texture45.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0D661B317EA6C4B00E44885 /* texture45.bmp */; };
 		D0D7A5C5191AEA1B0083FDF8 /* texture64.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0D7A5C4191AEA1B0083FDF8 /* texture64.bmp */; };
 		D0D7A5C7191AEFDF0083FDF8 /* texture65.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0D7A5C6191AEFDF0083FDF8 /* texture65.bmp */; };
@@ -478,7 +477,6 @@
 		D0CB80E61BFF9A5C00E52F43 /* texture92.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture92.bmp; sourceTree = "<group>"; };
 		D0CEC6F129F516E1009BFF62 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = ../../Downloads/Firebase/module.modulemap; sourceTree = "<group>"; };
 		D0CF62B514A919D600E08151 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
-		D0CF62B614A919D600E08151 /* object.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = object.m; sourceTree = "<group>"; };
 		D0D661B317EA6C4B00E44885 /* texture45.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture45.bmp; sourceTree = "<group>"; };
 		D0D7A5C4191AEA1B0083FDF8 /* texture64.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture64.bmp; sourceTree = "<group>"; };
 		D0D7A5C6191AEFDF0083FDF8 /* texture65.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture65.bmp; sourceTree = "<group>"; };
@@ -501,6 +499,7 @@
 		D0F3BE2317DFEDE100E9C49E /* texture42.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture42.bmp; sourceTree = "<group>"; };
 		D0F3BE2517E3C72300E9C49E /* texture43.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture43.bmp; sourceTree = "<group>"; };
 		D0F3BE2717E8D8E900E9C49E /* texture44.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture44.bmp; sourceTree = "<group>"; };
+		D0F4D8F62B14F9C500948122 /* boolean.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = boolean.h; sourceTree = "<group>"; };
 		D0FE6D0318553E6E007D67CF /* texture51.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture51.bmp; sourceTree = "<group>"; };
 		D0FE6D051856F528007D67CF /* texture52.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture52.bmp; sourceTree = "<group>"; };
 		D0FE6D0718570BD0007D67CF /* texture53.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture53.bmp; sourceTree = "<group>"; };
@@ -550,7 +549,6 @@
 				D03ABA6414ADACF000C44538 /* world.h */,
 				D0280A622241BBF500E8C1E8 /* building3_model.h */,
 				6D91DE9F16697F0B00362864 /* world.c */,
-				D0CF62B614A919D600E08151 /* object.m */,
 				D02F630E14C6ABD80028601F /* textures.h */,
 				D0C3743D193EC5FC000C2915 /* textures.c */,
 				D077557C152588C800DF2E0B /* quaternions.c */,
@@ -619,6 +617,7 @@
 				D011EF5A19BE45C0004A56CB /* gamePlatform.h */,
 				D011EF5B19BE46EE004A56CB /* gameDebug.h */,
 				D0C822811A11EDC4005E9490 /* collision.c */,
+				D0F4D8F62B14F9C500948122 /* boolean.h */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -1219,7 +1218,6 @@
 				D02B8F171964D67700830369 /* cocoaGameInput.m in Sources */,
 				D05AEDA521FD5F4800692833 /* glFlightGLKViewController.m in Sources */,
 				D0C3743E193EC5FC000C2915 /* textures.c in Sources */,
-				D0CF62B714A919D600E08151 /* object.m in Sources */,
 				D077557E152588C800DF2E0B /* quaternions.c in Sources */,
 				D02B8F1A1964D7D700830369 /* gameInput.c in Sources */,
 				6DD6C315157422AD00BF3305 /* gameInterface.c in Sources */,

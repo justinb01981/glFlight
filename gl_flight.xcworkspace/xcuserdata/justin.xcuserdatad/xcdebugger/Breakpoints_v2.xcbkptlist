@@ -142,6 +142,36 @@
                   endingLineNumber = "411"
                   offsetFromSymbolStart = "1528">
                </Location>
+               <Location
+                  uuid = "9D776AB5-32B2-4704-A3D5-86D3A653504C - 482470e08cc12e5d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "glFlightFrameStage1"
+                  moduleName = "d0gf1ght 95"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/collision.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "411"
+                  endingLineNumber = "411"
+                  offsetFromSymbolStart = "1532">
+               </Location>
+               <Location
+                  uuid = "9D776AB5-32B2-4704-A3D5-86D3A653504C - 482470e08cc12e5d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "glFlightFrameStage1"
+                  moduleName = "d0gf1ght 95"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/collision.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "411"
+                  endingLineNumber = "411"
+                  offsetFromSymbolStart = "1536">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -158,6 +188,54 @@
             startingLineNumber = "480"
             endingLineNumber = "480"
             landmarkName = "do_world_collision_handling(tc)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3CEFF190-7FB6-4D8E-AEEE-36529510F9D0"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/world.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1785"
+            endingLineNumber = "1785"
+            landmarkName = "world_update_elem_removed_hook(pElem)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4F67BA54-6A26-469B-B553-369F390E4AA9"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/world.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1799"
+            endingLineNumber = "1799"
+            landmarkName = "updatefilterPass2Objects(e)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "EA7F85D4-337D-49D5-92C5-9588EB34B90A"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/world.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1791"
+            endingLineNumber = "1791"
+            landmarkName = "updatefilterPass1Objects(e)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

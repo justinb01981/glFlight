@@ -615,16 +615,22 @@ gameDialogCancelString()
 }
 
 static void
-gameDialogScores()
+gameDialogScores(void)
 {
     static char gameDialogScoresString[1024];
     
-    sprintf(gameDialogScoresString, "firewall:%d\nSurvival:%d\nDefend:%d\nDeathmatch:%d\nTurret:%d\n",
-            gameStateSinglePlayer.high_score[GAME_TYPE_COLLECT],
-            gameStateSinglePlayer.high_score[GAME_TYPE_SURVIVAL],
-            gameStateSinglePlayer.high_score[GAME_TYPE_DEFEND],
-            gameStateSinglePlayer.high_score[GAME_TYPE_DEATHMATCH],
-            gameStateSinglePlayer.high_score[GAME_TYPE_TURRET]);
+    sprintf(gameDialogScoresString, "firewall:%d"
+            //"\nSurvival:%d"
+            //"\nDefend:%d"
+            "\nDeathmatch:%d"
+//            "\nTurret:%d\n",
+            ,
+            gameStateSinglePlayer.high_score[GAME_TYPE_COLLECT]
+//            ,gameStateSinglePlayer.high_score[GAME_TYPE_SURVIVAL]
+//            ,gameStateSinglePlayer.high_score[GAME_TYPE_DEFEND]
+            ,gameStateSinglePlayer.high_score[GAME_TYPE_DEATHMATCH]
+//            ,gameStateSinglePlayer.high_score[GAME_TYPE_TURRET]
+            );
     
     gameInterfaceModalDialog(gameDialogScoresString,
                              "OK", "OK",

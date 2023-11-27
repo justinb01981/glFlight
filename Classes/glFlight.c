@@ -220,8 +220,6 @@ calibrate_bail:
     
     // physical collisions between world objects
     do_world_collision_handling(tc);
-
-    assert(world_inited);   // TODO: ensure world state is not damged during collision resolution
     
     // play engine sound
     const char* engine_sounds[] = {"engine", "engineslow"};
