@@ -116,12 +116,12 @@ extern float GYRO_DC;
 const static int pooped_cube_interval_ms = 25;
 const static int pooped_cube_lifetime = 30;    // determines trail length
 
-const static float collision_repulsion_coeff = 1.2;
+const static float collision_repulsion_coeff = 1.1;
 
 const static float RADAR_MIN_VELOCITY = 1;
 
 const static float TOW_DISTANCE_MAX = 20;
-const static float TOW_DISTANCE_MIN = 1.0;
+const static float TOW_DISTANCE_MIN = 2.0;
 
 const static float GAME_AI_UPDATE_INTERVAL_MS = 40;
 
@@ -134,7 +134,7 @@ const static float GAME_AI_UPDATE_INTERVAL_MS = 40;
 #define game_ammo_bullets_max 32
 #define GAME_POWERUP_DROP_TABLE_LEN 10
 
-#define GAME_CAPTURE_TOW_FORCE 0.90
+#define GAME_CAPTURE_TOW_FORCE 0.60 // based on brief testing of stickiness
 
 extern game_timeval_t time_engine_sound_next;
 

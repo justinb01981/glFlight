@@ -371,7 +371,7 @@ game_add_powerup(float x, float y, float z, int type, int lifetime)
     world_add_object(MODEL_SPRITE,
                      spawn[0], spawn[1], spawn[2],
                      spawn[3], spawn[4], spawn[5],
-                     3.0,   // scale of bounding box is important for collisions
+                     2.0,   // scale of bounding box is important for collisions
                      tex_id);
     
     world_get_last_object()->durability = 0;
@@ -2504,7 +2504,7 @@ firePoopedCube(WorldElem *elem)
     static float lineColorEnemyAce[8] = {0.9, 0.9,     0.9, 0.9,     0.9, 0.9,     0.9, 0.9};
     int lineColorLen = 8;
     float *lineColor = lineColorEnemy;
-    float Zm = 1.5;
+    float Zm = 0.2;
     int trailCoords[] = {6, 9, 18, 21, 30, 33, 42, 45};
     int i;
     
@@ -2515,6 +2515,7 @@ firePoopedCube(WorldElem *elem)
     
     int texture_id = /*elem->texture_id*/ TEXTURE_ID_COLORMAP;
     int model = MODEL_CONTRAIL;
+    double scale = 0.1;
     
     if(elem->elem_id == my_ship_id) lineColor = lineColorMine;
     if(elem->texture_id == TEXTURE_ID_ENEMYSHIP_ACE) lineColor = lineColorEnemyAce;
@@ -2532,7 +2533,7 @@ firePoopedCube(WorldElem *elem)
                          elem->physics.ptr->y + V[1],
                          elem->physics.ptr->z + V[2],
                          elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
-                         0.2,
+                         scale,
                          texture_id);
     WorldElem* pElem = world_get_last_object();
 
@@ -2561,10 +2562,8 @@ firePoopedCube(WorldElem *elem)
     
     pElem->object_type = OBJ_POOPEDCUBE;
     pElem->destructible = 0;
-    pElem->physics.ptr->friction = 1;
     world_object_set_lifetime(obj, pooped_cube_lifetime);
-    
-     //update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);
+
     
     addEngineExhaust(elem);
     

@@ -79,22 +79,15 @@ gameCamera_normalize()
     float a = gameCamera_getEulerAlpha();
     float b = gameCamera_getEulerBeta();
     float c = gameCamera_getEulerGamma();
-    
+
+
     tmp = cam_pos;
     
     tmp.bx = init_qx;
     tmp.by = init_qy;
     tmp.bz = init_qz;
-    
-    // Z
-    quaternion_rotate_inplace(&tmp.bx, &tmp.bz, a);
-    quaternion_rotate_inplace(&tmp.by, &tmp.bz, a);
-    // X'
-    quaternion_rotate_inplace(&tmp.bz, &tmp.bx, b);
-    quaternion_rotate_inplace(&tmp.by, &tmp.bx, b);
-    // Z''
-    quaternion_rotate_inplace(&tmp.by, &tmp.bz, c);
-    quaternion_rotate_inplace(&tmp.bx, &tmp.bz, c);
+
+    get_body_vectors_for_euler(a, b, c, &tmp.bx, &tmp.by, &tmp.bz);
     
     cam_pos = tmp;
 }

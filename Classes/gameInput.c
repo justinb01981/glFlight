@@ -72,17 +72,13 @@ int needTrim = 1;
 int initialized = 0;
 double motionRoll, motionPitch, motionYaw;
 double devicePitch, deviceYaw, deviceRoll;
-double deviceInputDiv =
-        // TODO: this is a hack - all devices are using the same orientations for input? -- means some calculation in the sensor input pipeline is wrong
-16.0;
 
 double motionRollMotion, motionPitchMotion, motionYawMotion;
 static const float maxInputShipRotate = 0.2;
 float yprResponse[3] = {0, 0, 0}, yprD = maxInputShipRotate/360.0;
 float rollOffset = 0, pitchOffset = 0, yawOffset = 0;
-double devicePitchFrac = 0, deviceYawFrac = 0;
+double devicePitchFrac = 0, deviceYawFrac = 0;  // used for controls rendering in gameGraphics
 int firstCalibrate = 1;
-float fcr = 0.0, fcp = 0.0, fcy = 0.0;
 float gyroSenseScale = PLATFORM_GYRO_SENSE_SCALE;
 double gyroLastRange[3];
 void (*trimDoneCallback)(void);
@@ -115,8 +111,8 @@ gameInputInit()
     speed = minSpeed;
     targetSpeed = speed;
     maxAccelDecel = /*5*/ MAX_SPEED/2; // change per second
-    minSpeed = MAX_SPEED / 20;
-    bulletVel = MAX_SPEED*8;
+    minSpeed = MAX_SPEED / 20;  // careful this doesn't round to 0
+    bulletVel = MAX_SPEED*3;
     needTrim = 1;
     
     isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
@@ -239,14 +235,13 @@ gameInput()
     deviceRoll = motionRoll;
 #endif
 
-    float deviceO[3] = {deviceRoll, devicePitch, deviceYaw};
-    
     if(!initialized)
     {
         return;
     }
 
 //
+//    float deviceO[3] = {deviceRoll, devicePitch, deviceYaw};
 //    gameInputStatsAppend(deviceO);
 //
 //    if(needTrim)
@@ -276,9 +271,9 @@ gameInput()
      
      */
     
-    float input_roll = (deviceRoll - rollOffset) / deviceInputDiv;
-    float input_pitch = (devicePitch - pitchOffset) / deviceInputDiv;
-    float input_yaw = (deviceYaw - yawOffset) / deviceInputDiv;
+    float input_roll = (deviceRoll - rollOffset)/M_PI/3;
+    float input_pitch = (devicePitch - pitchOffset)/M_PI/3;
+    float input_yaw = (deviceYaw - yawOffset)/M_PI/3;
     
     devicePitchFrac = devicePitch / M_PI;
     deviceYawFrac =  deviceYaw / M_PI;
@@ -286,7 +281,7 @@ gameInput()
     // periodically do some stuff
     if(rm_count <= 0)
     {
-        rm_count = 256;
+        rm_count = 33;
         
         // renormalize body vectors every so often
         gameCamera_normalize();

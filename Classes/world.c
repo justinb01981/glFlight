@@ -1796,10 +1796,14 @@ static BOOL updatefilterPass1Objects(WorldElem* e)
 
 static BOOL updatefilterPass2Objects(WorldElem* e)
 {
+    return TRUE;
+    /*
     if (e->object_type != OBJ_BULLET) {
         return TRUE;
     }
     return FALSE;
+     */
+
 }
 
 void
@@ -1824,17 +1828,16 @@ world_update(float tc)
     // TODO: first apply boundary enforcement, THEN iterate moving objects again and apply collision
     
     gWorld->world_update_state.world_remove_hook = world_update_elem_removed_hook;
-    
-    gWorld->world_update_state.ptr_objects_moving = &gWorld->elements_moving;
 
-    WorldElemListNode* pListFiltHeadRetry = gWorld->world_update_state.ptr_objects_moving;
+    WorldElemListNode* pListFiltHeadRetry = &gWorld->elements_moving;
+
     for (i = 0; filters[i] != NULL; i++)
     {
         WorldElemListNode* pOOBListElem = NULL;
 
         gWorld->world_update_state.ptr_objects_moving = pListFiltHeadRetry;
 
-        while(gWorld->world_update_state.ptr_objects_moving && gWorld->world_update_state.ptr_objects_moving->next)
+        while(gWorld->world_update_state.ptr_objects_moving->next)
         {
             WorldElem* pElem;
 
@@ -1943,7 +1946,7 @@ world_update(float tc)
 
                             float dot = dot2(V, P);
 
-                            if(dot < 0.001)
+                            if(dot < 0.00000001)
                             {
                                 if(pElem->bounding_remain)
                                 {

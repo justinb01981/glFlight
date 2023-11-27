@@ -53,6 +53,7 @@ gameShip_normalize()
     get_euler_from_body_vectors(&my_ship_bx, &my_ship_by, &my_ship_bz, &alpha, &beta, &gamma);
     
     get_body_vectors_for_euler(alpha, beta, gamma, &my_ship_bx, &my_ship_by, &my_ship_bz);
+    
 }
 
 void

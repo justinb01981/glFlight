@@ -382,29 +382,31 @@ static model_texcoord_t model_contrail_texcoords[] =
 
 static model_coord_t model_contrail[] =
 {
+    // WARNING: these are being manipulated at model creation see firePoopedCube
+    
     //bottom
     -0.06, -0.06, 0,
     0.06, -0.06, 0,
-    0.06, -0.06, 0.5,
-    -0.06, -0.06, 0.5,
+    0.06, -0.06, 0.2,
+    -0.06, -0.06, 0.2,
     
     // top
     -0.06, 0.06, 0,
     0.06, 0.06, 0,
-    0.06, 0.06, 0.5,
-    -0.06, 0.06, 0.5,
+    0.06, 0.06, 0.2,
+    -0.06, 0.06, 0.2,
     
     //bottom2
     -0.06, -0.06, 0,
     0.06, -0.06, 0,
-    0.06, -0.06, 0.5,
-    -0.06, -0.06, 0.5,
+    0.06, -0.06, 0.2,
+    -0.06, -0.06, 0.2,
     
     //top2
     -0.06, 0.06, 0,
     0.06, 0.06, 0,
-    0.06, 0.06, 0.5,
-    -0.06, 0.06, 0.5,
+    0.06, 0.06, 0.2,
+    -0.06, 0.06, 0.2,
 };
 
 static model_index_t model_contrail_indices[] =
