@@ -1492,7 +1492,7 @@ world_move_elem(WorldElem* pElem, float x, float y, float z, int relative)
 }
 
 void
-world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, float Frepulse)
+world_repulse_elem(WorldElem* pCollisionB, WorldElem* pCollisionA, float tc, float Frepulse)
 {
     float mv[3];
     int i;
@@ -1771,12 +1771,12 @@ world_update_elem_removed_hook(WorldElem* pElem)
     world_update_state_t *state = &gWorld->world_update_state;
     if(!state->world_region_iterate_cur) return;
 
-    WorldElemListNode *tmp = state->world_region_iterate_cur->elem, *next = tmp->next;
+    WorldElemListNode *tmp = state->world_region_iterate_cur, *next = tmp->next;
 
     if(tmp && tmp->elem == pElem)
     {
-        // our position in the list was invalidated
-        state->world_region_iterate_cur = next;
+        // our position in the list was invalidated (previously changed iterate_cur to *next but this MIGHT not be optimal?
+        state->world_region_iterate_cur = state->world_region_iterate_retry_head;
     }
     
     if(state->ptr_objects_moving && state->ptr_objects_moving->elem == pElem)
@@ -1804,6 +1804,7 @@ world_update(float tc)
     gWorld->world_update_state.world_remove_hook = world_update_elem_removed_hook;
     
     gWorld->world_update_state.ptr_objects_moving = &gWorld->elements_moving;
+
     while(gWorld->world_update_state.ptr_objects_moving && gWorld->world_update_state.ptr_objects_moving->next)
     {
         WorldElem* pElem;
@@ -1937,6 +1938,7 @@ world_update(float tc)
                     
                     if(bounding_enforced)
                     {
+                        // TODO: separate functions for handling bounding collisions / objects
                         game_handle_collision(pElem, NULL, COLLISION_ACTION_REPULSE);
                         gameNetwork_handle_collision(pElem, NULL, COLLISION_ACTION_REPULSE);
                         game_ai_collision(pElem, NULL, COLLISION_ACTION_REPULSE);
@@ -1969,30 +1971,40 @@ world_update(float tc)
 
                             if(pRegionElemsHead)
                             {
-                                WorldElem* pRegionElem;
+                                WorldElem* pRegionElem, *pElemCollided = pElem;
+                                int pElem = 0;  // remove this sanity
                                 
                                 //region_collision_retry:
-                                
-                                gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead->next;
+
+                                gWorld->world_update_state.world_region_iterate_retry_head = pRegionElemsHead;
+                                gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_retry_head->next;
                                 
                                 while(gWorld->world_update_state.world_region_iterate_cur)
                                 {
                                     pRegionElem = gWorld->world_update_state.world_region_iterate_cur->elem;
                                     
-                                    if(pRegionElem != pElem)
+                                    if(pRegionElem != pElemCollided)
                                     {
-                                        if(check_collision(pElem, pRegionElem))
+                                        if(check_collision(pElemCollided, pRegionElem))
                                         {
-                                            WorldElem* pElemCollided = pRegionElem;
-                                            
+                                            // SWAP to enforce object type priority ?
+                                            if(pRegionElem->object_type > pElemCollided->object_type)
+                                            {
+                                                WorldElem *tmp = pElemCollided;
+                                                pElemCollided = pRegionElem;
+                                                pRegionElem = tmp;
+                                            }
+
                                             // record collision
-                                            collision_action_t colact = (*collision_actions_cur)[pElemCollided->object_type][pElem->object_type];
+                                            collision_action_t colact = (*collision_actions_cur)[pElemCollided->object_type][pRegionElem->object_type];
                                             
                                             if(
-                                               (!pElemCollided->destructible || !pElem->destructible) ||
+                                               (!pElemCollided->destructible || !pRegionElem->destructible) ||
                                                colact == COLLISION_ACTION_NONE
                                                )
                                             {
+                                                assert(!(pElemCollided->object_type == OBJ_POWERUP_GENERIC && (pRegionElem->object_type == OBJ_PLAYER || pRegionElem->object_type == OBJ_SHIP)));
+
                                                 gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;
                                                 continue;
                                             }
@@ -2015,15 +2027,15 @@ world_update(float tc)
                                             {
                                                 momentum = 0;
                                                 
-                                                world_repulse_elem(pElem, pElemCollided, tc, collision_repulsion_coeff);
+                                                world_repulse_elem(pRegionElem, pElemCollided, tc, collision_repulsion_coeff);
                                                 
-                                                if(pElem->elem_id == my_ship_id && !sound_played)
+                                                if(pElemCollided->elem_id == my_ship_id && !sound_played)
                                                 {
                                                     sound_played = 1;
                                                     gameAudioPlaySoundAtLocation("bump",
-                                                                                 pElem->physics.ptr->x,
-                                                                                 pElem->physics.ptr->y,
-                                                                                 pElem->physics.ptr->z);
+                                                                                 pElemCollided->physics.ptr->x,
+                                                                                 pElemCollided->physics.ptr->y,
+                                                                                 pElemCollided->physics.ptr->z);
                                                 }
                                             }
 
@@ -2031,43 +2043,26 @@ world_update(float tc)
                                             {
                                                 WorldElemListNode *nA, *nB;
                                                 
-                                                nA = world_elem_list_find_elem(pElem, &gWorld->elements_collided);
-                                                nB = world_elem_list_find_elem(pElemCollided, &gWorld->elements_collided);
+                                                nA = world_elem_list_find_elem(pElemCollided, &gWorld->elements_collided);
+                                                nB = world_elem_list_find_elem(pRegionElem, &gWorld->elements_collided);
                                                 
                                                 if(!nA && !nB)
                                                 {
-                                                    WorldElemListNode* pNodeA, *pNodeB;
-                                                    
-                                                    // HACK: order by durability to make collision-list parsing simpler (list is LIFO)
-                                                    if(pElem->durability <= pElemCollided->durability)
-                                                    {
-                                                        pNodeB = world_elem_list_add(pElemCollided, &gWorld->elements_collided);
-                                                    }
-                                                    else
-                                                    {
-                                                        pNodeA = world_elem_list_add(pElem, &gWorld->elements_collided);
-                                                    }
-                                                    
-                                                    if(pElem->durability <= pElemCollided->durability)
-                                                    {
-                                                        pNodeA = world_elem_list_add(pElem, &gWorld->elements_collided);
-                                                    }
-                                                    else
-                                                    {
-                                                        pNodeB = world_elem_list_add(pElemCollided, &gWorld->elements_collided);
-                                                    }
+                                                    WorldElemListNode* pNodeA = world_elem_list_add(pElemCollided, &gWorld->elements_collided),
+                                                        *pNodeB = world_elem_list_add(pRegionElem, &gWorld->elements_collided);
                                                     
                                                     pNodeA->elem_collided = pNodeB->elem;
                                                     pNodeB->elem_collided = pNodeA->elem;
                                                     pNodeA->userarg = colact;
                                                     pNodeB->userarg = colact;
                                                     
-                                                    //game_handle_collision(pElem, pElemCollided, colact);
-                                                    //gameNetwork_handle_collision(pElem, pElemCollided, colact);
-                                                    //game_ai_collision(pElem, pElemCollided, colact);
+                                                    game_handle_collision(pRegionElem, pElemCollided, colact);
+                                                    gameNetwork_handle_collision(pRegionElem, pElemCollided, colact);
+                                                    game_ai_collision(pRegionElem, pElemCollided, colact);
                                                 }
                                                 else
                                                 {
+                                                    // allow some collisions to override others based on priority
                                                     if((nA && nA->userarg < colact) ||
                                                        (nB && nB->userarg < colact))
                                                     {
@@ -2091,7 +2086,7 @@ world_update(float tc)
                                     }
                                     
                                     // check if this was invalidated by the remove-callback
-                                    // TODO: -- I don't think this can happen anymore
+                                    // TODO: -- I don't think this can happen anymore fixed with a callback handling when collisions modify world+visibility state
                                     if(!gWorld->world_update_state.world_region_iterate_cur)
                                     {
                                         DBPRINTF(("gWorld->world_update_state.world_region_iterate_cur invalidated!"));

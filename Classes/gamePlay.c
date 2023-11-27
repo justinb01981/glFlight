@@ -56,7 +56,6 @@ float game_boost_recharge_rate = 0.1;
 int model_my_ship = MODEL_SHIP1;
 int new_level = 0;
 int game_delay_frames = 0;
-int invuln_count = 0;
 unsigned int score_last_checked = 0;
 //float collects_count_gameover = 10;
 char game_status_string_[255] = {0};
@@ -741,7 +740,6 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.points_enemy_bh_killed = gameStateSinglePlayer.points_enemy_killed*2;
     gameStateSinglePlayer.points_turret_killed = 25;
     gameStateSinglePlayer.points_per_second_elapsed = 0;
-    gameStateSinglePlayer.invuln_time_after_hit = 0;
     gameStateSinglePlayer.powerup_lifetime_frames = GAME_FRAME_RATE * 10;
     gameStateSinglePlayer.player_drops_powerup = 0;
     gameStateSinglePlayer.enemy1_ignore_player_pct = 0;
@@ -774,8 +772,6 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.powerup_drop_chance[5] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[6] = GAME_SUBTYPE_MISSLE;
         gameStateSinglePlayer.powerup_drop_chance[7] = GAME_SUBTYPE_LIFE;
-        
-        collision_actions_set_grab_powerup();
         
         gameStateSinglePlayer.player_drops_powerup = 1;
         
@@ -813,14 +809,12 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/20;
         gameStateSinglePlayer.rate_enemy_count_increase = 1.0/20;
         
-        gameStateSinglePlayer.enemy1_ignore_player_pct = 75;
+        gameStateSinglePlayer.enemy1_ignore_player_pct = 90;
         
         // different map for "collection" game type
         gameMapSetMap(initial_map_collection);
         
         gameStateSinglePlayer.game_action_spawnpoint_new_game = 0;
-        
-        gameStateSinglePlayer.invuln_time_after_hit = 2;
     }
     else if(gameStateSinglePlayer.game_type == GAME_TYPE_SURVIVAL)
     {
@@ -850,8 +844,6 @@ game_start(float difficulty, int type)
         
         // different map for "collection" game typ
         gameMapSetMap(initial_map_survival);
-        
-        gameStateSinglePlayer.invuln_time_after_hit = 3;
     }
     else if(gameStateSinglePlayer.game_type == GAME_TYPE_SPEEDRUN)
     {
@@ -880,8 +872,6 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.points_per_second_elapsed = 1;
         
         gameMapSetMap(map_speedrun);
-        
-        gameStateSinglePlayer.invuln_time_after_hit = 0;
     }
     else if(gameStateSinglePlayer.game_type == GAME_TYPE_DEFEND)
     {
@@ -900,8 +890,6 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.enemy_durability = 3;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1/10;
-        
-        gameStateSinglePlayer.invuln_time_after_hit = 3;
         
         // different map for "collection" game typ
         //gameMapSetMapData(initial_map_survival);
@@ -923,8 +911,6 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.enemy_durability = 3;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1/10;
-        
-        gameStateSinglePlayer.invuln_time_after_hit = 3;
         
         gameStateSinglePlayer.enemy1_ignore_player_pct = 100;
         
@@ -957,8 +943,6 @@ game_start(float difficulty, int type)
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/10;
         gameStateSinglePlayer.rate_enemy_count_increase = 1.0/20;
-        
-        gameStateSinglePlayer.invuln_time_after_hit = 3;
         
         gameStateSinglePlayer.enemy1_ignore_player_pct = 0;
         
@@ -1131,6 +1115,8 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
     WorldElemListNode* myShipListNode = world_elem_list_find(my_ship_id, &gWorld->elements_moving);
     if(!myShipListNode) return;
 
+    assert(elemA->object_type <= elemB->object_type);
+
     int collect_sound = 0;
     switch(elemB->stuff.subtype)
     {
@@ -1183,6 +1169,7 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
             }
             else 
             {
+
                 if(elemA->stuff.towed_elem_id == WORLD_ELEM_ID_INVALID)
                 {
                     if(elemA->elem_id != my_ship_id)
@@ -1212,6 +1199,7 @@ game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB)
             break;
             
         default:
+            assert("unknown powerup subtype?!");
             world_remove_object(elemB->elem_id);
             collect_sound = 1;
             break;
@@ -1230,6 +1218,8 @@ void
 game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
 {
     int vibrate_on_collide = 0;
+
+    if (elemB && elemA) assert(elemA->object_type <= elemB->object_type);
     
     //if(collision_action != COLLISION_ACTION_DAMAGE && collision_action != COLLISION_ACTION_FLAG) return;
     if(collision_action == COLLISION_ACTION_REPULSE) return;
@@ -1243,11 +1233,12 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     
     switch(collision_action)
     {
-        case COLLISION_ACTION_POWERUP_GRAB:
-            game_handle_collision_powerup(elemB, elemA);
+        case COLLISION_ACTION_POWERUP_GRAB_OR_TOW:
+            // reminder: object ordinality determined by their type now
+            game_handle_collision_powerup(elemA, elemB);
         break;
             
-        case COLLISION_ACTION_POWERUP_CAPTURE:
+        case COLLISION_ACTION_POWERUP_CAPTURE:  // BAD NAMING: CAPTURE refers to the "goal" object being involved in the collision
         {
             if(elemB->object_type == OBJ_SPAWNPOINT_ENEMY)
             {
@@ -1276,7 +1267,6 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                 world_get_last_object()->object_type = OBJ_BLOCK;
                 
                 world_get_last_object()->destructible = 0;
-                //world_object_set_lifetime(obj_id, 15);
                 update_object_velocity(obj_id, 0, 0, 0, 0);
                 
                 world_remove_object(elemA->elem_id);
@@ -1335,7 +1325,7 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
             
         case COLLISION_ACTION_DAMAGE:
         {
-            if(elemA->object_type == OBJ_BULLET || elemA->object_type == OBJ_MISSLE)
+            if(elemB->object_type == OBJ_BULLET || elemB->object_type == OBJ_MISSLE)
             {
                 game_collision_last_bullet_affiliation = elemA->stuff.affiliation;
                 
@@ -1348,23 +1338,12 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
                                                      myShipListNode->elem->physics.ptr->y,
                                                      myShipListNode->elem->physics.ptr->z);
                     }
-                    
-                    if(gameStateSinglePlayer.invuln_time_after_hit)
-                    {
-                        collision_actions_set_player_invuln();
-                        invuln_count = gameStateSinglePlayer.invuln_time_after_hit;
-                    }
-                }
-                
-                if(elemB->object_type == OBJ_SHIP)
-                {
-                    elemB->stuff.towed_elem_id = WORLD_ELEM_ID_INVALID;
                 }
             }
         }
         break;
-            
-        case COLLISION_ACTION_FLAG:
+
+        case COLLISION_ACTION_FLAG: // not really using this game mode any more but leaving it around (player tows)
         {
             if(elemB->object_type == OBJ_PLAYER)
             {
@@ -1722,7 +1701,8 @@ game_run()
                 default:
                     break;
             }
-            
+
+            // MARK: -- this is where towing "tractor beam" strength is controlled?
             if(pCur->elem->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID)
             {
                 WorldElemListNode *listNodeTowed =
@@ -1744,7 +1724,7 @@ game_run()
                         pCur->elem->physics.ptr->z + (bz.z*TOW_DISTANCE_MIN + by.z*0.5) - listNodeTowed->elem->physics.ptr->z
                     };
                     float tow_d = sqrt(tow_v[0]*tow_v[0] + tow_v[1]*tow_v[1] + tow_v[2]*tow_v[2]); // dist
-                    float tow_m = tow_d * /*4.5*/ 1.0; // multiple
+                    float tow_m = GAME_CAPTURE_TOW_FORCE * tow_d; // multiple representing force
                     
                     tow_v[0] = (tow_v[0]/tow_d);
                     tow_v[1] = (tow_v[1]/tow_d);
@@ -1998,15 +1978,6 @@ game_run()
                     world_get_last_object()->stuff.u.enemy.time_last_run = time_ms + 2000;
                 }
                 */
-            }
-            
-            if(invuln_count > 0)
-            {
-                invuln_count--;
-            }
-            else
-            {
-                collision_actions_set_player_vuln();
             }
             
             if(gameStateSinglePlayer.boost_charge < 1.0)

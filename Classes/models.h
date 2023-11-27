@@ -85,9 +85,9 @@ typedef struct
 #include "building2_model.h"
 
 typedef enum {
-    MODEL_FIRST = 0,
+    MODEL_FIRST,
 	MODEL_SHIP1 = 0,
-	MODEL_CUBE = 1,
+	MODEL_CUBE,
     MODEL_CUBE2,
 	MODEL_PYRAMID,
 	MODEL_SQUARE, // 4

@@ -1764,8 +1764,6 @@ do_game_network_world_update()
         return;
     }
     
-    collision_actions_set_grab_powerup();
-    
     //get_time_ms_wall();
     
     /*
@@ -2917,7 +2915,7 @@ gameNetwork_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_a
     
     if(gameNetworkState.hostInfo.hosting)
     {
-        if(collision_action == COLLISION_ACTION_POWERUP_GRAB)
+        if(collision_action == COLLISION_ACTION_POWERUP_GRAB_OR_TOW)
         {
             gameNetwork_getPlayerInfo(elemB->stuff.affiliation, &pInfo, 0);
             

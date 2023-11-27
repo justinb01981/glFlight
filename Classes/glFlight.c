@@ -213,11 +213,15 @@ calibrate_bail:
         goto draw_bail;
     }
 
+    game_run();
+
     world_update(tc);
     world_update_time_last = time_ms;
     
     // physical collisions between world objects
     do_world_collision_handling(tc);
+
+    assert(world_inited);   // TODO: ensure world state is not damged during collision resolution
     
     // play engine sound
     const char* engine_sounds[] = {"engine", "engineslow"};
@@ -253,7 +257,7 @@ calibrate_bail:
         }
     }
     
-    game_run();
+    // game run WAS here but moved prior to world update to resolve a crash when re-rendering world
     
     get_time_ms();
     
@@ -285,10 +289,6 @@ calibrate_bail:
     paused_bail:
     
     if(glFlightDrawframeHook) glFlightDrawframeHook();
-#if DEBUG
-    if(!world_inited) printf("world_inited: %d", world_inited);
-    //if(!world_inited) goto draw_bail;
-#endif
     
     pListNode = world_elem_list_find(my_ship_id, &gWorld->elements_list);
     if(pListNode) pWorldElemMyShip = pListNode->elem;

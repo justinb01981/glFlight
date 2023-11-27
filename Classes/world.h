@@ -31,7 +31,7 @@ extern float visible_distance;
 
 typedef struct {
     WorldElemListNode* ptr_objects_moving;
-    WorldElemListNode* world_region_iterate_cur;
+    WorldElemListNode* world_region_iterate_cur, *world_region_iterate_retry_head;
     WorldElemListNode* collision_recs_iterate_cur;
     
     void (*world_remove_hook)(WorldElem* pElem);

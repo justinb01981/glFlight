@@ -26,7 +26,7 @@
 enum
 {
     TEXTURE_ID_FRAMEBUFFER = 0,
-    TEXTURE_ID_BOUNDING = 0,
+    TEXTURE_ID_BOUNDING = 47,
     TEXTURE_ID_PORTAL = 98,
     TEXTURE_ID_POOPED_CUBE = 33,
     TEXTURE_ID_POOPED_CUBE_BOOST = 2,
@@ -188,6 +188,8 @@ extern int texture_id_playership;
 extern int texture_id_background;
 
 void initTextures(const char *prefix);
+
+int bindTextureRequestCore(int);
 
 void textures_hack_framebuffer(GLuint);
 int textures_hack_framebuffer_inited(void);

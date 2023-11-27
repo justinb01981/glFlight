@@ -172,7 +172,7 @@ bindTexture(unsigned int tex_id)
     if(!bindTextureRequestCore(tex_id))
     {
         //assert(tex_id == TEXTURE_ID_BOUNDING);       /**/
-        tex_id = TEXTURE_ID_BOUNDING;
+        tex_id = TEXTURE_ID_FONTMAP;
         glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
         drawn_texture_last = tex_id;
         return 1;
@@ -1741,8 +1741,7 @@ void drawBounding()
     glVertexPointer(3, GL_FLOAT, 0, boData->coords256);
     glTexCoordPointer(2, GL_FLOAT, 0, boData->txcoords256);
 
-    //bindTexture(TEXTURE_ID_BOUNDING);
-    glBindTexture(GL_TEXTURE_2D, texture_list[TEXTURE_ID_BOUNDING]);
+    bindTexture(TEXTURE_ID_BOUNDING);
 
     glDrawElements(GL_TRIANGLES, boData->count,
         index_type_enum, boData->indices256);
@@ -2044,7 +2043,7 @@ gameGraphicsInit(void)
                        16.0,
                        BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
 
-    frameBufInit(&gFrameBufSt);
+    //frameBufInit(&gFrameBufSt);
 }
 
 void
@@ -2061,5 +2060,5 @@ gameGraphicsUninit(void)
 
 
     drawBackgroundUninit();
-    frameBufCleanup(&gFrameBufSt);
+    //frameBufCleanup(&gFrameBufSt);
 }

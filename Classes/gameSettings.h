@@ -32,7 +32,7 @@ typedef struct
 } glFlightPrefs;
 
 // TODO:bump this every time settings change
-const static int settings_version = 41; // previously 39
+const static int settings_version = 42; // previously 39
 
 // HACK: externs built in .m files
 extern double dz_roll, dz_pitch, dz_yaw;
@@ -81,8 +81,8 @@ static void
 gameSettingsDefaults()
 {
     // default values
-    gameStateSinglePlayer.difficulty = 1;
-    gameStateSinglePlayer.setting_bot_intelligence = 1;
+    gameStateSinglePlayer.difficulty = 2;
+    gameStateSinglePlayer.setting_bot_intelligence = 2;
     gameAudioMuted = 0;
     texture_id_playership = TEXTURE_ID_SHIP1;
     block_scale = 1.0;

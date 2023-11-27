@@ -97,7 +97,8 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
     appWriteSettings();
     
 
-    gameMapSetMap(initial_map);
+//    gameMapSetMap(initial_map);
+    gameMapSetMap(map_debug);
     
     console_write("Welcome to "GAMETITLE" %s\n"
                   "http://www.domain17.net/d0gf1ght\n"

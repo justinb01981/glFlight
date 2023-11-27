@@ -82,17 +82,18 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
 "mesh_manip_complete 1 "#tex" 1 "#scale"\n"
 
 #define WORLD_SCALED_FRAME(x, tex, scale)                                \
-"register_params 200 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
+"register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-"set_world_size r\n" \
+"set_world_size r\n"                                                     \
+"set_background_info " BACKGROUND_TEXTURE_STR "\n"                       \
 "\n"
 
-#define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
-"register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
-"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-"set_world_size r\n"                                                 \
-"mesh_manip_add 0 " "0" " 0" " 4 0 0" " 0 0 4" " wx0.25 wz0.25\n" \
-"mesh_manip_gltriangles_complete "#tex"\n"
+//#define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
+//"register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
+//"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
+//"set_world_size r\n"                                                 \
+//"mesh_manip_add 0 " "0" " 0" " 4 0 0" " 0 0 4" " wx0.25 wz0.25\n" \
+//"mesh_manip_gltriangles_complete "#tex"\n"
 
 #define WORLD_SCALED_FRAME_TERRAIN(y, tex, scale) \
 WORLD_CUBEGRID(y, tex, scale)
@@ -800,6 +801,14 @@ WORLD_SCALED_FRAME(1, /*57*/28, 4)
 "map_program_with_args 100 0 100\n"
 
 #endif
+;
+
+// MARK: -- map - debugging collisions
+const static char map_debug[] = ""
+"set_world_size 50"
+COLLECT_POINT_ADD(0.0, 0.0, 0.0)
+BASE_ENEMY_1
+WORLD_ADD_OBJECT(MODEL_CUBE, 0.0, 0.0, 0.0, 0.25, 0.25, -0.66, scale, tx_id)
 ;
 
 // MARK: -- map - survival
