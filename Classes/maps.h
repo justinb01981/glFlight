@@ -81,6 +81,7 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
 "mesh_manip_round 0 1 0\n" \
 "mesh_manip_complete 1 "#tex" 1 "#scale"\n"
 
+// WARN: this contains 2 \n\n trailing so nothing after it in the string will be read
 #define WORLD_SCALED_FRAME(x, tex, scale)                                \
 "register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
@@ -806,9 +807,9 @@ WORLD_SCALED_FRAME(1, /*57*/28, 4)
 // MARK: -- map - debugging collisions
 const static char map_debug[] = ""
 "set_world_size 100\n"
+"set_background_info 32\n"
 COLLECT_POINT_ADD(0.0, 0.0, 0.0)
 BASE_ENEMY_1
-WORLD_ADD_OBJECT(2, 0.0, 1.0, 0.0, 0.25, 0.25, -0.66, 4.0, 72)
 ;
 
 // MARK: -- map - survival
@@ -1347,13 +1348,13 @@ const static char* maps_list_names[] =
     NULL
 };
 
-const static char* initial_map = ""                         \
-"set_background_info " BACKGROUND_TEXTURE_STR "\n" \
-WORLD_SCALED_FRAME(1, /*57*/28, 4) \
-MAP_GENERATED_MACRO \
-"add_spawn_invis 0 5 -6 0.01 0.01 0.01\n" \
-WORLD_ADD_OBJECT(12, -2, 5, -4, 0, 0, 0, 1.0 , 24)          \
-WORLD_ADD_OBJECT(14, 2, 5, -4, 0, 0, 0, 1.0 , 71)           \
+const static char* initial_map = ""
+WORLD_SCALED_FRAME(1, /*57*/28, 4)
+"map_program_with_args 100 0 100\n"
+MAP_GENERATED_MACRO
+"add_spawn_invis 0 5 -6 0.01 0.01 0.01\n"
+WORLD_ADD_OBJECT(12, -2, 5, -4, 0, 0, 0, 1.0 , 24)
+WORLD_ADD_OBJECT(14, 2, 5, -4, 0, 0, 0, 1.0 , 71)
 "";
 
 

@@ -97,8 +97,11 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
     appWriteSettings();
     
 
-//    gameMapSetMap(initial_map);
+#ifdef DEBUG
     gameMapSetMap(map_debug);
+#else
+    gameMapSetMap(initial_map);
+#endif
     
     console_write("Welcome to "GAMETITLE" %s\n"
                   "http://www.domain17.net/d0gf1ght\n"
@@ -138,8 +141,6 @@ void glFlightResume(time_t time_last_suspend)
     [NSThread detachNewThreadSelector:@selector(run) toTarget:[[cocoaAudioThread alloc] init] withObject:NULL];
 
     [NSThread detachNewThreadSelector:@selector(applicationBackgroundWorker) toTarget:self withObject:NULL];
-    
-    [NSThread detachNewThreadSelector:@selector(applicationBackgroundWorkerTimer) toTarget:self withObject:NULL];
     
     [NSThread detachNewThreadSelector:@selector(applicationBackgroundInitOnce) toTarget:self withObject:NULL];
     
@@ -217,18 +218,6 @@ void glFlightResume(time_t time_last_suspend)
         
         // throttle this thread in select(), not here
         do_game_network_read();
-    }
-}
-
-- (void) applicationBackgroundWorkerTimer
-{
-    while(1)
-    {
-        /* keeping this in glFlight-main render loop for now on iOS */
-        //extern void update_time_ms_frame_tick();
-        //update_time_ms_frame_tick();
-        
-        usleep((1000/GAME_TICK_RATE)*1000);
     }
 }
 

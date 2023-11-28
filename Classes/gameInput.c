@@ -271,7 +271,7 @@ gameInput()
      
      */
     
-    float input_roll = (deviceRoll - rollOffset)/M_PI/3;
+    float input_roll = (deviceRoll - rollOffset)/M_PI/2;
     float input_pitch = (devicePitch - pitchOffset)/M_PI/3;
     float input_yaw = (deviceYaw - yawOffset)/M_PI/3;
     
@@ -334,7 +334,7 @@ gameInput()
         {
 //            printf("-----------ROLLING-----------\n");
             
-            double s = input_roll * fabs(input_roll) * GYRO_DC * tc * (speed/MAX_SPEED) * (speed/MAX_SPEED*1.5); // "roll dominant"
+            double s = input_roll * fabs(input_roll) * GYRO_DC * tc * (speed/MAX_SPEED*1.5); // "roll dominant" multiplier
 
             if(fabs(yprResponse[0]) < maxInputShipRotate) yprResponse[0] += yprD /* * (s/fabs(s)) */;
             s = s / (1.0 - yprResponse[0]);

@@ -98,7 +98,7 @@ extern int fireActionQueuedAfterEdit;
 #endif
 
 /* reducing friction influences this... should be MAX_THRUST really */
-#define MAX_SPEED /*(15)*/ (20)
+#define MAX_SPEED /*(15)*/ (18.0)
 
 #define GAME_AI_DEBUG 0
 
