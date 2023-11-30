@@ -52,7 +52,7 @@ game_lock_t gWorldLock;
 float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
 float C_FRICTION = /*0.04*/ 0.030; // higher values = more friction
 float GYRO_FEEDBACK = 0;
-float GYRO_DC = 3;
+float GYRO_DC = 1.0;
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
 
 static struct mesh_t* world_pending_mesh = NULL;
@@ -504,6 +504,10 @@ world_add_object_core(Model type,
             
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
+            break;
+
+        case MODEL_FIRST:
+            assert(0);
             break;
             
         default:
@@ -1772,17 +1776,17 @@ world_update_elem_removed_hook(WorldElem* pElem)
     world_update_state_t *state = &gWorld->world_update_state;
     if(!state->world_region_iterate_cur) return;
 
-    WorldElemListNode *tmp = state->world_region_iterate_cur, *next = tmp->next;
-
-    if(tmp && tmp->elem == pElem)
+    if(state->world_region_iterate_cur && state->world_region_iterate_cur->elem == pElem)
     {
         // our position in the list was invalidated (previously changed iterate_cur to *next but this MIGHT not be optimal?
-        state->world_region_iterate_cur = state->world_region_iterate_retry_head;
+        state->world_region_iterate_cur = state->world_region_iterate_cur->next;
+        if(!state->world_region_iterate_cur) state->world_region_iterate_cur = state->world_region_iterate_retry_head;
     }
     
     if(state->ptr_objects_moving && state->ptr_objects_moving->elem == pElem)
     {
-        state->ptr_objects_moving = NULL;
+        state->ptr_objects_moving = state->ptr_objects_moving->next;
+        if(!state->ptr_objects_moving) state->ptr_objects_moving = gWorld->elements_moving.next;   // reset back to moving elements head
     }
 }
 
@@ -2040,8 +2044,7 @@ world_update(float tc)
                                                 {
                                                     assert(!(pElemCollided->object_type == OBJ_POWERUP_GENERIC && (pRegionElem->object_type == OBJ_PLAYER || pRegionElem->object_type == OBJ_SHIP)));
 
-                                                    gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;
-                                                    continue;
+                                                    goto world_update_collision_ignore;
                                                 }
 
                                                 //pElem->physics.ptr->x = collision_rollback_coord[0];
@@ -2119,6 +2122,8 @@ world_update(float tc)
                                                 }
                                             }
                                         }
+
+                                    world_update_collision_ignore:
 
                                         // check if this was invalidated by the remove-callback
                                         // TODO: -- I don't think this can happen anymore fixed with a callback handling when collisions modify world+visibility state

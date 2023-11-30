@@ -334,7 +334,7 @@ gameInput()
         {
 //            printf("-----------ROLLING-----------\n");
             
-            double s = input_roll * fabs(input_roll) * GYRO_DC * tc * (speed/MAX_SPEED*1.5); // "roll dominant" multiplier
+            double s = input_roll * fabs(input_roll) * GYRO_DC * tc * (speed/MAX_SPEED); // "roll dominant" multiplier
 
             if(fabs(yprResponse[0]) < maxInputShipRotate) yprResponse[0] += yprD /* * (s/fabs(s)) */;
             s = s / (1.0 - yprResponse[0]);

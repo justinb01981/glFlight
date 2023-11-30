@@ -213,8 +213,6 @@ calibrate_bail:
         goto draw_bail;
     }
 
-    game_run();
-
     world_update(tc);
     world_update_time_last = time_ms;
     
@@ -254,8 +252,8 @@ calibrate_bail:
             time_engine_sound_next = time_ms + (engine_sounds_duration[sound_idx] * (1.0/rate));
         }
     }
-    
-    // game run WAS here but moved prior to world update to resolve a crash when re-rendering world
+
+    game_run();
     
     get_time_ms();
     
@@ -581,50 +579,9 @@ calibrate_bail:
      */
     
     n_elements_out_of_order = 0;
-    
-    // sort elements by distance
-    static float visible_dot = 0.7;
-    
-    // start visible-subset building/policing (spans multiple frames) over if necessary
-    // alternating between current-visible-list, global moving/nonstatic objects list and
-    // potentially-visible list for region XYZ
-    
-    // visibility-sorting binary tree
-    if(!btreeVisibleTest)
-    {
-        visibleBtreeRootBuilding = &visibleBtreeRootStorage1;
 
-        //world_elem_btree_destroy_root(visibleBtreeRootBuilding);
-        
-        btreeVisibleTest = gWorld->elements_list.next;
-    }
-    
-    // walk part of the list and add some potentially-visible elements
-    unsigned int btreeVisibleTestCount = 100;
-    //unsigned int btreeVisIdx = (visibleBtreeRootBuilding == &visibleBtreeRootStorage1 ? 0 : 1);
-    while(btreeVisibleTest && btreeVisibleTestCount > 0)
-    {
-        btreeVisibleTest->elem->renderInfo.distance =
-            distance(gameCamera_getX(),
-                     gameCamera_getY(),
-                     gameCamera_getZ(),
-                     btreeVisibleTest->elem->physics.ptr->x,
-                     btreeVisibleTest->elem->physics.ptr->y,
-                     btreeVisibleTest->elem->physics.ptr->z);
-        
-        world_elem_btree_remove(visibleBtreeRootBuilding, btreeVisibleTest->elem);
-        
-        // TODO: account for scale approx dist to boundaries of the model poly
-        int visible = element_visible(btreeVisibleTest->elem, visible_distance, visible_dot);
-        
-        if(visible)
-        {
-            world_elem_btree_insert(visibleBtreeRootBuilding, btreeVisibleTest->elem, btreeVisibleTest->elem->renderInfo.distance);
-        }
-        
-        btreeVisibleTest = btreeVisibleTest->next;
-        btreeVisibleTestCount--;
-    }
+    // 11-29-2023 - visibility tree test was happening here
+
     
     // partially sort current visible subset
     world_elem_list_sort_1(&gWorld->elements_visible, element_dist_compare, 0, INT_MAX);
@@ -676,22 +633,71 @@ calibrate_bail:
         world_elem_list_add_sorted(&gWorld->elements_visible, &visibleSkipList,
                                    pAddedPtr->elem, element_dist_compare);
         visibleElementsLen++;
-        
+
         pAddedPtr->elem->renderInfo.distance = distance(gameCamera_getX(),
                                                         gameCamera_getY(),
                                                         gameCamera_getZ(),
                                                         pAddedPtr->elem->physics.ptr->x,
                                                         pAddedPtr->elem->physics.ptr->y,
                                                         pAddedPtr->elem->physics.ptr->z);
-        
+
         // insert into all visible-trees immediately
         world_elem_btree_insert(visibleBtreeRootBuilding, pAddedPtr->elem, pAddedPtr->elem->renderInfo.distance);
-        
+
         world_elem_list_remove(pAddedPtr->elem, &gWorld->elements_to_be_added);
-        
+
         pAddedPtr = pAddedPtr->next;
     }
-    
+
+
+    // now sort visibile elements
+
+    // sort elements by distance
+    static float visible_dot = 0.7;
+
+    // start visible-subset building/policing (spans multiple frames) over if necessary
+    // alternating between current-visible-list, global moving/nonstatic objects list and
+    // potentially-visible list for region XYZ
+
+    // visibility-sorting binary tree
+    if(!btreeVisibleTest)
+    {
+        visibleBtreeRootBuilding = &visibleBtreeRootStorage1;
+
+        //world_elem_btree_destroy_root(visibleBtreeRootBuilding);
+
+        btreeVisibleTest = gWorld->elements_list.next;
+    }
+
+    // walk part of the list and add some potentially-visible elements
+    unsigned int btreeVisibleTestCount = 100;
+    //unsigned int btreeVisIdx = (visibleBtreeRootBuilding == &visibleBtreeRootStorage1 ? 0 : 1);
+    while(btreeVisibleTest && btreeVisibleTestCount > 0)
+    {
+        btreeVisibleTest->elem->renderInfo.distance =
+            distance(gameCamera_getX(),
+                     gameCamera_getY(),
+                     gameCamera_getZ(),
+                     btreeVisibleTest->elem->physics.ptr->x,
+                     btreeVisibleTest->elem->physics.ptr->y,
+                     btreeVisibleTest->elem->physics.ptr->z);
+
+        world_elem_btree_remove(visibleBtreeRootBuilding, btreeVisibleTest->elem);
+
+        // TODO: account for scale approx dist to boundaries of the model poly
+        int visible = element_visible(btreeVisibleTest->elem, visible_distance, visible_dot);
+
+        if(visible)
+        {
+            world_elem_btree_insert(visibleBtreeRootBuilding, btreeVisibleTest->elem, btreeVisibleTest->elem->renderInfo.distance);
+        }
+
+        btreeVisibleTest = btreeVisibleTest->next;
+        btreeVisibleTestCount--;
+    }
+
+
+
     WorldElemListNode* pDrawCur = gWorld->elements_visible.next;
     
     // draw mesh

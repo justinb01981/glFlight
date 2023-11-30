@@ -2464,6 +2464,7 @@ addEngineExhaust(WorldElem *elem)
         0.9, 0.9,
         0.9, 0.6,
         0.9, 0.6};
+    float model_bullet_scale = 0.5;
     int lineColorLen = 8;
     float *lineColor = lineColorExhaust;
     
@@ -2475,7 +2476,7 @@ addEngineExhaust(WorldElem *elem)
                          elem->physics.ptr->y + qz.y*2,
                          elem->physics.ptr->z + qz.z*2,
                          elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
-                         1.0,
+                         model_bullet_scale,
                          texture_id);
     WorldElem* pElem = world_get_last_object();
     
@@ -2488,7 +2489,7 @@ addEngineExhaust(WorldElem *elem)
     pElem->renderInfo.priority = 1;
     pElem->destructible = 0;
     pElem->physics.ptr->friction = 1;
-    world_object_set_lifetime(obj, /*pooped_cube_lifetime*/ 5);
+    world_object_set_lifetime(obj, pooped_cube_lifetime);
     
     update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);
     
@@ -2504,11 +2505,17 @@ firePoopedCube(WorldElem *elem)
     static float lineColorEnemyAce[8] = {0.9, 0.9,     0.9, 0.9,     0.9, 0.9,     0.9, 0.9};
     int lineColorLen = 8;
     float *lineColor = lineColorEnemy;
-    float Zm = 0.2;
+    float Zm = 1.0; // origin
     int trailCoords[] = {6, 9, 18, 21, 30, 33, 42, 45};
     int i;
+
+    float coordinates[] = {elem->physics.ptr->x, elem->physics.ptr->y, elem->physics.ptr->z};
+    for(i=0; i < 3; i++) if ( isnan( coordinates[i] ) )
+    {
+        return WORLD_ELEM_ID_INVALID;
+    }
     
-    if(elem->physics.ptr->velocity <= 1) return WORLD_ELEM_ID_INVALID;
+    if(elem->physics.ptr->velocity <= 1 || isnan(elem->physics.ptr->x)) return WORLD_ELEM_ID_INVALID;
     
     get_body_vectors_for_euler(elem->physics.ptr->alpha, elem->physics.ptr->beta, elem->physics.ptr->gamma,
                                &qx, &qy, &qz);

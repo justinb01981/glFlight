@@ -83,8 +83,8 @@
             timestampString = "590103628.620787"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1326"
-            endingLineNumber = "1326"
+            startingLineNumber = "1330"
+            endingLineNumber = "1330"
             landmarkName = "world_init(radius)"
             landmarkType = "9">
          </BreakpointContent>
@@ -100,8 +100,8 @@
             timestampString = "590103628.621181"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1366"
-            endingLineNumber = "1366"
+            startingLineNumber = "1370"
+            endingLineNumber = "1370"
             landmarkName = "world_init(radius)"
             landmarkType = "9">
          </BreakpointContent>
@@ -117,8 +117,8 @@
             timestampString = "590103628.621461"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1315"
-            endingLineNumber = "1315"
+            startingLineNumber = "1319"
+            endingLineNumber = "1319"
             landmarkName = "world_init(radius)"
             landmarkType = "9">
          </BreakpointContent>
@@ -351,6 +351,53 @@
             endingLineNumber = "578"
             landmarkName = "gameDialogNetworkGameEnded()"
             landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "2021CB13-F099-453F-A18C-DC2927365D2F - 7f9361c1bd490467"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "gameDialogNetworkGameEnded"
+                  moduleName = "d0gf1ght 95"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "578"
+                  endingLineNumber = "578"
+                  offsetFromSymbolStart = "12">
+               </Location>
+               <Location
+                  uuid = "2021CB13-F099-453F-A18C-DC2927365D2F - 928fb6a0135bff2c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "gameDialogNetworkGameEnded"
+                  moduleName = "gl_flight_debug"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "578"
+                  endingLineNumber = "578"
+                  offsetFromSymbolStart = "12">
+               </Location>
+               <Location
+                  uuid = "2021CB13-F099-453F-A18C-DC2927365D2F - 928fb6a0135bff2c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "gameDialogNetworkGameEnded"
+                  moduleName = "gl_flight_debug"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "578"
+                  endingLineNumber = "578"
+                  offsetFromSymbolStart = "32">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -363,8 +410,8 @@
             filePath = "Classes/world.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2172"
-            endingLineNumber = "2172"
+            startingLineNumber = "2177"
+            endingLineNumber = "2177"
             landmarkName = "world_update(tc)"
             landmarkType = "9">
          </BreakpointContent>

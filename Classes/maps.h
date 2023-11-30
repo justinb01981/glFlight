@@ -10,31 +10,31 @@
 #define gl_flight_maps_h
 
 #include "textures.h"
+#include "models.h"
 #include "mapgenerated.h"
 
 /*
  * models
  */
-#define MAPMODEL_SHIP1 "0"
-#define MAPMODEL_CUBE "1"
-#define MAPMODEL_CUBE2 "2"
-#define MAPMODEL_PYRAMID "3"
-#define MAPMODEL_SQUARE "4"
-#define MAPMODEL_BULLET "5"
-#define MAPMODEL_SURFACE "6"
-#define MAPMODEL_VERTICAL_PILLAR "7"
-#define MAPMODEL_MESH "8"
-#define MAPMODEL_TELEPORTER "9"
-#define MAPMODEL_SPRITE "10"
-#define MAPMODEL_TURRET "11"
-#define MAPMODEL_SHIP2 "12"
-#define MAPMODEL_MISSLE "13"
-#define MAPMODEL_SHIP3 "14"
-#define MAPMODEL_ICOSAHEDRON "15"
-#define MAPMODEL_PYRAMID "3"
-#define MAPMODEL_CUBE_INVERTED "16"
-#define MAPMODEL_SPHERE "17"
-#define MAPMODEL_ENEMYBASE "18"
+#define MAPMODEL_SHIP1 "1"
+#define MAPMODEL_CUBE "2"
+#define MAPMODEL_CUBE2 "3"
+#define MAPMODEL_PYRAMID "4"
+#define MAPMODEL_SQUARE "5"
+#define MAPMODEL_BULLET "6"
+#define MAPMODEL_SURFACE "7"
+#define MAPMODEL_VERTICAL_PILLAR "8"
+#define MAPMODEL_MESH "9"
+#define MAPMODEL_TELEPORTER "10"
+#define MAPMODEL_SPRITE "11"
+#define MAPMODEL_TURRET "12"
+#define MAPMODEL_SHIP2 "13"
+#define MAPMODEL_MISSLE "14"
+#define MAPMODEL_SHIP3 "15"
+#define MAPMODEL_ICOSAHEDRON "16"
+#define MAPMODEL_CUBE_INVERTED "18"
+#define MAPMODEL_SPHERE "19"
+#define MAPMODEL_ENEMYBASE "20"
 #define MAP_BASE_ALT "50"
 #define MAPMODEL_SPRITE_SCENERY "22"
 
@@ -543,7 +543,6 @@ RANDOM_FLOATING_BLOCKS_1
 const static char initial_map_collection[] = ""
 
 #if 0
-//"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
 
 "set_background_info " BACKGROUND_TEXTURE_STR "\n"
 
@@ -806,9 +805,8 @@ WORLD_SCALED_FRAME(1, /*57*/28, 4)
 
 // MARK: -- map - debugging collisions
 const static char map_debug[] = ""
-"set_world_size 100\n"
+"set_world_size 50\n"
 "set_background_info 32\n"
-COLLECT_POINT_ADD(0.0, 0.0, 0.0)
 BASE_ENEMY_1
 ;
 

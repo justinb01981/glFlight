@@ -47,12 +47,12 @@ collision_actions_default[OBJ_LAST][OBJ_LAST] =
     // TODO: (generic blocks treated equivalent to OBJ_BLOCK?)
     {0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0,       2, 0, 0, 0, 0, 0, 2, 0, 0}, // unknown
     {2, 2, 2, 0, 2, 2, 1, 0, 0, 0, SHIPXPOWERUP,       0, 1, 1, 1, 0, 0, 1, 0, 0}, // ship
-    {2, 2, 2, 3, 2, 2, 1, 4, 7, 0, PLYRXPOWERUP, /*3*/ 0, 1, 1, 1, 0, 0, 0, 0, 0}, // player
+    {2, 2, 2, 3, 2, 2, 1, COLLISION_ACTION_PORTAL_TELEPORT, 7, 0, PLYRXPOWERUP, /*3*/ 0, 1, 1, 1, 0, 0, 0, 0, 0}, // player
     {0, 0, 2, 2, 0, 2, 1, 0, 0, 0, TURRETXPOWERUP,       0, 0, 1, 0, 0, 0, 0, 0, 0}, // turret
     {0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0,       0, 0, 1, 0, 0, 0, 0, 0, 0}, // block_moving (4)
     {0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0,       0, 0, 1, 0, 0, 0, 0, 0, 0}, // block
     {1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,       0, 1, 0, 0, 0, 0, 0, 0, 0}, // bullet
-    {0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // portal
+    {0, 0, COLLISION_ACTION_PORTAL_TELEPORT, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // portal
 
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // poopedcube
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // wreckage
@@ -383,15 +383,16 @@ do_world_collision_handling(float tc)
                     // MARK: -- apply force (in some collision cases)
                     if(world_coll_act == COLLISION_ACTION_DAMAGE)
                     {
+                        // pCollisionA points at OBJ_SHIP instead of OBJ_BULLET
                         if(pCollisionA->elem->moving &&
                             pCollisionB->elem->moving)
                         {
                             float bullet_vtransfer = 0.2 * pCollisionA->elem->durability;
 
-                            update_object_velocity(pCollisionB->elem->elem_id,
-                                                   pCollisionA->elem->physics.ptr->vx*bullet_vtransfer,
-                                                   pCollisionA->elem->physics.ptr->vy*bullet_vtransfer,
-                                                   pCollisionA->elem->physics.ptr->vz*bullet_vtransfer,
+                            update_object_velocity(pCollisionA->elem->elem_id,
+                                                   pCollisionB->elem->physics.ptr->vx*bullet_vtransfer,
+                                                   pCollisionB->elem->physics.ptr->vy*bullet_vtransfer,
+                                                   pCollisionB->elem->physics.ptr->vz*bullet_vtransfer,
                                                    1);
                         }
                     }
@@ -518,7 +519,7 @@ do_world_collision_handling(float tc)
                     
             case COLLISION_ACTION_PORTAL_TELEPORT:
                 {
-                    char* nametag = pCollisionA->elem->stuff.nametag;
+                    char* nametag = pCollisionB->elem->stuff.nametag;
 
                     console_clear();
                     gameNetwork_disconnectSignal();
@@ -532,7 +533,7 @@ do_world_collision_handling(float tc)
                             gameNetwork_connect(nametag, NULL);
                         }
                     }
-                    world_remove_object(pCollisionA->elem->elem_id);
+                    world_remove_object(pCollisionB->elem->elem_id);
                 }
                 break;
             }

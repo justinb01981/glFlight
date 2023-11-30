@@ -246,13 +246,13 @@ send_lan_broadcast(gameNetworkMessage* msg)
 }
 
 static void
-send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
+ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
 {
     struct sockaddr_storage* sa;
     int r;
 
     sa = address->storage;
-    
+
     gameMessage_to_nbo(msg);
     
     if(gameNetworkState.hostInfo.bonjour_lan)

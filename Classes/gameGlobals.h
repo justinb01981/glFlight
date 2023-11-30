@@ -102,7 +102,7 @@ extern int fireActionQueuedAfterEdit;
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "1.7.7_core";
+const static char* GAME_VERSION_STR = "1.10.1_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 
@@ -114,9 +114,9 @@ extern float GYRO_FEEDBACK;
 extern float GYRO_DC;
 
 const static int pooped_cube_interval_ms = 25;
-const static int pooped_cube_lifetime = 30;    // determines trail length
+const static int pooped_cube_lifetime = 5;    // determines trail length
 
-const static float collision_repulsion_coeff = 1.1;
+const static float collision_repulsion_coeff = 1.02;
 
 const static float RADAR_MIN_VELOCITY = 1;
 
