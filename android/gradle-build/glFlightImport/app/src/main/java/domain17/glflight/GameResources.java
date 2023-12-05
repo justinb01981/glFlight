@@ -285,7 +285,8 @@ public class GameResources {
             "victory",
             "warning",
             "teleport",
-            "filelost"
+            "filelost",
+            "menubeep"
 
     };
 
@@ -308,7 +309,8 @@ public class GameResources {
             R.raw.victory,
             R.raw.warning,
             R.raw.teleport,
-            R.raw.filelost
+            R.raw.filelost,
+            R.raw.menubeep
     };
 
     static GameResources inst = null;

@@ -85,23 +85,23 @@ typedef struct
 #include "building2_model.h"
 
 typedef enum {
-    MODEL_FIRST = 0,
-	MODEL_SHIP1 = 0,
-	MODEL_CUBE = 1,
+    MODEL_FIRST,
+	MODEL_SHIP1 = 1,
+	MODEL_CUBE,
     MODEL_CUBE2,
 	MODEL_PYRAMID,
-	MODEL_SQUARE, // 4
+	MODEL_SQUARE, //
     MODEL_BULLET,
     MODEL_SURFACE,
-    MODEL_VERTICAL_PILLAR, // 7
+    MODEL_VERTICAL_PILLAR, //
     MODEL_MESH,
     MODEL_TELEPORTER,
-    MODEL_SPRITE,          // 10
+    MODEL_SPRITE,          // 
     MODEL_TURRET,
     MODEL_SHIP2,
     MODEL_MISSLE,
     MODEL_SHIP3,
-    MODEL_ICOSAHEDRON,
+    MODEL_ICOSAHEDRON = 16,
     MODEL_CUBE_INVERTED,
     MODEL_SPHERE,
     MODEL_ENEMY_BASE,
@@ -382,29 +382,31 @@ static model_texcoord_t model_contrail_texcoords[] =
 
 static model_coord_t model_contrail[] =
 {
+    // WARNING: these are being manipulated at model creation see firePoopedCube
+    
     //bottom
     -0.06, -0.06, 0,
     0.06, -0.06, 0,
-    0.06, -0.06, 0.5,
-    -0.06, -0.06, 0.5,
+    0.06, -0.06, 0.2,
+    -0.06, -0.06, 0.2,
     
     // top
     -0.06, 0.06, 0,
     0.06, 0.06, 0,
-    0.06, 0.06, 0.5,
-    -0.06, 0.06, 0.5,
+    0.06, 0.06, 0.2,
+    -0.06, 0.06, 0.2,
     
     //bottom2
     -0.06, -0.06, 0,
     0.06, -0.06, 0,
-    0.06, -0.06, 0.5,
-    -0.06, -0.06, 0.5,
+    0.06, -0.06, 0.2,
+    -0.06, -0.06, 0.2,
     
     //top2
     -0.06, 0.06, 0,
     0.06, 0.06, 0,
-    0.06, 0.06, 0.5,
-    -0.06, 0.06, 0.5,
+    0.06, 0.06, 0.2,
+    -0.06, 0.06, 0.2,
 };
 
 static model_index_t model_contrail_indices[] =

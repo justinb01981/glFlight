@@ -11,12 +11,18 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <sys/types.h>
+
 #include "gameIncludes.h"
 #include "gameDebug.h"
 #include "assert.h"
 
 #include "textures.h"
 #include "framebuffer.h"
+
+// remove this hack but requires .h dependency redo
+#ifndef GL_NONE
+#define GL_NONE 0
+#endif
 
 unsigned int texture_list[MAX_TEXTURES];
 unsigned int texture_list_loaded[MAX_TEXTURES];
@@ -215,13 +221,17 @@ void initTextures(const char *prefix)
     // load the first N textures
     for(i = 0; i < texture_preload_count; i++)
     {
-        bindTextureRequest(i);
+        bindTextureRequestCore(i);
     }
 }
 
-int bindTextureRequest(int tex_id)
+int bindTextureRequestCore(int tex_id)
 {
-    int load_count = 6;
+
+    if(tex_id == 0)
+    {
+        return 0;
+    }
     
     if(!texture_list_loaded[tex_id])
     {
@@ -231,37 +241,30 @@ int bindTextureRequest(int tex_id)
         //console_clear();
         //console_write("loading texture: %d", tex_id);
         
-        while(n_textures <= tex_id && load_count > 0)
+
+        if(tex_id != TEXTURE_ID_FRAMEBUFFER)
+        if(read_bitmap_to_gltexture(n_textures) != 0)
         {
-            // TODO: ignore TEXTURE_ID_BOUNDING
-
-            if(read_bitmap_to_gltexture(n_textures) != 0)
-            {
-                printf("failed to load texture: %d\n", n_textures);
-                return 0;
-            }
-
-            n_textures++;
-
-            load_count--;
+            printf("failed to load texture: %d\n", n_textures);
+            return 0;
         }
+
+        n_textures++;
     }
     
     return texture_list_loaded[tex_id];
 }
 
 void textures_hack_framebuffer(GLuint newtx) {
-    // accept new texture rendered from framebuf
-    texture_list_loaded[TEXTURE_ID_FRAMEBUFFER] = 1;
-    texture_list[TEXTURE_ID_FRAMEBUFFER] = newtx;
+//    // accept new texture rendered from framebuf
+//    if(!texture_list_loaded[TEXTURE_ID_BOUNDING]) {
+//        texture_list_loaded[TEXTURE_ID_BOUNDING] = 1;
+//        texture_list[TEXTURE_ID_BOUNDING] = newtx;
+//    }
 }
 
 void textures_hack_framebuffer_cleanup(void) {
     // accept new texture rendered from framebuf
-    texture_list_loaded[TEXTURE_ID_FRAMEBUFFER] = 0;
-    texture_list[TEXTURE_ID_FRAMEBUFFER] = GL_NONE;
-}
-
-int textures_hack_framebuffer_inited(void) {
-    return texture_list_loaded[TEXTURE_ID_FRAMEBUFFER] ? 1 : 0;
+//    texture_list_loaded[TEXTURE_ID_BOUNDING] = 0;
+//    texture_list[TEXTURE_ID_BOUNDING] = -1;
 }

@@ -9,17 +9,24 @@
 			<key>orderHint</key>
 			<integer>3</integer>
 		</dict>
-		<key>gl_flight.xcscheme</key>
+		<key>gl_flight copy.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>12</integer>
+		</dict>
+		<key>gl_flight.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
-		<key>release.xcscheme</key>
+		<key>release.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
-		<key>spacecombat1995.xcscheme</key>
+		<key>spacecombat1995.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>2</integer>
@@ -33,6 +40,11 @@
 			<true/>
 		</dict>
 		<key>D0BCC8FB2052EDC100094809</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>D0F4D8F72B1568B500948122</key>
 		<dict>
 			<key>primary</key>
 			<true/>

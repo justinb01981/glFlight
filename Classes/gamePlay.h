@@ -16,10 +16,6 @@
 #include "gameAI.h"
 #include "assert.h"
 
-#define game_ammo_missles_max 4
-#define game_ammo_bullets_max 32
-#define GAME_POWERUP_DROP_TABLE_LEN 10
-
 enum
 {
     STUFF_FLAGS_TURRET = 0x02,
@@ -173,10 +169,10 @@ const static float game_variables_default[] = {
     1,           // LEAVES TRAIL
     800.0,       // SCAN_DISTANCE_MAX
     0.02,        // ENEMY1_MAX_TURN_SKILL_SCALE
-    /*25*/25,    // ENEMY1_JUKE_PCT
+    25,    // ENEMY1_JUKE_PCT
     2,           // ENEMY1_COLLECT_DURABILITY
     20,          // ENEMY_RUN_DISTANCE
-    PLATFORM_TICK_RATE*60,       // COLLECT_POINT_LIFETIME
+    PLATFORM_TICK_RATE*300,       // COLLECT_POINT_LIFETIME
     0,0,0,0,0,0,0,0,0,0,0,0,
     0            // END
 };
@@ -217,9 +213,7 @@ typedef struct
     float rate_enemy_p_increase;
     
     float enemy_durability;
-    
-    int invuln_time_after_hit;
-    
+        
     float boost_charge;
     
     int powerup_lifetime_frames;
@@ -304,15 +298,15 @@ void game_add_enemy();
 void game_add_turret();
  */
 
-void game_init();
+void game_init(void);
 
 void game_start(float difficulty, int type);
 
-void game_start_network_guest();
+void game_start_network_guest(void);
 
-void game_run();
+void game_run(void);
 
-void game_run_paused();
+void game_run_paused(void);
 
 void game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action);
 
@@ -320,9 +314,9 @@ void game_handle_collision_powerup(WorldElem* elemA, WorldElem* elemB);
 
 void game_handle_destruction(WorldElem* elem);
 
-game_timeval_t game_time_remaining();
+game_timeval_t game_time_remaining(void);
 
-int game_time_elapsed();
+int game_time_elapsed(void);
 
 int game_add_spawnpoint(float x, float y, float z, char* game_name);
 

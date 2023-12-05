@@ -56,6 +56,7 @@
 void gameInputStatsCollectStart(void);
 void gameInputStatsAppend(float ypr[3]);
 void gameInputStatsCalc(void);
+void trimDoneIgnore(void);
 
 int rm_count = 0;
 
@@ -71,14 +72,13 @@ int needTrim = 1;
 int initialized = 0;
 double motionRoll, motionPitch, motionYaw;
 double devicePitch, deviceYaw, deviceRoll;
-double deviceInputDiv = 16.0;
+
 double motionRollMotion, motionPitchMotion, motionYawMotion;
 static const float maxInputShipRotate = 0.2;
 float yprResponse[3] = {0, 0, 0}, yprD = maxInputShipRotate/360.0;
 float rollOffset = 0, pitchOffset = 0, yawOffset = 0;
-double devicePitchFrac = 0, deviceYawFrac = 0;
+double devicePitchFrac = 0, deviceYawFrac = 0;  // used for controls rendering in gameGraphics
 int firstCalibrate = 1;
-float fcr = 0.0, fcp = 0.0, fcy = 0.0;
 float gyroSenseScale = PLATFORM_GYRO_SENSE_SCALE;
 double gyroLastRange[3];
 void (*trimDoneCallback)(void);
@@ -111,8 +111,8 @@ gameInputInit()
     speed = minSpeed;
     targetSpeed = speed;
     maxAccelDecel = /*5*/ MAX_SPEED/2; // change per second
-    minSpeed = MAX_SPEED / 20;
-    bulletVel = MAX_SPEED*8;
+    minSpeed = MAX_SPEED / 20;  // careful this doesn't round to 0
+    bulletVel = MAX_SPEED*3;
     needTrim = 1;
     
     isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
@@ -125,7 +125,7 @@ gameInputInit()
     
     initialized = 1;
     
-    trimDoneCallback = NULL;
+    trimDoneCallback = trimDoneIgnore;
 }
 
 void
@@ -235,14 +235,13 @@ gameInput()
     deviceRoll = motionRoll;
 #endif
 
-    float deviceO[3] = {deviceRoll, devicePitch, deviceYaw};
-    
     if(!initialized)
     {
         return;
     }
 
 //
+//    float deviceO[3] = {deviceRoll, devicePitch, deviceYaw};
 //    gameInputStatsAppend(deviceO);
 //
 //    if(needTrim)
@@ -263,10 +262,6 @@ gameInput()
 //        trimDoneCallback();
 //    }
     
-    if(needTrim) {
-        trimDoneCallback();
-    }
-    
     /*
                          (Rmax-Rmin)
             Dr - Rmin + ------------
@@ -276,9 +271,9 @@ gameInput()
      
      */
     
-    float input_roll = (deviceRoll - rollOffset) / deviceInputDiv;
-    float input_pitch = (devicePitch - pitchOffset) / deviceInputDiv;
-    float input_yaw = (deviceYaw - yawOffset) / deviceInputDiv;
+    float input_roll = (deviceRoll - rollOffset)/M_PI/2;
+    float input_pitch = (devicePitch - pitchOffset)/M_PI/3;
+    float input_yaw = (deviceYaw - yawOffset)/M_PI/3;
     
     devicePitchFrac = devicePitch / M_PI;
     deviceYawFrac =  deviceYaw / M_PI;
@@ -286,7 +281,7 @@ gameInput()
     // periodically do some stuff
     if(rm_count <= 0)
     {
-        rm_count = 256;
+        rm_count = 33;
         
         // renormalize body vectors every so often
         gameCamera_normalize();
@@ -300,44 +295,46 @@ gameInput()
     
     if(!game_paused)
     {
-        if(!gameSettingsComplexControls)
-        {
-            input_roll = input_yaw * -3.0;
-            
-            gameShip_unfakeRoll();
-        }
-            
-        if(!gameSettingsComplexControls)
-        {
-            float angleGround = gameShip_calcRoll() - M_PI;
-            
-            if(fabs(angleGround) > 0.02)
-            {
-                float shipy[3];
-                gameShip_getYVector(shipy);
-                
-                float r = 0.01;
-                
-                if(angleGround > 0)
-                {
-                    r = -r;
-                }
-                else
-                {
-                    r = r;
-                }
-                
-                if(shipy[1] < 0) r *= 4;
-                
-                gameShip_roll(r);
-            }
-        }
+//        if(!gameSettingsComplexControls)
+//        {
+//            input_roll = input_yaw * -3.0;
+//
+//            gameShip_unfakeRoll();
+//        }
+//
+//        if(!gameSettingsComplexControls)
+//        {
+//            float angleGround = gameShip_calcRoll() - M_PI;
+//
+//            if(fabs(angleGround) > 0.02)
+//            {
+//                float shipy[3];
+//                gameShip_getYVector(shipy);
+//
+//                float r = 0.01;
+//
+//                if(angleGround > 0)
+//                {
+//                    r = -r;
+//                }
+//                else
+//                {
+//                    r = r;
+//                }
+//
+//                if(shipy[1] < 0) r *= 4;
+//
+//                gameShip_roll(r);
+//            }
+//        }
         
-        if(fabs(input_roll) > dz_min && gameSettingsComplexControls)
+        if(fabs(input_roll) > dz_min
+//           && gameSettingsComplexControls
+           )
         {
-            //printf("-----------ROLLING-----------\n");
+//            printf("-----------ROLLING-----------\n");
             
-            double s = input_roll * fabs(input_roll) * GYRO_DC * tc;
+            double s = input_roll * fabs(input_roll) * GYRO_DC * tc * (speed/MAX_SPEED); // "roll dominant" multiplier
 
             if(fabs(yprResponse[0]) < maxInputShipRotate) yprResponse[0] += yprD /* * (s/fabs(s)) */;
             s = s / (1.0 - yprResponse[0]);
@@ -347,9 +344,9 @@ gameInput()
         
         if(fabs(input_pitch) > dz_min)
         {
-            //printf("-----------PITCHING-----------\n");
+//            printf("-----------PITCHING-----------\n");
             
-            double s = input_pitch * fabs(input_pitch) * GYRO_DC * tc;
+            double s = input_pitch * fabs(input_pitch) * GYRO_DC * tc * (speed/MAX_SPEED);
 
             if(fabs(yprResponse[1]) < maxInputShipRotate) yprResponse[1] += yprD /* * (s/fabs(s)) */;
             s = s / (1.0 - yprResponse[1]);
@@ -359,9 +356,9 @@ gameInput()
         
         if(fabs(input_yaw) > dz_min)
         {
-            //printf("-----------YAWING-----------\n");
+//            printf("-----------YAWING-----------\n");
             
-            double s = input_yaw * fabs(input_yaw) * GYRO_DC * tc;
+            double s = input_yaw * fabs(input_yaw) * GYRO_DC * tc * (speed/MAX_SPEED);
 
             if(fabs(yprResponse[2]) < maxInputShipRotate) yprResponse[2] += yprD /* * (s/fabs(s)) */;
             s = s / (1.0 - yprResponse[2]);
@@ -369,10 +366,10 @@ gameInput()
             gameShip_yaw(s);
         }
         
-        if(!gameSettingsComplexControls)
-        {
-            gameShip_fakeRoll(input_roll);
-        }
+//        if(!gameSettingsComplexControls)
+//        {
+//            gameShip_fakeRoll(input_roll);
+//        }
     }
     
     // HACK: in extreme cases the quaternion becomes NaN and we will crash - catch that here
@@ -384,8 +381,6 @@ gameInput()
         my_ship_bx = cam_pos.bx;
         my_ship_by = cam_pos.by;
         my_ship_bz = cam_pos.bz;
-        
-//        assert(0); // okay this has beeen fixed
     }
     
     deviceLast[0] = deviceRoll;
@@ -451,4 +446,9 @@ gameInputStatsCalc()
     printf("gameInputStats avg:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.avg[j]); printf("\n");
     printf("gameInputStats min:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.min[j]); printf("\n");
     printf("gameInputStats max:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.max[j]); printf("\n");
+}
+
+void trimDoneIgnore(void)
+{
+
 }

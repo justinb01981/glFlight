@@ -13,8 +13,10 @@
 
 #define BASE_TEXTURE_ID_FRIENDLY "98"
 #define BASE_TEXTURE_ID_ENEMY "89"
+
 #define BACKGROUND_TEXTURE_STR "47"
 #define BACKGROUND_TEXTURE 47
+
 #define CUBE_TEXTURE_1 19
 #define CUBE_TEXTURE_2 28
 #define CUBE_TEXTURE_3 52
@@ -25,6 +27,8 @@
 
 enum
 {
+    TEXTURE_ID_FRAMEBUFFER = 0,
+    TEXTURE_ID_BOUNDING = 96,
     TEXTURE_ID_PORTAL = 98,
     TEXTURE_ID_POOPED_CUBE = 33,
     TEXTURE_ID_POOPED_CUBE_BOOST = 2,
@@ -93,7 +97,6 @@ enum
     TEXTURE_ID_CONTROLS_POPUPOVER_DIALOG_BOX = 52,
     TEXTURE_ID_CONTROLS_RADAR = 20,
     TEXTURE_ID_STATIC = 18,
-    TEXTURE_ID_UNKNOWN = 0,
     TEXTURE_ID_ARROW_OBJ = 104,
     TEXTURE_ID_ARROW_ENEMY = 105,
     TEXTURE_ID_ARROW_PLAYER = 106,
@@ -110,8 +113,13 @@ enum
     TEXTURE_ID_COLORMAP = 11,
     TEXTURE_ID_CALIBRATE_CURSOR = 6,
     TEXTURE_ID_BUILDING3 = 116,
-    TEXTURE_ID_BOUNDING = 80,
-    TEXTURE_ID_FRAMEBUFFER = 901,
+    TEXTURE_ID_BUILDING4 = 117,
+    TEXTURE_ID_BUILDING5 = 118,
+    TEXTURE_ID_BUILDING6 = 120,
+    TEXTURE_ID_BUILDING7 = 121,
+    TEXTURE_ID_BUILDING8 = 122,
+    TEXTURE_ID_BUILDING9 = 123,
+
     TEXTURE_ID_LAST
 };
 
@@ -183,7 +191,7 @@ extern int texture_id_background;
 
 void initTextures(const char *prefix);
 
-int bindTextureRequest(int tex_id);
+int bindTextureRequestCore(int);
 
 void textures_hack_framebuffer(GLuint);
 int textures_hack_framebuffer_inited(void);

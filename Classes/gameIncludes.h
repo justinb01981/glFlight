@@ -18,10 +18,13 @@
 #include <GLFW/glfw3.h>
 #else
 #if GAME_PLATFORM_ANDROID
+#define GL_GLEXT_PROTOTYPES
 #include <GLES/gl.h>
 #include <GLES/glext.h>
-#include <GLES/glplatform.h>
-#include "GLES/glext.h"
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#include <GLES2/gl2platform.h>
+//#include "GLES/glext.h"
 #else /* iOS */
 #include <OpenGLES/ES1/gl.h>
 #include <OpenGLES/ES1/glext.h>

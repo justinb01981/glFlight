@@ -34,7 +34,8 @@ const float zdot_ikillyou = 0.5;
 const float zdot_juke = 0.3;
 const float zdot_collision = 0.7;
 const float dist_tooclose = 10.0;
-const float boundary_avoid_distance = 5.0;
+// TODO: tweaking this to allow enemies to capture powerups close to boundary
+const float boundary_avoid_distance = 2.0;
 
 float juke_distance = 20.0, juke_distance_patrol = 50.0;
 
@@ -655,7 +656,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         vdesired = 1.0;
     }
 
-    if(zdot < 0)
+    if(/*zdot < 0*/ 0)
     {
         quaternion_rotate_inplace(&zq, &xq, elem->stuff.u.enemy.max_slerp*tc);
         quaternion_rotate_inplace(&yq, &xq, elem->stuff.u.enemy.max_slerp*tc);
@@ -678,7 +679,9 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
 
         if (isnan(z1q.w) || isnan(z1q.x) || isnan(z1q.y) || isnan(z1q.z))
         {
-            assert(0);  // z1q = zq;
+            printf("WARN: gameAI.c isNan in object_pursue is a BUG!");
+
+            zq.w = z1q.w = 1; zq.x = z1q.x = 0; zq.y = z1q.y = 0; zq.z = z1q.z = 1;
         }
     }
     
@@ -699,23 +702,26 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     elem->yq = yq;
     elem->zq = zq;
     
-#if 0
+#if 1
     // TODO: re-apply a,b,g to elem body vectors or store the whole quaternion - no more drift to NaN
     float* pFloatCheckIsNan[] = {
         &alpha,
         &beta,
-        &gamma
-    };
-    float* pFloatCheckIsNanR[] = {
-        &elem->physics.ptr->alpha,
-        &elem->physics.ptr->beta,
-        &elem->physics.ptr->gamma
+        &gamma,
+        &elem->physics.ptr->x,
+        &elem->physics.ptr->y,
+        &elem->physics.ptr->z
     };
     for(iF = 0; iF < sizeof(pFloatCheckIsNan)/sizeof(float*); iF++)
     {
         if(isnan(*pFloatCheckIsNan[iF]))
         {
             printf("gameAI.c: isnan (%p)\n", elem);
+
+            alpha = beta = gamma = 0.0;
+            *pFloatCheckIsNan[iF] = 1.0;
+
+            break;
             /*
             // *pFloatCheckIsNan[iF] = 0;
             
@@ -741,11 +747,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             
             get_euler_from_body_vectors(&resx, &resy, &resz, &alpha, &beta, &gamma);
             */
-            
-            // assuming gimbal lock is the problem, retry after minor euler alpha change
-            elem->physics.ptr->alpha *= 0.95;
-            elem->stuff.u.enemy.time_last_run = time_ms - elem->stuff.u.enemy.time_run_interval;
-            return;
         }
     }
 #endif
@@ -872,7 +873,7 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
        elemC->stuff.affiliation != 0)
     {
         elemAI->stuff.u.enemy.target_id = elemC->stuff.affiliation;
-        ai_debug("enemy targeting affiliation:%d", elemAI, elemC->stuff.affiliation);
+        ai_debug("enemy targeting obj+affiliation:%d", elemAI, elemC->stuff.affiliation);
     }
     
     if(elemAI /*&& elemC->physics.ptr->velocity == 0*/)

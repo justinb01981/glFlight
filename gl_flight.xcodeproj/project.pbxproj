@@ -189,7 +189,6 @@
 		D0CB80E31BFB9F5500E52F43 /* texture90.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0CB80E21BFB9F5500E52F43 /* texture90.bmp */; };
 		D0CB80E51BFD9F0100E52F43 /* texture91.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0CB80E41BFD9F0100E52F43 /* texture91.bmp */; };
 		D0CB80E71BFF9A5C00E52F43 /* texture92.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0CB80E61BFF9A5C00E52F43 /* texture92.bmp */; };
-		D0CF62B714A919D600E08151 /* object.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CF62B614A919D600E08151 /* object.m */; };
 		D0D661B417EA6C4B00E44885 /* texture45.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0D661B317EA6C4B00E44885 /* texture45.bmp */; };
 		D0D7A5C5191AEA1B0083FDF8 /* texture64.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0D7A5C4191AEA1B0083FDF8 /* texture64.bmp */; };
 		D0D7A5C7191AEFDF0083FDF8 /* texture65.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0D7A5C6191AEFDF0083FDF8 /* texture65.bmp */; };
@@ -211,6 +210,215 @@
 		D0F3BE2417DFEDE100E9C49E /* texture42.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F3BE2317DFEDE100E9C49E /* texture42.bmp */; };
 		D0F3BE2617E3C72400E9C49E /* texture43.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F3BE2517E3C72300E9C49E /* texture43.bmp */; };
 		D0F3BE2817E8D8EB00E9C49E /* texture44.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F3BE2717E8D8E900E9C49E /* texture44.bmp */; };
+		D0F4D8FA2B1568B500948122 /* texture50.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D07B356518527FE200900D60 /* texture50.bmp */; };
+		D0F4D8FB2B1568B500948122 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 2514C27910084DCA00A42282 /* Shader.fsh */; };
+		D0F4D8FC2B1568B500948122 /* texture110.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3A208172D8009F9618 /* texture110.bmp */; };
+		D0F4D8FD2B1568B500948122 /* Shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 2514C27A10084DCA00A42282 /* Shader.vsh */; };
+		D0F4D8FE2B1568B500948122 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
+		D0F4D8FF2B1568B500948122 /* texture88.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02071721BF282D4000AC2BA /* texture88.bmp */; };
+		D0F4D9002B1568B500948122 /* texture55.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0FE6D0C1859C871007D67CF /* texture55.bmp */; };
+		D0F4D9012B1568B500948122 /* texture83.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CD1A325F1500F125D4 /* texture83.bmp */; };
+		D0F4D9022B1568B500948122 /* texture0.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D1073221585CAE0006B6499 /* texture0.bmp */; };
+		D0F4D9032B1568B500948122 /* texture92.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0CB80E61BFF9A5C00E52F43 /* texture92.bmp */; };
+		D0F4D9042B1568B500948122 /* texture85.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CF1A325F1500F125D4 /* texture85.bmp */; };
+		D0F4D9052B1568B500948122 /* texture93.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EFCAA81C3A4E3700731FAF /* texture93.bmp */; };
+		D0F4D9062B1568B500948122 /* texture79.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D00D78CF1A09525100E701B9 /* texture79.bmp */; };
+		D0F4D9072B1568B500948122 /* texture1.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DE4E2CB15926E7B00CE3C37 /* texture1.bmp */; };
+		D0F4D9082B1568B500948122 /* texture30.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F09195DF2CC00830369 /* texture30.bmp */; };
+		D0F4D9092B1568B500948122 /* texture2.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DEA18FC15A4610B007BD58F /* texture2.bmp */; };
+		D0F4D90A2B1568B500948122 /* texture31.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F0A195DF2CC00830369 /* texture31.bmp */; };
+		D0F4D90B2B1568B500948122 /* texture3.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DEFF8EC15A60C310078E98E /* texture3.bmp */; };
+		D0F4D90C2B1568B500948122 /* towing.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A5536818BC16C700F7E798 /* towing.wav */; };
+		D0F4D90D2B1568B500948122 /* texture68.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A66F40194B9497004A5E42 /* texture68.bmp */; };
+		D0F4D90E2B1568B500948122 /* texture96.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0017FC61C62B9D4003F0368 /* texture96.bmp */; };
+		D0F4D90F2B1568B500948122 /* texture99.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D08AC6BE1DAAE3DA00E367B7 /* texture99.bmp */; };
+		D0F4D9102B1568B500948122 /* texture113.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0290F3320A25BF2002935C3 /* texture113.bmp */; };
+		D0F4D9112B1568B500948122 /* texture4.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DF4AFBE15B2531C00A5C8B9 /* texture4.bmp */; };
+		D0F4D9122B1568B500948122 /* texture58.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A5535F18B6DDD700F7E798 /* texture58.bmp */; };
+		D0F4D9132B1568B500948122 /* texture90.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0CB80E21BFB9F5500E52F43 /* texture90.bmp */; };
+		D0F4D9142B1568B500948122 /* texture72.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F1C1969E7AF00830369 /* texture72.bmp */; };
+		D0F4D9152B1568B500948122 /* filelost.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0C225F11CB93BC200A08AEB /* filelost.wav */; };
+		D0F4D9162B1568B500948122 /* texture60.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0AF470918D7E2DD00081B81 /* texture60.bmp */; };
+		D0F4D9172B1568B500948122 /* texture114.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0549E8320ED4126009FF191 /* texture114.bmp */; };
+		D0F4D9182B1568B500948122 /* texture6.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DF655CD15D1E90F0015D5DF /* texture6.bmp */; };
+		D0F4D9192B1568B500948122 /* texture7.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DF655CF15D1E9170015D5DF /* texture7.bmp */; };
+		D0F4D91A2B1568B500948122 /* texture5.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DF655D315D1EA100015D5DF /* texture5.bmp */; };
+		D0F4D91B2B1568B500948122 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D0432C3A29AF201C00C8DBF4 /* GoogleService-Info.plist */; };
+		D0F4D91C2B1568B500948122 /* app_icon_lg_prev.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4CE1BDDF9DB0089D9F0 /* app_icon_lg_prev.jpg */; };
+		D0F4D91D2B1568B500948122 /* texture8.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DF655E315EAB3EE0015D5DF /* texture8.bmp */; };
+		D0F4D91E2B1568B500948122 /* texture9.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DEA66E815F1919C0002C75D /* texture9.bmp */; };
+		D0F4D91F2B1568B500948122 /* texture64.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0D7A5C4191AEA1B0083FDF8 /* texture64.bmp */; };
+		D0F4D9202B1568B500948122 /* shoot.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6D4F2F3D1618241000286C16 /* shoot.wav */; };
+		D0F4D9212B1568B500948122 /* texture63.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0AF470F18ECAE8200081B81 /* texture63.bmp */; };
+		D0F4D9222B1568B500948122 /* boom.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6D4F2F3F1618241A00286C16 /* boom.wav */; };
+		D0F4D9232B1568B500948122 /* app_icon152x152.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4D41BDE0F8E0089D9F0 /* app_icon152x152.png */; };
+		D0F4D9242B1568B500948122 /* app_icon114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4D21BDE0F720089D9F0 /* app_icon114x114.png */; };
+		D0F4D9252B1568B500948122 /* texture48.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A5535B189868B800F7E798 /* texture48.bmp */; };
+		D0F4D9262B1568B500948122 /* texture107.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665F3201801FD00B106AE /* texture107.bmp */; };
+		D0F4D9272B1568B500948122 /* texture104.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665E620162D1A00B106AE /* texture104.bmp */; };
+		D0F4D9282B1568B500948122 /* fontmap.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D9A8CBC1627974600953833 /* fontmap.bmp */; };
+		D0F4D9292B1568B500948122 /* texture10.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D595F651655A85500C21926 /* texture10.bmp */; };
+		D0F4D92A2B1568B500948122 /* texture11.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D595F661655A85500C21926 /* texture11.bmp */; };
+		D0F4D92B2B1568B500948122 /* texture81.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03441691A1E7B8A00C89475 /* texture81.bmp */; };
+		D0F4D92C2B1568B500948122 /* texture49.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0DD22E6182A0C5200A51D34 /* texture49.bmp */; };
+		D0F4D92D2B1568B500948122 /* texture12.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D595F671655A85500C21926 /* texture12.bmp */; };
+		D0F4D92E2B1568B500948122 /* teleport.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0C225EF1CB9361200A08AEB /* teleport.wav */; };
+		D0F4D92F2B1568B500948122 /* texture13.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D595F681655A85500C21926 /* texture13.bmp */; };
+		D0F4D9302B1568B500948122 /* texture94.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EFCAAA1C54A2CD00731FAF /* texture94.bmp */; };
+		D0F4D9312B1568B500948122 /* texture53.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0FE6D0718570BD0007D67CF /* texture53.bmp */; };
+		D0F4D9322B1568B500948122 /* texture14.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D595F691655A85600C21926 /* texture14.bmp */; };
+		D0F4D9332B1568B500948122 /* texture15.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D595F6F16563FD500C21926 /* texture15.bmp */; };
+		D0F4D9342B1568B500948122 /* texture70.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F041954A91000830369 /* texture70.bmp */; };
+		D0F4D9352B1568B500948122 /* texture17.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D595F73165B896700C21926 /* texture17.bmp */; };
+		D0F4D9362B1568B500948122 /* flyby.wav in Resources */ = {isa = PBXBuildFile; fileRef = D00D78C919FB18EC00E701B9 /* flyby.wav */; };
+		D0F4D9372B1568B500948122 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D062FE171FEAF7DC00ABE435 /* LaunchScreen.xib */; };
+		D0F4D9382B1568B500948122 /* texture18.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D91DEA6166C73FD00362864 /* texture18.bmp */; };
+		D0F4D9392B1568B500948122 /* texture98.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D04256661DA75CFB00E9C17B /* texture98.bmp */; };
+		D0F4D93A2B1568B500948122 /* highscore.wav in Resources */ = {isa = PBXBuildFile; fileRef = D065B0FE1888412E002C1980 /* highscore.wav */; };
+		D0F4D93B2B1568B500948122 /* texture19.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D91DEA8166C74F400362864 /* texture19.bmp */; };
+		D0F4D93C2B1568B500948122 /* shipicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D91DEAD167A9C6A00362864 /* shipicon.png */; };
+		D0F4D93D2B1568B500948122 /* greenhex.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0C133C219F448A1003A6949 /* greenhex.bmp */; };
+		D0F4D93E2B1568B500948122 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6D413C031688150500A37ADF /* Settings.bundle */; };
+		D0F4D93F2B1568B500948122 /* texture89.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02071741BF29F11000AC2BA /* texture89.bmp */; };
+		D0F4D9402B1568B500948122 /* texture20.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D53C4D01693FA1D009D6C3C /* texture20.bmp */; };
+		D0F4D9412B1568B500948122 /* texture21.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D53C4D31693FD69009D6C3C /* texture21.bmp */; };
+		D0F4D9422B1568B500948122 /* app_icon_64x64.png in Resources */ = {isa = PBXBuildFile; fileRef = D00D78D71A0AFA4800E701B9 /* app_icon_64x64.png */; };
+		D0F4D9432B1568B500948122 /* texture76.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D00D78CB1A02BF8B00E701B9 /* texture76.bmp */; };
+		D0F4D9442B1568B500948122 /* texture22.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6D53C4D8169407E1009D6C3C /* texture22.bmp */; };
+		D0F4D9452B1568B500948122 /* engineloop.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0B918EF1F5BC27B0073ECD6 /* engineloop.wav */; };
+		D0F4D9462B1568B500948122 /* dead.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6D53C4DA1696D30B009D6C3C /* dead.wav */; };
+		D0F4D9472B1568B500948122 /* app_icon57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4D61BDE145D0089D9F0 /* app_icon57x57.png */; };
+		D0F4D9482B1568B500948122 /* texture25.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DDAAC6B16B8A396003D97DF /* texture25.bmp */; };
+		D0F4D9492B1568B500948122 /* texture51.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0FE6D0318553E6E007D67CF /* texture51.bmp */; };
+		D0F4D94A2B1568B500948122 /* texture74.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09051C9196DD87200E5F29E /* texture74.bmp */; };
+		D0F4D94B2B1568B500948122 /* texture73.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F1E1969E7B800830369 /* texture73.bmp */; };
+		D0F4D94C2B1568B500948122 /* texture112.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0290F3020A2445F002935C3 /* texture112.bmp */; };
+		D0F4D94D2B1568B500948122 /* texture69.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F021954A74400830369 /* texture69.bmp */; };
+		D0F4D94E2B1568B500948122 /* texture54.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0FE6D0A1859C6C3007D67CF /* texture54.bmp */; };
+		D0F4D94F2B1568B500948122 /* texture57.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A5535D18A6C79900F7E798 /* texture57.bmp */; };
+		D0F4D9502B1568B500948122 /* texture26.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6DDAAC7D16BEF3CB003D97DF /* texture26.bmp */; };
+		D0F4D9512B1568B500948122 /* enemydead.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0BD22F32055A01500D4AEE3 /* enemydead.wav */; };
+		D0F4D9522B1568B500948122 /* enginefast.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A5039B1A43EF9400C4BBD1 /* enginefast.wav */; };
+		D0F4D9532B1568B500948122 /* texture24.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0AD4F6716D8466E00664895 /* texture24.bmp */; };
+		D0F4D9542B1568B500948122 /* texture80.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D00D78D01A09525100E701B9 /* texture80.bmp */; };
+		D0F4D9552B1568B500948122 /* texture27.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09E7FC716EFBFC400343CE6 /* texture27.bmp */; };
+		D0F4D9562B1568B500948122 /* texture62.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0AF470D18E2546000081B81 /* texture62.bmp */; };
+		D0F4D9572B1568B500948122 /* texture101.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D08AC6C01DAAE3DA00E367B7 /* texture101.bmp */; };
+		D0F4D9582B1568B500948122 /* texture59.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A5537418C13C7100F7E798 /* texture59.bmp */; };
+		D0F4D9592B1568B500948122 /* texture109.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D087BAEA204707B300F4D6E0 /* texture109.bmp */; };
+		D0F4D95A2B1568B500948122 /* texture52.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0FE6D051856F528007D67CF /* texture52.bmp */; };
+		D0F4D95B2B1568B500948122 /* warning.wav in Resources */ = {isa = PBXBuildFile; fileRef = D02E6B77184405B600360AF2 /* warning.wav */; };
+		D0F4D95C2B1568B500948122 /* texture34.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2B1757CEA000B5B815 /* texture34.bmp */; };
+		D0F4D95D2B1568B500948122 /* texture33.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2D1757CFFD00B5B815 /* texture33.bmp */; };
+		D0F4D95E2B1568B500948122 /* texture35.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2F1757D69200B5B815 /* texture35.bmp */; };
+		D0F4D95F2B1568B500948122 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB311757D9B200B5B815 /* Default-568h@2x.png */; };
+		D0F4D9602B1568B500948122 /* app_icon76x76.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4D01BDE0F5F0089D9F0 /* app_icon76x76.png */; };
+		D0F4D9612B1568B500948122 /* Default2.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C133C419F448BF003A6949 /* Default2.png */; };
+		D0F4D9622B1568B500948122 /* texture37.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0309F1F1770F3A600100357 /* texture37.bmp */; };
+		D0F4D9632B1568B500948122 /* engineslow.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A503991A43EF8C00C4BBD1 /* engineslow.wav */; };
+		D0F4D9642B1568B500948122 /* texture108.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D079A83220217FFC0098641B /* texture108.bmp */; };
+		D0F4D9652B1568B500948122 /* texture116.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0280A5F2241BA2000E8C1E8 /* texture116.bmp */; };
+		D0F4D9662B1568B500948122 /* texture38.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0309F211770F41C00100357 /* texture38.bmp */; };
+		D0F4D9672B1568B500948122 /* texture36.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0309F231770F42A00100357 /* texture36.bmp */; };
+		D0F4D9682B1568B500948122 /* texture16.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0309F251771A39E00100357 /* texture16.bmp */; };
+		D0F4D9692B1568B500948122 /* texture23.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0309F271771A3C800100357 /* texture23.bmp */; };
+		D0F4D96A2B1568B500948122 /* texture28.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0309F2B1771A45E00100357 /* texture28.bmp */; };
+		D0F4D96B2B1568B500948122 /* texture84.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4CE1A325F1500F125D4 /* texture84.bmp */; };
+		D0F4D96C2B1568B500948122 /* texture86.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0B4C4D31A32616B00F125D4 /* texture86.bmp */; };
+		D0F4D96D2B1568B500948122 /* texture65.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0D7A5C6191AEFDF0083FDF8 /* texture65.bmp */; };
+		D0F4D96E2B1568B500948122 /* texture40.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D05A90B517A1CF8100F40807 /* texture40.bmp */; };
+		D0F4D96F2B1568B500948122 /* app_icon120x120_orig.png in Resources */ = {isa = PBXBuildFile; fileRef = D04EB4CC1BDDCD5E0089D9F0 /* app_icon120x120_orig.png */; };
+		D0F4D9702B1568B500948122 /* engine.wav in Resources */ = {isa = PBXBuildFile; fileRef = D05A90B717A1E3F400F40807 /* engine.wav */; };
+		D0F4D9712B1568B500948122 /* texture78.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D00D78CE1A09525100E701B9 /* texture78.bmp */; };
+		D0F4D9722B1568B500948122 /* missle.wav in Resources */ = {isa = PBXBuildFile; fileRef = D07B35671853A5CF00900D60 /* missle.wav */; };
+		D0F4D9732B1568B500948122 /* engine2.wav in Resources */ = {isa = PBXBuildFile; fileRef = D02DAC0D17C72E9700035601 /* engine2.wav */; };
+		D0F4D9742B1568B500948122 /* texture97.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D08C196C1D4455D1003EE6B2 /* texture97.bmp */; };
+		D0F4D9752B1568B500948122 /* texture100.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D08AC6BF1DAAE3DA00E367B7 /* texture100.bmp */; };
+		D0F4D9762B1568B500948122 /* texture91.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0CB80E41BFD9F0100E52F43 /* texture91.bmp */; };
+		D0F4D9772B1568B500948122 /* bump.wav in Resources */ = {isa = PBXBuildFile; fileRef = D02DAC0F17D145A000035601 /* bump.wav */; };
+		D0F4D9782B1568B500948122 /* collect.wav in Resources */ = {isa = PBXBuildFile; fileRef = D02DAC1117D1478400035601 /* collect.wav */; };
+		D0F4D9792B1568B500948122 /* dropoff.wav in Resources */ = {isa = PBXBuildFile; fileRef = D02DAC1317D147E500035601 /* dropoff.wav */; };
+		D0F4D97A2B1568B500948122 /* texture39.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F10195DF2E700830369 /* texture39.bmp */; };
+		D0F4D97B2B1568B500948122 /* texture103.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665E420162CF000B106AE /* texture103.bmp */; };
+		D0F4D97C2B1568B500948122 /* Default-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = D09A4E311840196E004C73F2 /* Default-Landscape.png */; };
+		D0F4D97D2B1568B500948122 /* texture41.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02DAC1517D14AE400035601 /* texture41.bmp */; };
+		D0F4D97E2B1568B500948122 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC117D5C5F200C03EB5 /* Default@2x.png */; };
+		D0F4D97F2B1568B500948122 /* texture75.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A8D74519F9983C006FE907 /* texture75.bmp */; };
+		D0F4D9802B1568B500948122 /* texture102.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D077BA4A1DB435DB00B4C701 /* texture102.bmp */; };
+		D0F4D9812B1568B500948122 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC317D5C5FF00C03EB5 /* Default.png */; };
+		D0F4D9822B1568B500948122 /* texture106.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665EA20162D5A00B106AE /* texture106.bmp */; };
+		D0F4D9832B1568B500948122 /* texture56.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0FE6D0E1859C97B007D67CF /* texture56.bmp */; };
+		D0F4D9842B1568B500948122 /* texture105.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D03665E820162D3500B106AE /* texture105.bmp */; };
+		D0F4D9852B1568B500948122 /* texture66.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D098934E1937FA4100298C8E /* texture66.bmp */; };
+		D0F4D9862B1568B500948122 /* texture29.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F08195DF2CC00830369 /* texture29.bmp */; };
+		D0F4D9872B1568B500948122 /* screenshot1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC717D67C9A00C03EB5 /* screenshot1.jpg */; };
+		D0F4D9882B1568B500948122 /* screenshot2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC817D67C9B00C03EB5 /* screenshot2.jpg */; };
+		D0F4D9892B1568B500948122 /* speedboost.wav in Resources */ = {isa = PBXBuildFile; fileRef = D098934C1937F44400298C8E /* speedboost.wav */; };
+		D0F4D98A2B1568B500948122 /* texture111.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3D208174EB009F9618 /* texture111.bmp */; };
+		D0F4D98B2B1568B500948122 /* texture42.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F3BE2317DFEDE100E9C49E /* texture42.bmp */; };
+		D0F4D98C2B1568B500948122 /* texture82.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D034416B1A1E7B9200C89475 /* texture82.bmp */; };
+		D0F4D98D2B1568B500948122 /* texture43.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F3BE2517E3C72300E9C49E /* texture43.bmp */; };
+		D0F4D98E2B1568B500948122 /* texture115.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0BB4FBA2224FE71009457A4 /* texture115.bmp */; };
+		D0F4D98F2B1568B500948122 /* texture44.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F3BE2717E8D8E900E9C49E /* texture44.bmp */; };
+		D0F4D9902B1568B500948122 /* texture95.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0017FC41C62B524003F0368 /* texture95.bmp */; };
+		D0F4D9912B1568B500948122 /* texture45.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0D661B317EA6C4B00E44885 /* texture45.bmp */; };
+		D0F4D9922B1568B500948122 /* texture46.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A6367117F382A50088F0AD /* texture46.bmp */; };
+		D0F4D9932B1568B500948122 /* texture67.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09893501937FD7D00298C8E /* texture67.bmp */; };
+		D0F4D9942B1568B500948122 /* texture61.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0AF470B18DCAF7600081B81 /* texture61.bmp */; };
+		D0F4D9952B1568B500948122 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D062FE151FEADFDF00ABE435 /* Media.xcassets */; };
+		D0F4D9962B1568B500948122 /* texture47.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0DA479D180B336400BD4DC2 /* texture47.bmp */; };
+		D0F4D9972B1568B500948122 /* menubeep.wav in Resources */ = {isa = PBXBuildFile; fileRef = D03491ED21D1335E001D5611 /* menubeep.wav */; };
+		D0F4D9982B1568B500948122 /* lockedon.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A8D74719F9BFE6006FE907 /* lockedon.wav */; };
+		D0F4D9992B1568B500948122 /* texture32.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F0B195DF2CC00830369 /* texture32.bmp */; };
+		D0F4D99A2B1568B500948122 /* texture71.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F061954D5F400830369 /* texture71.bmp */; };
+		D0F4D99B2B1568B500948122 /* texture77.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D00D78CD1A09525100E701B9 /* texture77.bmp */; };
+		D0F4D99C2B1568B500948122 /* victory.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0DA479F180F4D7500BD4DC2 /* victory.wav */; };
+		D0F4D99D2B1568B500948122 /* texture87.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F33ADD1BBF453C00215953 /* texture87.bmp */; };
+		D0F4D99E2B1568B500948122 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0DA47AD18186E1000BD4DC2 /* MainWindow-iPad.xib */; };
+		D0F4D99F2B1568B500948122 /* app_icon120x120.png in Resources */ = {isa = PBXBuildFile; fileRef = D0DA47AF18186E6A00BD4DC2 /* app_icon120x120.png */; };
+		D0F4D9A02B1568B500948122 /* app_icon72x72.png in Resources */ = {isa = PBXBuildFile; fileRef = D0DA47B318186F2600BD4DC2 /* app_icon72x72.png */; };
+		D0F4D9A32B1568B500948122 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		D0F4D9A42B1568B500948122 /* gl_flightAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* gl_flightAppDelegate.m */; };
+		D0F4D9A52B1568B500948122 /* cocoaGameInput.m in Sources */ = {isa = PBXBuildFile; fileRef = D02B8F161964D67700830369 /* cocoaGameInput.m */; };
+		D0F4D9A62B1568B500948122 /* glFlightGLKViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05AEDA421FD5F4800692833 /* glFlightGLKViewController.m */; };
+		D0F4D9A72B1568B500948122 /* textures.c in Sources */ = {isa = PBXBuildFile; fileRef = D0C3743D193EC5FC000C2915 /* textures.c */; };
+		D0F4D9A82B1568B500948122 /* quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = D077557C152588C800DF2E0B /* quaternions.c */; };
+		D0F4D9A92B1568B500948122 /* gameInput.c in Sources */ = {isa = PBXBuildFile; fileRef = D02B8F191964D7D700830369 /* gameInput.c */; };
+		D0F4D9AA2B1568B500948122 /* gameInterface.c in Sources */ = {isa = PBXBuildFile; fileRef = 6DD6C314157422AD00BF3305 /* gameInterface.c */; };
+		D0F4D9AB2B1568B500948122 /* gameMotionInterp.c in Sources */ = {isa = PBXBuildFile; fileRef = D03ECD8E228F7EC1001581E2 /* gameMotionInterp.c */; };
+		D0F4D9AC2B1568B500948122 /* gameDialogs.c in Sources */ = {isa = PBXBuildFile; fileRef = D02B8F0019535AAB00830369 /* gameDialogs.c */; };
+		D0F4D9AD2B1568B500948122 /* gameCamera.c in Sources */ = {isa = PBXBuildFile; fileRef = 6DF655DC15E6CFF70015D5DF /* gameCamera.c */; };
+		D0F4D9AE2B1568B500948122 /* mapgenerated.c in Sources */ = {isa = PBXBuildFile; fileRef = D04E466C22C833D1003D0055 /* mapgenerated.c */; };
+		D0F4D9AF2B1568B500948122 /* gameUtils.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D512E1615EC1F130064DF49 /* gameUtils.c */; };
+		D0F4D9B02B1568B500948122 /* worldElem.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D512E1A15EC21A20064DF49 /* worldElem.c */; };
+		D0F4D9B12B1568B500948122 /* framebuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = D0532FB32A14616C000D6891 /* framebuffer.c */; };
+		D0F4D9B22B1568B500948122 /* gameShip.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D07DE3C15F7FCA00048129B /* gameShip.c */; };
+		D0F4D9B32B1568B500948122 /* mesh.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D3FF5F815FA7B40009A5388 /* mesh.c */; };
+		D0F4D9B42B1568B500948122 /* gameSettings.c in Sources */ = {isa = PBXBuildFile; fileRef = D02B8EFE195357FE00830369 /* gameSettings.c */; };
+		D0F4D9B52B1568B500948122 /* world_file.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D595F5E164C80FE00C21926 /* world_file.c */; };
+		D0F4D9B62B1568B500948122 /* gameNetwork.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D595F78165CD34500C21926 /* gameNetwork.c */; };
+		D0F4D9B72B1568B500948122 /* world.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D91DE9F16697F0B00362864 /* world.c */; };
+		D0F4D9B82B1568B500948122 /* GameNetworkBonjourManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D062FE1E1FEB702C00ABE435 /* GameNetworkBonjourManager.m */; };
+		D0F4D9B92B1568B500948122 /* cocoaGameAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D91DEA2166C0DB300362864 /* cocoaGameAudio.m */; };
+		D0F4D9BA2B1568B500948122 /* gameAudio.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D91DEA4166C0EF100362864 /* gameAudio.c */; };
+		D0F4D9BB2B1568B500948122 /* gameBounding.c in Sources */ = {isa = PBXBuildFile; fileRef = 6D91DEAB1675556200362864 /* gameBounding.c */; };
+		D0F4D9BC2B1568B500948122 /* cocoaAudioThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D53C4D61693FDB4009D6C3C /* cocoaAudioThread.m */; };
+		D0F4D9BD2B1568B500948122 /* glFlight.c in Sources */ = {isa = PBXBuildFile; fileRef = D062ED5916E0279B00CA4374 /* glFlight.c */; };
+		D0F4D9BE2B1568B500948122 /* gameGraphics.c in Sources */ = {isa = PBXBuildFile; fileRef = D062ED5C16E0295500CA4374 /* gameGraphics.c */; };
+		D0F4D9BF2B1568B500948122 /* gameTests.c in Sources */ = {isa = PBXBuildFile; fileRef = D080491022D2B7EC002684B7 /* gameTests.c */; };
+		D0F4D9C02B1568B500948122 /* gamePlay.c in Sources */ = {isa = PBXBuildFile; fileRef = D0EECB1F1753E08B00B5B815 /* gamePlay.c */; };
+		D0F4D9C12B1568B500948122 /* gameAI.c in Sources */ = {isa = PBXBuildFile; fileRef = D0EECB211753E27C00B5B815 /* gameAI.c */; };
+		D0F4D9C22B1568B500948122 /* collision.c in Sources */ = {isa = PBXBuildFile; fileRef = D0C822811A11EDC4005E9490 /* collision.c */; };
+		D0F4D9C32B1568B500948122 /* actions.c in Sources */ = {isa = PBXBuildFile; fileRef = D03ADBA7178271E800D725F7 /* actions.c */; };
+		D0F4D9C52B1568B500948122 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		D0F4D9C62B1568B500948122 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		D0F4D9C72B1568B500948122 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD14FF0DC6FC520079059D /* OpenGLES.framework */; };
+		D0F4D9C82B1568B500948122 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD15070DC6FC5B0079059D /* QuartzCore.framework */; };
+		D0F4D9C92B1568B500948122 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D033788614D9FEFD00FD8A74 /* CoreMotion.framework */; };
+		D0F4D9CA2B1568B500948122 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0AD4F6516D6F11600664895 /* AVFoundation.framework */; };
+		D0F4D9CB2B1568B500948122 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D05AEDA121FD5DE300692833 /* GLKit.framework */; };
+		D0F4D9CC2B1568B500948122 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0BCBFB0175FE67F00003168 /* AudioToolbox.framework */; };
+		D0F4D9CD2B1568B500948122 /* Pods_gl_flight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9EB3FB0B47BB3AAF50651D8 /* Pods_gl_flight.framework */; };
 		D0FE6D0418553E6E007D67CF /* texture51.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0FE6D0318553E6E007D67CF /* texture51.bmp */; };
 		D0FE6D061856F528007D67CF /* texture52.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0FE6D051856F528007D67CF /* texture52.bmp */; };
 		D0FE6D0818570BD0007D67CF /* texture53.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0FE6D0718570BD0007D67CF /* texture53.bmp */; };
@@ -221,6 +429,16 @@
 
 /* Begin PBXCopyFilesBuildPhase section */
 		D0CEC6C429F1CEAD009BFF62 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D0F4D9CE2B1568B500948122 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
@@ -478,7 +696,6 @@
 		D0CB80E61BFF9A5C00E52F43 /* texture92.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture92.bmp; sourceTree = "<group>"; };
 		D0CEC6F129F516E1009BFF62 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = ../../Downloads/Firebase/module.modulemap; sourceTree = "<group>"; };
 		D0CF62B514A919D600E08151 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
-		D0CF62B614A919D600E08151 /* object.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = object.m; sourceTree = "<group>"; };
 		D0D661B317EA6C4B00E44885 /* texture45.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture45.bmp; sourceTree = "<group>"; };
 		D0D7A5C4191AEA1B0083FDF8 /* texture64.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture64.bmp; sourceTree = "<group>"; };
 		D0D7A5C6191AEFDF0083FDF8 /* texture65.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture65.bmp; sourceTree = "<group>"; };
@@ -501,6 +718,9 @@
 		D0F3BE2317DFEDE100E9C49E /* texture42.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture42.bmp; sourceTree = "<group>"; };
 		D0F3BE2517E3C72300E9C49E /* texture43.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture43.bmp; sourceTree = "<group>"; };
 		D0F3BE2717E8D8E900E9C49E /* texture44.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture44.bmp; sourceTree = "<group>"; };
+		D0F4D8F62B14F9C500948122 /* boolean.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = boolean.h; sourceTree = "<group>"; };
+		D0F4D9D32B1568B500948122 /* gl_flight_debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = gl_flight_debug.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0F4D9D42B1568B700948122 /* gl_flight copy2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "gl_flight copy2-Info.plist"; path = "/Users/justin/workspace/glFlight/gl_flight copy2-Info.plist"; sourceTree = "<absolute>"; };
 		D0FE6D0318553E6E007D67CF /* texture51.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture51.bmp; sourceTree = "<group>"; };
 		D0FE6D051856F528007D67CF /* texture52.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture52.bmp; sourceTree = "<group>"; };
 		D0FE6D0718570BD0007D67CF /* texture53.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture53.bmp; sourceTree = "<group>"; };
@@ -528,6 +748,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D0F4D9C42B1568B500948122 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0F4D9C52B1568B500948122 /* Foundation.framework in Frameworks */,
+				D0F4D9C62B1568B500948122 /* UIKit.framework in Frameworks */,
+				D0F4D9C72B1568B500948122 /* OpenGLES.framework in Frameworks */,
+				D0F4D9C82B1568B500948122 /* QuartzCore.framework in Frameworks */,
+				D0F4D9C92B1568B500948122 /* CoreMotion.framework in Frameworks */,
+				D0F4D9CA2B1568B500948122 /* AVFoundation.framework in Frameworks */,
+				D0F4D9CB2B1568B500948122 /* GLKit.framework in Frameworks */,
+				D0F4D9CC2B1568B500948122 /* AudioToolbox.framework in Frameworks */,
+				D0F4D9CD2B1568B500948122 /* Pods_gl_flight.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -550,7 +786,6 @@
 				D03ABA6414ADACF000C44538 /* world.h */,
 				D0280A622241BBF500E8C1E8 /* building3_model.h */,
 				6D91DE9F16697F0B00362864 /* world.c */,
-				D0CF62B614A919D600E08151 /* object.m */,
 				D02F630E14C6ABD80028601F /* textures.h */,
 				D0C3743D193EC5FC000C2915 /* textures.c */,
 				D077557C152588C800DF2E0B /* quaternions.c */,
@@ -619,6 +854,7 @@
 				D011EF5A19BE45C0004A56CB /* gamePlatform.h */,
 				D011EF5B19BE46EE004A56CB /* gameDebug.h */,
 				D0C822811A11EDC4005E9490 /* collision.c */,
+				D0F4D8F62B14F9C500948122 /* boolean.h */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -627,6 +863,7 @@
 			isa = PBXGroup;
 			children = (
 				1D6058910D05DD3D006BFB54 /* d0gf1ght 95.app */,
+				D0F4D9D32B1568B500948122 /* gl_flight_debug.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -662,6 +899,7 @@
 				D0BCC9CB2052EDC500094809 /* gl_flight copy-Info.plist */,
 				D0432C3A29AF201C00C8DBF4 /* GoogleService-Info.plist */,
 				74F616FCD7F17E3E4335D3CC /* Pods */,
+				D0F4D9D42B1568B700948122 /* gl_flight copy2-Info.plist */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -926,6 +1164,27 @@
 			productReference = 1D6058910D05DD3D006BFB54 /* d0gf1ght 95.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D0F4D8F72B1568B500948122 /* gl_flight_debug */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D0F4D9D02B1568B500948122 /* Build configuration list for PBXNativeTarget "gl_flight_debug" */;
+			buildPhases = (
+				D0F4D8F82B1568B500948122 /* [CP] Check Pods Manifest.lock */,
+				D0F4D8F92B1568B500948122 /* Resources */,
+				D0F4D9A12B1568B500948122 /* Run Script (convert models) */,
+				D0F4D9A22B1568B500948122 /* Sources */,
+				D0F4D9C42B1568B500948122 /* Frameworks */,
+				D0F4D9CE2B1568B500948122 /* Embed Frameworks */,
+				D0F4D9CF2B1568B500948122 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = gl_flight_debug;
+			productName = gl_flight;
+			productReference = D0F4D9D32B1568B500948122 /* gl_flight_debug.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -936,6 +1195,10 @@
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
 					1D6058900D05DD3D006BFB54 = {
+						DevelopmentTeam = ZQVH66AQJ9;
+						ProvisioningStyle = Automatic;
+					};
+					D0F4D8F72B1568B500948122 = {
 						DevelopmentTeam = ZQVH66AQJ9;
 						ProvisioningStyle = Automatic;
 					};
@@ -957,6 +1220,7 @@
 			projectRoot = "";
 			targets = (
 				1D6058900D05DD3D006BFB54 /* gl_flight */,
+				D0F4D8F72B1568B500948122 /* gl_flight_debug */,
 			);
 		};
 /* End PBXProject section */
@@ -1136,6 +1400,180 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D0F4D8F92B1568B500948122 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0F4D8FA2B1568B500948122 /* texture50.bmp in Resources */,
+				D0F4D8FB2B1568B500948122 /* Shader.fsh in Resources */,
+				D0F4D8FC2B1568B500948122 /* texture110.bmp in Resources */,
+				D0F4D8FD2B1568B500948122 /* Shader.vsh in Resources */,
+				D0F4D8FE2B1568B500948122 /* MainWindow.xib in Resources */,
+				D0F4D8FF2B1568B500948122 /* texture88.bmp in Resources */,
+				D0F4D9002B1568B500948122 /* texture55.bmp in Resources */,
+				D0F4D9012B1568B500948122 /* texture83.bmp in Resources */,
+				D0F4D9022B1568B500948122 /* texture0.bmp in Resources */,
+				D0F4D9032B1568B500948122 /* texture92.bmp in Resources */,
+				D0F4D9042B1568B500948122 /* texture85.bmp in Resources */,
+				D0F4D9052B1568B500948122 /* texture93.bmp in Resources */,
+				D0F4D9062B1568B500948122 /* texture79.bmp in Resources */,
+				D0F4D9072B1568B500948122 /* texture1.bmp in Resources */,
+				D0F4D9082B1568B500948122 /* texture30.bmp in Resources */,
+				D0F4D9092B1568B500948122 /* texture2.bmp in Resources */,
+				D0F4D90A2B1568B500948122 /* texture31.bmp in Resources */,
+				D0F4D90B2B1568B500948122 /* texture3.bmp in Resources */,
+				D0F4D90C2B1568B500948122 /* towing.wav in Resources */,
+				D0F4D90D2B1568B500948122 /* texture68.bmp in Resources */,
+				D0F4D90E2B1568B500948122 /* texture96.bmp in Resources */,
+				D0F4D90F2B1568B500948122 /* texture99.bmp in Resources */,
+				D0F4D9102B1568B500948122 /* texture113.bmp in Resources */,
+				D0F4D9112B1568B500948122 /* texture4.bmp in Resources */,
+				D0F4D9122B1568B500948122 /* texture58.bmp in Resources */,
+				D0F4D9132B1568B500948122 /* texture90.bmp in Resources */,
+				D0F4D9142B1568B500948122 /* texture72.bmp in Resources */,
+				D0F4D9152B1568B500948122 /* filelost.wav in Resources */,
+				D0F4D9162B1568B500948122 /* texture60.bmp in Resources */,
+				D0F4D9172B1568B500948122 /* texture114.bmp in Resources */,
+				D0F4D9182B1568B500948122 /* texture6.bmp in Resources */,
+				D0F4D9192B1568B500948122 /* texture7.bmp in Resources */,
+				D0F4D91A2B1568B500948122 /* texture5.bmp in Resources */,
+				D0F4D91B2B1568B500948122 /* GoogleService-Info.plist in Resources */,
+				D0F4D91C2B1568B500948122 /* app_icon_lg_prev.jpg in Resources */,
+				D0F4D91D2B1568B500948122 /* texture8.bmp in Resources */,
+				D0F4D91E2B1568B500948122 /* texture9.bmp in Resources */,
+				D0F4D91F2B1568B500948122 /* texture64.bmp in Resources */,
+				D0F4D9202B1568B500948122 /* shoot.wav in Resources */,
+				D0F4D9212B1568B500948122 /* texture63.bmp in Resources */,
+				D0F4D9222B1568B500948122 /* boom.wav in Resources */,
+				D0F4D9232B1568B500948122 /* app_icon152x152.png in Resources */,
+				D0F4D9242B1568B500948122 /* app_icon114x114.png in Resources */,
+				D0F4D9252B1568B500948122 /* texture48.bmp in Resources */,
+				D0F4D9262B1568B500948122 /* texture107.bmp in Resources */,
+				D0F4D9272B1568B500948122 /* texture104.bmp in Resources */,
+				D0F4D9282B1568B500948122 /* fontmap.bmp in Resources */,
+				D0F4D9292B1568B500948122 /* texture10.bmp in Resources */,
+				D0F4D92A2B1568B500948122 /* texture11.bmp in Resources */,
+				D0F4D92B2B1568B500948122 /* texture81.bmp in Resources */,
+				D0F4D92C2B1568B500948122 /* texture49.bmp in Resources */,
+				D0F4D92D2B1568B500948122 /* texture12.bmp in Resources */,
+				D0F4D92E2B1568B500948122 /* teleport.wav in Resources */,
+				D0F4D92F2B1568B500948122 /* texture13.bmp in Resources */,
+				D0F4D9302B1568B500948122 /* texture94.bmp in Resources */,
+				D0F4D9312B1568B500948122 /* texture53.bmp in Resources */,
+				D0F4D9322B1568B500948122 /* texture14.bmp in Resources */,
+				D0F4D9332B1568B500948122 /* texture15.bmp in Resources */,
+				D0F4D9342B1568B500948122 /* texture70.bmp in Resources */,
+				D0F4D9352B1568B500948122 /* texture17.bmp in Resources */,
+				D0F4D9362B1568B500948122 /* flyby.wav in Resources */,
+				D0F4D9372B1568B500948122 /* LaunchScreen.xib in Resources */,
+				D0F4D9382B1568B500948122 /* texture18.bmp in Resources */,
+				D0F4D9392B1568B500948122 /* texture98.bmp in Resources */,
+				D0F4D93A2B1568B500948122 /* highscore.wav in Resources */,
+				D0F4D93B2B1568B500948122 /* texture19.bmp in Resources */,
+				D0F4D93C2B1568B500948122 /* shipicon.png in Resources */,
+				D0F4D93D2B1568B500948122 /* greenhex.bmp in Resources */,
+				D0F4D93E2B1568B500948122 /* Settings.bundle in Resources */,
+				D0F4D93F2B1568B500948122 /* texture89.bmp in Resources */,
+				D0F4D9402B1568B500948122 /* texture20.bmp in Resources */,
+				D0F4D9412B1568B500948122 /* texture21.bmp in Resources */,
+				D0F4D9422B1568B500948122 /* app_icon_64x64.png in Resources */,
+				D0F4D9432B1568B500948122 /* texture76.bmp in Resources */,
+				D0F4D9442B1568B500948122 /* texture22.bmp in Resources */,
+				D0F4D9452B1568B500948122 /* engineloop.wav in Resources */,
+				D0F4D9462B1568B500948122 /* dead.wav in Resources */,
+				D0F4D9472B1568B500948122 /* app_icon57x57.png in Resources */,
+				D0F4D9482B1568B500948122 /* texture25.bmp in Resources */,
+				D0F4D9492B1568B500948122 /* texture51.bmp in Resources */,
+				D0F4D94A2B1568B500948122 /* texture74.bmp in Resources */,
+				D0F4D94B2B1568B500948122 /* texture73.bmp in Resources */,
+				D0F4D94C2B1568B500948122 /* texture112.bmp in Resources */,
+				D0F4D94D2B1568B500948122 /* texture69.bmp in Resources */,
+				D0F4D94E2B1568B500948122 /* texture54.bmp in Resources */,
+				D0F4D94F2B1568B500948122 /* texture57.bmp in Resources */,
+				D0F4D9502B1568B500948122 /* texture26.bmp in Resources */,
+				D0F4D9512B1568B500948122 /* enemydead.wav in Resources */,
+				D0F4D9522B1568B500948122 /* enginefast.wav in Resources */,
+				D0F4D9532B1568B500948122 /* texture24.bmp in Resources */,
+				D0F4D9542B1568B500948122 /* texture80.bmp in Resources */,
+				D0F4D9552B1568B500948122 /* texture27.bmp in Resources */,
+				D0F4D9562B1568B500948122 /* texture62.bmp in Resources */,
+				D0F4D9572B1568B500948122 /* texture101.bmp in Resources */,
+				D0F4D9582B1568B500948122 /* texture59.bmp in Resources */,
+				D0F4D9592B1568B500948122 /* texture109.bmp in Resources */,
+				D0F4D95A2B1568B500948122 /* texture52.bmp in Resources */,
+				D0F4D95B2B1568B500948122 /* warning.wav in Resources */,
+				D0F4D95C2B1568B500948122 /* texture34.bmp in Resources */,
+				D0F4D95D2B1568B500948122 /* texture33.bmp in Resources */,
+				D0F4D95E2B1568B500948122 /* texture35.bmp in Resources */,
+				D0F4D95F2B1568B500948122 /* Default-568h@2x.png in Resources */,
+				D0F4D9602B1568B500948122 /* app_icon76x76.png in Resources */,
+				D0F4D9612B1568B500948122 /* Default2.png in Resources */,
+				D0F4D9622B1568B500948122 /* texture37.bmp in Resources */,
+				D0F4D9632B1568B500948122 /* engineslow.wav in Resources */,
+				D0F4D9642B1568B500948122 /* texture108.bmp in Resources */,
+				D0F4D9652B1568B500948122 /* texture116.bmp in Resources */,
+				D0F4D9662B1568B500948122 /* texture38.bmp in Resources */,
+				D0F4D9672B1568B500948122 /* texture36.bmp in Resources */,
+				D0F4D9682B1568B500948122 /* texture16.bmp in Resources */,
+				D0F4D9692B1568B500948122 /* texture23.bmp in Resources */,
+				D0F4D96A2B1568B500948122 /* texture28.bmp in Resources */,
+				D0F4D96B2B1568B500948122 /* texture84.bmp in Resources */,
+				D0F4D96C2B1568B500948122 /* texture86.bmp in Resources */,
+				D0F4D96D2B1568B500948122 /* texture65.bmp in Resources */,
+				D0F4D96E2B1568B500948122 /* texture40.bmp in Resources */,
+				D0F4D96F2B1568B500948122 /* app_icon120x120_orig.png in Resources */,
+				D0F4D9702B1568B500948122 /* engine.wav in Resources */,
+				D0F4D9712B1568B500948122 /* texture78.bmp in Resources */,
+				D0F4D9722B1568B500948122 /* missle.wav in Resources */,
+				D0F4D9732B1568B500948122 /* engine2.wav in Resources */,
+				D0F4D9742B1568B500948122 /* texture97.bmp in Resources */,
+				D0F4D9752B1568B500948122 /* texture100.bmp in Resources */,
+				D0F4D9762B1568B500948122 /* texture91.bmp in Resources */,
+				D0F4D9772B1568B500948122 /* bump.wav in Resources */,
+				D0F4D9782B1568B500948122 /* collect.wav in Resources */,
+				D0F4D9792B1568B500948122 /* dropoff.wav in Resources */,
+				D0F4D97A2B1568B500948122 /* texture39.bmp in Resources */,
+				D0F4D97B2B1568B500948122 /* texture103.bmp in Resources */,
+				D0F4D97C2B1568B500948122 /* Default-Landscape.png in Resources */,
+				D0F4D97D2B1568B500948122 /* texture41.bmp in Resources */,
+				D0F4D97E2B1568B500948122 /* Default@2x.png in Resources */,
+				D0F4D97F2B1568B500948122 /* texture75.bmp in Resources */,
+				D0F4D9802B1568B500948122 /* texture102.bmp in Resources */,
+				D0F4D9812B1568B500948122 /* Default.png in Resources */,
+				D0F4D9822B1568B500948122 /* texture106.bmp in Resources */,
+				D0F4D9832B1568B500948122 /* texture56.bmp in Resources */,
+				D0F4D9842B1568B500948122 /* texture105.bmp in Resources */,
+				D0F4D9852B1568B500948122 /* texture66.bmp in Resources */,
+				D0F4D9862B1568B500948122 /* texture29.bmp in Resources */,
+				D0F4D9872B1568B500948122 /* screenshot1.jpg in Resources */,
+				D0F4D9882B1568B500948122 /* screenshot2.jpg in Resources */,
+				D0F4D9892B1568B500948122 /* speedboost.wav in Resources */,
+				D0F4D98A2B1568B500948122 /* texture111.bmp in Resources */,
+				D0F4D98B2B1568B500948122 /* texture42.bmp in Resources */,
+				D0F4D98C2B1568B500948122 /* texture82.bmp in Resources */,
+				D0F4D98D2B1568B500948122 /* texture43.bmp in Resources */,
+				D0F4D98E2B1568B500948122 /* texture115.bmp in Resources */,
+				D0F4D98F2B1568B500948122 /* texture44.bmp in Resources */,
+				D0F4D9902B1568B500948122 /* texture95.bmp in Resources */,
+				D0F4D9912B1568B500948122 /* texture45.bmp in Resources */,
+				D0F4D9922B1568B500948122 /* texture46.bmp in Resources */,
+				D0F4D9932B1568B500948122 /* texture67.bmp in Resources */,
+				D0F4D9942B1568B500948122 /* texture61.bmp in Resources */,
+				D0F4D9952B1568B500948122 /* Media.xcassets in Resources */,
+				D0F4D9962B1568B500948122 /* texture47.bmp in Resources */,
+				D0F4D9972B1568B500948122 /* menubeep.wav in Resources */,
+				D0F4D9982B1568B500948122 /* lockedon.wav in Resources */,
+				D0F4D9992B1568B500948122 /* texture32.bmp in Resources */,
+				D0F4D99A2B1568B500948122 /* texture71.bmp in Resources */,
+				D0F4D99B2B1568B500948122 /* texture77.bmp in Resources */,
+				D0F4D99C2B1568B500948122 /* victory.wav in Resources */,
+				D0F4D99D2B1568B500948122 /* texture87.bmp in Resources */,
+				D0F4D99E2B1568B500948122 /* MainWindow-iPad.xib in Resources */,
+				D0F4D99F2B1568B500948122 /* app_icon120x120.png in Resources */,
+				D0F4D9A02B1568B500948122 /* app_icon72x72.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -1207,6 +1645,74 @@
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython3 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython3 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\npython3 tools/objconvert.py building3 models/building3.obj > Classes/building3_model.h;\n";
 		};
+		D0F4D8F82B1568B500948122 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-gl_flight-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D0F4D9A12B1568B500948122 /* Run Script (convert models) */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script (convert models)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython3 tools/objconvert.py newship models/newship.obj > Classes/model_newship.h;\npython3 tools/objconvert.py building2 models/building2.obj > Classes/building2_model.h;\npython3 tools/objconvert.py building3 models/building3.obj > Classes/building3_model.h;\n";
+		};
+		D0F4D9CF2B1568B500948122 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-gl_flight/Pods-gl_flight-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/FirebaseCore/FirebaseCore.framework",
+				"${BUILT_PRODUCTS_DIR}/FirebaseCoreInternal/FirebaseCoreInternal.framework",
+				"${BUILT_PRODUCTS_DIR}/FirebaseInstallations/FirebaseInstallations.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/PromisesObjC/FBLPromises.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FirebaseCore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FirebaseCoreInternal.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FirebaseInstallations.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-gl_flight/Pods-gl_flight-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1219,7 +1725,6 @@
 				D02B8F171964D67700830369 /* cocoaGameInput.m in Sources */,
 				D05AEDA521FD5F4800692833 /* glFlightGLKViewController.m in Sources */,
 				D0C3743E193EC5FC000C2915 /* textures.c in Sources */,
-				D0CF62B714A919D600E08151 /* object.m in Sources */,
 				D077557E152588C800DF2E0B /* quaternions.c in Sources */,
 				D02B8F1A1964D7D700830369 /* gameInput.c in Sources */,
 				6DD6C315157422AD00BF3305 /* gameInterface.c in Sources */,
@@ -1251,6 +1756,46 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D0F4D9A22B1568B500948122 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0F4D9A32B1568B500948122 /* main.m in Sources */,
+				D0F4D9A42B1568B500948122 /* gl_flightAppDelegate.m in Sources */,
+				D0F4D9A52B1568B500948122 /* cocoaGameInput.m in Sources */,
+				D0F4D9A62B1568B500948122 /* glFlightGLKViewController.m in Sources */,
+				D0F4D9A72B1568B500948122 /* textures.c in Sources */,
+				D0F4D9A82B1568B500948122 /* quaternions.c in Sources */,
+				D0F4D9A92B1568B500948122 /* gameInput.c in Sources */,
+				D0F4D9AA2B1568B500948122 /* gameInterface.c in Sources */,
+				D0F4D9AB2B1568B500948122 /* gameMotionInterp.c in Sources */,
+				D0F4D9AC2B1568B500948122 /* gameDialogs.c in Sources */,
+				D0F4D9AD2B1568B500948122 /* gameCamera.c in Sources */,
+				D0F4D9AE2B1568B500948122 /* mapgenerated.c in Sources */,
+				D0F4D9AF2B1568B500948122 /* gameUtils.c in Sources */,
+				D0F4D9B02B1568B500948122 /* worldElem.c in Sources */,
+				D0F4D9B12B1568B500948122 /* framebuffer.c in Sources */,
+				D0F4D9B22B1568B500948122 /* gameShip.c in Sources */,
+				D0F4D9B32B1568B500948122 /* mesh.c in Sources */,
+				D0F4D9B42B1568B500948122 /* gameSettings.c in Sources */,
+				D0F4D9B52B1568B500948122 /* world_file.c in Sources */,
+				D0F4D9B62B1568B500948122 /* gameNetwork.c in Sources */,
+				D0F4D9B72B1568B500948122 /* world.c in Sources */,
+				D0F4D9B82B1568B500948122 /* GameNetworkBonjourManager.m in Sources */,
+				D0F4D9B92B1568B500948122 /* cocoaGameAudio.m in Sources */,
+				D0F4D9BA2B1568B500948122 /* gameAudio.c in Sources */,
+				D0F4D9BB2B1568B500948122 /* gameBounding.c in Sources */,
+				D0F4D9BC2B1568B500948122 /* cocoaAudioThread.m in Sources */,
+				D0F4D9BD2B1568B500948122 /* glFlight.c in Sources */,
+				D0F4D9BE2B1568B500948122 /* gameGraphics.c in Sources */,
+				D0F4D9BF2B1568B500948122 /* gameTests.c in Sources */,
+				D0F4D9C02B1568B500948122 /* gamePlay.c in Sources */,
+				D0F4D9C12B1568B500948122 /* gameAI.c in Sources */,
+				D0F4D9C22B1568B500948122 /* collision.c in Sources */,
+				D0F4D9C32B1568B500948122 /* actions.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
@@ -1278,13 +1823,17 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "gl_flight-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MARKETING_VERSION = 1.10.2;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR/Firebase;
 				VALID_ARCHS = "arm64 arm64e armv7 arm7s x86_64";
@@ -1312,13 +1861,17 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "gl_flight-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MARKETING_VERSION = 1.10.2;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR/Firebase;
 				VALIDATE_PRODUCT = YES;
@@ -1355,7 +1908,6 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					DEBUG,
 					GAME_PLATFORM_IOS,
 					DEVICEMOTION_USE_GYRO_DATA,
 				);
@@ -1433,6 +1985,103 @@
 			};
 			name = Release;
 		};
+		D0F4D9D12B1568B500948122 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7DC329340B541AFE5F822D0E /* Pods-gl_flight.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = ZQVH66AQJ9;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = gl_flight_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					DEBUG,
+					"$(inherited)",
+					"COCOAPODS=1",
+					"$(inherited)",
+					"PB_FIELD_32BIT=1",
+					"PB_NO_PACKED_STRUCTS=1",
+					"PB_ENABLE_MALLOC=1",
+				);
+				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "gl_flight copy2-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MARKETING_VERSION = 1.9.1;
+				OTHER_LDFLAGS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR/Firebase;
+				VALID_ARCHS = "arm64 arm64e armv7 arm7s x86_64";
+			};
+			name = Debug;
+		};
+		D0F4D9D22B1568B500948122 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A9D011A81240F92C49698C65 /* Pods-gl_flight.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = ZQVH66AQJ9;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = gl_flight_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					DEBUG,
+					"$(inherited)",
+					"COCOAPODS=1",
+					"$(inherited)",
+					"PB_FIELD_32BIT=1",
+					"PB_NO_PACKED_STRUCTS=1",
+					"PB_ENABLE_MALLOC=1",
+				);
+				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "gl_flight copy2-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MARKETING_VERSION = 1.9.1;
+				OTHER_LDFLAGS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR/Firebase;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1450,6 +2099,15 @@
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
 				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D0F4D9D02B1568B500948122 /* Build configuration list for PBXNativeTarget "gl_flight_debug" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D0F4D9D12B1568B500948122 /* Debug */,
+				D0F4D9D22B1568B500948122 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

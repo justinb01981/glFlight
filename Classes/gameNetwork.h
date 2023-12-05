@@ -15,7 +15,6 @@
 #define GAME_NETWORK_MAX_PLAYERS 64
 #define GAME_NETWORK_MAX_STRING_LEN 128
 #define GAME_NETWORK_MAX_MAP_STRING_LEN 256
-//#define GAME_NETWORK_PORT 52000
 #define GAME_NETWORK_PORT_BONJOUR 52010
 #define GAME_NETWORK_PLAYER_ID_HOST 16000
 #define GAME_NETWORK_PLAYER_ID_MAX (GAME_NETWORK_PLAYER_ID_HOST-1)
@@ -24,12 +23,12 @@
 #define GAME_NETWORK_ADDRESS_FAMILY(x) (((struct sockaddr_in6*) (x)->storage)->sin6_family)
 #define GAME_NETWORK_ADDRESS_INADDR(x) (((struct sockaddr_in6*) (x)->storage)->sin6_addr)
 #define GAME_NETWORK_ADDRESS_PORT(x) (((struct sockaddr_in6*) (x)->storage)->sin6_port)
-#define GAME_NETWORK_ADDRESS_LEN_CORRECT(x) ((x)->len == sizeof(struct sockaddr_in6))
+//#define GAME_NETWORK_ADDRESS_LEN_CORRECT(x) ((x)->len == sizeof(struct sockaddr_in6))
 #define GAME_NETWORK_ADDRESS_ISEQUAL(x, y) (memcmp((x)->storage, (y)->storage, (x)->len) == 0)
 #define GAME_NETWORK_BONJOUR_ADDRFAMILY_HACK 0x09
 #define GAME_NETWORK_MAP_REQUEST_WINDOW_LEN (GAME_NETWORK_MAX_MAP_STRING_LEN * 1)
 #define GAME_NETWORK_HOST_PORTAL_NAME "*host*"
-#define GAME_NETWORK_READ_THREAD_IDLE_USLEEP_INTERVAL (100000)
+#define GAME_NETWORK_READ_THREAD_IDLE_USLEEP_INTERVAL (10000)
 #define MESSAGES_SIGNAL_MAX (256)
 
 //const static char *GAME_NETWORK_LAN_GAME_NAME = "d0gf1ght_lan";

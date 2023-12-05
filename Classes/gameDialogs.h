@@ -117,7 +117,7 @@ gameDialogWelcomeMenu()
     gameInterfaceControls.textMenuControl.visible = 1;
 }
 
-static void gameDialogWelcome();
+static void gameDialogWelcome(void);
 
 static void
 gameDialogRating()
@@ -473,7 +473,7 @@ gameDialogStartNetworkGame2()
 static void
 gameDialogStartNetworkGameWait()
 {
-    gameInterfaceModalDialog("Waiting for guests\nTap when everyone has\njoined, and 5 min game\nwill start...", "", "",
+    gameInterfaceModalDialog("[WAITING FOR GUESTS]\nOK when everyone has\njoined\n300sec/game\n  [CANCEL]  to wait\n", "", "",
                              gameDialogStartNetworkGame2, gameDialogCancelNetworkWaiting);
 }
 
@@ -615,16 +615,22 @@ gameDialogCancelString()
 }
 
 static void
-gameDialogScores()
+gameDialogScores(void)
 {
     static char gameDialogScoresString[1024];
     
-    sprintf(gameDialogScoresString, "firewall:%d\nSurvival:%d\nDefend:%d\nDeathmatch:%d\nTurret:%d\n",
-            gameStateSinglePlayer.high_score[GAME_TYPE_COLLECT],
-            gameStateSinglePlayer.high_score[GAME_TYPE_SURVIVAL],
-            gameStateSinglePlayer.high_score[GAME_TYPE_DEFEND],
-            gameStateSinglePlayer.high_score[GAME_TYPE_DEATHMATCH],
-            gameStateSinglePlayer.high_score[GAME_TYPE_TURRET]);
+    sprintf(gameDialogScoresString, "firewall:%d"
+            //"\nSurvival:%d"
+            //"\nDefend:%d"
+            "\nDeathmatch:%d"
+//            "\nTurret:%d\n",
+            ,
+            gameStateSinglePlayer.high_score[GAME_TYPE_COLLECT]
+//            ,gameStateSinglePlayer.high_score[GAME_TYPE_SURVIVAL]
+//            ,gameStateSinglePlayer.high_score[GAME_TYPE_DEFEND]
+            ,gameStateSinglePlayer.high_score[GAME_TYPE_DEATHMATCH]
+//            ,gameStateSinglePlayer.high_score[GAME_TYPE_TURRET]
+            );
     
     gameInterfaceModalDialog(gameDialogScoresString,
                              "OK", "OK",

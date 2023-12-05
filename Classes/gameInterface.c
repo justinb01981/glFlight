@@ -40,7 +40,7 @@ const char *charMap = "abcdefghijklmnopqrstuvwxyz0123456789. _-@!$%^&*";
 // variables scoped for fireAction menu handling
 unsigned int maps_list_idx = 0;
 int game_map_custom_loaded = 0;
-int game_start_difficulty = 2;
+int game_start_difficulty = 8;
 int game_start_score = 0;
 
 static void trimThenHideCalibrateRect(void)
@@ -113,7 +113,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
      */
     gameInterfaceControls.textMenuButton = actionRect;
     gameInterfaceControls.textMenuButton.tex_id = TEXTURE_ID_CONTROLS_MENUBUTTON;
-    gameInterfaceControls.textMenuButton.visible = 0;
+    gameInterfaceControls.textMenuButton.visible = 1;
     
     gameInterfaceControls.accelIndicator = accelRect;
     gameInterfaceControls.accelIndicator.xw = 10;
@@ -385,7 +385,7 @@ gameInterfaceHandleTouchMove(float x, float y)
     else if(touchedControl == &gameInterfaceControls.trim)
     {
         gameInputTrimBegin(trimThenHideCalibrateRect);
-        gyro_calibrate_log(100);
+//        gyro_calibrate_log(100);
         gameInterfaceControls.trim.blinking = 0;
         gameInterfaceControls.calibrateRect.visible = 1;
     }

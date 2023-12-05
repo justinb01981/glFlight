@@ -35,8 +35,15 @@ void dbtrace(const char* x, int y) { __android_log_print(ANDROID_LOG_DEBUG, "LOG
 void dbtracelog(const char* x, int y, const char* s) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d %s\n", x, y, s); }
 
 extern void update_time_ms_frame_tick();
+extern void (*trimDoneCallback)(void);
 
 #include "game/glFlight.h"
+
+// globals
+double sumroll, sumpitch, sumyaw, sumrolloff, sumpitchoff, sumyawoff;
+game_timeval_t sensorInputNext = 0;
+float trimRoll, trimPitch, trimYaw;
+char glFlightDefaultPlayerName_[256];
 
 static int
 env_float_copy(JNIEnv* e, jfloatArray arr, float dest[])
@@ -69,6 +76,7 @@ std::map<int,int> touchIDMap;
 int touchStateTouchCount = 0;
 
 static char settingsPath[255];
+static char glFlightDefaultGameName_[256];
 
 inline static const char*
 glFlightSettingsPath()
@@ -80,7 +88,7 @@ glFlightSettingsPath()
 inline static const char*
 glFlightDefaultGameName()
 {
-	static char glFlightDefaultGameName_[256];
+
 
 	sprintf(glFlightDefaultGameName_, "android%d", rand() % 1024);
 	return glFlightDefaultGameName_;
@@ -89,8 +97,6 @@ glFlightDefaultGameName()
 inline static const char*
 glFlightDefaultPlayerName()
 {
-	static char glFlightDefaultPlayerName_[256];
-
 	sprintf(glFlightDefaultPlayerName_, "player%d", rand() % 1024);
 	return glFlightDefaultPlayerName_;
 }
@@ -116,6 +122,9 @@ glFlightJNIInit()
 	{
 		gameSettingsDefaults();
 	}
+
+	// TODO: hack!
+	gameSettingsPortNumber = 52000;
 
 	game_ai_init();
 
@@ -158,32 +167,29 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 JNIEXPORT
 void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceCreated(JNIEnv *e, jobject o)
 {
+	// surface doesnt have bounds yet
 }
+
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(JNIEnv *e, jobject o, jfloatArray arr)
 {
+	// surface bounds have changed and we can init
+
 	float f[16];
 	int l = env_float_copy(e, arr, f);
 
 	viewWidth = f[0]*xscale;
 	viewHeight = f[1]*yscale;
 
-	DBPRINTF(("Java_com_example_glflight_GameRenderer_onSurfaceChanged: "
-			"viewWidth:%f",
-			viewWidth));
-	DBPRINTF(("Java_com_example_glflight_GameRenderer_onSurfaceChanged: "
-			"viewHeight:%f",
-			viewHeight));
+	if(viewWidth == 0 || viewHeight == 0) return;
 
-    // complete
-    if(!glFlightInited && viewWidth > 0 && viewHeight > 0)
-    {
-        DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
+	DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
 
-        glFlightJNIInit();
+	assert(!glFlightInited);
+	
+	glFlightJNIInit();
 
-		glFlightInited = true;
-    }
+	glFlightInited = true;
 }
 
 static game_timeval_t gameInputTimeLast = 0;
@@ -192,6 +198,7 @@ static game_timeval_t gameDrawTimeLast = 0;
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jobject o)
 {
     // TODO: draw a 'wait...loading' status string each frame until load
+	if(!glFlightInited) return;
 
 	if(time_ms_wall - gameInputTimeLast >= (1000/GYRO_SAMPLE_RATE))
 	{
@@ -280,7 +287,6 @@ JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAu
 		gameAudioUnlock();
 	}
 
-	/* TODO: leak here? */
 	jstring s = e->NewStringUTF(audioStr);
     return s;
 }
@@ -288,40 +294,49 @@ JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAu
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInput(JNIEnv *e, jobject o, jfloatArray arr)
 {
 	float jf[16];
-	static game_timeval_t sensorInputLast = 0;
-	static float trimRoll, trimPitch, trimYaw;
 
 	int l = env_float_copy(e, arr, jf);
 
-	/* based off the inputs in landscape mode on my nexus 7... */
-	float roll = -jf[2];
-	float pitch = -jf[1];
-	float yaw = -jf[0];
+	// see FullScreenActivity.java
+
+    sumroll = sumrolloff - jf[0];
+    sumpitch = sumpitchoff - jf[2];
+    sumyaw = sumyawoff - jf[1];
 
 	if(!glFlightInited) return;
 
-	/*
-	if(gameInputTrimPending())
+	if(needTrim && trimDoneCallback)
 	{
-		trimRoll = roll;
-		trimPitch = pitch;
-		trimYaw = yaw;
-		gameInputGyro(roll, pitch, yaw);
-	}
-	*/
+		sumrolloff = jf[0];
+		sumpitchoff = jf[2];
+		sumyawoff = jf[1];
 
-	if(time_ms - sensorInputLast >= 1000/PLATFORM_TICK_RATE)
-	{
-		gameInputGyro2(roll, pitch, yaw);
-		sensorInputLast = time_ms;
+        needTrim = 0;
+
+		trimDoneCallback();
+
+		return;
 	}
 
-	gameInputMotion(roll, pitch, yaw);
+	if(time_ms >= sensorInputNext)
+    {
+		if(time_ms - sensorInputNext > 1000) {
+			sensorInputNext = time_ms;
+			return;
+		}
+
+        // Z reversed
+//		gameInputGyro(-sumroll, sumyaw, -sumpitch);
+		gameInputGyro(-sumroll, sumpitch, -sumyaw);
+		sensorInputNext += 1000 / PLATFORM_TICK_RATE;
+	}
+
+	//gameInputMotion(sumroll, sumpitch, sumyaw);
 }
 
 JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorNeedsCalibrate(JNIEnv *e, jobject o)
 {
-	return 0;
+	return needTrim;
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInput(JNIEnv *e, jobject o, jfloatArray arr)

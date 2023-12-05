@@ -13,7 +13,7 @@
 int
 run_network_sanity()
 {
-#if DEBUG
+#ifdef DEBUG
     int original_val = 65535;
     
     gameNetworkMessage msg;
