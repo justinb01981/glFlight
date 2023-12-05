@@ -12,6 +12,7 @@
 #include <limits.h>
 #include <stdlib.h>
 
+#include "boolean.h"
 #include "world.h"
 #include "quaternions.h"
 #include "gameAudio.h"
@@ -51,7 +52,7 @@ game_lock_t gWorldLock;
 float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
 float C_FRICTION = /*0.04*/ 0.030; // higher values = more friction
 float GYRO_FEEDBACK = 0;
-float GYRO_DC = 3;
+float GYRO_DC = 1.0;
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
 
 static struct mesh_t* world_pending_mesh = NULL;
@@ -503,6 +504,10 @@ world_add_object_core(Model type,
             
             model_normals = model_cube_normals;
             model_normals_sizeof = sizeof(model_cube_normals) / sizeof(model_coord_t);
+            break;
+
+        case MODEL_FIRST:
+            assert(0);
             break;
             
         default:
@@ -1492,7 +1497,7 @@ world_move_elem(WorldElem* pElem, float x, float y, float z, int relative)
 }
 
 void
-world_repulse_elem(WorldElem* pCollisionA, WorldElem* pCollisionB, float tc, float Frepulse)
+world_repulse_elem(WorldElem* pCollisionB, WorldElem* pCollisionA, float tc, float Frepulse)
 {
     float mv[3];
     int i;
@@ -1771,18 +1776,38 @@ world_update_elem_removed_hook(WorldElem* pElem)
     world_update_state_t *state = &gWorld->world_update_state;
     if(!state->world_region_iterate_cur) return;
 
-    WorldElemListNode *tmp = state->world_region_iterate_cur->elem, *next = tmp->next;
-
-    if(tmp && tmp->elem == pElem)
+    if(state->world_region_iterate_cur && state->world_region_iterate_cur->elem == pElem)
     {
-        // our position in the list was invalidated
-        state->world_region_iterate_cur = next;
+        // our position in the list was invalidated (previously changed iterate_cur to *next but this MIGHT not be optimal?
+        state->world_region_iterate_cur = state->world_region_iterate_cur->next;
+        if(!state->world_region_iterate_cur) state->world_region_iterate_cur = state->world_region_iterate_retry_head;
     }
     
     if(state->ptr_objects_moving && state->ptr_objects_moving->elem == pElem)
     {
-        state->ptr_objects_moving = NULL;
+        state->ptr_objects_moving = state->ptr_objects_moving->next;
+        if(!state->ptr_objects_moving) state->ptr_objects_moving = gWorld->elements_moving.next;   // reset back to moving elements head
     }
+}
+
+static BOOL updatefilterPass1Objects(WorldElem* e)
+{
+    if (e->object_type == OBJ_BULLET) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static BOOL updatefilterPass2Objects(WorldElem* e)
+{
+    return TRUE;
+    /*
+    if (e->object_type != OBJ_BULLET) {
+        return TRUE;
+    }
+    return FALSE;
+     */
+
 }
 
 void
@@ -1791,340 +1816,351 @@ world_update(float tc)
     // TODO: for meshes test collision by checking if object is < plane-normal vector
     int do_check_collisions = 1;
     int do_sound_checks = 1;
-    float FRdiv = 64;
     // HACK: -- apply min velocity "wobble back/forth"
     float Fmin = 0.01 * (tex_pass % 2) - 1;
     int iF;
-    WorldElemListNode* pOOBListElem = NULL;
+     // out-of-bounds
+
+
+    typedef  BOOL (*FilterCallback)(WorldElem*);
+    FilterCallback filters[] = {updatefilterPass1Objects, updatefilterPass2Objects, NULL};
+    int i;
+
     
     WorldElemListNode* pCur = gWorld->elements_moving.next;
     
     // TODO: first apply boundary enforcement, THEN iterate moving objects again and apply collision
     
     gWorld->world_update_state.world_remove_hook = world_update_elem_removed_hook;
-    
-    gWorld->world_update_state.ptr_objects_moving = &gWorld->elements_moving;
-    while(gWorld->world_update_state.ptr_objects_moving && gWorld->world_update_state.ptr_objects_moving->next)
+
+    WorldElemListNode* pListFiltHeadRetry = &gWorld->elements_moving;
+
+    for (i = 0; filters[i] != NULL; i++)
     {
-        WorldElem* pElem;
-        
-        if(gWorld->world_update_state.ptr_objects_moving) gWorld->world_update_state.ptr_objects_moving = gWorld->world_update_state.ptr_objects_moving->next;
-        
-        if(pOOBListElem)
+        WorldElemListNode* pOOBListElem = NULL;
+
+        gWorld->world_update_state.ptr_objects_moving = pListFiltHeadRetry;
+
+        while(gWorld->world_update_state.ptr_objects_moving->next)
         {
-            world_elem_list_remove(pOOBListElem->elem, &gWorld->elements_moving);
-            pOOBListElem = NULL;
-        }
-        
-        //remove_retry:
-        
-        pElem = gWorld->world_update_state.ptr_objects_moving->elem;
-        
-        if(!pElem->head_elem) // not a child elem
-        {
-#if 0
-            float* pFloatCheckIsNan[] = {
-                &pElem->physics.ptr->vx,
-                &pElem->physics.ptr->vy,
-                &pElem->physics.ptr->vz
-            };
-            for(iF = 0; iF < sizeof(pFloatCheckIsNan)/sizeof(float*); iF++)
+            WorldElem* pElem;
+
+            if(gWorld->world_update_state.ptr_objects_moving) gWorld->world_update_state.ptr_objects_moving = gWorld->world_update_state.ptr_objects_moving->next;
+
+            if(pOOBListElem)    // remove out of bounds elem
             {
-                if(isnan(*pFloatCheckIsNan[iF]))
-                {
-                    // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
-                    *pFloatCheckIsNan[iF] = 0;
-                    printf("isnan: %p\n", pElem);
-                }
+                world_elem_list_remove(pOOBListElem->elem, &gWorld->elements_moving);
+                pOOBListElem = NULL;
             }
-#endif
-            
-            if(pElem->physics.ptr->vx != 0 || pElem->physics.ptr->vy+Fmin != 0 || pElem->physics.ptr->vz != 0 || pElem->physics.ptr->gravity)
+
+            pElem = gWorld->world_update_state.ptr_objects_moving->elem;
+
+            if( !filters[i](pElem) )
             {
-                int out_of_bounds_remove = 0;
-                
-                if(pElem->physics.ptr->gravity)
-                {
-                    pElem->physics.ptr->vx += gWorld->vec_gravity[0] * tc;
-                    pElem->physics.ptr->vy += gWorld->vec_gravity[1] * tc;
-                    pElem->physics.ptr->vz += gWorld->vec_gravity[2] * tc;   
-                }
-                
-                if(pElem->physics.ptr->friction)
-                {
-                    pElem->physics.ptr->vx *= 1 - C_FRICTION;
-                    pElem->physics.ptr->vy *= 1 - C_FRICTION;
-                    pElem->physics.ptr->vz *= 1 - C_FRICTION;
-                }
-                
-                float vm[] = {
-                    pElem->physics.ptr->vx,
-                    pElem->physics.ptr->vy,
-                    pElem->physics.ptr->vz
-                };
-                
-                // TODO: get rid of this it's expensive
-                pElem->physics.ptr->velocity = sqrt(vm[0]*vm[0] + vm[1]*vm[1] + vm[2]*vm[2]);
-                
-                gWorld->world_update_state.world_rgn_remove_hook = NULL;
-                
-                remove_element_from_region(pElem);
-                
-                gWorld->world_update_state.world_rgn_remove_hook = world_update_elem_removed_hook;
-                
-                if(do_sound_checks)
-                {
-                    if(pElem->stuff.sound.emit_sound_id)
-                    {
-                        const char *soundName = gameSoundNames[pElem->stuff.sound.emit_sound_id];
-                        
-                        game_timeval_t next_play = pElem->stuff.sound.emit_sound_duration + pElem->stuff.sound.time_last_emit;
-                        
-                        if(time_ms >= next_play)
-                        {
-                            pElem->stuff.sound.time_last_emit = time_ms;
-                            
-                            gameAudioPlaySoundAtLocation(soundName,
-                                                         pElem->physics.ptr->x,
-                                                         pElem->physics.ptr->y,
-                                                         pElem->physics.ptr->z);
-                        }
-                    }
-                }
-                
-                // apply boundary enforcement, which takes priority over object-collision
-                if(pElem->object_type != OBJ_DISPLAYONLY)
-                {
-                    int bounding_enforced = 0;
-                    int i;
+                continue;
+            }
 
-                    for(i = 0; i < gWorld->boundingRegion->nVectorsInited; i++)
+            if(!pElem->head_elem) // not a child elem
+            {
+
+//                float* pFloatCheckIsNan[] = {
+//                    &pElem->physics.ptr->vx,
+//                    &pElem->physics.ptr->vy,
+//                    &pElem->physics.ptr->vz
+//                };
+//                for(iF = 0; iF < sizeof(pFloatCheckIsNan)/sizeof(float*); iF++)
+//                {
+//                    if(isnan(*pFloatCheckIsNan[iF]))
+//                    {
+//                        // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
+//                        *pFloatCheckIsNan[iF] = 0;
+//                        printf("isnan: %p\n", pElem);
+//                    }
+//                }
+
+
+                if(pElem->physics.ptr->vx != 0 || pElem->physics.ptr->vy+Fmin != 0 || pElem->physics.ptr->vz != 0 || pElem->physics.ptr->gravity)
+                {
+                    int out_of_bounds_remove = 0;
+
+                    if(pElem->physics.ptr->gravity)
                     {
-                        float U[] = {vm[0]*tc, vm[1]*tc, vm[2]*tc};
-                        float V[] = {gWorld->boundingRegion->v[i].f[3], gWorld->boundingRegion->v[i].f[4], gWorld->boundingRegion->v[i].f[5]};
-                        float P[3];
-                        
-                        P[0] = (pElem->physics.ptr->x - gWorld->boundingRegion->v[i].f[0]) + U[0];
-                        P[1] = (pElem->physics.ptr->y - gWorld->boundingRegion->v[i].f[1]) + U[1];
-                        P[2] = (pElem->physics.ptr->z - gWorld->boundingRegion->v[i].f[2]) + U[2];
-                        
-                        float dot = dot2(V, P);
-             
-                        if(dot < 0.001)
+                        pElem->physics.ptr->vx += gWorld->vec_gravity[0] * tc;
+                        pElem->physics.ptr->vy += gWorld->vec_gravity[1] * tc;
+                        pElem->physics.ptr->vz += gWorld->vec_gravity[2] * tc;
+                    }
+
+                    if(pElem->physics.ptr->friction)
+                    {
+                        pElem->physics.ptr->vx *= 1 - C_FRICTION;
+                        pElem->physics.ptr->vy *= 1 - C_FRICTION;
+                        pElem->physics.ptr->vz *= 1 - C_FRICTION;
+                    }
+
+                    float vm[] = {
+                        pElem->physics.ptr->vx,
+                        pElem->physics.ptr->vy,
+                        pElem->physics.ptr->vz
+                    };
+
+                    // TODO: get rid of this it's expensive
+                    pElem->physics.ptr->velocity = sqrt(vm[0]*vm[0] + vm[1]*vm[1] + vm[2]*vm[2]);
+
+                    gWorld->world_update_state.world_rgn_remove_hook = NULL;
+
+                    remove_element_from_region(pElem);
+
+                    gWorld->world_update_state.world_rgn_remove_hook = world_update_elem_removed_hook;
+
+                    if(do_sound_checks)
+                    {
+                        if(pElem->stuff.sound.emit_sound_id)
                         {
-                            if(pElem->bounding_remain)
+                            const char *soundName = gameSoundNames[pElem->stuff.sound.emit_sound_id];
+
+                            game_timeval_t next_play = pElem->stuff.sound.emit_sound_duration + pElem->stuff.sound.time_last_emit;
+
+                            if(time_ms >= next_play)
                             {
-                                pElem->physics.ptr->vx += V[0]*maxAccelDecel*-dot;
-                                pElem->physics.ptr->vy += V[1]*maxAccelDecel*-dot;
-                                pElem->physics.ptr->vz += V[2]*maxAccelDecel*-dot;
-                                
-                                bounding_enforced = 1;
-                            }
-                            else if(pElem->bounding_reflect)
-                            {
-                                if(V[0] / pElem->physics.ptr->vx < 0.0) pElem->physics.ptr->vx = -pElem->physics.ptr->vx;
-                                if(V[1] / pElem->physics.ptr->vy < 0.0) pElem->physics.ptr->vy = -pElem->physics.ptr->vy;
-                                if(V[2] / pElem->physics.ptr->vz < 0.0) pElem->physics.ptr->vz = -pElem->physics.ptr->vz;
-                                
-                                bounding_enforced = 1;
-                            }
-                            else
-                            {
-                                out_of_bounds_remove = 1;
+                                pElem->stuff.sound.time_last_emit = time_ms;
+
+                                gameAudioPlaySoundAtLocation(soundName,
+                                                             pElem->physics.ptr->x,
+                                                             pElem->physics.ptr->y,
+                                                             pElem->physics.ptr->z);
                             }
                         }
                     }
-                    
-                    if(bounding_enforced)
-                    {
-                        game_handle_collision(pElem, NULL, COLLISION_ACTION_REPULSE);
-                        gameNetwork_handle_collision(pElem, NULL, COLLISION_ACTION_REPULSE);
-                        game_ai_collision(pElem, NULL, COLLISION_ACTION_REPULSE);
-                    }
-                    
-                    if(!out_of_bounds_remove)
-                    {
-                        float momentum = 1;
-                        
-                        collision_vorigin[0] = pElem->physics.ptr->x;
-                        collision_vorigin[1] = pElem->physics.ptr->y;
-                        collision_vorigin[2] = pElem->physics.ptr->z;
-                        
-                        // MARK: -- attempt to move along vm
-                        //move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
-                        
-                        // MARK: -- resolve collisions with other objects
-                        
-                        collision_action_table_t *collision_actions_cur = &collision_actions;
-                        
-                        if(do_check_collisions && pElem->collision_start_time <= time_ms)
-                        {
-                            int sound_played = 0;
-                            
-                            // check collisions
-                            WorldElemListNode* pRegionElemsHead =
-                            get_region_list_head(pElem->physics.ptr->x,
-                                                 pElem->physics.ptr->y,
-                                                 pElem->physics.ptr->z);
 
-                            if(pRegionElemsHead)
+                    // apply boundary enforcement, which takes priority over object-collision
+                    if(pElem->object_type != OBJ_DISPLAYONLY)
+                    {
+                        int bounding_enforced = 0;
+                        int i;
+
+                        for(i = 0; i < gWorld->boundingRegion->nVectorsInited; i++)
+                        {
+                            float U[] = {vm[0]*tc, vm[1]*tc, vm[2]*tc};
+                            float V[] = {gWorld->boundingRegion->v[i].f[3], gWorld->boundingRegion->v[i].f[4], gWorld->boundingRegion->v[i].f[5]};
+                            float P[3];
+
+                            P[0] = (pElem->physics.ptr->x - gWorld->boundingRegion->v[i].f[0]) + U[0];
+                            P[1] = (pElem->physics.ptr->y - gWorld->boundingRegion->v[i].f[1]) + U[1];
+                            P[2] = (pElem->physics.ptr->z - gWorld->boundingRegion->v[i].f[2]) + U[2];
+
+                            float dot = dot2(V, P);
+
+                            if(dot < 0.00000001)
                             {
-                                WorldElem* pRegionElem;
-                                
-                                //region_collision_retry:
-                                
-                                gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead->next;
-                                
-                                while(gWorld->world_update_state.world_region_iterate_cur)
+                                if(pElem->bounding_remain)
                                 {
-                                    pRegionElem = gWorld->world_update_state.world_region_iterate_cur->elem;
-                                    
-                                    if(pRegionElem != pElem)
+                                    pElem->physics.ptr->vx += V[0]*maxAccelDecel*-dot;
+                                    pElem->physics.ptr->vy += V[1]*maxAccelDecel*-dot;
+                                    pElem->physics.ptr->vz += V[2]*maxAccelDecel*-dot;
+
+                                    bounding_enforced = 1;
+                                }
+                                else if(pElem->bounding_reflect)
+                                {
+                                    if(V[0] / pElem->physics.ptr->vx < 0.0) pElem->physics.ptr->vx = -pElem->physics.ptr->vx;
+                                    if(V[1] / pElem->physics.ptr->vy < 0.0) pElem->physics.ptr->vy = -pElem->physics.ptr->vy;
+                                    if(V[2] / pElem->physics.ptr->vz < 0.0) pElem->physics.ptr->vz = -pElem->physics.ptr->vz;
+
+                                    bounding_enforced = 1;
+                                }
+                                else
+                                {
+                                    out_of_bounds_remove = 1;
+                                }
+                            }
+                        }
+
+                        if(bounding_enforced)
+                        {
+                            // TODO: separate functions for handling bounding collisions / objects
+                            game_handle_collision(pElem, NULL, COLLISION_ACTION_REPULSE);
+                            gameNetwork_handle_collision(pElem, NULL, COLLISION_ACTION_REPULSE);
+                            game_ai_collision(pElem, NULL, COLLISION_ACTION_REPULSE);
+                        }
+
+                        if(!out_of_bounds_remove)
+                        {
+                            float momentum = 1;
+
+                            collision_vorigin[0] = pElem->physics.ptr->x;
+                            collision_vorigin[1] = pElem->physics.ptr->y;
+                            collision_vorigin[2] = pElem->physics.ptr->z;
+
+                            // MARK: -- attempt to move along vm
+                            //move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
+
+                            // MARK: -- resolve collisions with other objects
+
+                            collision_action_table_t *collision_actions_cur = &collision_actions;
+
+                            if(do_check_collisions && pElem->collision_start_time <= time_ms)
+                            {
+                                int sound_played = 0;
+
+                                // check collisions
+                                WorldElemListNode* pRegionElemsHead =
+                                get_region_list_head(pElem->physics.ptr->x,
+                                                     pElem->physics.ptr->y,
+                                                     pElem->physics.ptr->z);
+
+                                if(pRegionElemsHead)
+                                {
+                                    WorldElem* pRegionElem, *pElemCollided = pElem;
+                                    int pElem = 0;  // remove this sanity
+
+                                    //region_collision_retry:
+
+                                    gWorld->world_update_state.world_region_iterate_retry_head = pRegionElemsHead;
+                                    gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_retry_head->next;
+
+                                    while(gWorld->world_update_state.world_region_iterate_cur)
                                     {
-                                        if(check_collision(pElem, pRegionElem))
+                                        pRegionElem = gWorld->world_update_state.world_region_iterate_cur->elem;
+
+                                        if(pRegionElem != pElemCollided)
                                         {
-                                            WorldElem* pElemCollided = pRegionElem;
-                                            
-                                            // record collision
-                                            collision_action_t colact = (*collision_actions_cur)[pElemCollided->object_type][pElem->object_type];
-                                            
-                                            if(
-                                               (!pElemCollided->destructible || !pElem->destructible) ||
-                                               colact == COLLISION_ACTION_NONE
-                                               )
+                                            if(check_collision(pElemCollided, pRegionElem))
                                             {
-                                                gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;
-                                                continue;
-                                            }
-                                            
-                                            //pElem->physics.ptr->x = collision_rollback_coord[0];
-                                            //pElem->physics.ptr->y = collision_rollback_coord[1];
-                                            //pElem->physics.ptr->z = collision_rollback_coord[2];
-//                                                pElem->physics.ptr->velocity = collision_rollback_velocity;
-//
-//                                                // move all coordinates (for bounding boxes)
-//                                                if(!rollback_done)
-//                                                {
-//                                                    move_elem_relative(pElem, -vm[0] * tc, vm[1] * tc, vm[2] * tc);
-//                                                    rollback_done = 1;
-//                                                }
-
-                                            // HACK: removed a hack that enforced elemA had higher velocity than B and swapped
-                                            
-                                            if(colact == COLLISION_ACTION_REPULSE)
-                                            {
-                                                momentum = 0;
-                                                
-                                                world_repulse_elem(pElem, pElemCollided, tc, collision_repulsion_coeff);
-                                                
-                                                if(pElem->elem_id == my_ship_id && !sound_played)
+                                                // SWAP to enforce object type priority ?
+                                                if(pRegionElem->object_type > pElemCollided->object_type)
                                                 {
-                                                    sound_played = 1;
-                                                    gameAudioPlaySoundAtLocation("bump",
-                                                                                 pElem->physics.ptr->x,
-                                                                                 pElem->physics.ptr->y,
-                                                                                 pElem->physics.ptr->z);
+                                                    WorldElem *tmp = pElemCollided;
+                                                    pElemCollided = pRegionElem;
+                                                    pRegionElem = tmp;
                                                 }
-                                            }
 
-                                        collision_list_add_retry:
-                                            {
-                                                WorldElemListNode *nA, *nB;
-                                                
-                                                nA = world_elem_list_find_elem(pElem, &gWorld->elements_collided);
-                                                nB = world_elem_list_find_elem(pElemCollided, &gWorld->elements_collided);
-                                                
-                                                if(!nA && !nB)
+                                                // record collision
+                                                collision_action_t colact = (*collision_actions_cur)[pElemCollided->object_type][pRegionElem->object_type];
+
+                                                if(
+                                                   (!pElemCollided->destructible || !pRegionElem->destructible) ||
+                                                   colact == COLLISION_ACTION_NONE
+                                                   )
                                                 {
-                                                    WorldElemListNode* pNodeA, *pNodeB;
-                                                    
-                                                    // HACK: order by durability to make collision-list parsing simpler (list is LIFO)
-                                                    if(pElem->durability <= pElemCollided->durability)
+                                                    assert(!(pElemCollided->object_type == OBJ_POWERUP_GENERIC && (pRegionElem->object_type == OBJ_PLAYER || pRegionElem->object_type == OBJ_SHIP)));
+
+                                                    goto world_update_collision_ignore;
+                                                }
+
+                                                //pElem->physics.ptr->x = collision_rollback_coord[0];
+                                                //pElem->physics.ptr->y = collision_rollback_coord[1];
+                                                //pElem->physics.ptr->z = collision_rollback_coord[2];
+                                                //                                                pElem->physics.ptr->velocity = collision_rollback_velocity;
+                                                //
+                                                //                                                // move all coordinates (for bounding boxes)
+                                                //                                                if(!rollback_done)
+                                                //                                                {
+                                                //                                                    move_elem_relative(pElem, -vm[0] * tc, vm[1] * tc, vm[2] * tc);
+                                                //                                                    rollback_done = 1;
+                                                //                                                }
+
+                                                // HACK: removed a hack that enforced elemA had higher velocity than B and swapped
+
+                                                if(colact == COLLISION_ACTION_REPULSE)
+                                                {
+                                                    momentum = 0;
+
+                                                    world_repulse_elem(pRegionElem, pElemCollided, tc, collision_repulsion_coeff);
+
+                                                    if(pElemCollided->elem_id == my_ship_id && !sound_played)
                                                     {
-                                                        pNodeB = world_elem_list_add(pElemCollided, &gWorld->elements_collided);
+                                                        sound_played = 1;
+                                                        gameAudioPlaySoundAtLocation("bump",
+                                                                                     pElemCollided->physics.ptr->x,
+                                                                                     pElemCollided->physics.ptr->y,
+                                                                                     pElemCollided->physics.ptr->z);
+                                                    }
+                                                }
+
+                                            collision_list_add_retry:
+                                                {
+                                                    WorldElemListNode *nA, *nB;
+
+                                                    nA = world_elem_list_find_elem(pElemCollided, &gWorld->elements_collided);
+                                                    nB = world_elem_list_find_elem(pRegionElem, &gWorld->elements_collided);
+
+                                                    if(!nA && !nB)
+                                                    {
+                                                        WorldElemListNode* pNodeA = world_elem_list_add(pElemCollided, &gWorld->elements_collided),
+                                                        *pNodeB = world_elem_list_add(pRegionElem, &gWorld->elements_collided);
+
+                                                        pNodeA->elem_collided = pNodeB->elem;
+                                                        pNodeB->elem_collided = pNodeA->elem;
+                                                        pNodeA->userarg = colact;
+                                                        pNodeB->userarg = colact;
+
+                                                        game_handle_collision(pRegionElem, pElemCollided, colact);
+                                                        gameNetwork_handle_collision(pRegionElem, pElemCollided, colact);
+                                                        game_ai_collision(pRegionElem, pElemCollided, colact);
                                                     }
                                                     else
                                                     {
-                                                        pNodeA = world_elem_list_add(pElem, &gWorld->elements_collided);
-                                                    }
-                                                    
-                                                    if(pElem->durability <= pElemCollided->durability)
-                                                    {
-                                                        pNodeA = world_elem_list_add(pElem, &gWorld->elements_collided);
-                                                    }
-                                                    else
-                                                    {
-                                                        pNodeB = world_elem_list_add(pElemCollided, &gWorld->elements_collided);
-                                                    }
-                                                    
-                                                    pNodeA->elem_collided = pNodeB->elem;
-                                                    pNodeB->elem_collided = pNodeA->elem;
-                                                    pNodeA->userarg = colact;
-                                                    pNodeB->userarg = colact;
-                                                    
-                                                    //game_handle_collision(pElem, pElemCollided, colact);
-                                                    //gameNetwork_handle_collision(pElem, pElemCollided, colact);
-                                                    //game_ai_collision(pElem, pElemCollided, colact);
-                                                }
-                                                else
-                                                {
-                                                    if((nA && nA->userarg < colact) ||
-                                                       (nB && nB->userarg < colact))
-                                                    {
-                                                        if(nA)
+                                                        // allow some collisions to override others based on priority
+                                                        if((nA && nA->userarg < colact) ||
+                                                           (nB && nB->userarg < colact))
                                                         {
-                                                            if(nA->elem_collided) world_elem_list_remove(nA->elem_collided, &gWorld->elements_collided);
-                                                            world_elem_list_remove(nA->elem, &gWorld->elements_collided);
+                                                            if(nA)
+                                                            {
+                                                                if(nA->elem_collided) world_elem_list_remove(nA->elem_collided, &gWorld->elements_collided);
+                                                                world_elem_list_remove(nA->elem, &gWorld->elements_collided);
+                                                            }
+
+                                                            if(nB)
+                                                            {
+                                                                if(nB->elem_collided) world_elem_list_remove(nB->elem_collided, &gWorld->elements_collided);
+                                                                world_elem_list_remove(nB->elem, &gWorld->elements_collided);
+                                                            }
+
+                                                            goto collision_list_add_retry;
                                                         }
-                                                        
-                                                        if(nB)
-                                                        {
-                                                            if(nB->elem_collided) world_elem_list_remove(nB->elem_collided, &gWorld->elements_collided);
-                                                            world_elem_list_remove(nB->elem, &gWorld->elements_collided);
-                                                        }
-                                                        
-                                                        goto collision_list_add_retry;
                                                     }
                                                 }
                                             }
                                         }
+
+                                    world_update_collision_ignore:
+
+                                        // check if this was invalidated by the remove-callback
+                                        // TODO: -- I don't think this can happen anymore fixed with a callback handling when collisions modify world+visibility state
+                                        if(!gWorld->world_update_state.world_region_iterate_cur)
+                                        {
+                                            DBPRINTF(("gWorld->world_update_state.world_region_iterate_cur invalidated!"));
+                                            assert(0);
+                                            //gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead;
+                                        }
+
+                                        gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;
                                     }
-                                    
-                                    // check if this was invalidated by the remove-callback
-                                    // TODO: -- I don't think this can happen anymore
-                                    if(!gWorld->world_update_state.world_region_iterate_cur)
-                                    {
-                                        DBPRINTF(("gWorld->world_update_state.world_region_iterate_cur invalidated!"));
-                                        assert(0);
-                                        //gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead;
-                                    }
-                                    
-                                    gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;
                                 }
                             }
-                        }
-                        
-                        // no collisions, move along VM
-                        if(momentum > 0) move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
-                        
-                        // MARK: -- resolve collisions with other objects - DONE (restore collision priority)
-                        
-                        add_element_to_region(pElem);
-                    }
-                    else
-                    {
-                        WorldElem* pCurRemoveElem = pElem;
 
-                        // out of bounds
-                        world_elem_list_remove(pCurRemoveElem, &gWorld->elements_expiring);
-                        world_elem_list_remove(pCurRemoveElem, &gWorld->elements_list);
-                        
-                        if(!world_elem_list_find(pCurRemoveElem->elem_id, &gWorld->elements_to_be_freed))
-                        {
-                            world_elem_list_add(pCurRemoveElem, &gWorld->elements_to_be_freed);
+                            // no collisions, move along VM
+                            if(momentum > 0) move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
+
+                            // MARK: -- resolve collisions with other objects - DONE (restore collision priority)
+
+                            add_element_to_region(pElem);
                         }
-                        
-                        pOOBListElem = gWorld->world_update_state.ptr_objects_moving;
+                        else
+                        {
+                            WorldElem* pCurRemoveElem = pElem;
+
+                            // out of bounds
+                            world_elem_list_remove(pCurRemoveElem, &gWorld->elements_expiring);
+                            world_elem_list_remove(pCurRemoveElem, &gWorld->elements_list);
+
+                            if(!world_elem_list_find(pCurRemoveElem->elem_id, &gWorld->elements_to_be_freed))
+                            {
+                                world_elem_list_add(pCurRemoveElem, &gWorld->elements_to_be_freed);
+                            }
+
+                            pOOBListElem = gWorld->world_update_state.ptr_objects_moving;
+                        }
                     }
                 }
             }

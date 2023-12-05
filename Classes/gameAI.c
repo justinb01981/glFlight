@@ -34,7 +34,8 @@ const float zdot_ikillyou = 0.5;
 const float zdot_juke = 0.3;
 const float zdot_collision = 0.7;
 const float dist_tooclose = 10.0;
-const float boundary_avoid_distance = 5.0;
+// TODO: tweaking this to allow enemies to capture powerups close to boundary
+const float boundary_avoid_distance = 2.0;
 
 float juke_distance = 20.0, juke_distance_patrol = 50.0;
 
@@ -655,7 +656,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         vdesired = 1.0;
     }
 
-    if(zdot < 0)
+    if(/*zdot < 0*/ 0)
     {
         quaternion_rotate_inplace(&zq, &xq, elem->stuff.u.enemy.max_slerp*tc);
         quaternion_rotate_inplace(&yq, &xq, elem->stuff.u.enemy.max_slerp*tc);
@@ -872,7 +873,7 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
        elemC->stuff.affiliation != 0)
     {
         elemAI->stuff.u.enemy.target_id = elemC->stuff.affiliation;
-        ai_debug("enemy targeting affiliation:%d", elemAI, elemC->stuff.affiliation);
+        ai_debug("enemy targeting obj+affiliation:%d", elemAI, elemC->stuff.affiliation);
     }
     
     if(elemAI /*&& elemC->physics.ptr->velocity == 0*/)

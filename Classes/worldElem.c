@@ -784,7 +784,7 @@ world_elem_btree_remove(world_elem_btree_node* root, WorldElem* elem)
     if(!elem->btree_node) return;
     
     float order = ((world_elem_btree_node*)elem->btree_node)->order;
-    
+
     //if(isnan(order)) assert(0);
     
     //if(((world_elem_btree_node*)elem->stuff.btree_node[world_elem_btree_ptr_idx])) ((world_elem_btree_node*)elem->stuff.btree_node[world_elem_btree_ptr_idx])->elem = NULL;

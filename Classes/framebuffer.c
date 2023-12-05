@@ -11,102 +11,133 @@
 #include "gameIncludes.h"
 #include "framebuffer.h"
 #include "textures.h"
+#include "gameDebug.h"
 
-int gTextureFramebuffer = -1;
+void
+setupGLFramebufferView()
+{
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    
+    glOrthof(-FB_TEXTURE_WIDTHHEIGHT/2, FB_TEXTURE_WIDTHHEIGHT/2,
+             -FB_TEXTURE_WIDTHHEIGHT/2, FB_TEXTURE_WIDTHHEIGHT/2,
+             1, -1);
 
-GLuint FramebufferName = GL_NONE;
-GLuint renderedTexture = GL_NONE;
-GLuint FramebufferNameInitial = GL_NONE;
+    glTranslatef(0, 0, 0);
+
+    // see framebuffer.h
+}
+
+void
+setupGLFramebufferViewDone()
+{
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+}
 
 void frameBufUpdate(struct FrameBufInst* s) {
-    
+
     setupGLFramebufferView();
 
-    glBindTexture(GL_TEXTURE_2D, renderedTexture);
-
-
-
-    // Render to our framebuffer
-    glViewport(0, 0, s->width, s->height); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    DBPRINTF(("frameBufUpdate: renderedTexture = %d\n", s->texture));
+    
+    // Render to our framebuffer - glViewport necessary?
 
     // adding binding/drawing here
-    glClearColor(0.0, 0.4, 0.0, 1.0);
-    //glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     float width = s->width;
     float height = s->height;
+    
+    const int T = 4;
+    int idx = 0;
+    
+    while (idx < (width-T) * (height-T)  )
+    {
+        // set origin
 
-    // draw triangles
-    GLfloat o3[] = {-width/2, -height/2, -1};
+        GLfloat o3[] = {-width/2, -height/2, -1};
+        o3[0] += idx % (int) width;
+        o3[1] += idx / width;
 
-    int c = 0;
-    s->coords[c++] = o3[0];//
-    s->coords[c++] = o3[1];
-    s->coords[c++] = o3[2];
-    s->coords[c++] = o3[0]+width;//
-    s->coords[c++] = o3[1];
-    s->coords[c++] = o3[2];
-    s->coords[c++] = o3[0];//
-    s->coords[c++] = o3[1]+height;
-    s->coords[c++] = o3[2];
-    s->coords[c++] = o3[0]+width;//
-    s->coords[c++] = o3[1]+height;
-    s->coords[c++] = o3[2];
+        float width = T;
+        float height = T;
+        
+        int c = 0;
+        s->coords[c++] = o3[0];//
+        s->coords[c++] = o3[1];
+        s->coords[c++] = o3[2];
+        s->coords[c++] = o3[0]+width;//
+        s->coords[c++] = o3[1];
+        s->coords[c++] = o3[2];
+        s->coords[c++] = o3[0];//
+        s->coords[c++] = o3[1]+height;
+        s->coords[c++] = o3[2];
+        s->coords[c++] = o3[0]+width;//
+        s->coords[c++] = o3[1]+height;
+        s->coords[c++] = o3[2];
 
-    int i = 0;
-    s->indices[i++] = 0;
-    s->indices[i++] = 1;
-    s->indices[i++] = 2;
-    s->indices[i++] = 3;
-    s->indices[i++] = 2;
-    s->indices[i++] = 1;
+        int i = 0;
+        s->indices[i++] = 0;
+        s->indices[i++] = 1;
+        s->indices[i++] = 2;
+        s->indices[i++] = 3;
+        s->indices[i++] = 2;
+        s->indices[i++] = 1;
 
-    int t = 0;
-    GLfloat m = 1.0;
+        int t = 0;
+        GLfloat m = 1.0;
 
-    s->colors[t++] = m;
-    s->colors[t++] = 0.0;
-    s->colors[t++] = 0.0;
-    s->colors[t++] = 1.0;
+        s->colors[t++] = fmod(rand(), 1000) / 1000.0;
+        s->colors[t++] = 0;
+        s->colors[t++] = 1.0;
+        s->colors[t++] = 1.0;
 
-    s->colors[t++] = 0.0;
-    s->colors[t++] = m;
-    s->colors[t++] = 0.0;
-    s->colors[t++] = 1.0;
+        s->colors[t++] = 0.0;
+        s->colors[t++] = 1.0;
+        s->colors[t++] = 0.0;
+        s->colors[t++] = 1.0;
 
-    s->colors[t++] = 0.0;
-    s->colors[t++] = 0.0;
-    s->colors[t++] = m;
-    s->colors[t++] = 1.0;
+        s->colors[t++] = 1.0;
+        s->colors[t++] = 0.0;
+        s->colors[t++] = 0.0;
+        s->colors[t++] = 1.0;
 
-    s->colors[t++] = m;
-    s->colors[t++] = 0.0;
-    s->colors[t++] = 0.0;
-    s->colors[t++] = 1.0;
+        s->colors[t++] = 0.5;
+        s->colors[t++] = 0.5;
+        s->colors[t++] = 0.5;
+        s->colors[t++] = 1.0;
 
-    // lets gradiate...
-//    static float mg = 1.0;
-//    for(int t = 0; t <= 4; t++) for(int ti = 0; ti < 4; ti++) {
-//        s->colors[t*4+ti] = ti*0.5;
-//    }
-//    mg *= -1;
+        s->count = i;
 
-    s->count = i;
+        glEnableClientState(GL_COLOR_ARRAY);
 
-    glEnableClientState(GL_COLOR_ARRAY);
+        // see gameGraphics.c - setting up view matrix already done
 
-    // see gameGraphics.c - setting up view matrix already done
+        // Set the list of draw buffers.
+        GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+        glDrawBuffers(1, DrawBuffers);
 
-    // Set the list of draw buffers.
-    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    glDrawBuffers(1, DrawBuffers);
+        glVertexPointer(3, GL_FLOAT, 0, s->coords); // ??
+        glColorPointer(4, GL_FLOAT, 0, s->colors);
 
-    glVertexPointer(3, GL_FLOAT, 0, s->coords);
-    glColorPointer(4, GL_FLOAT, 0, s->colors);
+        glDrawElements(GL_TRIANGLES, (int) s->count, GL_UNSIGNED_INT, s->indices);
 
-    glDrawElements(GL_TRIANGLES, (int) s->count, GL_UNSIGNED_INT, s->indices);
+        assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+        if(idx % (int) width == 0)
+        {
+            if((idx / (int) width) % 2 == 0)
+            {
+            // skip odd
+                idx += width-1;
+            }
+        }
+        idx += 1;
+    }
+    
     glDisableClientState(GL_COLOR_ARRAY);
     
     setupGLFramebufferViewDone();
@@ -114,33 +145,38 @@ void frameBufUpdate(struct FrameBufInst* s) {
 
 void frameBufCleanup(struct FrameBufInst* s)
 {
-    glDeleteFramebuffers(1, &FramebufferName); FramebufferName = GL_NONE;
+    if(s->name >= 0)
+        glDeleteFramebuffers(1, &s->name);
+    s->name = -1;
 
-    glDeleteTextures(1, &renderedTexture); renderedTexture = GL_NONE;
+    // hack: retain texture due to a problem releasing/recreating
+//    if (s->texture > 0)
+//        glDeleteTextures(1, &s->texture);
+//    s->texture = -1;
+//
+//    textures_hack_framebuffer_cleanup();
 
-    gTextureFramebuffer = -1;
-
-    memset(s, 0, sizeof(*s));
-
-    textures_hack_framebuffer_cleanup();
+    s->width = s->height = 0;
 }
 
 void frameBufInit(struct FrameBufInst* s)
 {
-    s->width = s->height = 128;
+    //if(s->width != 0) return;
+    
+    s->width = s->height = FB_TEXTURE_WIDTHHEIGHT;
 
-    glGenFramebuffers(1, &FramebufferName);
-    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+    glGenFramebuffers(1, &s->name);
+    glBindFramebuffer(GL_FRAMEBUFFER, s->name);
 
     // Set the list of draw buffers.
     GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
     glDrawBuffers(1, DrawBuffers);
 
     // The texture we're going to render to
-    glGenTextures(1, &renderedTexture);
+    glGenTextures(1, &s->texture);
 
     // "Bind" the newly created texture : all future texture functions will modify this texture
-    glBindTexture(GL_TEXTURE_2D, renderedTexture);
+    glBindTexture(GL_TEXTURE_2D, s->texture);
 
     // Give an empty image to OpenGL ( the last "0" )
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, s->width, s->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
@@ -150,7 +186,7 @@ void frameBufInit(struct FrameBufInst* s)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
     // Set "renderedTexture" as our colour attachement #0
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, s->texture, 0);
 
 
     /*
@@ -158,13 +194,15 @@ void frameBufInit(struct FrameBufInst* s)
      |  /
      | /
      |/
-    2
      */
+    textures_hack_framebuffer(s->texture);
 
     // TODO: relocate to draw loop
-    //frameBufUpdate(s);
-
-    textures_hack_framebuffer(renderedTexture);
-
-    // restore our initial framebuffer outside
+    frameBufUpdate(s);
+    
+    // ToDO: can we release framebuffer here now that tex is rendered?
+    // release
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    
 }

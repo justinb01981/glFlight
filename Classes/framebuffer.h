@@ -16,9 +16,7 @@
 #include "gameGraphics.h"
 #include "textures.h"
 
-#define FB_TEXTURE_WIDTHHEIGHT (128)
-
-extern int gTextureFramebuffer;
+#define FB_TEXTURE_WIDTHHEIGHT (512)
 
 extern void glDrawBuffers(GLuint, GLenum*);
 extern int bindTexture(unsigned int);
@@ -43,10 +41,10 @@ struct FrameBufInst {
     GLfloat colors[256];
     float width, height;
     size_t count;
+    
+    GLint name;
+    GLint texture;
 };
-
-extern GLuint FramebufferName;
-extern GLuint renderedTexture;
 
 void frameBufUpdate(struct FrameBufInst* s);
 

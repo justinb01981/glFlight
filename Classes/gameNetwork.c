@@ -189,7 +189,7 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     }
 
 #ifdef BSD_SOCKETS
-    setsockopt(sock, sol_socket, so_nosigpipe, &so_arg, sizeof(so_arg));
+    setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &so_arg, sizeof(so_arg));
 #endif
 
     //setsockopt(sock, sol_socket, so_reuseaddr, &so_arg, sizeof(so_arg));
@@ -246,13 +246,13 @@ send_lan_broadcast(gameNetworkMessage* msg)
 }
 
 static void
-send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
+ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
 {
     struct sockaddr_storage* sa;
     int r;
 
     sa = address->storage;
-    
+
     gameMessage_to_nbo(msg);
     
     if(gameNetworkState.hostInfo.bonjour_lan)
@@ -377,7 +377,7 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
 
     addrInfoResultp = NULL;
     
-#if BSD_SOCKETS
+#ifdef BSD_SOCKETS
     int aret =    getaddrinfo(name, portnum, &hints, &addrInfoResultp);
     if(aret != 0) {
         DBPRINTF(("getaddrinfo failed: %s\n", gai_strerror(aret)));
@@ -1764,8 +1764,6 @@ do_game_network_world_update()
         return;
     }
     
-    collision_actions_set_grab_powerup();
-    
     //get_time_ms_wall();
     
     /*
@@ -2917,7 +2915,7 @@ gameNetwork_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_a
     
     if(gameNetworkState.hostInfo.hosting)
     {
-        if(collision_action == COLLISION_ACTION_POWERUP_GRAB)
+        if(collision_action == COLLISION_ACTION_POWERUP_GRAB_OR_TOW)
         {
             gameNetwork_getPlayerInfo(elemB->stuff.affiliation, &pInfo, 0);
             
