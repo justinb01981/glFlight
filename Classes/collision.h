@@ -292,7 +292,6 @@ do_world_collision_handling(float tc)
                 else if(pCollisionB->elem->stuff.bullet.action == ACTION_BLOCK_TEXTURE)
                 {
                     pCollisionA->elem->texture_id++;
-                    if(pCollisionA->elem->texture_id >= n_textures) pCollisionA->elem->texture_id = 0;
                     
                     if(!world_elem_list_find(pCollisionB->elem->elem_id, &gWorld->elements_to_be_freed))
                     {

@@ -11,6 +11,8 @@ import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.EGLExt;
 import android.view.Choreographer;
 
+import com.domain17.glflight.GameRunnable;
+
 public class GameRenderer implements Renderer {
 	
 	static {
@@ -43,7 +45,7 @@ public class GameRenderer implements Renderer {
 	public void onSurfaceCreated(GL10 arg0, EGLConfig arg1) {
 		onSurfaceCreated();
 
-		EGL14.eglSwapInterval(EGL14.eglGetCurrentDisplay(), 0);
+		GameRunnable.glFlightInit();
 	}
 
 	public void requestRender() {

@@ -46,6 +46,19 @@ android {
 
 }
 
+copy {
+    from '../../../../Classes'
+    into 'src/main/jni/game/'
+    include '*.*'
+}
+
+copy {
+    from '../../../../'
+    into 'src/main/res/raw/'
+    include '*.bmp'
+    include '*.wav'
+}
+
 dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0'
 }

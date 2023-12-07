@@ -27,7 +27,6 @@
 unsigned int texture_list[MAX_TEXTURES];
 unsigned int texture_list_loaded[MAX_TEXTURES];
 GLubyte* texture_data_table[MAX_TEXTURES];
-int n_textures = 0;
 int texture_preload_count = 12;
 const static unsigned char alpha_black = 0x00;
 const static unsigned char alpha_semitrans = 0xD0;
@@ -78,7 +77,7 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
     int width = max_bitmap_dim;
     int height = max_bitmap_dim;
     
-    sprintf(file_name, "%s""texture%d.bmp", initTexturesPrefix, n_textures);
+    sprintf(file_name, "%s""texture%d.bmp", initTexturesPrefix, tex_id);
 
     /*
      * bitmaps are 24-bit BMP files (usually 512x512 but some power of 2)
@@ -211,8 +210,6 @@ void initTextures(const char *prefix)
     int i;
     strcpy(initTexturesPrefix, prefix);
     
-    n_textures = 0;
-    
     for(i = 0; i < MAX_TEXTURES; i++)
     {
         texture_list_loaded[i] = 0;
@@ -228,7 +225,7 @@ void initTextures(const char *prefix)
 int bindTextureRequestCore(int tex_id)
 {
 
-    if(tex_id == 0)
+    if(tex_id == TEXTURE_ID_NONE)
     {
         return 0;
     }
@@ -240,16 +237,12 @@ int bindTextureRequestCore(int tex_id)
         
         //console_clear();
         //console_write("loading texture: %d", tex_id);
-        
 
-        if(tex_id != TEXTURE_ID_FRAMEBUFFER)
-        if(read_bitmap_to_gltexture(n_textures) != 0)
+        if(read_bitmap_to_gltexture(tex_id) != 0)
         {
-            printf("failed to load texture: %d\n", n_textures);
+            printf("failed to load texture: %d\n", tex_id);
             return 0;
         }
-
-        n_textures++;
     }
     
     return texture_list_loaded[tex_id];

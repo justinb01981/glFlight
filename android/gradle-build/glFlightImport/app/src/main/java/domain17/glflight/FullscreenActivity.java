@@ -151,8 +151,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         // sensor registerListener called in onResume
 
-        GameRunnable.glFlightInit(gameRenderer);
-
         running = true;
         mBGThread.start();
         if(!renderContinuously) mRenderThread.start();

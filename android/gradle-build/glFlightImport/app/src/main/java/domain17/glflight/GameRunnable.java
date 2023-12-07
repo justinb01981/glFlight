@@ -1,16 +1,12 @@
 package com.domain17.glflight;
 
-import java.lang.Runnable;
-
-import com.domain17.glflight.*;
-
 public class GameRunnable  {
 	
 	static {
 		System.loadLibrary("glFlight");
 	}
 	
-	static native void glFlightInit(GameRenderer r);
+	static native void glFlightInit();
 	static native void glFlightUninit();
 	static native void glFlightRunBGThread();
 	static native void glFlightTouchInput(float f[]);

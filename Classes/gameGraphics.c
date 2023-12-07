@@ -178,7 +178,7 @@ bindTexture(unsigned int tex_id)
         return 1;
     }
     
-    if((tex_id != drawn_texture_last && tex_id < n_textures))
+    if((tex_id != drawn_texture_last))
     {
         glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
         drawn_texture_last = tex_id;
@@ -1271,18 +1271,18 @@ drawElem(WorldElem* pElem)
             free(face_table);
             face_table = NULL;
             
-            //if(gl_vertex_ptr_last != drawElem_vertexBatchBuffer)
-            //{
-            //    glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBuffer);
-            //    gl_vertex_ptr_last = drawElem_vertexBatchBuffer;
-            //}
+            if(gl_vertex_ptr_last != drawElem_vertexBatchBuffer)
+            {
+                glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBuffer);
+                gl_vertex_ptr_last = drawElem_vertexBatchBuffer;
+            }
             
             
-            //if(gl_texcoord_ptr_last != drawElem_textCoordBatchBuffer)
-            //{
-            //    glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBuffer);
-            //    gl_texcoord_ptr_last = drawElem_textCoordBatchBuffer;
-            //}
+            if(gl_texcoord_ptr_last != drawElem_textCoordBatchBuffer)
+            {
+                glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBuffer);
+                gl_texcoord_ptr_last = drawElem_textCoordBatchBuffer;
+            }
         }
         else
         {
