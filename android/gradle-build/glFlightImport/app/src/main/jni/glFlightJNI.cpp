@@ -142,6 +142,7 @@ glFlightJNIInit()
 
     // HACK: touch inputs are in portrait mode
 
+    glFlightInited = true;
 }
 
 JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightResourcesInit(JNIEnv *e, jobject o)
@@ -207,9 +208,6 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIEnv *e, jobject o)
 {
 	glFlightJNIInit();
-
-	glFlightInited = true;
-
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNIEnv *e, jobject o)
