@@ -1548,11 +1548,6 @@ drawBackgroundInit(int tex_id,
             float r = tan(M_PI / (WORLD_BOUNDING_SPHERE_STEPS))*gWorld->bound_radius*2 + Vpad; // sin((M_PI*2) / WORLD_BOUNDING_SPHERE_STEPS) * (gWorld->bound_radius);
             struct boundingRegionVector *boundVec = &gWorld->boundingRegion->v[i];
             
-            if(boundVec->f[3] == 0 && fabs(boundVec->f[4]) == 1 && boundVec->f[5] == 0) {
-                // don't display
-                continue;
-            }
-            
             float V[3];
             float V_[] = {
                 boundVec->f[3],
@@ -1640,12 +1635,6 @@ drawBackgroundInit(int tex_id,
         
         drawBackgroundBuildTerrain(bgData, bgRepeatScale);
     }
-}
-
-void
-graphics_add_boundary(float origin[], float vec[])
-{
-    
 }
 
 static void
@@ -2036,6 +2025,9 @@ drawTriangleMesh(struct mesh_opengl_t* glmesh, int tex_id)
 void
 gameGraphicsInit(void)
 {
+    assert(gWorld->bound_radius > 0);
+    assert(texture_id_background > 0);
+
     drawBackgroundInit(texture_id_background, 0, 0, 0,
                        gWorld->bound_radius,
                        16.0,
