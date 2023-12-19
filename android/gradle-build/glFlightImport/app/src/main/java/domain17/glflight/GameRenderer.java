@@ -38,17 +38,24 @@ public class GameRenderer implements Renderer {
 	@Override
 	public void onSurfaceChanged(GL10 arg0, int arg1, int arg2) {
 		float f[] = {arg1, arg2};
+
 		onSurfaceChanged(f);
+
+		GameRunnable.glFlightInit();	// this is funky (but unused in the JNI code for now
 	}
 
 	@Override
 	public void onSurfaceCreated(GL10 arg0, EGLConfig arg1) {
 		onSurfaceCreated();
-
-		GameRunnable.glFlightInit();
 	}
 
 	public void requestRender() {
 		if(surfaceView != null) surfaceView.requestRender();
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		GameRunnable.glFlightUninit();
 	}
 }

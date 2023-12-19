@@ -85,6 +85,12 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
      * exported with "do not write colorspace information checked
      * created with GIMP
      */
+
+    if(texture_data_table[tex_id] != NULL)  // cleanup prior?
+    {
+        free(texture_data_table[tex_id]);
+        texture_data_table[tex_id] = NULL;
+    }
     
     fp = fopen(file_name, "rb");
     if(fp)
@@ -183,7 +189,9 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
                     err = 0;
                 }
                 
-                free(data);
+                // TODO: LEAKING THIS
+                //free(data);
+                //texture_data_table[tex_id] = NULL;
             }
         }
         
@@ -210,22 +218,20 @@ void initTextures(const char *prefix)
     int i;
     strcpy(initTexturesPrefix, prefix);
     
-    for(i = 0; i < MAX_TEXTURES; i++)
-    {
-        texture_list_loaded[i] = 0;
-    }
+    // for(i = 0; i < MAX_TEXTURES; i++)
+    // {
+    //     texture_list_loaded[i] = 0;
+    //
+    //     bindTextureRequestCore(i);
+    // }
+
     
-    // load the first N textures
-    for(i = 0; i < texture_preload_count; i++)
-    {
-        bindTextureRequestCore(i);
-    }
 }
 
 int bindTextureRequestCore(int tex_id)
 {
 
-    if(tex_id == TEXTURE_ID_NONE)
+    if(tex_id <= TEXTURE_ID_NONE)
     {
         return 0;
     }

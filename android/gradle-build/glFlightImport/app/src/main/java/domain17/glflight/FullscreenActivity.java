@@ -37,6 +37,7 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.domain17.glflight.GameRenderer;
+import com.domain17.glflight.GameRunnable;
 import com.domain17.glflight.util.*;
 
 //import javax.microedition.khronos.egl.EGL10;
@@ -51,7 +52,7 @@ import com.domain17.glflight.util.*;
 public class FullscreenActivity extends Activity implements SensorEventListener {
 
     public boolean running = false;
-    public boolean renderContinuously = false;        // near as I can tell this makes no difference now  more testing needed
+    public boolean renderContinuously = true;        // near as I can tell this makes no difference now  more testing needed
     Context appCtx;
     int accuracyLast = SensorManager.SENSOR_STATUS_UNRELIABLE;
 
@@ -146,9 +147,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         contentView.setOnTouchListener(mOnTouchListener);
 
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-
         // sensor registerListener called in onResume
 
         running = true;
@@ -175,7 +173,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         mRenderThread.cancel();
         */
 
-        GameRunnable.glFlightUninit();
+
     }
 
 //    @Override
@@ -184,42 +182,38 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 //    }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-
-        mSensorManager.unregisterListener(this);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
 
-        mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_FASTEST);
-        running = true;
+        gameRenderer.surfaceView.onResume();
+        // moved registereListener from here to bg thread
     }
     
     /**
      * SensorEventListener
      */
 
+
+
     public void onSensorChanged(SensorEvent e) {
 
         // thanks to
         // https://github.com/tutsplus/android-sensors-in-depth-proximity-and-gyroscope/blob/master/app/src/main/java/com/tutsplus/sensorstutorial/RotationVectorActivity.java
 
-        float[] Rm = new float[16];
-        SensorManager.getRotationMatrixFromVector(Rm, e.values);
-
-        // no need to do remapCoordinateSystem but do change order and invert z
-        int col_sz = 4;
-        //Rm[2*col_sz] *= -1; Rm[2*col_sz+1] *= -1; Rm[2*col_sz+2] *= -1; // invert-z
-
-        float[] orientations = new float[3];
-        SensorManager.getOrientation(Rm, orientations);
-
     	if(e.sensor == mSensorGyro)
     	{
-//            System.out.println("orientations: " + orientations[0] + "," + orientations [1] + "," + orientations[2]);
+            float[] Rm = new float[16];
+            float[] orientations = new float[3];
+
+            SensorManager.getRotationMatrixFromVector(Rm, e.values);
+
+            // no need to do remapCoordinateSystem but do change order and invert z
+            int col_sz = 4;
+            //Rm[2*col_sz] *= -1; Rm[2*col_sz+1] *= -1; Rm[2*col_sz+2] *= -1; // invert-z
+
+            SensorManager.getOrientation(Rm, orientations);
+
+            //System.out.println("orientations: " + orientations[0] + "," + orientations [1] + "," + orientations[2]);
 
             GameRunnable.glFlightSensorInput(orientations);
     	}
@@ -309,6 +303,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
     double mRenderNext = (double) java.lang.System.currentTimeMillis();
 
+
+
     /**
      * render scheduler
      */
@@ -316,7 +312,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         public void run() {
 
-            while (running) {
+            while (running && !renderContinuously) {
+
                 double delta = mRenderNext - java.lang.System.currentTimeMillis();
 
                 if (delta <= 0) {
@@ -338,9 +335,12 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
     Thread mBGThread = new Thread(new Runnable() {
     		public void run() {
-    			long sleep_ms = 1000/(GameRenderer.fps/2);
+    			long sleep_ms = 1000/(GameRenderer.fps);
 
     			while(running) {
+
+                    // check for gyro reset
+                    resetGyroSensorMaybe();
 
 					GameRunnable.runBGThread();
 	    			
@@ -366,5 +366,22 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     private GameRenderer gameRenderer = new GameRenderer();
     private View contentView;
     private SensorManager mSensorManager;
-    private Sensor mSensorGyro; 
+    private Sensor mSensorGyro;
+
+
+    // private impl
+
+
+    private void resetGyroSensorMaybe() {
+        if(GameRunnable.glFlightSensorNeedsCalibrate()) {
+
+            if(mSensorManager == null) {
+                mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+                mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+            }
+
+            mSensorManager.unregisterListener(this);
+            mSensorManager.registerListener(this, mSensorGyro, 20000);
+        }
+    }
 }

@@ -134,6 +134,7 @@ game_ai_find_target(WorldElem *pElem)
     
     if(pElem->stuff.towed_elem_id != WORLD_ELEM_ID_INVALID) return WORLD_ELEM_ID_INVALID;
     
+    // TODO: do this search once for all AI prior to assigning decisions
     WorldElemListNode* pTarget = gWorld->elements_moving.next;
     while(pTarget)
     {
@@ -776,7 +777,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     }
     
     // fire a bullet
-    assert(skill > 0.0);
+    assert(!gameStateSinglePlayer.started || skill > 0.0);
     
     if(fireBullet &&
        time_ms - elem->stuff.u.enemy.time_last_bullet > (game_ai_fire_rate_ms-(game_ai_fire_rate_ms*(diff_m/skill))))

@@ -135,10 +135,10 @@ glFlightFrameStage1()
     
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	// turn off bilinear filtering
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // turn off bilinear filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
     float ship_z_vec_prev[3];
     gameShip_getZVector(ship_z_vec_prev);
@@ -179,8 +179,10 @@ glFlightFrameStage1()
     update_time_ms_frame_tick();
     
 calibrate_bail:
-//    get_time_ms();
+    get_time_ms();
+
 #if GAME_PLATFORM_ANDROID
+    // TODO: move timer handleing to platform code
     time_ms = time_ms_wall;
 #endif
     
@@ -257,7 +259,7 @@ calibrate_bail:
     
     get_time_ms();
     
-    if(!gameNetworkState.connected || gameNetworkState.hostInfo.hosting) game_ai_run();
+    // moved game_ai_run to do_networkd_world_update
     
     // JB: moved to background thread
     //do_game_network_read();

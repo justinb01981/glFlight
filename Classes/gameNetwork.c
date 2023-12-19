@@ -1758,6 +1758,9 @@ do_game_network_world_update()
     gameNetworkMessage netMsg;
     WorldElemListNode* pNode;
     float network_time_ms = get_time_ms_wall();
+
+    // HACK: also calling game_ai_run here
+    if(!gameNetworkState.connected || gameNetworkState.hostInfo.hosting) game_ai_run();
     
     if(!gameNetworkState.connected)
     {

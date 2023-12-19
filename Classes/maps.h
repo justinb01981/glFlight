@@ -86,7 +86,7 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
 "register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
 "set_world_size r\n"                                                     \
-"set_background_info " BACKGROUND_TEXTURE_STR "\n"                       \
+"set_background_info 47\n"                                               \
 "\n"
 
 //#define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
@@ -1351,8 +1351,8 @@ WORLD_SCALED_FRAME(1, /*57*/28, 4)
 "map_program_with_args 100 0 100\n"
 MAP_GENERATED_MACRO
 "add_spawn_invis 0 5 -6 0.01 0.01 0.01\n"
-WORLD_ADD_OBJECT(12, -2, 5, -4, 0, 0, 0, 1.0 , 24)
-WORLD_ADD_OBJECT(14, 2, 5, -4, 0, 0, 0, 1.0 , 71)
+WORLD_ADD_OBJECT(13, -2, 5, -4, 0, 0, 0, 1.0 , 24)
+WORLD_ADD_OBJECT(15, 2, 5, -4, 0, 0, 0, 1.0 , 71)
 "";
 
 

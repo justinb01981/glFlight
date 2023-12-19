@@ -386,7 +386,7 @@ do_world_collision_handling(float tc)
                         if(pCollisionA->elem->moving &&
                             pCollisionB->elem->moving)
                         {
-                            float bullet_vtransfer = 0.2 * pCollisionA->elem->durability;
+                            float bullet_vtransfer = 0.2;
 
                             update_object_velocity(pCollisionA->elem->elem_id,
                                                    pCollisionB->elem->physics.ptr->vx*bullet_vtransfer,

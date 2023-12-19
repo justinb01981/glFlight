@@ -1238,8 +1238,8 @@ void world_init(float radius)
 {
     float ws = 25;
     
-	gWorld = malloc(sizeof(world_t));
-	memset(gWorld, 0, sizeof(world_t));
+    gWorld = malloc(sizeof(world_t));
+    memset(gWorld, 0, sizeof(world_t));
     
     gWorld->bound_radius = radius;
     gWorld->region_size = ws;

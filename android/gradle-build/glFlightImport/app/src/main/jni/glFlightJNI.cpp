@@ -34,8 +34,6 @@ extern "C" {
 
 void dbtrace(const char* x, int y) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d\n", x, y); }
 void dbtracelog(const char* x, int y, const char* s) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d %s\n", x, y, s); }
-
-extern void update_time_ms_frame_tick();
 extern void (*trimDoneCallback)(void);
 
 #include "game/glFlight.h"
@@ -115,6 +113,8 @@ glFlightJNIInit()
 
 	world_lock_init();
 
+    world_lock();
+
 	gameSettingsPlatformInit(glFlightDefaultPlayerName(), glFlightDefaultGameName());
 
 	if(!gameSettingsRead(glFlightSettingsPath()))
@@ -142,12 +142,14 @@ glFlightJNIInit()
 
     // HACK: touch inputs are in portrait mode
 
-    glFlightInited = true;
-}
+    gameInterfaceInit(viewWidth, viewHeight);
+    gameInterfaceControls.trim.blinking = 1;
 
-JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightResourcesInit(JNIEnv *e, jobject o)
-{
-    return 0;
+	DBPRINTF(("glFlightJNIInit done!\n"));
+
+    world_unlock();
+
+    glFlightInited = true;
 }
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
@@ -178,8 +180,6 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 
     glViewport(0, 0, viewWidth, viewHeight);
 
-	gameInterfaceInit(viewWidth, viewHeight);
-	gameInterfaceControls.trim.blinking = 1;
 }
 
 static game_timeval_t gameInputTimeLast = 0;
@@ -189,6 +189,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 {
     // TODO: draw a 'wait...loading' status string each frame until load
 	if(!glFlightInited) {
+		glFlightJNIInit();
 		return;
 	}
 
@@ -207,7 +208,12 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIEnv *e, jobject o)
 {
-	glFlightJNIInit();
+//
+}
+
+JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightResourcesInit(JNIEnv *e, jobject o)
+{
+	return 0;
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNIEnv *e, jobject o)
@@ -288,11 +294,13 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 
 	// see FullScreenActivity.java
 
-    sumroll = sumrolloff - jf[0];
-    sumpitch = sumpitchoff - jf[2];
-    sumyaw = sumyawoff - jf[1];
+    sumroll = fmod(sumrolloff - jf[0], M_PI);
+    sumpitch = fmod(sumpitchoff - jf[2], M_PI);
+    sumyaw = fmod(sumyawoff - jf[1], M_PI);
 
-	if(!glFlightInited) return;
+    //DBPRINTF(("sensor: %03f %03f %03f", jf[0], jf[1], jf[2]));
+
+	//if(!glFlightInited) return;
 
 	if(needTrim && trimDoneCallback)
 	{
@@ -300,18 +308,14 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 		sumpitchoff = jf[2];
 		sumyawoff = jf[1];
 
-        needTrim = 0;
-
 		trimDoneCallback();
+        needTrim = false;
 
 		return;
 	}
 
 	// Z reversed
-	//		gameInputGyro(-sumroll, sumyaw, -sumpitch); // remove this - these agree across all devices
 	gameInputGyro(-sumroll, sumpitch, -sumyaw);
-
-	//gameInputMotion(sumroll, sumpitch, sumyaw);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorNeedsCalibrate(JNIEnv *e, jobject o)

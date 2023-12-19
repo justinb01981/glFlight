@@ -11,7 +11,7 @@ public class GameRunnable  {
 	static native void glFlightRunBGThread();
 	static native void glFlightTouchInput(float f[]);
 	static native String glFlightNextAudioEvent(String s);
-	static native Integer glFlightSensorNeedsCalibrate();
+	static native boolean glFlightSensorNeedsCalibrate();
 	
 	static native void glFlightSensorInput(float f[]);
 	

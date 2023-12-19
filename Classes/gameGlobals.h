@@ -123,7 +123,7 @@ const static float RADAR_MIN_VELOCITY = 1;
 const static float TOW_DISTANCE_MAX = 20;
 const static float TOW_DISTANCE_MIN = 2.0;
 
-const static float GAME_AI_UPDATE_INTERVAL_MS = 40;
+const static float GAME_AI_UPDATE_INTERVAL_MS = 120;
 
 #define GAME_FRAME_RATE 60
 #define GAME_FRAME_RATE_TIMES_4 240
