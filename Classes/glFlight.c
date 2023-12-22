@@ -133,7 +133,7 @@ glFlightFrameStage1()
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnable(GL_DEPTH_TEST);
     
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0, 0, 0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // turn off bilinear filtering
@@ -173,19 +173,13 @@ glFlightFrameStage1()
         
         goto draw_bail;
     }
-
-
-    extern void update_time_ms_frame_tick(void);
-    update_time_ms_frame_tick();
     
 calibrate_bail:
     get_time_ms();
 
-#if GAME_PLATFORM_ANDROID
-    // TODO: move timer handleing to platform code
+    // TODO: move timer handleing to platform code - i think this is only for android?
     time_ms = time_ms_wall;
-#endif
-    
+
 //    if(gameInputInitialTrimPending())
 //    {
 //        speed = 0.0;
@@ -214,6 +208,8 @@ calibrate_bail:
         world_update_time_last = time_ms;
         goto draw_bail;
     }
+
+    // DBPRINTF(("tc:%f", tc));
 
     world_update(tc);
     world_update_time_last = time_ms;
@@ -373,12 +369,11 @@ calibrate_bail:
         //gameCamera_pitchRadians(-M_PI/2);
         //camera_locked_frames = 120;
         
-        /* TODO: figure out why a crash in visible-checks if this isn't here */
-        // bail this draw
         
         console_write(game_log_messages[GAME_LOG_TELEPORT]);
         gameAudioPlaySoundAtLocationWithRate("teleport", 1.0, gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
-        return;
+
+        return; // HACK: is this necessary anymore - testing needed
     }
     else
     {

@@ -303,7 +303,7 @@ game_ai_run()
                 if(pCurElem->stuff.u.enemy.changes_target &&
                    time_ms >= pCurElem->stuff.u.enemy.time_next_retarget)
                 {
-                    pCurElem->stuff.u.enemy.time_next_retarget = time_ms + 2000;
+                    pCurElem->stuff.u.enemy.time_next_retarget = time_ms + change_target_frequency;
                     
                     if((pCurElem->stuff.u.enemy.target_id = game_ai_find_target(pCurElem)) != WORLD_ELEM_ID_INVALID)
                     {

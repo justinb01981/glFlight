@@ -98,11 +98,11 @@ extern int fireActionQueuedAfterEdit;
 #endif
 
 /* reducing friction influences this... should be MAX_THRUST really */
-#define MAX_SPEED /*(15)*/ (18.0)
+#define MAX_SPEED (15.5)
 
 #define GAME_AI_DEBUG 0
 
-const static char* GAME_VERSION_STR = "1.10.1_core";
+const static char* GAME_VERSION_STR = "1.10.2_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 

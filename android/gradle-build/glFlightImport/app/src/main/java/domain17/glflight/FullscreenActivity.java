@@ -52,7 +52,7 @@ import com.domain17.glflight.util.*;
 public class FullscreenActivity extends Activity implements SensorEventListener {
 
     public boolean running = false;
-    public boolean renderContinuously = true;        // near as I can tell this makes no difference now  more testing needed
+    public boolean renderContinuously = false;  // targeting 60fps
     Context appCtx;
     int accuracyLast = SensorManager.SENSOR_STATUS_UNRELIABLE;
 

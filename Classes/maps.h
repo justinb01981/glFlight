@@ -122,7 +122,7 @@ WORLD_CUBEGRID(y, tex, scale)
 "add_object 1 rndx rndy rndz rndr rndr rndr 2 18\n"
 
 #define BACKGROUND_TEX_SPACE                                                      \
-"register_params "BACKGROUND_TEX_BEGIN" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"          \
+"register_params 47 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"          \
 "register_params_update rnd_""1"" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n" \
 "set_background_info r""\n"
 

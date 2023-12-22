@@ -244,7 +244,7 @@ world_build_run_program(float x, float y, float z)
                          0.01, 0.01, 0.01,
                          6, TEXTURE_ID_ANIMATED_STATIC);
         world_get_last_object()->object_type = OBJ_SPAWNPOINT;
-        //update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
+        update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
         world_object_set_lifetime(world_get_last_object()->elem_id, 300);
     }
     
