@@ -856,6 +856,44 @@ int world_add_object(Model type, float x, float y, float z, float yaw, float pit
     return world_add_object_core(type, x, y, z, yaw, pitch, roll, scale, texture_id, WORLD_ELEM_ID_INVALID);
 }
 
+
+void world_unlink_elem(WorldElem* pFreeElem)
+{
+    /*
+     * void
+world_remove_object(int elem_id)
+{
+    WorldElem* pElem = NULL;
+
+    if(gWorld->ignore_remove) return;
+
+    WorldElemListNode* pRemoveNode;
+    pRemoveNode = world_elem_list_find(elem_id, &gWorld->elements_list);
+    if(pRemoveNode) pElem = pRemoveNode->elem;
+
+    if(pElem && !pElem->remove_pending)
+    {
+        if(gWorld->world_update_state.world_remove_hook) gWorld->world_update_state.world_remove_hook(pElem);
+
+        remove_element_from_region(pElem);
+
+        world_elem_list_remove(pElem, &gWorld->elements_expiring);
+        world_elem_list_remove(pElem, &gWorld->elements_moving);
+        world_elem_list_remove(pElem, &gWorld->elements_intelligent);
+
+        world_elem_list_remove(pElem, &gWorld->elements_list);
+        world_elem_list_add(pElem, &gWorld->elements_to_be_freed);
+        pElem->remove_pending = 1;
+    }
+}
+     */
+        world_elem_list_remove(pFreeElem, &gWorld->elements_expiring);
+        world_elem_list_remove(pFreeElem, &gWorld->elements_moving);
+        world_elem_list_remove(pFreeElem, &gWorld->elements_intelligent);
+        // elements_collided is handled elsewhere (temporary list)
+        remove_element_from_region(pFreeElem);
+}
+
 void
 world_remove_object(int elem_id)
 {
@@ -871,12 +909,12 @@ world_remove_object(int elem_id)
     {
         if(gWorld->world_update_state.world_remove_hook) gWorld->world_update_state.world_remove_hook(pElem);
         
-        remove_element_from_region(pElem);
-        
-        world_elem_list_remove(pElem, &gWorld->elements_expiring);
-        world_elem_list_remove(pElem, &gWorld->elements_moving);
-        
-        world_elem_list_remove(pElem, &gWorld->elements_list);
+        world_unlink_elem(pElem);
+
+        // here, remove from elements list immediately instead of waiting for elements_to_be_freed-pending to do it
+        //world_elem_list_remove(pElem, &gWorld->elements_list);
+
+        // freed from the rest later in clear_pending
         world_elem_list_add(pElem, &gWorld->elements_to_be_freed);
         pElem->remove_pending = 1;
     }
@@ -955,15 +993,17 @@ world_find_elem_with_attrs(WorldElemListNode* head, int object_type, int affilia
 
 static void update_object_in_motion(WorldElem* pElem)
 {
+
+    pElem->physics.ptr->velocity = sqrt(pElem->physics.ptr->vx*pElem->physics.ptr->vx +
+                                    pElem->physics.ptr->vy*pElem->physics.ptr->vy +
+                                    pElem->physics.ptr->vz*pElem->physics.ptr->vz);
+
     // add to "elements-moving" list
     if(!world_elem_list_find_elem(pElem, &gWorld->elements_moving))
     {
         world_elem_list_add(pElem, &gWorld->elements_moving);
     }
     
-    pElem->physics.ptr->velocity = sqrt(pElem->physics.ptr->vx*pElem->physics.ptr->vx +
-                                        pElem->physics.ptr->vy*pElem->physics.ptr->vy +
-                                        pElem->physics.ptr->vz*pElem->physics.ptr->vz);
     pElem->moving = 1;
 }
 
@@ -1401,10 +1441,8 @@ void world_clear_pending()
     {
         WorldElem* pFreeElem = pCur->elem;
         pCur = pCur->next;
-        
-        world_elem_list_remove(pFreeElem, &gWorld->elements_expiring);
-        world_elem_list_remove(pFreeElem, &gWorld->elements_moving);
-        remove_element_from_region(pFreeElem);
+
+        world_unlink_elem(pFreeElem);
         
         world_elem_list_remove(pFreeElem, &gWorld->elements_to_be_freed);
         

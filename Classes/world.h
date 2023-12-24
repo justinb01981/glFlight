@@ -45,6 +45,8 @@ typedef struct
     //WorldElemListNode elements_by_region[WORLD_MAX_REGIONS][WORLD_MAX_REGIONS][WORLD_MAX_REGIONS];
     
     WorldElemListNode elements_moving;
+
+    WorldElemListNode elements_intelligent;
     
     WorldElemListNode elements_expiring;
     

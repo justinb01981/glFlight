@@ -200,7 +200,7 @@ void
 game_ai_run()
 {
     // TODO: problem here where placed objects may not be moving, but should get AI time
-    WorldElemListNode* pCur = gWorld->elements_moving.next, *pNext;
+    WorldElemListNode* pCur = gWorld->elements_intelligent.next, *pNext;
     while(pCur)
     {
         pNext = pCur->next;
@@ -703,7 +703,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     elem->yq = yq;
     elem->zq = zq;
     
-#if 1
+#if 0
     // TODO: re-apply a,b,g to elem body vectors or store the whole quaternion - no more drift to NaN
     float* pFloatCheckIsNan[] = {
         &alpha,

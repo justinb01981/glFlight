@@ -480,6 +480,7 @@ game_add_enemy_core(float x, float y, float z, int model)
     world_get_last_object()->stuff.u.enemy.intelligence = gameStateSinglePlayer.enemy_intelligence;
     world_get_last_object()->stuff.u.enemy.enemy_state = ENEMY_STATE_PATROL;
     world_get_last_object()->stuff.intelligent = 1;
+    world_elem_list_add_fast(world_get_last_object(), &gWorld->elements_intelligent, LIST_TYPE_UNKNOWN);
     world_get_last_object()->physics.ptr->friction = 1;
     game_elem_setup_ship(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
     update_object_velocity(obj_id, 1, 1, 1, 0);
@@ -559,6 +560,7 @@ game_add_turret(float x, float y, float z)
     world_get_last_object()->durability = DURABILITY_TURRET;
     world_get_last_object()->object_type = OBJ_TURRET;
     world_get_last_object()->stuff.intelligent = 1;
+    world_elem_list_add_fast(world_get_last_object(), &gWorld->elements_intelligent, LIST_TYPE_UNKNOWN);
     game_elem_setup_turret(world_get_last_object(), gameStateSinglePlayer.enemy_intelligence);
     update_object_velocity(obj_id, -0.1, -0.1, -0.1, 0);
 }
@@ -2369,6 +2371,7 @@ game_add_bullet(float pos[3], float euler[3], float vel, float leadV, int bullet
             world_get_last_object()->stuff.u.enemy.target_id = missle_target;
             world_get_last_object()->texture_id = TEXTURE_ID_MISSLE;
             world_object_set_lifetime(obj, GAME_MISSLE_LIFETIME);
+            world_elem_list_add_fast(world_get_last_object(), &gWorld->elements_intelligent, LIST_TYPE_UNKNOWN);
             
             gameAudioPlaySoundAtLocation("missle", pos[0], pos[1], pos[2]);
             
