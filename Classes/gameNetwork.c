@@ -1767,7 +1767,7 @@ do_game_network_world_update()
         return;
     }
     
-    //get_time_ms_wall();
+     get_time_ms_wall();
     
     /*
      * walk list of newly pending-added objects, do not do world_elem_remove here

@@ -31,6 +31,9 @@ extern void GameNetworkBonjourManagerBrowseBegin(void);
 extern void game_add_network_portal(char* name);
 extern void load_map_and_host_game(void);
 
+extern void (*trimDoneCallback)(void);
+extern void gameInputTrimEnd(void);
+
 controls gameInterfaceControls;
 
 int texture_id_block = TEXTURE_ID_BLOCK;
@@ -45,6 +48,7 @@ int game_start_score = 0;
 
 static void trimThenHideCalibrateRect(void)
 {
+    gameInterfaceControls.trim.blinking = 0;
     gameInterfaceControls.calibrateRect.visible = 0;
 }
 
@@ -284,6 +288,8 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.consoleHidden = 0;
     
     gameInterfaceControls.touchCount = 0;
+
+    gameInterfaceControls.trim.blinking = 1; // attention the user to calibrate
 }
 
 void
@@ -384,10 +390,7 @@ gameInterfaceHandleTouchMove(float x, float y)
     }
     else if(touchedControl == &gameInterfaceControls.trim)
     {
-        gameInputTrimBegin(trimThenHideCalibrateRect);
-//        gyro_calibrate_log(100);
-        gameInterfaceControls.trim.blinking = 0;
-        gameInterfaceControls.calibrateRect.visible = 1;
+
     }
     else if(touchedControl == &gameInterfaceControls.look)
     {
@@ -514,7 +517,8 @@ gameInterfaceHandleTouchBegin(float x, float y)
         };
         float touchRadius = 200;
         float RMin = touchRadius;
-        
+
+        // menu sounds/nav
         if(touchedControl == &gameInterfaceControls.textMenuControl)
         {
             int outofbounds = 1;
@@ -662,6 +666,12 @@ gameInterfaceHandleTouchBegin(float x, float y)
     if(touchedControl == &gameInterfaceControls.fire)
     {
         gameInterfaceHandleTouchMove(x, y);
+    }
+
+    if(touchedControl == &gameInterfaceControls.trim) {
+
+        gameInterfaceControls.calibrateRect.visible = 1;
+        gameInputTrimBegin(trimThenHideCalibrateRect);
     }
     
     // update what controls are visible based on menu conditions
@@ -1121,12 +1131,6 @@ gameInterfaceHandleTouchEnd(float x, float y)
 
     if (touchedControl)
     {
-        // removed: trim is now a touchdown-only button, not held
-//        if (touchedControl == &gameInterfaceControls.trim)
-//        {
-//            gameInputTrimCancel();
-//        }
-        
         touchedControl->touch_began = 0;
         //gameInterfaceHandleTouchMove(x, y);
         touchedControl->touch_end_last = time_ms;
@@ -1139,6 +1143,12 @@ gameInterfaceHandleTouchEnd(float x, float y)
         {
             gameInterfaceControls.controlArray[i]->touch_began = 0;
             gameInterfaceControls.controlArray[i]->touch_end_last = time_ms;
+
+            // identify control tap ending and apply in some cases here
+            if(gameInterfaceControls.controlArray[i] == &gameInterfaceControls.trim) {
+                gameInterfaceControls.calibrateRect.visible = 0;
+                gameInputTrimEnd();
+            }
         }
     }
     

@@ -1,4 +1,5 @@
 //
+//
 //  world.m
 //  gl_flight
 //
@@ -50,9 +51,10 @@ world_t *gWorld = NULL;
 game_lock_t gWorldLock;
 
 float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
+// TODO: DO NOT SET THIS HERE SEE gameVariables
 float C_FRICTION = /*0.04*/ 0.030; // higher values = more friction
 float GYRO_FEEDBACK = 0;
-float GYRO_DC = 1.0;
+float GYRO_DC = 0.05; // no longer used in gameInput - remove this
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
 
 static struct mesh_t* world_pending_mesh = NULL;
@@ -84,7 +86,12 @@ world_add_object_core(Model type,
     int new_durability = 1;
     int model_changed = 0;
     WorldElem* pElem;
-    
+
+    if(isnan(x) || isnan(y) || isnan(z)) {
+        DBPRINTF(("WARNING: world_add_object loc NaN! ignoring object"));
+        return WORLD_ELEM_ID_INVALID;
+    }
+
     MODEL_POLY_COMPONENTS_DECLARE();
     
     MODEL_POLY_COMPONENTS_INIT();
@@ -795,12 +802,7 @@ world_add_object_core(Model type,
     {
         pElem->durability = new_durability;
     }
-	
-	switch (texture_id)
-	{
-	default:
-		break;
-	}
+
     
     /*
     if(is_collideable && replace_id == WORLD_ELEM_ID_INVALID)
@@ -852,7 +854,6 @@ world_add_object_core(Model type,
 
 int world_add_object(Model type, float x, float y, float z, float yaw, float pitch, float roll, float scale, int texture_id)
 {
-    if(gWorld->ignore_add) return WORLD_ELEM_ID_INVALID;
     return world_add_object_core(type, x, y, z, yaw, pitch, roll, scale, texture_id, WORLD_ELEM_ID_INVALID);
 }
 

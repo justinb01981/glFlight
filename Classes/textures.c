@@ -24,8 +24,8 @@
 #define GL_NONE 0
 #endif
 
-unsigned int texture_list[MAX_TEXTURES];
-unsigned int texture_list_loaded[MAX_TEXTURES];
+unsigned int texture_list[MAX_TEXTURES] = {0};
+unsigned int texture_list_loaded[MAX_TEXTURES] = {0};
 GLubyte* texture_data_table[MAX_TEXTURES];
 int texture_preload_count = 12;
 const static unsigned char alpha_black = 0x00;
@@ -86,11 +86,7 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
      * created with GIMP
      */
 
-    if(texture_data_table[tex_id] != NULL)  // cleanup prior?
-    {
-        free(texture_data_table[tex_id]);
-        texture_data_table[tex_id] = NULL;
-    }
+    assert(texture_data_table[tex_id] == NULL);
     
     fp = fopen(file_name, "rb");
     if(fp)
@@ -189,9 +185,9 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
                     err = 0;
                 }
                 
-                // TODO: LEAKING THIS
-                //free(data);
-                //texture_data_table[tex_id] = NULL;
+                // this is OK says openGL docs
+                free(data);
+                texture_data_table[tex_id] = NULL;
             }
         }
         
@@ -215,6 +211,10 @@ read_bitmap_to_gltexture(int tex_id)
 
 void initTextures(const char *prefix)
 {
+
+    uninitTextures();
+
+
     int i;
     strcpy(initTexturesPrefix, prefix);
     
@@ -266,4 +266,17 @@ void textures_hack_framebuffer_cleanup(void) {
     // accept new texture rendered from framebuf
 //    texture_list_loaded[TEXTURE_ID_BOUNDING] = 0;
 //    texture_list[TEXTURE_ID_BOUNDING] = -1;
+}
+
+
+void uninitTextures() {
+    int i;
+    for(i = 0; i < MAX_TEXTURES; i++)
+    {
+        if(texture_list_loaded[i]) {
+            glDeleteTextures(1, &texture_list[i]);
+            texture_list[i] = GL_NONE;
+            texture_list_loaded[i] = 0;
+        }
+    }
 }

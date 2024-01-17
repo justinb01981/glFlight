@@ -98,32 +98,30 @@ extern int fireActionQueuedAfterEdit;
 #endif
 
 /* reducing friction influences this... should be MAX_THRUST really */
-#define MAX_SPEED (15.5)
+#define MAX_SPEED (12.0)
 
-#define GAME_AI_DEBUG 0
-
-const static char* GAME_VERSION_STR = "1.10.2_core";
+const static char* GAME_VERSION_STR = "1.10.3_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 
 const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2);
 const static float SPEED_BOOST_FRAMES = 60 * 5;
 extern float C_THRUST;
-extern float C_FRICTION;
+extern float C_FRICTION;    // SEE physics_friction_c gameVariable
 extern float GYRO_FEEDBACK;
 extern float GYRO_DC;
 
-const static int pooped_cube_interval_ms = 25;
-const static int pooped_cube_lifetime = 5;    // determines trail length
+const static int pooped_cube_interval_ms = 50;
+const static int pooped_cube_lifetime = 20;    // determines trail length
 
-const static float collision_repulsion_coeff = 1.02;
+const static float collision_repulsion_coeff = 1.01;
 
 const static float RADAR_MIN_VELOCITY = 1;
 
 const static float TOW_DISTANCE_MAX = 20;
 const static float TOW_DISTANCE_MIN = 2.0;
 
-const static float GAME_AI_UPDATE_INTERVAL_MS = 120;
+const static float GAME_AI_UPDATE_INTERVAL_MS = 63;
 
 #define GAME_FRAME_RATE 60
 #define GAME_FRAME_RATE_TIMES_4 240
@@ -135,6 +133,8 @@ const static float GAME_AI_UPDATE_INTERVAL_MS = 120;
 #define GAME_POWERUP_DROP_TABLE_LEN 10
 
 #define GAME_CAPTURE_TOW_FORCE 0.60 // based on brief testing of stickiness
+
+#define GAME_AI_DEBUG 0
 
 extern game_timeval_t time_engine_sound_next;
 

@@ -13,22 +13,20 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "game/gameIncludes.h"
-
-#include "game/textures.h"
-#include "game/gameCamera.h"
-#include "game/gameSettings.h"
-#include "game/gameAi.h"
-#include "game/gameInput.h"
-#include "game/world_file.h"
-#include "game/gameGraphics.h"
-#include "game/gameInterface.h"
-#include "game/gameAudio.h"
-#include "game/gameNetwork.h"
-#include "game/maps.h"
-#include "game/gameDebug.h"
-#include "game/gameDialogs.h"
+#include "gameIncludes.h"
+#include "textures.h"
+#include "gameCamera.h"
+#include "gameSettings.h"
+#include "gameAi.h"
+#include "gameInput.h"
+#include "world_file.h"
+#include "gameGraphics.h"
+#include "gameInterface.h"
+#include "gameAudio.h"
+#include "gameNetwork.h"
+#include "maps.h"
+#include "gameDebug.h"
+#include "gameDialogs.h"
     
 #include "stubs.h"
 
@@ -36,7 +34,7 @@ void dbtrace(const char* x, int y) { __android_log_print(ANDROID_LOG_DEBUG, "LOG
 void dbtracelog(const char* x, int y, const char* s) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d %s\n", x, y, s); }
 extern void (*trimDoneCallback)(void);
 
-#include "game/glFlight.h"
+#include "glFlight.h"
 
 // globals
 double sumroll, sumpitch, sumyaw, sumrolloff, sumpitchoff, sumyawoff;
@@ -143,7 +141,6 @@ glFlightJNIInit()
     // HACK: touch inputs are in portrait mode
 
     gameInterfaceInit(viewWidth, viewHeight);
-    gameInterfaceControls.trim.blinking = 1;
 
 	DBPRINTF(("glFlightJNIInit done!\n"));
 
@@ -245,7 +242,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JN
 
     gameInputUninit();
     tex_pass = 0;
-    glFlightDrawframeHook = gameDialogInitialCountdown;
+    glFlightDrawframeHook = gameDialogInitialCountdownDrawCallback;
 
     DBPRINTF(("Java_com_domain17_glflight_GameRunnable_glFlightUninit called + exiting"));
 }
@@ -299,20 +296,6 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
     sumyaw = fmod(sumyawoff - jf[1], M_PI);
 
     //DBPRINTF(("sensor: %03f %03f %03f", jf[0], jf[1], jf[2]));
-
-	//if(!glFlightInited) return;
-
-	if(needTrim && trimDoneCallback)
-	{
-		sumrolloff = jf[0];
-		sumpitchoff = jf[2];
-		sumyawoff = jf[1];
-
-		trimDoneCallback();
-        needTrim = false;
-
-		return;
-	}
 
 	// Z reversed
 	gameInputGyro(-sumroll, sumpitch, -sumyaw);

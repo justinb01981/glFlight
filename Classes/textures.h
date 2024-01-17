@@ -28,7 +28,7 @@
 enum
 {
     TEXTURE_ID_NONE = 0,
-    TEXTURE_ID_BOUNDING = 52,
+    TEXTURE_ID_BOUNDING = 96,
     TEXTURE_ID_PORTAL = 98,
     TEXTURE_ID_POOPED_CUBE = 33,
     TEXTURE_ID_POOPED_CUBE_BOOST = 2,
@@ -190,6 +190,8 @@ extern int texture_id_playership;
 extern int texture_id_background;
 
 void initTextures(const char *prefix);
+
+void uninitTextures(void);
 
 int bindTextureRequestCore(int);
 

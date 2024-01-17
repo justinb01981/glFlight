@@ -41,16 +41,15 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
     }
     namespace 'com.domain17.glflight'
-    buildToolsVersion '28.0.3'
 
 
 }
 
-copy {
-    from '../../../../Classes'
-    into 'src/main/jni/game/'
-    include '*.*'
-}
+// copy {
+//    from '../../../../Classes'
+//    into 'src/main/jni/game/'
+//    include '*.*'
+//}
 
 copy {
     from '../../../../'

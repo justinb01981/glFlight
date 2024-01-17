@@ -100,8 +100,7 @@ typedef struct
     float vec_gravity[3];
     
     float vec[6];
-    
-    int ignore_add:1;
+
     int ignore_remove:1;
     int visible_list_change:1;
     

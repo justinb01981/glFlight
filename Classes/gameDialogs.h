@@ -37,6 +37,8 @@ extern void AppDelegateOpenURL(const char* url);
 
 extern void gameDialogStartNetworkGame(void);
 
+static void gameDialogWelcome(void);
+
 static void
 gameDialogCancel(void)
 {
@@ -70,14 +72,14 @@ gameDialogGraphic(int tex_id)
 static void
 gameDialogGraphicDangerCountdown()
 {
-    static int passes = 60;
+    static int passes = 20;
     gameDialogGraphic(TEXTURE_ID_DAMAGE_FLASH);
     passes--;
     if(passes <= 0)
     {
         gameDialogGraphicCancel();
         glFlightDrawframeHook = NULL;
-        passes = 60;
+        passes = 20;
     }
 }
 
@@ -115,9 +117,11 @@ static void
 gameDialogWelcomeMenu()
 {
     gameInterfaceControls.textMenuControl.visible = 1;
+    //gameInterfaceControls.menuControl.visible = 1;
+    glFlightDrawframeHook = NULL;
 }
 
-static void gameDialogWelcome(void);
+
 
 static void
 gameDialogRating()
@@ -181,8 +185,6 @@ gameDialogMenuCountdown()
 //        return;
 //    }
     
-    glFlightDrawframeHook = NULL;
-    
     if(AppDelegateIsMultiplayerEager())
     {
         actions_menu_set(ACTION_CONNECT_TO_GAME);
@@ -243,7 +245,7 @@ gameDialogCalibrate()
     gameDialogClose();
     gameInterfaceModalDialogDequeue();
     
-    gameInputInit();
+
     gameInputTrimBegin(gameDialogWelcome);
     /*
     gameInterfaceModalDialog(
@@ -264,24 +266,13 @@ static void
 gameDialogInitial()
 {
     console_clear();
-
-    /*
-    gameInterfaceModalDialog(
-                             "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
-                             "^C                             ^C\n"
-                             "^C     Gently steer device     ^C\n"
-                             "^C    to adjust sensitivity    ^C\n"
-                             "^C                             ^C\n"
-                             "^C       (Tap to begin)        ^C\n"
-                             "^C                             ^C\n"
-                             "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
-                             "", "cancel", gameDialogCalibrate, gameDialogCalibrate);
-     */
-    gameDialogCalibrate();
+    //gameDialogCalibrate();
+    gameDialogWelcome();
 }
 
+// MARK: -- first draw-callback called to render intro and finally pop welcome
 static void
-gameDialogInitialCountdown()
+gameDialogInitialCountdownDrawCallback()
 {
     static int count = 240;
     
@@ -316,7 +307,6 @@ static void
 gameDialogResume()
 {
     gameInterfaceControls.textMenuControl.visible = 1;
-    gameInput_trimLock();
     
 //    gameInterfaceModalDialog("Resume paused game?", "Yes", "No",
 //                             gameDialogResumePaused, gameDialogResumePausedNo);

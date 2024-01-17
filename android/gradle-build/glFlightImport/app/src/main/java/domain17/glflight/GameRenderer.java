@@ -30,6 +30,8 @@ public class GameRenderer implements Renderer {
 
 	public GLSurfaceView surfaceView;
 
+	boolean glflightInitDone = false;
+
 	@Override
 	public void onDrawFrame(GL10 arg0) {
 		onDrawFrame();
@@ -41,7 +43,10 @@ public class GameRenderer implements Renderer {
 
 		onSurfaceChanged(f);
 
-		GameRunnable.glFlightInit();	// this is funky (but unused in the JNI code for now
+		if(!glflightInitDone) {
+			glflightInitDone = true;
+			GameRunnable.glFlightInit();    // this is funky (but unused in the JNI code for now
+		}
 	}
 
 	@Override

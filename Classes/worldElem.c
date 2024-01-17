@@ -108,7 +108,7 @@ world_elem_free(WorldElem* pElem)
         
         // LEAK
         DBPRINTF(("***WARNING (leak) freeing element STILL remaining in list*** (pNode->type:%d list:%02x)\n",
-                  pNode->type, (unsigned int) pElem->listRefHead.listNext->listElem));
+                  pNode->type, (unsigned long) pElem->listRefHead.listNext->listElem));
         
         // HACK: shouldn't be necessary, should only be in pending-freed list, fix this
         hack_remove_elem_from_all(pElem);
@@ -785,7 +785,10 @@ world_elem_btree_remove(world_elem_btree_node* root, WorldElem* elem)
     
     float order = ((world_elem_btree_node*)elem->btree_node)->order;
 
-    //if(isnan(order)) assert(0);
+    if(isnan(order)) {
+        //assert(0);
+        DBPRINTF(("WARNING: world_elem_btree_remove ignoring elem-ordinal: NaN"));
+    }
     
     //if(((world_elem_btree_node*)elem->stuff.btree_node[world_elem_btree_ptr_idx])) ((world_elem_btree_node*)elem->stuff.btree_node[world_elem_btree_ptr_idx])->elem = NULL;
     //elem->stuff.btree_node[world_elem_btree_ptr_idx] = NULL;

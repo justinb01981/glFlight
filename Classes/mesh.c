@@ -251,7 +251,7 @@ mesh_to_opengl_triangles(struct mesh_t* mesh, float tx_m, float ty_m)
     // build indices from triangles
     for(unsigned int t = 0; t < mesh->n_triangles; t++)
     {
-        unsigned int coord_idx;
+        model_index_t coord_idx;
         
         coord_idx = MESH_COORD_IDX(mesh, mesh->triangles[t].points[0].x,
                                    mesh->triangles[t].points[0].y);
@@ -387,7 +387,7 @@ TESS_STEPU_FUNCTION
         
         if(S->Id < 0)
         {
-            unsigned int tmp = *(S->Icur+1);
+            model_index_t tmp = *(S->Icur+1);
             *(S->Icur+1) = *(S->Icur+2);
             *(S->Icur+2) = tmp;
         }
@@ -402,7 +402,7 @@ TESS_STEPU_FUNCTION
         
         if(S->Id < 0)
         {
-            unsigned int tmp = *(S->Icur+1);
+            model_index_t tmp = *(S->Icur+1);
             *(S->Icur+1) = *(S->Icur+2);
             *(S->Icur+2) = tmp;
         }
@@ -421,7 +421,7 @@ TESS_STEPU_FUNCTION
         
         if(S->Id > 0)
         {
-            unsigned int tmp = *(S->Icur+1);
+            model_index_t tmp = *(S->Icur+1);
             *(S->Icur+1) = *(S->Icur+2);
             *(S->Icur+2) = tmp;
         }
@@ -434,7 +434,7 @@ TESS_STEPU_FUNCTION
         
         if(S->Id < 0)
         {
-            unsigned int tmp = *(S->Icur+1);
+            model_index_t tmp = *(S->Icur+1);
             *(S->Icur+1) = *(S->Icur+2);
             *(S->Icur+2) = tmp;
         }

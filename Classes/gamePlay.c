@@ -488,7 +488,7 @@ game_add_enemy_core(float x, float y, float z, int model)
     console_write(game_log_messages[GAME_LOG_NEWENEMY1]);
     if(gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWENEMY1] > 0)
     {
-        gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWENEMY1]--;
+        gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWENEMY1] -= 1;   // once,
         glFlightCamFix(obj_id);
     }
     
@@ -750,10 +750,7 @@ game_start(float difficulty, int type)
     
     gameStateSinglePlayer.collect_system_integrity = 100;
     
-    for(int t = 0; t < GAME_LOG_LAST; t++) gameStateSinglePlayer.log_event_camwatch[t] = 0;
-    
-    gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWENEMY1] = 1;
-    gameStateSinglePlayer.log_event_camwatch[GAME_LOG_WARN_CAPTURE] = 1;
+    for(int t = 0; t < GAME_LOG_LAST; t++) gameStateSinglePlayer.log_event_camwatch[t] = 1;
     
     collision_actions_set_default();
     
@@ -806,10 +803,10 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.enemy_spawnpoint_interval = 7000;
         gameStateSinglePlayer.base_spawn_collect_m = 0.9;
         gameStateSinglePlayer.base_spawn_collect_w = 65535/2;
-        gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
+        gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 1;
         
-        gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/20;
-        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/20;
+        gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/60;
+        gameStateSinglePlayer.rate_enemy_count_increase = 1.0/60;
         
         gameStateSinglePlayer.enemy1_ignore_player_pct = 90;
         
@@ -941,7 +938,7 @@ game_start(float difficulty, int type)
         
         gameStateSinglePlayer.counter_enemies_spawned = /* 3 + difficulty * 2 */ 9999;
         gameStateSinglePlayer.enemy_spawnpoint_interval = 5;
-        gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 3;
+        gameStateSinglePlayer.log_event_camwatch[GAME_LOG_NEWDATA] = 1;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1.0/10;
         gameStateSinglePlayer.rate_enemy_count_increase = 1.0/20;
@@ -950,12 +947,13 @@ game_start(float difficulty, int type)
         
         gameMapSetMap(pokeball_map);
     }
-    
-    if(GAME_AI_DEBUG)
+
+#if GAME_AI_DEBUG
     {
         gameStateSinglePlayer.n_turrets = 0;
         gameStateSinglePlayer.max_enemies = 1;
     }
+#endif
     
     gameAIState.started = 1;
     
@@ -1609,7 +1607,9 @@ game_run()
                     obj_id_enemy_spawn = pCur->elem->elem_id;
                     
                     // MARK: spawn enemies
-                    
+
+                    DBPRINTF(("gameStateSinglePlayer.max_enemies:%f", gameStateSinglePlayer.max_enemies));
+
                     if (gameStateSinglePlayer.counter_enemies_spawned > 0 &&
                         enemies_found < floor(gameStateSinglePlayer.max_enemies) &&
                         time_ms - pCur->elem->stuff.u.spawnpoint.spawn_last >= gameStateSinglePlayer.enemy_spawnpoint_interval
@@ -2640,14 +2640,14 @@ void
 game_elem_setup_ship(WorldElem* elem, int skill)
 {
     elem->stuff.u.enemy.intelligence = skill;
-    elem->stuff.u.enemy.leaves_trail = GAME_VARIABLE("ENEMY1_LEAVES_TRAIL");
+    elem->stuff.u.enemy.leaves_trail = 1;
     elem->stuff.u.enemy.run_distance = rand_in_range(4, GAME_VARIABLE("ENEMY_RUN_DISTANCE"));
     elem->stuff.u.enemy.changes_target = GAME_VARIABLE("ENEMY1_CHANGES_TARGET");
-    elem->stuff.u.enemy.fires = GAME_VARIABLE("ENEMY1_FIRES_LASERS");
+    elem->stuff.u.enemy.fires = 1;
     elem->stuff.u.enemy.patrols_no_target_jukes = GAME_VARIABLE("ENEMY1_PATROLS_NO_TARGET");
     elem->stuff.u.enemy.max_speed = GAME_VARIABLE("ENEMY1_SPEED_MAX");
-    elem->stuff.u.enemy.max_slerp = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS")+ GAME_VARIABLE("ENEMY1_MAX_TURN_SKILL_SCALE")*skill;
-    elem->stuff.u.enemy.time_run_interval = GAME_VARIABLE("ENEMY1_RUN_INTERVAL_MS")
+    elem->stuff.u.enemy.max_slerp = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS") + GAME_VARIABLE("ENEMY1_MAX_TURN_SKILL_SCALE")*skill;
+    elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     //MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
     ;
     elem->stuff.u.enemy.scan_distance = /*GAME_VARIABLE("ENEMY1_FORGET_DISTANCE")*/ 1.0
@@ -2678,7 +2678,7 @@ game_elem_setup_turret(WorldElem* elem, int skill)
     elem->stuff.u.enemy.fires_missles = 0;
     elem->stuff.u.enemy.patrols_no_target_jukes = 0;
     elem->stuff.u.enemy.max_speed = MAX_SPEED/2;
-    elem->stuff.u.enemy.max_slerp = 1.2;
+    elem->stuff.u.enemy.max_slerp = GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS");
     elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     elem->stuff.u.enemy.scan_distance = 1;
     elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE");
@@ -2700,7 +2700,7 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
     x->durability = DURABILITY_MISSLE;
     x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
-    x->stuff.u.enemy.max_slerp = 4.0; // radians per second
+    x->stuff.u.enemy.max_slerp = GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS") * 2.0; // radians per second
     x->stuff.u.enemy.time_next_retarget = get_time_ms();
     x->stuff.u.enemy.scan_distance = 50;
     x->stuff.u.enemy.pursue_distance = 30;

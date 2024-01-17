@@ -25,10 +25,10 @@ float diff_m = 0.1;
 float scan_dist_increase = 60;
 float game_ai_fire_rate_ms = 800.0;
 float patrol_area_reached = 4.0;
-float tow_v_scale = /*0.5*/ 1.2;
+float tow_v_scale = /*0.5*/ 3.4;
 float min_patrol_distance = 20;
 float collect_deploy_distance = -2.5;
-float change_target_frequency = 10000;
+float change_target_frequency = 30000;  // nearly never
 float zdot_infront = 0.5;
 const float zdot_ikillyou = 0.5;
 const float zdot_juke = 0.3;
@@ -46,12 +46,12 @@ static float
 pursuit_speed_for_object(WorldElem* elem, float zdot);
 
 void
-ai_debug(char* msg, WorldElem* elem, float f)
+ai_debug(char* msg, WorldElem* elem, float f) {
+#if GAME_AI_DEBUG
 {
-    if(GAME_AI_DEBUG)
-    {
-        printf("ai_debug (%p):%s (%f)\n", elem, msg, f);
-    }
+    printf("ai_debug (%p):%s (%f)\n", elem, msg, f);
+}
+#endif
 }
 
 void
@@ -62,7 +62,6 @@ game_ai_init()
 void
 game_ai_setup(WorldElem* pNewElem)
 {
-    
     pNewElem->stuff.u.enemy.time_last_run = time_ms;
     pNewElem->stuff.u.enemy.time_next_retarget = time_ms;
     
@@ -281,7 +280,7 @@ game_ai_run()
             else if(pCurElem->stuff.u.enemy.target_id >= 0) // target, pursue
             {
                 WorldElemListNode* pTargetListNode = world_elem_list_find(pCurElem->stuff.u.enemy.target_id,
-                                                                          &gWorld->elements_list);
+                                                                          &gWorld->elements_moving);
                 if(pTargetListNode)
                 {
                     pv[pi++] = pTargetListNode->elem->physics.ptr->x;
@@ -301,7 +300,8 @@ game_ai_run()
             else // no target
             {
                 if(pCurElem->stuff.u.enemy.changes_target &&
-                   time_ms >= pCurElem->stuff.u.enemy.time_next_retarget)
+                        ( time_ms >= pCurElem->stuff.u.enemy.time_next_retarget || pCurElem->stuff.u.enemy.target_id)
+                        )
                 {
                     pCurElem->stuff.u.enemy.time_next_retarget = time_ms + change_target_frequency;
                     
@@ -379,14 +379,12 @@ game_ai_run()
                               pv[3], pv[4], pv[5],
                               pCurElem, target_objtype);
             }
-            
-            if(GAME_AI_DEBUG)
-            {
-                char tag_debug[255];
-                sprintf(tag_debug, "%d,%d", pCurElem->stuff.u.enemy.enemy_state, pCurElem->stuff.u.enemy.target_id);
-                world_object_set_nametag(pCurElem->elem_id, tag_debug);
-            }
-            
+
+#if GAME_AI_DEBUG
+            char tag_debug[255];
+            sprintf(tag_debug, "%d,%d", pCurElem->stuff.u.enemy.enemy_state, pCurElem->stuff.u.enemy.target_id);
+            world_object_set_nametag(pCurElem->elem_id, tag_debug);
+#endif
             pCurElem->stuff.u.enemy.collided = 0;
             pCurElem->stuff.u.enemy.time_last_run = time_ms + rand_in_range(-pCurElem->stuff.u.enemy.time_run_interval/10, pCurElem->stuff.u.enemy.time_run_interval/10);
         }
@@ -513,7 +511,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             {
                 ai_debug("juking:", elem, 0);
                 elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
-                elem->stuff.u.enemy.time_next_retarget = 3000;
+                elem->stuff.u.enemy.time_next_retarget = time_ms + 3000;
                 
                 game_ai_newheading(elem, juke_distance);
                 elem->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
@@ -603,9 +601,9 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         float result[3];
 
         // zq points backwards
-        dest[0] = elem->physics.ptr->x + -zq.x*S;
-        dest[1] = elem->physics.ptr->y + -zq.y*S;
-        dest[2] = elem->physics.ptr->z + -zq.z*S;
+        dest[0] = elem->physics.ptr->x - zq.x*S;
+        dest[1] = elem->physics.ptr->y - zq.y*S;
+        dest[2] = elem->physics.ptr->z - zq.z*S;
              
         if(world_bounding_violations(dest, result) /*&& zdot < 0.7*/)
         {
@@ -867,8 +865,8 @@ game_ai_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     
     elemAI->stuff.u.enemy.target_id = WORLD_ELEM_ID_INVALID;
     
-    // drop tow
-    elemAI->stuff.towed_elem_id = WORLD_ELEM_ID_INVALID;
+    // drop tow ? rubber-banding sometimes happens when towed by > 1
+    //elemAI->stuff.towed_elem_id = WORLD_ELEM_ID_INVALID;
     
     if(elemAI->stuff.u.enemy.target_id == WORLD_ELEM_ID_INVALID &&
        elemC->stuff.affiliation != 0)

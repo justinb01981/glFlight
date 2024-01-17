@@ -151,6 +151,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         running = true;
         mBGThread.start();
+
         if(!renderContinuously) mRenderThread.start();
     }
 
@@ -169,11 +170,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
             e.printStackTrace();
         }
 
-        /*
-        mRenderThread.cancel();
-        */
-
-
     }
 
 //    @Override
@@ -187,6 +183,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         gameRenderer.surfaceView.onResume();
         // moved registereListener from here to bg thread
+
+
     }
     
     /**
