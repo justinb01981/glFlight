@@ -2502,6 +2502,9 @@ addEngineExhaust(WorldElem *elem)
 int
 firePoopedCube(WorldElem *elem)
 {
+
+    assert(world_inited);
+
     quaternion_t qx, qy, qz;
     static float lineColorMine[8] = {0.1, 0.9,     0.1, 0.9,     0.1, 0.9,     0.1, 0.9};
     static float lineColorEnemy[8] = {1.0, 0.5,     0.95, 0.52,    0.95, 0.52,    1.0, 0.5};

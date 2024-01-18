@@ -83,8 +83,6 @@ const float tex_pass_initial_sample = 120;
 
 static double trim_dz[3];
 
-static int needTrimWas = 0;
-
 struct
 {
     float* buf, *dest;
@@ -255,15 +253,12 @@ gameInput()
 
     }
 
-    if(!needTrim && needTrimWas) {  // falling-edge of trim btn push
-        if(trimDoneCallback) {
-            trimDoneCallback();
-            trimDoneCallback = NULL;
-        }
+    if(!needTrim && trimDoneCallback)
+    {  // falling-edge of trim btn pushf(trimDoneCallback)
+        trimDoneCallback();
+        trimDoneCallback = NULL;
     }
-    needTrimWas = needTrim;
 
-    
     /*
                          (Rmax-Rmin)
             Dr - Rmin + ------------
