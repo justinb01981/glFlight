@@ -204,8 +204,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3086"
             endingLineNumber = "3086"
-            landmarkName = "unknown"
-            landmarkType = "0">
+            landmarkName = "gameNetwork_onBonjourConnecting3(msg, srcAddr)"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

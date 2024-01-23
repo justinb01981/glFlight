@@ -184,6 +184,21 @@
                   endingLineNumber = "412"
                   offsetFromSymbolStart = "2300">
                </Location>
+               <Location
+                  uuid = "9D776AB5-32B2-4704-A3D5-86D3A653504C - 17695d4728f6fbe9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "do_world_collision_handling"
+                  moduleName = "gl_flight_debug"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/collision.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "412"
+                  endingLineNumber = "412"
+                  offsetFromSymbolStart = "2308">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -201,117 +216,6 @@
             endingLineNumber = "481"
             landmarkName = "do_world_collision_handling(tc)"
             landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "39E227AE-1E6A-4C96-AA84-E45705F961DB"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/world.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "510"
-            endingLineNumber = "510"
-            landmarkName = "world_add_object_core(type, x, y, z, alpha, beta, gamma, scale, texture_id, replace_id)"
-            landmarkType = "9">
-            <Locations>
-               <Location
-                  uuid = "39E227AE-1E6A-4C96-AA84-E45705F961DB - 49677298739ee4bb"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "world_add_object_core"
-                  moduleName = "gl_flight_debug"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/world.c"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "510"
-                  endingLineNumber = "510"
-                  offsetFromSymbolStart = "4792">
-               </Location>
-               <Location
-                  uuid = "39E227AE-1E6A-4C96-AA84-E45705F961DB - 5050986042f230c2"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "world_add_object_core.cold.2"
-                  moduleName = "gl_flight_debug"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/world.c"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "510"
-                  endingLineNumber = "510"
-                  offsetFromSymbolStart = "8">
-               </Location>
-               <Location
-                  uuid = "39E227AE-1E6A-4C96-AA84-E45705F961DB - 49677298739ee4bb"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "world_add_object_core"
-                  moduleName = "gl_flight_debug"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/world.c"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "510"
-                  endingLineNumber = "510"
-                  offsetFromSymbolStart = "8272">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "7763CDF4-C0AF-461C-B8E9-1FC4C5BFD7D0"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/gameNetwork.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1960"
-            endingLineNumber = "1960"
-            landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
-            landmarkType = "9">
-            <Locations>
-               <Location
-                  uuid = "7763CDF4-C0AF-461C-B8E9-1FC4C5BFD7D0 - c2014117d5635cec"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "do_game_network_handle_msg"
-                  moduleName = "gl_flight_debug"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameNetwork.c"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1960"
-                  endingLineNumber = "1960"
-                  offsetFromSymbolStart = "352">
-               </Location>
-               <Location
-                  uuid = "7763CDF4-C0AF-461C-B8E9-1FC4C5BFD7D0 - c2014117d5635cec"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "do_game_network_handle_msg"
-                  moduleName = "gl_flight_debug"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameNetwork.c"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1960"
-                  endingLineNumber = "1960"
-                  offsetFromSymbolStart = "584">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
