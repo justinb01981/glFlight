@@ -2503,7 +2503,7 @@ int
 firePoopedCube(WorldElem *elem)
 {
 
-    assert(world_inited);
+    if(!world_inited) return WORLD_ELEM_ID_INVALID;
 
     quaternion_t qx, qy, qz;
     static float lineColorMine[8] = {0.1, 0.9,     0.1, 0.9,     0.1, 0.9,     0.1, 0.9};

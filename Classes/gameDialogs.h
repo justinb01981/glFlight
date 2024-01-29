@@ -9,6 +9,7 @@
 #ifndef gl_flight_gameDialogs_h
 #define gl_flight_gameDialogs_h
 
+#include <math.h>
 #include "gameGlobals.h"
 #include "gameInterface.h"
 #include "gameSettings.h"
@@ -19,6 +20,7 @@
 #include "gameCamera.h"
 
 #define GAME_DIALOG_LIFE_MAX 999999
+#define INTRO_ANIMATION_FRAMES (GAME_FRAME_RATE*300)
 
 struct gameDialogStateStruct
 {
@@ -274,31 +276,48 @@ gameDialogInitial()
 static void
 gameDialogInitialCountdownDrawCallback()
 {
-    static int count = 240;
+    const int sec = INTRO_ANIMATION_FRAMES;
+    static int count = GAME_FRAME_RATE * sec;
     
     if(count == 0)
     {
         glFlightDrawframeHook = NULL;
-        count = 240;
+        count = INTRO_ANIMATION_FRAMES;
         gameDialogInitial();
         
         return;
     }
     
-    if(count == 240-32)
+//    if(count == 240-32)
+//    {
+//        // TODO: freeze camera here and display ship
+//        gameInterfaceControls.mainMenu.visible = 0;
+//
+//        // init camera
+//        camera_locked_frames = 240-32;
+//
+//        gameCamera_yawRadians(3.14);
+//        gameCamera_MoveZ(-11);
+//        gameCamera_MoveY(3);
+//        gameCamera_pitchRadians(0.52);
+//    }
+//    gameCamera_MoveZ(0.03);
+
+
+//        // TODO: freeze camera here and display ship
+    gameInterfaceControls.mainMenu.visible = 0;
+    static float ph = 0.01;
+    const float rad = 4.0;
     {
-        // TODO: freeze camera here and display ship
-        gameInterfaceControls.mainMenu.visible = 0;
-        
-        // init camera
-        camera_locked_frames = 240-32;
-        
-        gameCamera_yawRadians(3.14);
-        gameCamera_MoveZ(-11);
-        gameCamera_MoveY(3);
-        gameCamera_pitchRadians(0.52);
+        float x = sin(ph) * rad;
+        float z = cos(ph) * rad;
+        float y = -1.0;
+
+        gameCamera_init(my_ship_x - x, my_ship_y - y, my_ship_z - z,
+                        M_PI/2.0, M_PI+ph, -M_PI/2.0);
+        ph += 0.010;
     }
-    gameCamera_MoveZ(0.03);
+    camera_locked_frames = 1;
     
     count--;
 }

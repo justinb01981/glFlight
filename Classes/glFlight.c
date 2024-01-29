@@ -224,8 +224,6 @@ calibrate_bail:
 //       && controlsCalibrated
        )
     {
-        float minSpeed = 0.1;
-        
         if(targetSpeed/maxSpeed >= minSpeed)
         {
             int sound_idx = 0;
