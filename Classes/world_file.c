@@ -556,6 +556,7 @@ void map_render(char *map_buf)
                         world_add_object(MODEL_CUBE, map_cmd.params[0], map_cmd.params[1], map_cmd.params[2],
                                          map_cmd.params[3], map_cmd.params[4], map_cmd.params[5],
                                          spawn_scaling, TEXTURE_ID_ANIMATED_STATIC);
+                        update_object_velocity(last_object_id, 0, 0, 0, 0);
                         world_get_last_object()->object_type = OBJ_SPAWNPOINT;
                         world_object_set_lifetime(last_object_id, 300);
                         break;

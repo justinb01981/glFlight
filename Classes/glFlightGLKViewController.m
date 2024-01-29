@@ -11,6 +11,21 @@
 #import "glFlight.h"
 #import "gameGlobals.h"
 #import "world.h"
+#import "PurchaseManager.h"
+
+
+// TODO: -- relocate to an extension
+extern int model_my_ship;
+static void fulfillShipPurchase(void) {
+
+    [PurchaseManager.shared purchase: ^(UIViewController* vc) {
+        // cool
+        printf("purchase attempting: %d", PurchaseManager.shared.purchased);
+    }];
+
+}
+
+// --
 
 @implementation glFlightGLKViewController
 {
@@ -37,7 +52,7 @@
     
     glView.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
     [glView.context setMultiThreaded:FALSE];
-    
+
     glView.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
 //    effect = nil;
@@ -66,7 +81,20 @@
         self.initBlock(self.view.frame.size);
         self.initBlock = nil;
     }
+
+
+    // init purchases
+    [PurchaseManager.shared uponActivation:^{
+        // activation successful
+        printf("purchase successful: %d", PurchaseManager.shared.purchased);
+
+        gameInterfaceActivateShip();
+
+    }];
+    glFlightOnPurchase = fulfillShipPurchase;
 }
+
+
 
 - (void)glkView: (GLKView*)glkView drawInRect: (CGRect)rect {
     

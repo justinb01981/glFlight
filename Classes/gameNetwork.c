@@ -66,12 +66,11 @@
 
 gameNetworkState_t gameNetworkState;
 
-unsigned long update_frequency_ms = 1000 / (GAME_TICK_RATE / 2);
+static unsigned long update_frequency_ms;
 static unsigned long update_time_last = 0;
 const unsigned long GAME_NETWORK_TIMEOUT_MS = (30*1000);
 const static char *map_eom = "\nmap_eom\n";
 
-const long GAME_NETWORK_PORT_DEFAULT = 52000;
 unsigned long GAME_NETWORK_PORT = 52000;
 
 static char *gameKillVerbs[] = {"slaughtered", "evicerated", "de-rezzed", "shot-down", "ended", "terminated"};
@@ -442,6 +441,12 @@ gameNetwork_initsockets()
     }
 }
 
+unsigned long
+gameNetwork_frequencyMs(void)
+{
+    return update_frequency_ms;
+}
+
 gameNetworkError
 gameNetwork_test()
 {
@@ -458,6 +463,9 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
                  const char* local_inet_addr)
 {
     const char *directory_name = GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT;
+
+    //assert(update_ms == 50);
+
     
     if(gameNetworkState.inited)
     {
@@ -779,6 +787,7 @@ gameNetwork_disconnectSignal()
         if(!gameNetworkState.connected_signal) waiting = 0;
         game_lock_unlock(&gameNetworkState.msgQueue.lock);
     } while (waiting);
+    
 }
 
 void
@@ -1410,7 +1419,6 @@ gameNetwork_updatePlayerObject(gameNetworkPlayerInfo* playerInfo,
         if(obj_id != WORLD_ELEM_ID_INVALID)
         {
             pElem->object_type = OBJ_PLAYER;
-        
             update_object_velocity(pElem->elem_id, velx, vely, velz, 0);
         }
         
@@ -1630,7 +1638,7 @@ do_game_network_write()
     gameNetworkMessage netMsg;
     WorldElemListNode* pNode;
     static game_timeval_t network_objects_update_time_last = 0;
-    static float net_obj_update_vel_ignore_min = 0.1;
+    static float net_obj_update_vel_ignore_min = 0.01;
     float network_time_ms = get_time_ms_wall();
     
     if(!gameNetworkState.connected)
@@ -1758,9 +1766,6 @@ do_game_network_world_update()
     gameNetworkMessage netMsg;
     WorldElemListNode* pNode;
     float network_time_ms = get_time_ms_wall();
-
-    // HACK: also calling game_ai_run here
-    if(!gameNetworkState.connected || gameNetworkState.hostInfo.hosting) game_ai_run();
     
     if(!gameNetworkState.connected)
     {
@@ -1768,7 +1773,7 @@ do_game_network_world_update()
     }
     
      get_time_ms_wall();
-    
+
     /*
      * walk list of newly pending-added objects, do not do world_elem_remove here
      */
@@ -1896,11 +1901,13 @@ do_game_network_world_update()
     gameNetworkPlayerInfo* pInfo = gameNetworkState.player_list_head.next_connected;
     while(pInfo)
     {
+
         if(pInfo->player_id == my_ship_id)
         {
         }
         else
         {
+
             WorldElemListNode* pElemNode = world_elem_list_find(pInfo->elem_id, &gWorld->elements_moving);
             WorldElem* pElem = NULL;
             if(pElemNode) pElem = pElemNode->elem;
@@ -2081,6 +2088,8 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                         world_object_set_nametag(playerInfo->elem_id, playerInfo->name);
                         
                         interp_velo = 0;
+
+                        DBPRINTF(("player elem replaced: %02x", pNode->elem->elem_id));
                     }
                     
                     pPlayerElem = pNode->elem;
@@ -2097,8 +2106,9 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                     };
                     
                     motion_interpolate_velocity(network_time_ms, motion, pPlayerElem, msg, interp_velo);
+                    
 
-                    //pPlayerElem->stuff.player.player_id = playerInfo->player_id;
+//                    pPlayerElem->stuff.player.player_id = playerInfo->player_id;
                     pPlayerElem->stuff.affiliation = pPlayerElem->stuff.game_object_id = playerInfo->player_id;
                     
                     // handle shot fired since last update
@@ -2156,11 +2166,14 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                                      msg->params.f[1], msg->params.f[2], msg->params.f[3],
                                      msg->params.f[4], msg->params.f[5], msg->params.f[6],
                                      msg->params.f[12], msg->params.f[13]);
-                    
+
+
                     //world_get_last_object()->stuff.player.player_id = playerInfo->player_id;
                     world_get_last_object()->stuff.affiliation = playerInfo->player_id;
                     world_get_last_object()->object_type = msg->params.f[15];
                     game_elem_setup_missle(world_get_last_object());
+                    // HACKY: duplicating gamePlay.c a bit here - cant move this to game_elem_setup_missle?
+                    world_elem_list_add_fast(world_get_last_object(), &gWorld->elements_intelligent, LIST_TYPE_UNKNOWN);
                     world_get_last_object()->stuff.u.enemy.target_id = object_target;
                     world_object_set_lifetime(world_get_last_object()->elem_id, msg->params.f[10]);
                     world_get_last_object()->destructible = msg->params.f[11];

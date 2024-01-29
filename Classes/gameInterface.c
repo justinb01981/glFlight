@@ -36,6 +36,8 @@ extern void gameInputTrimEnd(void);
 
 controls gameInterfaceControls;
 
+void (*glFlightOnPurchase)(void) = NULL;
+
 int texture_id_block = TEXTURE_ID_BLOCK;
 
 const char *charMap = "abcdefghijklmnopqrstuvwxyz0123456789. _-@!$%^&*";
@@ -55,6 +57,8 @@ static void trimThenHideCalibrateRect(void)
 void
 gameInterfaceInit(double screenWidth, double screenHeight)
 {
+    assert( ACTION_LAST ==  sizeof(action_strings)/sizeof(char*) );
+
     int i;
     controlRect tmpRect = {
         screenWidth-(screenWidth * 0.15),
@@ -906,6 +910,10 @@ void gameInterfaceProcessAction(void)
         case ACTION_OPEN_RATING_URL:
             gameDialogRating();
             break;
+
+        case ACTION_OPEN_PURCHASE_UPGRADE:
+            if(glFlightOnPurchase) glFlightOnPurchase();
+            break;
             
         case ACTION_RESUME_GAME:
             game_start_difficulty = gameStateSinglePlayer.last_game.difficulty;
@@ -994,7 +1002,7 @@ void gameInterfaceProcessAction(void)
         case ACTION_SETTING_SHIP_MODEL:
             {
                 int model_new = MODEL_SHIP1;
-                
+
                 switch(model_my_ship)
                 {
                     case MODEL_SHIP1:
@@ -1014,7 +1022,7 @@ void gameInterfaceProcessAction(void)
                         break;
                 }
                 model_my_ship = model_new;
-                
+
                 appWriteSettings();
             }
             break;
@@ -1067,12 +1075,12 @@ void gameInterfaceProcessAction(void)
                 texture_id_playership = TEXTURE_ID_SHIP3;
                 break;
             case TEXTURE_ID_SHIP3:
-                texture_id_playership = TEXTURE_ID_SHIP4;
+                texture_id_playership = TEXTURE_ID_ENEMYSHIP_ACE;
                 break;
-            case TEXTURE_ID_SHIP4:
-                texture_id_playership = TEXTURE_ID_SHIP5;
+            case TEXTURE_ID_ENEMYSHIP_ACE:
+                texture_id_playership = TEXTURE_ID_ENEMYSHIP;
                 break;
-            case TEXTURE_ID_SHIP5:
+            case TEXTURE_ID_ENEMYSHIP:
                 texture_id_playership = TEXTURE_ID_SHIP6;
                 break;
             case TEXTURE_ID_SHIP6:
@@ -1286,5 +1294,17 @@ gameInterfaceSetInterfaceState(InterfaceMiscState state)
             
         default:
             break;
+    }
+}
+
+
+void
+gameInterfaceActivateShip(void)
+{
+    if(model_my_ship == MODEL_SHIP1)
+    {
+        model_my_ship = MODEL_SHIP3;
+        texture_id_playership = TEXTURE_ID_ENEMYSHIP_ACE;
+        appWriteSettings();
     }
 }

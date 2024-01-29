@@ -172,6 +172,9 @@ glFlightFrameStage1()
         
         goto draw_bail;
     }
+
+    //extern void update_time_ms_frame_tick(void);
+    //update_time_ms_frame_tick();
     
 calibrate_bail:
     get_time_ms();
@@ -255,6 +258,7 @@ calibrate_bail:
     get_time_ms();
     
     // moved game_ai_run to do_networkd_world_update
+    if(gameNetworkState.hostInfo.hosting || !gameNetworkState.connected) game_ai_run();
     
     // JB: moved to background thread
     //do_game_network_read();
@@ -357,17 +361,9 @@ calibrate_bail:
         targetSpeed = MAX_SPEED/10;
 
         update_object_velocity(my_ship_id, 0,0,0, 0);   // fuck these dont matter because next frame does them
+
         world_get_last_object()->bounding_remain = 1;
         world_get_last_object()->durability = ship_durability;
-        
-        //gameCamera_init(my_ship_x, my_ship_y, my_ship_z,
-        //                -spawn[3], -spawn[4], -spawn[5]);
-        //gameCamera_yawRadians((viewRotationDegrees/180.0) * M_PI);
-        //gameCamera_MoveY(5);
-        //gameCamera_MoveZ(-camera_z_trail);
-        //gameCamera_pitchRadians(-M_PI/2);
-        //camera_locked_frames = 120;
-        
         
         console_write(game_log_messages[GAME_LOG_TELEPORT]);
         gameAudioPlaySoundAtLocationWithRate("teleport", 1.0, gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
@@ -470,29 +466,30 @@ calibrate_bail:
     {
         switch(model_my_ship)
         {
-            case 0:
+            case MODEL_SHIP1:
                 maxSpeed = MAX_SPEED * 1.0;
                 ship_durability = ship_durability * 1.0;
                 game_ammo_missle_recharge = 0.0;
                 game_ammo_bullets_recharge = 2.0;
                 break;
                 
-            case 12:
+            case MODEL_SHIP2:
                 maxSpeed = MAX_SPEED * 1.0;
                 ship_durability = ship_durability * 0.5;
                 game_ammo_missle_recharge = 0.0;
-                game_ammo_bullets_recharge = 4.0;
+                game_ammo_bullets_recharge = 2.0;
                 break;
                 
-            case 14:
-                maxSpeed = MAX_SPEED * 1.0;
+            case MODEL_SHIP3:
+                maxSpeed = MAX_SPEED * 0.8;
                 ship_durability = ship_durability * 1.5;
                 game_ammo_missle_recharge = 0.0;
                 game_ammo_bullets_recharge = 2.0;
                 break;
                 
             default:
-                maxSpeed = MAX_SPEED * 1;
+                assert(0);
+                //maxSpeed = MAX_SPEED * 1;
                 break;
         }
     }

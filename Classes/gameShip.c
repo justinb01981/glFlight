@@ -14,7 +14,6 @@
 
 int my_ship_id = WORLD_ELEM_ID_INVALID;
 int shared_model_sphere_id = WORLD_ELEM_ID_INVALID;
-int my_ship_changed = 0;
 float my_ship_x;
 float my_ship_y;
 float my_ship_z;

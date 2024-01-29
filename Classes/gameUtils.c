@@ -288,7 +288,7 @@ get_time_ms()
     time_ms = tvs * 1000 + tvus;
     */
     
-    time_ms_wall = get_time_ms_wall();
+    time_ms_wall = time_ms = get_time_ms_wall();
     
     return time_ms;
 }

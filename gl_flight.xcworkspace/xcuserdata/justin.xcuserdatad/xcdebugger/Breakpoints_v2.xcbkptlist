@@ -199,6 +199,21 @@
                   endingLineNumber = "412"
                   offsetFromSymbolStart = "2308">
                </Location>
+               <Location
+                  uuid = "9D776AB5-32B2-4704-A3D5-86D3A653504C - 482470e08cc12ef0"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "glFlightFrameStage1"
+                  moduleName = "d0gf1ght 95"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/collision.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "414"
+                  endingLineNumber = "414"
+                  offsetFromSymbolStart = "1548">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -221,22 +236,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "95E633AA-5D83-457A-98C6-138036A1BE72"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/gameSettings.h"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "103"
-            endingLineNumber = "103"
-            landmarkName = "gameSettingsDefaults()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "708E14C8-C52D-412C-BABB-21FE867D37DC"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -244,9 +243,25 @@
             filePath = "Classes/gameNetwork.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2112"
-            endingLineNumber = "2112"
+            startingLineNumber = "2122"
+            endingLineNumber = "2122"
             landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4A3F200C-DC71-47AC-9B0E-E7DCE5C1A133"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/world_file.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "511"
+            endingLineNumber = "511"
+            landmarkName = "map_render(map_buf)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

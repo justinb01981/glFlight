@@ -74,7 +74,7 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
     viewWidth = viewSize.width;
     viewHeight = viewSize.height;
     
-    gameCamera_init(0, 0, 0, 0, 0, 0);
+    //gameCamera_init(0, 0, 0, 0, 0, 0);
     game_init();
     gameAudioInit();
     world_lock_init();
@@ -96,13 +96,9 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
     game_terminated_gracefully = 0;
     appWriteSettings();
     
-
-#ifdef DEBUG
-    gameMapSetMap(map_debug);
-#else
+    //    gameMapSetMap(map_debug);
     gameMapSetMap(initial_map);
-#endif
-    
+
     console_write("Welcome to "GAMETITLE" %s\n"
                   "http://www.domain17.net/d0gf1ght\n"
                   "^D^Dnow with bluetooth local play!^D^D\n",

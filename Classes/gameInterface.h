@@ -166,6 +166,9 @@ void
 gameInterfaceEditString(char *ptr);
 
 void
-gameInterfaceProcessAction();
+gameInterfaceProcessAction(void);
+
+void
+gameInterfaceActivateShip(void);
 
 #endif

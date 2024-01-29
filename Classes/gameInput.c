@@ -55,7 +55,7 @@
 
 void trimDoneIgnore(void);
 
-int rm_count = 0;
+int rm_count = 1;
 
 float dz_min = 0.001;
 double speed = 0;

@@ -25,7 +25,7 @@ float diff_m = 0.1;
 float scan_dist_increase = 60;
 float game_ai_fire_rate_ms = 800.0;
 float patrol_area_reached = 4.0;
-float tow_v_scale = /*0.5*/ 3.4;
+float tow_v_scale = /*0.5*/ 1.7;
 float min_patrol_distance = 20;
 float collect_deploy_distance = -2.5;
 float change_target_frequency = 30000;  // nearly never
@@ -64,6 +64,7 @@ game_ai_setup(WorldElem* pNewElem)
 {
     pNewElem->stuff.u.enemy.time_last_run = time_ms;
     pNewElem->stuff.u.enemy.time_next_retarget = time_ms;
+    pNewElem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     
     pNewElem->xq = (quaternion_t){1, 1, 0, 0};
     pNewElem->yq = (quaternion_t){1, 0, 1, 0};
@@ -299,7 +300,8 @@ game_ai_run()
             }
             else // no target
             {
-                if(pCurElem->stuff.u.enemy.changes_target &&
+                if(
+                   pCurElem->stuff.u.enemy.changes_target &&
                         ( time_ms >= pCurElem->stuff.u.enemy.time_next_retarget || pCurElem->stuff.u.enemy.target_id)
                         )
                 {

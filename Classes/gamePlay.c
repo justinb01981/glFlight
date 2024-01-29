@@ -913,7 +913,7 @@ game_start(float difficulty, int type)
         
         gameStateSinglePlayer.enemy1_ignore_player_pct = 100;
         
-        gameMapSetMap(initial_map_turret);
+        gameMapSetMap(initial_map_collection);
     }
     else if(gameStateSinglePlayer.game_type == GAME_TYPE_LOBBALL)
     {
@@ -1727,7 +1727,7 @@ game_run()
                     };
                     float tow_d = sqrt(tow_v[0]*tow_v[0] + tow_v[1]*tow_v[1] + tow_v[2]*tow_v[2]); // dist
                     float tow_m = GAME_CAPTURE_TOW_FORCE * tow_d; // multiple representing force
-                    
+
                     tow_v[0] = (tow_v[0]/tow_d);
                     tow_v[1] = (tow_v[1]/tow_d);
                     tow_v[2] = (tow_v[2]/tow_d);
@@ -2502,8 +2502,10 @@ addEngineExhaust(WorldElem *elem)
 int
 firePoopedCube(WorldElem *elem)
 {
-
-    assert(world_inited);
+    if(!world_inited) {
+        DBPRINTF(("WARN: firePoopedCube but !world_inited - why does this happen"));
+        return WORLD_ELEM_ID_INVALID;
+    }
 
     quaternion_t qx, qy, qz;
     static float lineColorMine[8] = {0.1, 0.9,     0.1, 0.9,     0.1, 0.9,     0.1, 0.9};
@@ -2528,7 +2530,7 @@ firePoopedCube(WorldElem *elem)
     
     int texture_id = /*elem->texture_id*/ TEXTURE_ID_COLORMAP;
     int model = MODEL_CONTRAIL;
-    double scale = 0.1;
+    double scale = 0.3;
     
     if(elem->elem_id == my_ship_id) lineColor = lineColorMine;
     if(elem->texture_id == TEXTURE_ID_ENEMYSHIP_ACE) lineColor = lineColorEnemyAce;
@@ -2563,9 +2565,9 @@ firePoopedCube(WorldElem *elem)
     {
         for(i = 0; i < sizeof(trailCoords)/sizeof(int); i++)
         {
-            pElem->coords[trailCoords[i]] -= pElem->physics.ptr->x - elem->trail.last_coord[0];
-            pElem->coords[trailCoords[i]+1] -= pElem->physics.ptr->y - elem->trail.last_coord[1];
-            pElem->coords[trailCoords[i]+2] -= pElem->physics.ptr->z - elem->trail.last_coord[2];
+            pElem->coords[trailCoords[i]] -= (pElem->physics.ptr->x - elem->trail.last_coord[0]) / 2.0;
+            pElem->coords[trailCoords[i]+1] -= (pElem->physics.ptr->y - elem->trail.last_coord[1]) / 2.0;
+            pElem->coords[trailCoords[i]+2] -= (pElem->physics.ptr->z - elem->trail.last_coord[2]) / 2.0;
         }
     }
     
@@ -2578,7 +2580,7 @@ firePoopedCube(WorldElem *elem)
     world_object_set_lifetime(obj, pooped_cube_lifetime);
 
     
-    addEngineExhaust(elem);
+    //addEngineExhaust(elem);
     
     return obj;
 }
@@ -2650,7 +2652,6 @@ game_elem_setup_ship(WorldElem* elem, int skill)
     elem->stuff.u.enemy.patrols_no_target_jukes = GAME_VARIABLE("ENEMY1_PATROLS_NO_TARGET");
     elem->stuff.u.enemy.max_speed = GAME_VARIABLE("ENEMY1_SPEED_MAX");
     elem->stuff.u.enemy.max_slerp = /*0.5*/ GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS") + GAME_VARIABLE("ENEMY1_MAX_TURN_SKILL_SCALE")*skill;
-    elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     //MAX(20, GAME_AI_UPDATE_INTERVAL_MS - (10 * skill));
     ;
     elem->stuff.u.enemy.scan_distance = /*GAME_VARIABLE("ENEMY1_FORGET_DISTANCE")*/ 1.0
@@ -2682,7 +2683,6 @@ game_elem_setup_turret(WorldElem* elem, int skill)
     elem->stuff.u.enemy.patrols_no_target_jukes = 0;
     elem->stuff.u.enemy.max_speed = MAX_SPEED/2;
     elem->stuff.u.enemy.max_slerp = GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS");
-    elem->stuff.u.enemy.time_run_interval = GAME_AI_UPDATE_INTERVAL_MS;
     elem->stuff.u.enemy.scan_distance = 1;
     elem->stuff.u.enemy.pursue_distance = GAME_VARIABLE("ENEMY1_PURSUE_DISTANCE");
     game_ai_setup(elem);
@@ -2694,8 +2694,8 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.intelligent = 1;
     x->stuff.u.enemy.intelligence = 1.0;
     x->physics.ptr->friction = 1;
-    x->stuff.u.enemy.changes_target = 0;
-    x->stuff.u.enemy.patrols_no_target_jukes = 0;
+    //x->stuff.u.enemy.changes_target = 1;
+    //x->stuff.u.enemy.patrols_no_target_jukes = 1;
     x->stuff.u.enemy.leaves_trail = 0;
     x->stuff.u.enemy.run_distance = 0;
     x->stuff.u.enemy.ignore_collect = 1;

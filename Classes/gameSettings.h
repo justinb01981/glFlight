@@ -17,6 +17,7 @@
 #include "gamePlatform.h"
 #include "gameNetwork.h"
 #include "gameInput.h"
+#include "gameGlobals.h"
 
 typedef struct
 {
@@ -266,6 +267,10 @@ gameSettingsRead(const char *filename)
     {
         gameSettingsRatingGiven = 0;
     }
+
+    // OVERRIDE SOME SETTINGS I REGRET
+    gameSettingsNetworkFrequency = 50;
+    gameSettingsPortNumber = GAME_NETWORK_PORT_DEFAULT;
     
     if(fp) fclose(fp);
     return err;

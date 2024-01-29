@@ -1086,7 +1086,7 @@ int update_object_velocity_with_friction(int object_id, float v[3], float cthrus
         pElemNode->elem->physics.ptr->vx += ship_vnew[0];
         pElemNode->elem->physics.ptr->vy += ship_vnew[1];
         pElemNode->elem->physics.ptr->vz += ship_vnew[2];
-    
+
         update_object_in_motion(pElemNode->elem);
         
         return object_id;
@@ -1131,13 +1131,25 @@ void world_object_set_nametag(int object_id, char* nametag)
 void
 world_random_spawn_location(float loc[6], int affiliation)
 {
-    WorldElemListNode* pCur = gWorld->elements_list.next;
-    int n = rand() % 64;
-    int i = 0;
+//    WorldElemListNode* pCur = gWorld->elements_list.next;
+    int n = rand_in_range(1, 8);    // keep iterating some random # of points
     int found_spawns = 0;
-    
+
+    // no spawn point found, spawn randomly
+    loc[0] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
+    loc[1] = rand_in_range(1, gWorld->bound_radius/4);
+    loc[2] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
+
+    // heading should @ origin
+    loc[3] = 1.6;
+    loc[4] = atan2(loc[0], loc[2]); //rand_in_range(-M_PI+0.1, M_PI-0.1);
+    loc[5] = -1.6;
+
     while(n > 0)
     {
+        // TODO: guarantee spawnpoints are found in this list?
+        WorldElemListNode* pCur = gWorld->elements_moving.next;
+        int i = 0;
         while(pCur)
         {
             if(pCur->elem->object_type == OBJ_SPAWNPOINT)
@@ -1150,10 +1162,12 @@ world_random_spawn_location(float loc[6], int affiliation)
                     loc[i++] = pCur->elem->physics.ptr->x;
                     loc[i++] = pCur->elem->physics.ptr->y;
                     loc[i++] = pCur->elem->physics.ptr->z;
-                
-                    loc[i++] = pCur->elem->physics.ptr->alpha; // alpha
-                    loc[i++] = pCur->elem->physics.ptr->beta; // beta
-                    loc[i++] = pCur->elem->physics.ptr->gamma; // gamma
+
+                    // default orientation is aimed at origin parallel to ground
+                    loc[i++] = 1.6; // alpha, beta, gamma (euler)
+                    loc[i++] = atan2(loc[0], loc[2]); //rand_in_range(-M_PI+0.1, M_PI-0.1);
+                    loc[i++] = -1.6;
+
                     return;
                 }
             }
@@ -1161,18 +1175,7 @@ world_random_spawn_location(float loc[6], int affiliation)
         }
         
         if(!found_spawns) break;
-        
-        pCur = gWorld->elements_list.next;
     }
-    
-    // no spawn point found, spawn randomly
-    loc[0] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
-    loc[1] = rand_in_range(1, gWorld->bound_radius/2);
-    loc[2] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
-    
-    loc[3] = M_PI/2;
-    loc[4] = rand_in_range(-M_PI+0.1, M_PI-0.1);
-    loc[5] = -M_PI/2;
 }
 
 void world_free()

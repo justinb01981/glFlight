@@ -29,6 +29,7 @@ typedef enum
     ACTION_DISPLAY_SCORES,
     ACTION_HELP, /**/
     ACTION_OPEN_RATING_URL,
+    ACTION_OPEN_PURCHASE_UPGRADE,
     
     ACTION_HOST_GAME_OR_COMMIT,
     ACTION_CONNECT_TO_GAME,
@@ -65,21 +66,21 @@ typedef enum
     ACTION_SETTING_LOCAL_IP_OVERRIDE,
     ACTION_SETTING_RESET_SCORE,
     ACTION_SETTING_RESET_DEFAULT,
-    ACTION_LAST /* 46 */
+    ACTION_LAST /*  */
 } action_t;
 
 static int actions_sub[][ACTION_LAST] =
 {
     // main
-    {1,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {1,0,0,0,0,0,1,0,1,1,1,  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // net
-    {0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,  0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // game
-    //{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    //{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // build
-    //{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    //{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     // settings
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,0,1,1,1,1,1,1,1},
 };
 
 extern int *actions_enabled;
@@ -101,6 +102,7 @@ static const char* action_strings[ACTION_LAST] =
     "High Scores",
     "help/about",
     "rate d0gf1ght",
+    "$ ship upgrades $",
     "host game (internet)",
     "multiplayer internet game",
     "multiplayer local game",
@@ -233,11 +235,11 @@ static void actions_display_menu(char *dest)
     {
         case 0:
             beg = 0;
-            end = 11;
+            end = ACTION_HOST_GAME_OR_COMMIT;
             break;
         case 1:
-            beg = 11;
-            end = 16;
+            beg = ACTION_HOST_GAME_OR_COMMIT;
+            end = ACTION_FIRE_BULLET;
             break;
         case 2:
             {
