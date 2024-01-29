@@ -2694,6 +2694,7 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.intelligent = 1;
     x->stuff.u.enemy.intelligence = 1.0;
     x->physics.ptr->friction = 1;
+    x->bounding_remain = 1;
     //x->stuff.u.enemy.changes_target = 1;
     //x->stuff.u.enemy.patrols_no_target_jukes = 1;
     x->stuff.u.enemy.leaves_trail = 0;
