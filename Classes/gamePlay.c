@@ -2424,7 +2424,7 @@ fireBullet(int bulletAction)
     bullet_z_vec[1] = -bullet_z_vec[1];
     bullet_z_vec[2] = -bullet_z_vec[2];
     
-    bv = (missle? 4.0 : 2.0) * listNodeShip->elem->scale;
+    bv = (missle? 4.0 : 1.1) * listNodeShip->elem->scale;
     blr = missle? 0: 0.3 * listNodeShip->elem->scale;
     
     int shots = listNodeShip->elem->type == MODEL_SHIP3 && !missle? 2: 1;

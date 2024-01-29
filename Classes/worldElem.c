@@ -596,6 +596,11 @@ void
 world_elem_btree_insert(world_elem_btree_node* root, WorldElem* elem, float order)
 {
     if(elem->btree_node != NULL) return;
+
+    if(isnan(elem->renderInfo.distance) || isnan(order)) {
+        DBPRINTF(("ALERT: world_elem_btree_insert visibility ignoring NaN WorldElem (temporary? xyz=%f %f %f)", elem->physics.ptr->x, elem->physics.ptr->y, elem->physics.ptr->z));
+        return;
+    }
     
     if(order > root->order)
     {

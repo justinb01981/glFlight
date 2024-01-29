@@ -259,7 +259,12 @@ calibrate_bail:
     
     // moved game_ai_run to do_networkd_world_update
     if(gameNetworkState.hostInfo.hosting || !gameNetworkState.connected) game_ai_run();
-    
+
+    if(!world_inited) // invalidated just now - bail here
+    {
+        return;
+    }
+
     // JB: moved to background thread
     //do_game_network_read();
     
@@ -511,6 +516,8 @@ calibrate_bail:
                      pVisCheckPtr->elem->physics.ptr->x,
                      pVisCheckPtr->elem->physics.ptr->y,
                      pVisCheckPtr->elem->physics.ptr->z);
+
+        assert(!isnan(pVisCheckPtr->elem->renderInfo.distance));
         
         world_elem_btree_add_all(pVisCheckPtr->elem);
         
@@ -610,11 +617,11 @@ calibrate_bail:
     glTranslatef(-gameCamera_getX(), -gameCamera_getY(), -gameCamera_getZ());
     
     // walk list of new elements, adding to visible list
-    // TODO: THIS IS NOT WORKING because added-list is being cleaned in clear_pending
     WorldElemListNode* pAddedPtr = gWorld->elements_to_be_added.next;
     while(pAddedPtr)
     {
-        pAddedPtr->elem->in_visible_list = 1;
+        if(!world_inited) assert(world_inited); // no elements can be added until world rebuilt so these indicate a bug
+
         world_elem_list_add_sorted(&gWorld->elements_visible, &visibleSkipList,
                                    pAddedPtr->elem, element_dist_compare);
         visibleElementsLen++;
@@ -625,6 +632,12 @@ calibrate_bail:
                                                         pAddedPtr->elem->physics.ptr->x,
                                                         pAddedPtr->elem->physics.ptr->y,
                                                         pAddedPtr->elem->physics.ptr->z);
+
+        if(isnan(pAddedPtr->elem->renderInfo.distance)) {
+            assert(0);
+        }
+
+        pAddedPtr->elem->in_visible_list = (pAddedPtr->elem->btree_node == NULL);
 
         // insert into all visible-trees immediately
         world_elem_btree_insert(visibleBtreeRootBuilding, pAddedPtr->elem, pAddedPtr->elem->renderInfo.distance);
