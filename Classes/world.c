@@ -581,7 +581,6 @@ world_add_object_core(Model type,
             pElem->destructible = 1;
             pElem->spans_regions = 0;
             pElem->object_type = OBJ_MISSLE;
-            pElem->bounding_remain = 1;
             break;
             
         case MODEL_SURFACE:
