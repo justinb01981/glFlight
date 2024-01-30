@@ -2692,9 +2692,10 @@ void
 game_elem_setup_missle(WorldElem* x)
 {
     x->stuff.intelligent = 1;
-    x->stuff.u.enemy.intelligence = 1.0;
+    x->stuff.u.enemy.intelligence = 4.0;
     x->physics.ptr->friction = 1;
-    //x->stuff.u.enemy.changes_target = 1;
+//    x->bounding_remain = 1;   // needs testing
+    x->stuff.u.enemy.changes_target = 1;
     //x->stuff.u.enemy.patrols_no_target_jukes = 1;
     x->stuff.u.enemy.leaves_trail = 0;
     x->stuff.u.enemy.run_distance = 0;
@@ -2703,7 +2704,7 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.u.enemy.enemy_state = ENEMY_STATE_PURSUE;
     x->durability = DURABILITY_MISSLE;
     x->stuff.u.enemy.max_speed = MAX_SPEED_MISSLE;
-    x->stuff.u.enemy.max_slerp = GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS") * 2.0; // radians per second
+    x->stuff.u.enemy.max_slerp = GAME_VARIABLE("ENEMY1_TURN_MAX_RADIANS") * 3;
     x->stuff.u.enemy.time_next_retarget = get_time_ms();
     x->stuff.u.enemy.scan_distance = 50;
     x->stuff.u.enemy.pursue_distance = 30;

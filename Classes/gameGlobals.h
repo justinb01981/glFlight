@@ -101,11 +101,12 @@ extern void (*glFlightOnPurchase)(void);
 /* reducing friction influences this... should be MAX_THRUST really */
 #define MAX_SPEED (10.0)
 
-const static char* GAME_VERSION_STR = "1.10.6_core";
+const static char* GAME_VERSION_STR = "1.10.4_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 
-const static float MAX_SPEED_MISSLE = (MAX_SPEED * 4);
+const static float MAX_SPEED_MISSLE = (MAX_SPEED * 3);
+
 const static float SPEED_BOOST_FRAMES = 60 * 5;
 extern float C_THRUST;
 extern float C_FRICTION;    // SEE physics_friction_c gameVariable
