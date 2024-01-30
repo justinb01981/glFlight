@@ -38,13 +38,13 @@ INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightIm
 		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:2:1-36:12
 		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
 	android:versionName
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:4:5-35
+		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:4:5-33
 		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
 		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
 	xmlns:android
 		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:2:11-69
 	android:versionCode
-		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:3:5-35
+		ADDED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml:3:5-33
 		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
 		INJECTED from C:\Users\Justin\workspace\glFlight\android\gradle-build\glFlightImport\app\src\main\AndroidManifest.xml
 uses-permission#android.permission.INTERNET
