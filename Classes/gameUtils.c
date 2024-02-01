@@ -293,25 +293,25 @@ get_time_ms()
     return time_ms;
 }
 
-void
-update_time_ms_frame_tick()
-{
-    get_time_ms();
-
-    if (g_time_ms_start == 0)
-    {
-        g_time_ms_start = time_ms_wall;
-        g_time_frames = 1;
-    }
-
-    float ms_per_frame_avg = (time_ms_wall - g_time_ms_start) / (float) g_time_frames;
-
-    if(ms_per_frame_avg >= (1000/GAME_FRAME_RATE)) ms_per_frame_avg = (1000/GAME_FRAME_RATE);
-
-    time_ms += ms_per_frame_avg;
-
-    g_time_frames++;
-}
+//void
+//update_time_ms_frame_tick()
+//{
+//    get_time_ms();
+//
+//    if (g_time_ms_start == 0)
+//    {
+//        g_time_ms_start = time_ms_wall;
+//        g_time_frames = 1;
+//    }
+//
+//    float ms_per_frame_avg = (time_ms_wall - g_time_ms_start) / (float) g_time_frames;
+//
+//    if(ms_per_frame_avg >= (1000/GAME_FRAME_RATE)) ms_per_frame_avg = (1000/GAME_FRAME_RATE);
+//
+//    time_ms += ms_per_frame_avg;
+//
+//    g_time_frames++;
+//}
 
 unsigned long
 get_time_sec()

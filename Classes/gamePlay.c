@@ -2503,7 +2503,7 @@ int
 firePoopedCube(WorldElem *elem)
 {
     if(!world_inited) {
-        DBPRINTF(("WARN: firePoopedCube but !world_inited - why does this happen"));
+        //DBPRINTF(("WARN: firePoopedCube but !world_inited - why does this happen"));
         return WORLD_ELEM_ID_INVALID;
     }
 

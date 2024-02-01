@@ -101,7 +101,7 @@ extern void (*glFlightOnPurchase)(void);
 /* reducing friction influences this... should be MAX_THRUST really */
 #define MAX_SPEED (10.0)
 
-const static char* GAME_VERSION_STR = "1.10.4_core";
+const static char* GAME_VERSION_STR = "1.10.5_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 

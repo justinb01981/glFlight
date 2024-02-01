@@ -821,6 +821,7 @@
 				6D3FF5F815FA7B40009A5388 /* mesh.c */,
 				6D262136163F3A6B00F7EC2D /* simple_hash.h */,
 				6D595F61164C867E00C21926 /* world_file.h */,
+				D0EF8AFD170CCF0C00BDD4B7 /* collision.h */,
 				6D595F5E164C80FE00C21926 /* world_file.c */,
 				D080490F22D2B7DB002684B7 /* gameTests.h */,
 				D080491022D2B7EC002684B7 /* gameTests.c */,
@@ -839,23 +840,22 @@
 				D03ADBA7178271E800D725F7 /* actions.c */,
 				D062ED5816E0278F00CA4374 /* glFlight.h */,
 				D062ED5916E0279B00CA4374 /* glFlight.c */,
+				D02B8F181964D6BA00830369 /* gameInput.h */,
+				D0EECB1F1753E08B00B5B815 /* gamePlay.c */,
+				D03ADBA617823B5B00D725F7 /* gameSettings.h */,
+				D02B8EFE195357FE00830369 /* gameSettings.c */,
 				D062ED5B16E0294A00CA4374 /* gameGraphics.h */,
+				D02B8F191964D7D700830369 /* gameInput.c */,
+				D0AF471118ECB19700081B81 /* gameDialogs.h */,
 				D062ED5C16E0295500CA4374 /* gameGraphics.c */,
 				D02D5BC1293EB15C00F62480 /* framebuffer.h */,
 				D0532FB32A14616C000D6891 /* framebuffer.c */,
 				6D262134163F243600F7EC2D /* simple_list.h */,
-				D0EF8AFD170CCF0C00BDD4B7 /* collision.h */,
 				D0C75A8C174190630098A509 /* gameTimeval.h */,
 				D0C75A8D1742F6710098A509 /* gamePlay.h */,
-				D0EECB1F1753E08B00B5B815 /* gamePlay.c */,
 				D0BCBFB3176136CF00003168 /* gameLock.h */,
-				D03ADBA617823B5B00D725F7 /* gameSettings.h */,
-				D02B8EFE195357FE00830369 /* gameSettings.c */,
 				D0FE6D09185839F0007D67CF /* sounds.h */,
-				D0AF471118ECB19700081B81 /* gameDialogs.h */,
 				D02B8F0019535AAB00830369 /* gameDialogs.c */,
-				D02B8F181964D6BA00830369 /* gameInput.h */,
-				D02B8F191964D7D700830369 /* gameInput.c */,
 				D02B8F1B1968938600830369 /* gameIncludes.h */,
 				D011EF5A19BE45C0004A56CB /* gamePlatform.h */,
 				D011EF5B19BE46EE004A56CB /* gameDebug.h */,
@@ -1831,10 +1831,10 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "gl_flight-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.10.4;
+				MARKETING_VERSION = 1.10.5;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
@@ -1869,10 +1869,10 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "gl_flight-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.10.4;
+				MARKETING_VERSION = 1.10.5;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
@@ -2005,6 +2005,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2026,7 +2027,7 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "gl_flight copy2-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				MARKETING_VERSION = 1.10.3;
@@ -2054,6 +2055,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2073,7 +2075,7 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "gl_flight copy2-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				MARKETING_VERSION = 1.10.3;

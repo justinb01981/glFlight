@@ -62,7 +62,7 @@ double speed = 0;
 double maxAccelDecel = 0;
 double targetSpeed = 0;
 double maxSpeed = MAX_SPEED;
-double minSpeed = 0;
+double minSpeed;
 double speedBoost = 0;
 double bulletVel;
 int needTrim = 1;
