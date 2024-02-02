@@ -1175,9 +1175,21 @@ const static char* initial_map = ""
 
 
 // 0 euler is default orientation @ center
-"add_spawn_invis 0 5 0 0.01 3.14 3.14\n"
-WORLD_ADD_OBJECT(13, -2, 5, -4, 0, 0, 0, 2.0 , 24)
-WORLD_ADD_OBJECT(15, 2, 5, -4, 0, 0, 0, 2.0 , 71)
+"add_spawn_invis 4 5 -8 "
+"3.14 3.14 0.0"// initial ship orient -- watch out ship doesnt slerp to cam afterwards tho!
+"\n"
+WORLD_ADD_OBJECT(13,
+                 -2, 5, -4,
+                 0,0,0,
+                 1.0 , 24)
+WORLD_ADD_OBJECT(15,
+                 2, 5, -4,
+                 0,0,0,
+                 1.0 , 71)
+WORLD_ADD_OBJECT(1,
+                 4, 5, -4,
+                 0,0,0,
+                 1.0 , 115)
 "";
 
 

@@ -342,7 +342,7 @@ calibrate_bail:
         }
         else
         {
-            world_random_spawn_location(spawn, gameNetworkState.my_player_id);
+            world_random_spawn_location(spawn, gameNetworkState.my_player_id);  // i am respawning - update global ship orientation/camera?
         }
 
         gameShip_init(spawn[0], spawn[1], spawn[2],

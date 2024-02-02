@@ -20,7 +20,7 @@
 #include "gameCamera.h"
 
 #define GAME_DIALOG_LIFE_MAX 999999
-#define INTRO_ANIMATION_FRAMES (GAME_FRAME_RATE*300)
+#define INTRO_ANIMATION_FRAMES (GAME_FRAME_RATE*3)
 
 struct gameDialogStateStruct
 {
@@ -273,35 +273,14 @@ gameDialogInitial()
 }
 
 // MARK: -- first draw-callback called to render intro and finally pop welcome
+static int gameDialogInitialCountdownDrawCallbackCount = GAME_FRAME_RATE * 5;
 static void
 gameDialogInitialCountdownDrawCallback()
 {
     const int sec = INTRO_ANIMATION_FRAMES;
-    static int count = GAME_FRAME_RATE * sec;
-    
-    if(count == 0)
-    {
-        glFlightDrawframeHook = NULL;
-        count = INTRO_ANIMATION_FRAMES;
-        gameDialogInitial();
-        
-        return;
-    }
-    
-//    if(count == 240-32)
-//    {
-//        // TODO: freeze camera here and display ship
-//        gameInterfaceControls.mainMenu.visible = 0;
-//
-//        // init camera
-//        camera_locked_frames = 240-32;
-//
-//        gameCamera_yawRadians(3.14);
-//        gameCamera_MoveZ(-11);
-//        gameCamera_MoveY(3);
-//        gameCamera_pitchRadians(0.52);
-//    }
-//    gameCamera_MoveZ(0.03);
+
+
+    gameCamera_MoveZ(0.03);
 
 
 //        // TODO: freeze camera here and display ship
@@ -317,9 +296,27 @@ gameDialogInitialCountdownDrawCallback()
                         M_PI/2.0, M_PI+ph, -M_PI/2.0);
         ph += 0.010;
     }
-    camera_locked_frames = 1;
     
-    count--;
+    gameDialogInitialCountdownDrawCallbackCount--;
+
+    if(gameDialogInitialCountdownDrawCallbackCount == 0)
+    {
+        glFlightDrawframeHook = NULL;
+        gameDialogInitial();
+
+
+        // TODO: freeze camera here and display ship
+        gameInterfaceControls.mainMenu.visible = 0;
+
+        // init camera
+        camera_locked_frames = GAME_FRAME_RATE;
+
+        gameCamera_yawRadians(3.14);
+        gameCamera_MoveZ(-11);
+        gameCamera_MoveY(3);
+        gameCamera_pitchRadians(0.52);
+        return;
+    }
 }
 
 static void

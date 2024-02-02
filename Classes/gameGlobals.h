@@ -99,7 +99,7 @@ extern void (*glFlightOnPurchase)(void);
 #endif
 
 /* reducing friction influences this... should be MAX_THRUST really */
-#define MAX_SPEED (10.0)
+#define MAX_SPEED (8.25)
 
 const static char* GAME_VERSION_STR = "1.10.5_core";
 
