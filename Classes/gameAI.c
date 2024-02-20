@@ -512,7 +512,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
             {
                 ai_debug("juking:", elem, 0);
                 elem->stuff.u.enemy.last_state = elem->stuff.u.enemy.enemy_state;
-                elem->stuff.u.enemy.time_next_retarget = 3000;
+                elem->stuff.u.enemy.time_next_retarget = time_ms + 3000;
                 
                 game_ai_newheading(elem, juke_distance);
                 elem->stuff.u.enemy.enemy_state = ENEMY_STATE_JUKE;
