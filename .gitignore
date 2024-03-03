@@ -2,4 +2,5 @@
 **/**.gradle
 .idea
 .gradle
+xcuserdata
 android/gradle-build/glFlightImport/app/build/intermediates/
