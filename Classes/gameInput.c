@@ -71,8 +71,9 @@ double motionRoll, motionPitch, motionYaw;
 double devicePitch, deviceYaw, deviceRoll;
 
 double motionRollMotion, motionPitchMotion, motionYawMotion;
-static const float maxInputShipRotate = 0.2;
-float yprResponse[3] = {0, 0, 0}, yprD = maxInputShipRotate/360.0;
+#define maxInputShipRotate 0.2
+float yprResponse[3] = { 0, 0, 0 };
+float yprD = (maxInputShipRotate / 360.0);
 float rollOffset = 0, pitchOffset = 0, yawOffset = 0;
 double devicePitchFrac = 0, deviceYawFrac = 0;  // used for controls rendering in gameGraphics
 float gyroSenseScale = PLATFORM_GYRO_SENSE_SCALE;
@@ -107,7 +108,7 @@ gameInputInit()
     speed = minSpeed;
     targetSpeed = speed;
     maxAccelDecel = /*5*/ MAX_SPEED/2; // change per second
-    minSpeed = MAX_SPEED / 20;  // careful this doesn't round to 0
+    minSpeed = 0.001; //MAX_SPEED / 20;  // careful this doesn't round to 0
     bulletVel = MAX_SPEED*3;
 
     needTrim = 1;

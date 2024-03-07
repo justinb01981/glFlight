@@ -1402,10 +1402,10 @@ void world_init(float radius)
                 float LColor[] = {
                     0, 0xff, 0
                 };
+
+//                world_add_drawline(L1, L2, LColor, 999999);
                 
-                world_add_drawline(L1, L2, LColor, 999999);
-                
-                world_add_drawline(L3, L4, LColor, 999999);
+//                world_add_drawline(L3, L4, LColor, 999999);
             }
             
             quaternion_rotate_inplace(&U, &V, R/I);

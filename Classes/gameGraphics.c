@@ -168,7 +168,8 @@ setupGLTextureViewDone()
 int
 bindTexture(unsigned int tex_id)
 {
-    if(tex_id != drawn_texture_last)
+    if (tex_id == drawn_texture_last) return 1;
+
     if(!bindTextureRequestCore(tex_id))
     {
         //assert(tex_id == TEXTURE_ID_BOUNDING);       /**/
@@ -183,10 +184,6 @@ bindTexture(unsigned int tex_id)
         glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
         drawn_texture_last = tex_id;
         return 1;
-    }
-    else if(tex_id == drawn_texture_last)
-    {
-
     }
     else
     {
@@ -739,6 +736,7 @@ void drawControls()
     {
         controlRect r;
         subElementsN = 0;
+        int needTpop = 0;
 
         setupGLModelView(screenWidth, screenHeight);
 
@@ -806,6 +804,7 @@ void drawControls()
                 //glRotatef(RADIANS_TO_DEGREES(trimR), 0, 0, 1);
                 glMultMatrixf(m);
                 glTranslatef(-0.5, -0.5, 0);
+                needTpop = 1;//glPopMatrix();
             }
             else if(controls[i] == &gameInterfaceControls.radar)
             {
@@ -946,11 +945,15 @@ void drawControls()
             strcpy(controls[i]->text, menuBuf);
         }
 
-        if(controls[i] == &gameInterfaceControls.trim && controls[i]->visible)
+        DBPRINTF((""))
+
+        
+        if(needTpop) //(controls[i] == &gameInterfaceControls.trim && controls[i]->visible)
         {
             glMatrixMode(GL_TEXTURE);
             glPopMatrix();
         }
+        
 
         glDisable(GL_BLEND);
         setupGLTextureViewDone();
@@ -1458,7 +1461,7 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData, float Tk_)
     // tesselate - done
 }
 
-static void drawBoundingInit()
+static void drawBoundingInit(int tex_id)
 {
     int iC = 0, iV = 0, iT = 0, i;
     float hackMinSize = 0.001, hackMinSizeTot = 0;
@@ -1681,7 +1684,7 @@ drawBackground_tess(float* modelC, float* textureC, unsigned int* indicesC, unsi
     glVertexPointer(3, GL_FLOAT, 0, modelC);
     glTexCoordPointer(2, GL_FLOAT, 0, textureC);
 
-    bindTexture(texture_id_background);
+    bindTexture(TEXTURE_ID_TERRAIN);
     glDrawElements(GL_TRIANGLES, (int)indicesN, index_type_enum, indicesC);
 }
 
@@ -1735,17 +1738,17 @@ void drawBackground()
 {
     drawBackgroundCore();
 
-    drawBounding();
+    drawBounding(texture_id_background);
 }
 
-void drawBounding()
+void drawBounding(int boundtex_id)
 {
     if(!boData) return;
 
     glVertexPointer(3, GL_FLOAT, 0, boData->coords256);
     glTexCoordPointer(2, GL_FLOAT, 0, boData->txcoords256);
 
-    bindTexture(TEXTURE_ID_BOUNDING);
+    bindTexture(boundtex_id);
 
     glDrawElements(GL_TRIANGLES, boData->count,
         index_type_enum, boData->indices256);
@@ -2046,12 +2049,12 @@ gameGraphicsInit(void)
     assert(gWorld->bound_radius > 0);
     assert(texture_id_background > 0);
 
-    drawBackgroundInit(texture_id_background, 0, 0, 0,
+    drawBackgroundInit(TEXTURE_ID_TERRAIN, 0, 0, 0,
                        gWorld->bound_radius,
                        16.0,
                        BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
 
-    drawBoundingInit();
+    drawBoundingInit(texture_id_background);
 
     //frameBufInit(&gFrameBufSt);
 }

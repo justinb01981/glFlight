@@ -86,7 +86,8 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
 "register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
 "set_world_size r\n"                                                     \
-"set_background_info 47\n"                                               \
+"set_background_info "BACKGROUND_TEXTURE_STR"\n"                         \
+"map_program_with_args 100 0 100\n"                                      \
 "\n"
 
 //#define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
@@ -120,11 +121,6 @@ WORLD_CUBEGRID(y, tex, scale)
 "add_object 1 rndx rndy rndz rndr rndr rndr 2 18\n"              \
 "add_object 1 rndx rndy rndz rndr rndr rndr 2 18\n"              \
 "add_object 1 rndx rndy rndz rndr rndr rndr 2 18\n"
-
-#define BACKGROUND_TEX_SPACE                                                      \
-"register_params 47 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"          \
-"register_params_update rnd_""1"" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n" \
-"set_background_info r""\n"
 
 #define COIN_LINE_1_4X                                                     \
 "register_params 10 rndx rndz rndy 0 0 0 2 0 0 0 0 0 0 0 0\n"                \
@@ -541,53 +537,7 @@ RANDOM_FLOATING_BLOCKS_1
 
 // MARK: -- map - collection
 const static char initial_map_collection[] = ""
-
-#if 0
-
-"set_background_info " BACKGROUND_TEXTURE_STR "\n"
-
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
-
-"add_object " MAPMODEL_SPRITE_SCENERY " -175 75 -175 1.6 0.78 -1.6 100 ""114""\n"
-"object_set_info 16\n" // scenery
-
-// else
-//GREEN_TENDRILS_1
-
-/////////////
-
-// buildings
-MAP_GENERATED_MACRO
-
-// drifting asteroid example
-//"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-//"object_set_info 4\n" // moving block
-//"object_set_velocity 0 0.5 0\n"
-
-// enemy base
-BASE_ENEMY_1
-
-// "core" that spits out data
-BASE_GENERIC(0, 0)
-
-"add_spawn 0 2 0 1.6 1.6 -1.6\n"
-
-/*
-"register_params 1 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 1 r r r 0 0 0 10 40\n"
-"register_params_update 0 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 1 r r r 0 0 0 10 40\n"
-"register_params_update 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 1 r r r 0 0 0 10 40\n"
-"register_params_update 0 -20 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 1 r r r 0 0 0 10 40\n"
-"register_params_update 0 10 10 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 1 r r r 0 0 0 10 40\n"
- */
-#else
-WORLD_SCALED_FRAME(1, /*57*/28, 4)
-"map_program_with_args 100 0 100\n"
-#endif
 ;
 
 // MARK: -- map - turret

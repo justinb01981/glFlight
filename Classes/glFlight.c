@@ -612,7 +612,8 @@ calibrate_bail:
     
     // walk list of new elements, adding to visible list
     // TODO: THIS IS NOT WORKING because added-list is being cleaned in clear_pending
-    WorldElemListNode* pAddedPtr = gWorld->elements_to_be_added.next;
+    WorldElemListNode* pAddedPtr = gWorld->elements_to_be_added.next, *pAddedPtrNext;
+
     while(pAddedPtr)
     {
         pAddedPtr->elem->in_visible_list = 1;
@@ -630,10 +631,11 @@ calibrate_bail:
         // insert into all visible-trees immediately
         world_elem_btree_insert(visibleBtreeRootBuilding, pAddedPtr->elem, pAddedPtr->elem->renderInfo.distance);
 
+        pAddedPtrNext = pAddedPtr->next;    // mind the order removing below
         world_elem_list_remove(pAddedPtr->elem, &gWorld->elements_to_be_added);
-
-        pAddedPtr = pAddedPtr->next;
+        pAddedPtr = pAddedPtrNext;
     }
+    //world_elem_list_clear(&gWorld->elements_to_be_added);
 
 
     // 1.x clear pending removals from last pass

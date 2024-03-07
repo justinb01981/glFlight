@@ -18,19 +18,6 @@
 
 #define FB_TEXTURE_WIDTHHEIGHT (512)
 
-extern void glDrawBuffers(GLuint, GLenum*);
-extern int bindTexture(unsigned int);
-extern void glBlitFramebuffer(
-     GLint srcX0,
-     GLint srcY0,
-     GLint srcX1,
-     GLint srcY1,
-     GLint dstX0,
-     GLint dstY0,
-     GLint dstX1,
-     GLint dstY1,
-     GLbitfield mask,
-     GLenum filter);
 extern void setupGLFramebufferView(void);
 extern void setupGLFramebufferViewDone(void);
 

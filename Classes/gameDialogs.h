@@ -276,15 +276,15 @@ gameDialogInitial()
 static void
 gameDialogInitialCountdownDrawCallback()
 {
-    const int sec = INTRO_ANIMATION_FRAMES;
-    static int count = GAME_FRAME_RATE * sec;
+    const int sec = /*INTRO_ANIMATION_FRAMES*/ 4;
+    static int count = GAME_FRAME_RATE * 4;
     
     if(count == 0)
     {
         glFlightDrawframeHook = NULL;
         count = INTRO_ANIMATION_FRAMES;
         gameDialogInitial();
-        
+
         return;
     }
     
@@ -315,7 +315,10 @@ gameDialogInitialCountdownDrawCallback()
 
         gameCamera_init(my_ship_x - x, my_ship_y - y, my_ship_z - z,
                         M_PI/2.0, M_PI+ph, -M_PI/2.0);
+
         ph += 0.010;
+
+        targetSpeed = 0;
     }
     camera_locked_frames = 1;
     

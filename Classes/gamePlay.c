@@ -1608,7 +1608,7 @@ game_run()
                     
                     // MARK: spawn enemies
 
-                    DBPRINTF(("gameStateSinglePlayer.max_enemies:%f", gameStateSinglePlayer.max_enemies));
+                    //DBPRINTF(("gameStateSinglePlayer.max_enemies:%f", gameStateSinglePlayer.max_enemies));
 
                     if (gameStateSinglePlayer.counter_enemies_spawned > 0 &&
                         enemies_found < floor(gameStateSinglePlayer.max_enemies) &&
@@ -1909,11 +1909,9 @@ game_run()
                 // MARK: spawn collect points randomly
                 if(obj_id_base != WORLD_ELEM_ID_INVALID)
                 {
-                    gameStateSinglePlayer.base_spawn_collect_m += rand_in_range(-gameStateSinglePlayer.base_spawn_collect_w/3, gameStateSinglePlayer.base_spawn_collect_w/2) / 65535;
+                    gameStateSinglePlayer.base_spawn_collect_m += fabs(  rand_in_range(-gameStateSinglePlayer.base_spawn_collect_w/3, gameStateSinglePlayer.base_spawn_collect_w/2) / 65535  );
                     
-                    if(gameStateSinglePlayer.base_spawn_collect_m < 0) gameStateSinglePlayer.base_spawn_collect_m = 0;
-                    
-                    //DBPRINTF(("base_spawn_collect_m %f\n", gameStateSinglePlayer.base_spawn_collect_m));
+                    DBPRINTF(("base_spawn_collect_m %f\n", gameStateSinglePlayer.base_spawn_collect_m));
                     
                     if(gameStateSinglePlayer.base_spawn_collect_m >= 1.0)
                     {
