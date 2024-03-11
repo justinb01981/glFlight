@@ -935,8 +935,8 @@ void drawControls()
             }
         }
 
-        if(controls[i] == &gameInterfaceControls.textMenuControl &&
-           r.visible && r.hide_frames == 0)
+        if (controls[i] == &gameInterfaceControls.textMenuControl &&
+            r.visible && r.hide_frames == 0)
         {
             char menuBuf[1024];
 
@@ -944,9 +944,6 @@ void drawControls()
 
             strcpy(controls[i]->text, menuBuf);
         }
-
-        DBPRINTF((""))
-
         
         if(needTpop) //(controls[i] == &gameInterfaceControls.trim && controls[i]->visible)
         {

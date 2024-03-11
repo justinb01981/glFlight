@@ -131,7 +131,7 @@ static int
 prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
 {
     int sock;
-    struct sockaddr_in6 addr;
+    struct sockaddr_storage addr;
     struct sockaddr_in6* addr6 = (void*)& addr;
     int proto = 0;
     ADDRINFO hints, * addrResult = NULL;
@@ -140,10 +140,7 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     memset(&addr, 0, sizeof(addr));
     addr6->sin6_port = htons(port);
     addr6->sin6_family = AF_INET6;
-
-    if( ! inet_pton(AF_INET6, "::", &(addr6->sin6_addr)) ) {
-        return GAME_NETWORK_ERR_FAIL;
-    }
+    addr6->sin6_addr = in6addr_any;
 
     sock = socket(AF_INET6, (stream ? SOCK_STREAM : SOCK_DGRAM), proto);
     if (sock < 0)
@@ -152,21 +149,20 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
         return -1;
     }
 
-//    memset(&hints, 0, sizeof(hints));
-//    hints.ai_family = AF_INET6;
-//    hints.ai_flags = AI_PASSIVE | AI_ADDRCONFIG | AI_V4MAPPED;
-//    hints.ai_socktype = SOCK_DGRAM;
-//    hints.ai_addrlen = sizeof(struct sockaddr_in6);
-//    hints.ai_protocol = 0;
-//
-//    getaddrinfo("0.0.0.0", "52000/udp", &hints, &addrResult);
-//    if(!addrResult)
-//    {
-//        console_write("%s:%d %s (%s)\n", __func__, __LINE__, "getaddrinfo failure", strerror(errno));
-//        return -1;
-//    }
-//
-//    memcpy(addr6, addrResult->ai_addr, addrResult->ai_addrlen);
+#if 1
+    memset(&hints, 0, sizeof(hints));
+    
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_flags = AI_PASSIVE | AI_V4MAPPED;
+    hints.ai_socktype = SOCK_DGRAM;
+    
+    if (getaddrinfo(NULL, "52000", &hints, &addrResult) < 0 || !addrResult)
+    {
+        DBPRINTF(("%s:%d %s (%s)\n", __func__, __LINE__, "getaddrinfo failure", strerror(errno)));
+        return -1;
+    }
+    memcpy(addr6, addrResult->ai_addr, addrResult->ai_addrlen);
+#endif
 
 #ifdef BSD_SOCKETS
     addr6->sin6_len = sizeof(struct sockaddr_in6);
@@ -194,8 +190,9 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
 
     //setsockopt(sock, sol_socket, so_reuseaddr, &so_arg, sizeof(so_arg));
 
-//    so_arg = 1;
-//    setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &so_arg, sizeof(so_arg));
+    
+    so_arg = 0;
+    setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &so_arg, sizeof(so_arg));   // https://learn.microsoft.com/en-us/windows/win32/winsock/function-calls-2
     
     /* bind */
     if(do_bind)
@@ -246,12 +243,13 @@ send_lan_broadcast(gameNetworkMessage* msg)
 }
 
 static void
- send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
+send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
 {
-    struct sockaddr_storage* sa;
+    
     int r;
+    struct sockaddr_storage sa;
 
-    sa = address->storage;
+    memcpy(&sa, address->storage, address->len);
 
     gameMessage_to_nbo(msg);
     
@@ -261,12 +259,21 @@ static void
         gameMessage_from_nbo(msg);
         return;
     }
+
+    assert(((struct sockaddr_in6*) &sa)->sin6_family == AF_INET6);
     
     r = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg),
-               0, (struct sockaddr*) sa, address->len);
+        0, (struct sockaddr*)(address->storage), address->len);
     if(r < 0)
     {
-        DBPRINTF(("sendto: %ld - errno:%s\n", r, strerror(errno)));
+#ifdef _NOT_POSIX
+        errno = WSAGetLastError();
+        if (errno != 0)
+        {
+            DBPRINTF(("sendto errno=%u)\n", errno));
+        }
+
+#endif
     }
 
     gameMessage_from_nbo(msg);
@@ -372,6 +379,8 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
     memset(&hints, 0, sizeof(hints));
 
     hints.ai_family = AF_INET6;
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags = AI_PASSIVE | AI_V4MAPPED; // leftovers from AF_INET6
 
     sprintf(portnum, "%u", GAME_NETWORK_PORT_DEFAULT);
 
@@ -384,8 +393,8 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
         return GAME_NETWORK_ERR_FAIL;
     }
 #else
-    int aret =    getaddrinfo(name, portnum, NULL, &addrInfoResultp);
-    if(aret != 0) {
+    int aret =    getaddrinfo(name, portnum, &hints, &addrInfoResultp);
+    if(aret != 0 || !addrInfoResultp) {
         DBPRINTF(("getaddrinfo failed: %s\n", gai_strerror(aret)));
         return GAME_NETWORK_ERR_FAIL;
     }
@@ -393,26 +402,27 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
 
     if(addrInfoResultp->ai_family == AF_INET)
     {
-        // convert to ipv4
-        struct sockaddr_in* sa = addrInfoResultp->ai_addr;
-        sa->sin_port = htons(gameNetworkState.hostInfo.port);
-        inet_ntop(AF_INET, &sa->sin_addr, buf, sizeof(buf));
-        console_write("server DNS resolved: %s (ipv4)\n", buf);
+        assert(0);
+        // only ipv6 handled
     }
     else
     if(addrInfoResultp->ai_family == AF_INET6)
     {
-        // convert to ipv4
-        struct sockaddr_in6 *sa = addrInfoResultp->ai_addr;
-        sa->sin6_port = htons(gameNetworkState.hostInfo.port);
-        inet_ntop(AF_INET6, &sa->sin6_addr, buf, sizeof(buf));
+        // copy over
+        struct sockaddr_in6* sa6 = addrInfoResultp->ai_addr;
+
+        DBPRINTF(("result sockaddr6: fam:%d port:%u", sa6->sin6_family, ntohs(sa6->sin6_port)));
+
+        inet_ntop(AF_INET6, &sa6->sin6_addr, buf, sizeof(buf));
         console_write("server DNS resolved: %s (ipv6)\n", buf);
+
+        memcpy(addr->storage, sa6, addrInfoResultp->ai_addrlen);
+        addr->len = addrInfoResultp->ai_addrlen;
     } else {
         return GAME_NETWORK_ERR_FAIL;
     }
 
-    memcpy(addr->storage, addrInfoResultp->ai_addr, addrInfoResultp->ai_addrlen);
-    addr->len = addrInfoResultp->ai_addrlen;
+
 
     freeaddrinfo(addrInfoResultp);
     return ret;
@@ -435,18 +445,22 @@ gameNetwork_initsockets()
     if(gameNetworkState.hostInfo.stream_socket.s == -1)
     gameNetworkState.hostInfo.stream_socket.s = prepare_listen_socket(1, gameNetworkState.hostInfo.port+2, gameNetworkState.hostInfo.hosting);
 
-    if (gameNetworkState.hostInfo.socket.s < 0 || gameNetworkState.hostInfo.map_socket.s < 0 || gameNetworkState.hostInfo.stream_socket.s < 0)
-    {
-        console_append("incrementing GAME_NETWORK_PORT");
-        GAME_NETWORK_PORT += 1;
-    }
+    //if (gameNetworkState.hostInfo.socket.s < 0 || gameNetworkState.hostInfo.map_socket.s < 0 || gameNetworkState.hostInfo.stream_socket.s < 0)
+    //{
+    //    console_append("incrementing GAME_NETWORK_PORT");
+    //    GAME_NETWORK_PORT += 1;
+    //}
 }
 
 gameNetworkError
 gameNetwork_test()
 {
     gameNetworkAddress addr;
+
+    gameNetwork_initsockets();
     gameNetwork_getDNSAddress("d0gf1ght.domain17.net", &addr);
+
+    send_beacon(&addr, "test123");
 
     return addr.len >= sizeof(struct sockaddr_in);
 }
@@ -569,7 +583,7 @@ gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becameh
     sprintf(strtmp, "::FFFF:%s", server_name);
     if(inet_pton(AF_INET6, server_name, &(addr6->sin6_addr)) == 1)
     {
-        gameAddress.len = sizeof(*addr6);
+        gameAddress.len = sizeof(struct sockaddr_in6);
         
         addr6->sin6_port = htons(server_port_resolved);
         addr6->sin6_family = AF_INET6;
@@ -1115,7 +1129,7 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
         break;
     }
 
-    if (r != sizeof(*msg)) DBPRINTF((" ERROR: msg size wrong (%u/%u)", r, sizeof(*msg)));
+    //if (r != sizeof(*msg)) DBPRINTF((" ERROR: msg size wrong (%u/%u)", r, sizeof(*msg)));
     
     return r == sizeof(*msg)? GAME_NETWORK_ERR_NONE: GAME_NETWORK_ERR_FAIL;
 }
