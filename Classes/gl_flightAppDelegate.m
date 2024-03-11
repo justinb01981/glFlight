@@ -95,17 +95,11 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
     if(game_terminated_gracefully) reset_map = 0;
     game_terminated_gracefully = 0;
     appWriteSettings();
-    
 
-#ifdef DEBUG
-    gameMapSetMap(map_debug);
-#else
     gameMapSetMap(initial_map);
-#endif
     
     console_write("Welcome to "GAMETITLE" %s\n"
-                  "http://www.domain17.net/d0gf1ght\n"
-                  "^D^Dnow with bluetooth local play!^D^D\n",
+                  "^Dhttp://www.domain17.net/d0gf1ght^D\n\n",
                   [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] UTF8String]);
     
     gameInterfaceInit(viewWidth, viewHeight);

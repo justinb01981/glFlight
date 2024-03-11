@@ -271,7 +271,7 @@ gameInput()
      
      */
     
-    float input_roll = (deviceRoll - rollOffset)/M_PI/2;
+    float input_roll = (deviceRoll - rollOffset)/M_PI/3;
     float input_pitch = (devicePitch - pitchOffset)/M_PI/3;
     float input_yaw = (deviceYaw - yawOffset)/M_PI/3;
     
@@ -327,14 +327,14 @@ gameInput()
 //                gameShip_roll(r);
 //            }
 //        }
-        
+
         if(fabs(input_roll) > dz_min
 //           && gameSettingsComplexControls
            )
         {
 //            printf("-----------ROLLING-----------\n");
             
-            double s = input_roll * fabs(input_roll) * GYRO_DC * tc * (speed/MAX_SPEED); // "roll dominant" multiplier
+            double s = input_roll * fabs(input_roll) * GYRO_DC * tc * (sqrt(speed)/MAX_SPEED);
 
             if(fabs(yprResponse[0]) < maxInputShipRotate) yprResponse[0] += yprD /* * (s/fabs(s)) */;
             s = s / (1.0 - yprResponse[0]);
@@ -346,7 +346,7 @@ gameInput()
         {
 //            printf("-----------PITCHING-----------\n");
             
-            double s = input_pitch * fabs(input_pitch) * GYRO_DC * tc * (speed/MAX_SPEED);
+            double s = input_pitch * fabs(input_pitch) * GYRO_DC * tc * (sqrt(speed)/MAX_SPEED);
 
             if(fabs(yprResponse[1]) < maxInputShipRotate) yprResponse[1] += yprD /* * (s/fabs(s)) */;
             s = s / (1.0 - yprResponse[1]);
@@ -358,7 +358,7 @@ gameInput()
         {
 //            printf("-----------YAWING-----------\n");
             
-            double s = input_yaw * fabs(input_yaw) * GYRO_DC * tc * (speed/MAX_SPEED);
+            double s = input_yaw * fabs(input_yaw) * GYRO_DC * tc * (sqrt(speed)/MAX_SPEED);
 
             if(fabs(yprResponse[2]) < maxInputShipRotate) yprResponse[2] += yprD /* * (s/fabs(s)) */;
             s = s / (1.0 - yprResponse[2]);

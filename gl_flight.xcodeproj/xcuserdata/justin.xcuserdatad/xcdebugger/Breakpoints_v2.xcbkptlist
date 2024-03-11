@@ -235,8 +235,8 @@
             filePath = "Classes/gameDialogs.h"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "200"
-            endingLineNumber = "200"
+            startingLineNumber = "202"
+            endingLineNumber = "202"
             landmarkName = "gameDialogGameOverCountdown()"
             landmarkType = "9">
          </BreakpointContent>
@@ -335,69 +335,6 @@
             endingLineNumber = "2835"
             landmarkName = "gameNetwork_sendStatsAlert()"
             landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "2021CB13-F099-453F-A18C-DC2927365D2F"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/gameDialogs.h"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "578"
-            endingLineNumber = "578"
-            landmarkName = "gameDialogNetworkGameEnded()"
-            landmarkType = "9">
-            <Locations>
-               <Location
-                  uuid = "2021CB13-F099-453F-A18C-DC2927365D2F - 7f9361c1bd490467"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "gameDialogNetworkGameEnded"
-                  moduleName = "d0gf1ght 95"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "578"
-                  endingLineNumber = "578"
-                  offsetFromSymbolStart = "12">
-               </Location>
-               <Location
-                  uuid = "2021CB13-F099-453F-A18C-DC2927365D2F - 928fb6a0135bff2c"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "gameDialogNetworkGameEnded"
-                  moduleName = "gl_flight_debug"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "578"
-                  endingLineNumber = "578"
-                  offsetFromSymbolStart = "12">
-               </Location>
-               <Location
-                  uuid = "2021CB13-F099-453F-A18C-DC2927365D2F - 928fb6a0135bff2c"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "gameDialogNetworkGameEnded"
-                  moduleName = "gl_flight_debug"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "578"
-                  endingLineNumber = "578"
-                  offsetFromSymbolStart = "32">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

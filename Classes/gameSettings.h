@@ -88,7 +88,7 @@ gameSettingsDefaults()
     block_scale = 1.0;
     game_terminated_gracefully = 0;
     gameSettingsStatsReset();
-    GYRO_DC = 3;
+    
     model_my_ship = MODEL_SHIP1;
     gameStateSinglePlayer.last_game.difficulty = 0;
     gameStateSinglePlayer.last_game.score = 0;
@@ -179,6 +179,7 @@ gameSettingsRead(const char *filename)
     int err = 0;
     int ignored = 0;
     int i;
+    float GYRO_DC_FAKE = 0;
     
     while(fp)
     {
@@ -223,8 +224,9 @@ gameSettingsRead(const char *filename)
                 err = 0;
             }
         }
-        if(fscanf(fp, "%f", &GYRO_DC) < 1) break;
-        if(GYRO_DC < 0) GYRO_DC = 1;
+
+        if(fscanf(fp, "%f", &GYRO_DC_FAKE) < 1) break;  // this was a bad idea
+        if(GYRO_DC_FAKE < 0) GYRO_DC_FAKE = 1;  //
         
         if(fscanf(fp, "%d", &model_my_ship) < 1) break;
         if(fscanf(fp, "%d", &gameStateSinglePlayer.last_game.difficulty) < 1) break;

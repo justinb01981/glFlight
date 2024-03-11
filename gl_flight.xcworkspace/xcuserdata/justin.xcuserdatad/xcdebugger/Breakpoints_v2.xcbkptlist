@@ -328,6 +328,38 @@
             endingLineNumber = "103"
             landmarkName = "gameSettingsDefaults()"
             landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "95E633AA-5D83-457A-98C6-138036A1BE72 - f4481a429bd06c47"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "gameSettingsDefaults"
+                  moduleName = "gl_flight_debug"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameSettings.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "103"
+                  endingLineNumber = "103"
+                  offsetFromSymbolStart = "332">
+               </Location>
+               <Location
+                  uuid = "95E633AA-5D83-457A-98C6-138036A1BE72 - f4481a429bd06c47"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "gameSettingsDefaults"
+                  moduleName = "gl_flight_debug"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameSettings.h"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "103"
+                  endingLineNumber = "103"
+                  offsetFromSymbolStart = "316">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -343,6 +375,22 @@
             startingLineNumber = "2112"
             endingLineNumber = "2112"
             landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7E04DF5A-13C6-4656-A4AA-9807E69127DB"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/gameAI.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "870"
+            endingLineNumber = "870"
+            landmarkName = "game_ai_collision(elemA, elemB, collision_action)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

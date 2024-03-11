@@ -155,7 +155,7 @@ extern float game_variables_val[GAME_VARIABLES_MAX];
 const static float game_variables_default[] = {
     99999999,    // MAX_SPAWN_COUNT
     10,          // MAX_ALIVE_COUNT
-    8,           // ENEMY_SPAWN_MOVE_RATE
+    5,           // ENEMY_SPAWN_MOVE_RATE
     1,           // PHYSICS_FRICTION_C
     50,          // ENEMY1_FORGET_DISTANCE
     30,          // ENEMY1_PURSUE_DISTANCE

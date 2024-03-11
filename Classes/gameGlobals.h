@@ -98,7 +98,7 @@ extern int fireActionQueuedAfterEdit;
 #endif
 
 /* reducing friction influences this... should be MAX_THRUST really */
-#define MAX_SPEED /*(15)*/ (18.0)
+#define MAX_SPEED /*(15)*/ (12.0)
 
 #define GAME_AI_DEBUG 0
 
@@ -111,7 +111,7 @@ const static float SPEED_BOOST_FRAMES = 60 * 5;
 extern float C_THRUST;
 extern float C_FRICTION;
 extern float GYRO_FEEDBACK;
-extern float GYRO_DC;
+const static float GYRO_DC = 3.0;
 
 const static int pooped_cube_interval_ms = 25;
 const static int pooped_cube_lifetime = 5;    // determines trail length
