@@ -17,6 +17,7 @@
 #include "gamePlatform.h"
 #include "gameNetwork.h"
 #include "gameInput.h"
+#include "gameGlobals.h"
 
 typedef struct
 {
@@ -136,7 +137,7 @@ gameSettingsWrite(const char *filename)
         fprintf(fp, "%f\n", block_scale);
         fprintf(fp, "%d\n", game_terminated_gracefully);
         for(int s = 0; s < GAME_TYPE_LAST; s++) fprintf(fp, "%d\n", gameStateSinglePlayer.high_score[s]);
-        fprintf(fp, "%f\n", GYRO_DC);
+        fprintf(fp, "%f\n", 1.0);
         fprintf(fp, "%d\n", model_my_ship);
         fprintf(fp, "%d\n", gameStateSinglePlayer.last_game.difficulty);
         fprintf(fp, "%d\n", gameStateSinglePlayer.last_game.score);
@@ -268,6 +269,10 @@ gameSettingsRead(const char *filename)
     {
         gameSettingsRatingGiven = 0;
     }
+
+    // OVERRIDE SOME SETTINGS I REGRET
+    gameSettingsNetworkFrequency = 50;
+    gameSettingsPortNumber = GAME_NETWORK_PORT_DEFAULT;
     
     if(fp) fclose(fp);
     return err;

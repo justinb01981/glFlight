@@ -53,19 +53,16 @@
 
 #define AVG_INPUTS_LENGTH 5
 
-void gameInputStatsCollectStart(void);
-void gameInputStatsAppend(float ypr[3]);
-void gameInputStatsCalc(void);
 void trimDoneIgnore(void);
 
-int rm_count = 0;
+int rm_count = 1;
 
 float dz_min = 0.001;
 double speed = 0;
 double maxAccelDecel = 0;
 double targetSpeed = 0;
 double maxSpeed = MAX_SPEED;
-double minSpeed = 0;
+double minSpeed;
 double speedBoost = 0;
 double bulletVel;
 int needTrim = 1;
@@ -78,7 +75,6 @@ static const float maxInputShipRotate = 0.2;
 float yprResponse[3] = {0, 0, 0}, yprD = maxInputShipRotate/360.0;
 float rollOffset = 0, pitchOffset = 0, yawOffset = 0;
 double devicePitchFrac = 0, deviceYawFrac = 0;  // used for controls rendering in gameGraphics
-int firstCalibrate = 1;
 float gyroSenseScale = PLATFORM_GYRO_SENSE_SCALE;
 double gyroLastRange[3];
 void (*trimDoneCallback)(void);
@@ -113,19 +109,17 @@ gameInputInit()
     maxAccelDecel = /*5*/ MAX_SPEED/2; // change per second
     minSpeed = MAX_SPEED / 20;  // careful this doesn't round to 0
     bulletVel = MAX_SPEED*3;
+
     needTrim = 1;
-    
+
     isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
 
 //    controlsCalibrated = 0;
     
-    gameInputStatsCollectStart();
-
-    firstCalibrate = 1;
-    
     initialized = 1;
-    
-    trimDoneCallback = trimDoneIgnore;
+
+    //    needTrim = 1;
+    gameInputTrimBegin(trimDoneIgnore);
 }
 
 void
@@ -139,15 +133,12 @@ gameInputUninit()
 void
 gameInputTrimBegin(void (*callback)(void))
 {
-    needTrim = 1;
     trimDoneCallback = callback;
-    
-    gameInputStatsCollectStart();
+    needTrim = 1;
 }
 
 void
-gameInput_trimLock()
-{
+gameInputTrimEnd(void) {
     needTrim = 0;
 }
 
@@ -237,31 +228,37 @@ gameInput()
 
     if(!initialized)
     {
-        return;
+        gameInputInit(); // lazy init self
     }
 
 //
 //    float deviceO[3] = {deviceRoll, devicePitch, deviceYaw};
 //    gameInputStatsAppend(deviceO);
 //
-//    if(needTrim)
-//    {
-//        rollOffset = deviceRoll;
-//        pitchOffset = devicePitch;
-//        yawOffset = deviceYaw;
-//        needTrim = 0;
-//
-//        gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);
-//
-////        if(!controlsCalibrated)
-////        {
-////            controlsCalibrated = 1;
-////            if(trimDoneCallback) trimDoneCallback();
-////        }
-//
-//        trimDoneCallback();
-//    }
-    
+    if(needTrim)
+    {
+        rollOffset = deviceRoll;
+        pitchOffset = devicePitch;
+        yawOffset = deviceYaw;
+
+        //gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);   // NOT HERE - in gameDialogs
+
+//        if(!controlsCalibrated)
+//        {
+//            controlsCalibrated = 1;
+//            if(trimDoneCallback) trimDoneCallback();
+//        }
+
+        // HACK: moving trim callback to gameInterface button handling
+
+    }
+
+    if(!needTrim && trimDoneCallback)
+    {  // falling-edge of trim btn pushf(trimDoneCallback)
+        trimDoneCallback();
+        trimDoneCallback = NULL;
+    }
+
     /*
                          (Rmax-Rmin)
             Dr - Rmin + ------------
@@ -270,10 +267,11 @@ gameInput()
           gyroSenseScale * (Rmax-Rmin)
      
      */
-    
-    float input_roll = (deviceRoll - rollOffset)/M_PI/3;
-    float input_pitch = (devicePitch - pitchOffset)/M_PI/3;
-    float input_yaw = (deviceYaw - yawOffset)/M_PI/3;
+
+    const float R = M_PI*2;
+    float input_roll = (deviceRoll - rollOffset) / R;
+    float input_pitch = (devicePitch - pitchOffset) / R;
+    float input_yaw = (deviceYaw - yawOffset) / R;
     
     devicePitchFrac = devicePitch / M_PI;
     deviceYawFrac =  deviceYaw / M_PI;
@@ -328,16 +326,18 @@ gameInput()
 //            }
 //        }
 
+        float INPUT_SPEED = (  1.0 + log(speed)  ) / maxSpeed; // speed
+        // TODO: prevent  < 0
+
         if(fabs(input_roll) > dz_min
 //           && gameSettingsComplexControls
            )
         {
 //            printf("-----------ROLLING-----------\n");
-            
-            double s = input_roll * fabs(input_roll) * GYRO_DC * tc * (sqrt(speed)/MAX_SPEED);
+            float s = input_roll * (INPUT_SPEED);
 
             if(fabs(yprResponse[0]) < maxInputShipRotate) yprResponse[0] += yprD /* * (s/fabs(s)) */;
-            s = s / (1.0 - yprResponse[0]);
+            //s = s / (1.0 - yprResponse[0]);
             
             gameShip_roll(s);
         }
@@ -345,11 +345,10 @@ gameInput()
         if(fabs(input_pitch) > dz_min)
         {
 //            printf("-----------PITCHING-----------\n");
-            
-            double s = input_pitch * fabs(input_pitch) * GYRO_DC * tc * (sqrt(speed)/MAX_SPEED);
+            float s = input_pitch * (INPUT_SPEED);
 
             if(fabs(yprResponse[1]) < maxInputShipRotate) yprResponse[1] += yprD /* * (s/fabs(s)) */;
-            s = s / (1.0 - yprResponse[1]);
+            //s = s / (1.0 - yprResponse[1]);
             
             gameShip_pitch(s);
         }
@@ -357,11 +356,10 @@ gameInput()
         if(fabs(input_yaw) > dz_min)
         {
 //            printf("-----------YAWING-----------\n");
-            
-            double s = input_yaw * fabs(input_yaw) * GYRO_DC * tc * (sqrt(speed)/MAX_SPEED);
+            float s = input_yaw * (INPUT_SPEED);
 
             if(fabs(yprResponse[2]) < maxInputShipRotate) yprResponse[2] += yprD /* * (s/fabs(s)) */;
-            s = s / (1.0 - yprResponse[2]);
+            //s = s / (1.0 - yprResponse[2]);
             
             gameShip_yaw(s);
         }
@@ -389,63 +387,6 @@ gameInput()
                 
     // convert body axes to world-axes
     // http://en.wikipedia.org/wiki/Euler_angles
-}
-
-void
-gameInputStatsCollectStart()
-{
-    gameInputStats.buf = gameInputStats.storage;
-    gameInputStats.x = 0;
-    gameInputStats.samples = /*gameInputStats.max_samples*/ tex_pass_initial_sample;
-}
-
-void
-gameInputStatsAppend(float ypr[3])
-{
-    unsigned int l = (unsigned int) gameInputStats.samples * 3;
-    
-    gameInputStats.buf[(gameInputStats.x) % l] = ypr[0];
-    gameInputStats.buf[(gameInputStats.x+1) % l] = ypr[1];
-    gameInputStats.buf[(gameInputStats.x+2) % l] = ypr[2];
-    gameInputStats.x += 3;
-}
-
-void
-gameInputStatsCalc()
-{
-    int j;
-    unsigned int l = (unsigned int) gameInputStats.samples * 3;
-    
-    if(gameInputStats.buf)
-    {
-        float *src = gameInputStats.buf;
-        
-        for(j = 0; j < 3; j++)
-        {
-            gameInputStats.avg[j] = 0;
-            gameInputStats.min[j] = 9999;
-            gameInputStats.max[j] = -9999;
-        }
-        
-        int i = 0;
-        while(i < l)
-        {
-            for(j = 0; j < 3; j++)
-            {
-                float s = *(src+j);
-                gameInputStats.avg[j] += s/gameInputStats.samples;
-                if(s < gameInputStats.min[j]) gameInputStats.min[j] = s;
-                if(s > gameInputStats.max[j]) gameInputStats.max[j] = s;
-            }
-            
-            src++;
-            i++;
-        }
-    }
-    
-    printf("gameInputStats avg:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.avg[j]); printf("\n");
-    printf("gameInputStats min:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.min[j]); printf("\n");
-    printf("gameInputStats max:"); for(j = 0; j < 3; j++) printf("%f ", gameInputStats.max[j]); printf("\n");
 }
 
 void trimDoneIgnore(void)

@@ -9,6 +9,7 @@
 #ifndef gl_flight_gameDialogs_h
 #define gl_flight_gameDialogs_h
 
+#include <math.h>
 #include "gameGlobals.h"
 #include "gameInterface.h"
 #include "gameSettings.h"
@@ -19,6 +20,7 @@
 #include "gameCamera.h"
 
 #define GAME_DIALOG_LIFE_MAX 999999
+#define INTRO_ANIMATION_FRAMES (GAME_FRAME_RATE*3)
 
 struct gameDialogStateStruct
 {
@@ -36,6 +38,8 @@ extern int gameDialogCounter;
 extern void AppDelegateOpenURL(const char* url);
 
 extern void gameDialogStartNetworkGame(void);
+
+static void gameDialogWelcome(void);
 
 static void
 gameDialogCancel(void)
@@ -70,14 +74,14 @@ gameDialogGraphic(int tex_id)
 static void
 gameDialogGraphicDangerCountdown()
 {
-    static int passes = 60;
+    static int passes = 20;
     gameDialogGraphic(TEXTURE_ID_DAMAGE_FLASH);
     passes--;
     if(passes <= 0)
     {
         gameDialogGraphicCancel();
         glFlightDrawframeHook = NULL;
-        passes = 60;
+        passes = 20;
     }
 }
 
@@ -115,9 +119,11 @@ static void
 gameDialogWelcomeMenu()
 {
     gameInterfaceControls.textMenuControl.visible = 1;
+    //gameInterfaceControls.menuControl.visible = 1;
+    glFlightDrawframeHook = NULL;
 }
 
-static void gameDialogWelcome(void);
+
 
 static void
 gameDialogRating()
@@ -181,8 +187,6 @@ gameDialogMenuCountdown()
 //        return;
 //    }
     
-    glFlightDrawframeHook = NULL;
-    
     if(AppDelegateIsMultiplayerEager())
     {
         actions_menu_set(ACTION_CONNECT_TO_GAME);
@@ -243,7 +247,7 @@ gameDialogCalibrate()
     gameDialogClose();
     gameInterfaceModalDialogDequeue();
     
-    gameInputInit();
+
     gameInputTrimBegin(gameDialogWelcome);
     /*
     gameInterfaceModalDialog(
@@ -264,59 +268,61 @@ static void
 gameDialogInitial()
 {
     console_clear();
-
-    /*
-    gameInterfaceModalDialog(
-                             "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A\n"
-                             "^C                             ^C\n"
-                             "^C     Gently steer device     ^C\n"
-                             "^C    to adjust sensitivity    ^C\n"
-                             "^C                             ^C\n"
-                             "^C       (Tap to begin)        ^C\n"
-                             "^C                             ^C\n"
-                             "^A^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^A",
-                             "", "cancel", gameDialogCalibrate, gameDialogCalibrate);
-     */
-    gameDialogCalibrate();
+    //gameDialogCalibrate();
+    gameDialogWelcome();
 }
 
+// MARK: -- first draw-callback called to render intro and finally pop welcome
+static int gameDialogInitialCountdownDrawCallbackCount = GAME_FRAME_RATE * 5;
 static void
-gameDialogInitialCountdown()
+gameDialogInitialCountdownDrawCallback()
 {
-    static int count = 240;
-    
-    if(count == 0)
+    const int sec = INTRO_ANIMATION_FRAMES;
+
+
+    gameCamera_MoveZ(0.03);
+
+
+//        // TODO: freeze camera here and display ship
+    gameInterfaceControls.mainMenu.visible = 0;
+    static float ph = 0.01;
+    const float rad = 4.0;
     {
-        glFlightDrawframeHook = NULL;
-        count = 240;
-        gameDialogInitial();
-        
-        return;
+        float x = sin(ph) * rad;
+        float z = cos(ph) * rad;
+        float y = -1.0;
+
+        gameCamera_init(my_ship_x - x, my_ship_y - y, my_ship_z - z,
+                        M_PI/2.0, M_PI+ph, -M_PI/2.0);
+        ph += 0.010;
     }
     
-    if(count == 240-32)
+    gameDialogInitialCountdownDrawCallbackCount--;
+
+    if(gameDialogInitialCountdownDrawCallbackCount == 0)
     {
+        glFlightDrawframeHook = NULL;
+        gameDialogInitial();
+
+
         // TODO: freeze camera here and display ship
         gameInterfaceControls.mainMenu.visible = 0;
-        
+
         // init camera
-        camera_locked_frames = 240-32;
-        
+        camera_locked_frames = GAME_FRAME_RATE;
+
         gameCamera_yawRadians(3.14);
         gameCamera_MoveZ(-11);
         gameCamera_MoveY(3);
         gameCamera_pitchRadians(0.52);
+        return;
     }
-    gameCamera_MoveZ(0.03);
-    
-    count--;
 }
 
 static void
 gameDialogResume()
 {
     gameInterfaceControls.textMenuControl.visible = 1;
-    gameInput_trimLock();
     
 //    gameInterfaceModalDialog("Resume paused game?", "Yes", "No",
 //                             gameDialogResumePaused, gameDialogResumePausedNo);
@@ -473,7 +479,7 @@ gameDialogStartNetworkGame2()
 static void
 gameDialogStartNetworkGameWait()
 {
-    gameInterfaceModalDialog("^[WAITING FOR GUESTS^]\n_OK_ AFTER everyone has\njoined\n300sec/game\n  _CANCEL_  to wait\n", "", "",
+    gameInterfaceModalDialog("[WAITING FOR GUESTS]\nOK when everyone has\njoined\n300sec/game\n  [CANCEL]  to wait\n    (10s) more... ", "", "",
                              gameDialogStartNetworkGame2, gameDialogCancelNetworkWaiting);
 }
 

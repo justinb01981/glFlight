@@ -43,7 +43,7 @@ int world_inited = 0;
 int game_terminated_gracefully = 0;
 char *world_data = NULL;
 int game_paused = 1;
-void (*glFlightDrawframeHook)(void) = gameDialogInitialCountdown;
+void (*glFlightDrawframeHook)(void) = gameDialogInitialCountdownDrawCallback;
 
 unsigned int visibleElementsLen = 0;
 
@@ -133,12 +133,12 @@ glFlightFrameStage1()
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnable(GL_DEPTH_TEST);
     
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0, 0, 0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	// turn off bilinear filtering
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // turn off bilinear filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
     float ship_z_vec_prev[3];
     gameShip_getZVector(ship_z_vec_prev);
@@ -149,7 +149,6 @@ glFlightFrameStage1()
     {
         bindTexture(TEXTURE_ID_FONTMAP2);
         bindTexture(TEXTURE_ID_FONTMAP);
-//        if(controlsCalibrated) gameInput_trimLock();
         
         world_elem_btree_restart();
         
@@ -174,16 +173,15 @@ glFlightFrameStage1()
         goto draw_bail;
     }
 
-
-    extern void update_time_ms_frame_tick(void);
-    update_time_ms_frame_tick();
+    //extern void update_time_ms_frame_tick(void);
+    //update_time_ms_frame_tick();
     
 calibrate_bail:
-//    get_time_ms();
-#if GAME_PLATFORM_ANDROID
+    get_time_ms();
+
+    // TODO: move timer handleing to platform code - i think this is only for android?
     time_ms = time_ms_wall;
-#endif
-    
+
 //    if(gameInputInitialTrimPending())
 //    {
 //        speed = 0.0;
@@ -213,6 +211,8 @@ calibrate_bail:
         goto draw_bail;
     }
 
+    // DBPRINTF(("tc:%f", tc));
+
     world_update(tc);
     world_update_time_last = time_ms;
     
@@ -227,8 +227,6 @@ calibrate_bail:
 //       && controlsCalibrated
        )
     {
-        float minSpeed = 0.1;
-        
         if(targetSpeed/maxSpeed >= minSpeed)
         {
             int sound_idx = 0;
@@ -257,7 +255,8 @@ calibrate_bail:
     
     get_time_ms();
     
-    if(!gameNetworkState.connected || gameNetworkState.hostInfo.hosting) game_ai_run();
+    // moved game_ai_run to do_networkd_world_update
+    if(gameNetworkState.hostInfo.hosting || !gameNetworkState.connected) game_ai_run();
     
     // JB: moved to background thread
     //do_game_network_read();
@@ -343,7 +342,7 @@ calibrate_bail:
         }
         else
         {
-            world_random_spawn_location(spawn, gameNetworkState.my_player_id);
+            world_random_spawn_location(spawn, gameNetworkState.my_player_id);  // i am respawning - update global ship orientation/camera?
         }
 
         gameShip_init(spawn[0], spawn[1], spawn[2],
@@ -357,26 +356,17 @@ calibrate_bail:
                              my_ship_alpha, my_ship_beta, my_ship_gamma,
                              1, texture_id_playership);
         world_get_last_object()->object_type = OBJ_PLAYER;
-        targetSpeed = minSpeed + 3.0;
-        speed = 6;
-        update_object_velocity(my_ship_id, ship_z_vec[0]*speed, ship_z_vec[1]*speed, ship_z_vec[2]*speed, 0);
+        targetSpeed = MAX_SPEED/10;
+
+        update_object_velocity(my_ship_id, 0,0,0, 0);   // fuck these dont matter because next frame does them
+
         world_get_last_object()->bounding_remain = 1;
         world_get_last_object()->durability = ship_durability;
         
-        gameCamera_init(my_ship_x, my_ship_y, my_ship_z,
-                        -spawn[3], -spawn[4], -spawn[5]);
-        gameCamera_yawRadians((viewRotationDegrees/180.0) * M_PI);
-        //gameCamera_MoveY(5);
-        gameCamera_MoveZ(-camera_z_trail);
-        //gameCamera_pitchRadians(-M_PI/2);
-        //camera_locked_frames = 120;
-        
-        /* TODO: figure out why a crash in visible-checks if this isn't here */
-        // bail this draw
-        
         console_write(game_log_messages[GAME_LOG_TELEPORT]);
         gameAudioPlaySoundAtLocationWithRate("teleport", 1.0, gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
-        return;
+
+        return; // HACK: is this necessary anymore - testing needed
     }
     else
     {
@@ -474,29 +464,30 @@ calibrate_bail:
     {
         switch(model_my_ship)
         {
-            case 0:
+            case MODEL_SHIP1:
                 maxSpeed = MAX_SPEED * 1.0;
                 ship_durability = ship_durability * 1.0;
                 game_ammo_missle_recharge = 0.0;
                 game_ammo_bullets_recharge = 2.0;
                 break;
                 
-            case 12:
+            case MODEL_SHIP2:
                 maxSpeed = MAX_SPEED * 1.0;
                 ship_durability = ship_durability * 0.5;
                 game_ammo_missle_recharge = 0.0;
-                game_ammo_bullets_recharge = 4.0;
+                game_ammo_bullets_recharge = 2.0;
                 break;
                 
-            case 14:
-                maxSpeed = MAX_SPEED * 1.0;
+            case MODEL_SHIP3:
+                maxSpeed = MAX_SPEED * 0.8;
                 ship_durability = ship_durability * 1.5;
                 game_ammo_missle_recharge = 0.0;
                 game_ammo_bullets_recharge = 2.0;
                 break;
                 
             default:
-                maxSpeed = MAX_SPEED * 1;
+                assert(0);
+                //maxSpeed = MAX_SPEED * 1;
                 break;
         }
     }
@@ -524,10 +515,6 @@ calibrate_bail:
         pVisCheckPtr = pVisCheckPtr->next;
     }
     
-    // 1.x clear pending removals from last pass
-    // 1.1 walk list of pending removals, removing from visible list
-    clear_world_pending_removals();
-    
      // TODO: may be possible to unlock world-state here
      
      drawElem_newFrame();
@@ -543,10 +530,7 @@ calibrate_bail:
          glDisable(GL_CULL_FACE);
          glCullFace(GL_BACK);
      }
-    
-    // not using depth testing (yet)
-     //glDepthFunc(GL_LESS);
-     //glEnable(GL_DEPTH_TEST);
+
      glFrontFace(GL_CCW);
     
     drawBackground();
@@ -582,9 +566,8 @@ calibrate_bail:
 
     // 11-29-2023 - visibility tree test was happening here
 
-    
     // partially sort current visible subset
-    world_elem_list_sort_1(&gWorld->elements_visible, element_dist_compare, 0, INT_MAX);
+    //world_elem_list_sort_1(&gWorld->elements_visible, element_dist_compare, 0, /*INT_MAX*/ 128);
     
     // if over our ideal draw count, reduce draw distance
     if(dynamic_draw_distance)
@@ -649,6 +632,10 @@ calibrate_bail:
         pAddedPtr = pAddedPtr->next;
     }
 
+
+    // 1.x clear pending removals from last pass
+    // 1.1 walk list of pending removals, removing from visible list
+    clear_world_pending_removals();
 
     // now sort visibile elements
 

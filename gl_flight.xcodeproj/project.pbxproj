@@ -197,6 +197,8 @@
 		D0DA47AE18186E1000BD4DC2 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0DA47AD18186E1000BD4DC2 /* MainWindow-iPad.xib */; };
 		D0DA47B018186E6C00BD4DC2 /* app_icon120x120.png in Resources */ = {isa = PBXBuildFile; fileRef = D0DA47AF18186E6A00BD4DC2 /* app_icon120x120.png */; };
 		D0DA47B418186F2700BD4DC2 /* app_icon72x72.png in Resources */ = {isa = PBXBuildFile; fileRef = D0DA47B318186F2600BD4DC2 /* app_icon72x72.png */; };
+		D0DB605C2B619FE600CFBF1C /* PurchaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D0DB605B2B619FE600CFBF1C /* PurchaseManager.m */; };
+		D0DB605D2B619FE600CFBF1C /* PurchaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D0DB605B2B619FE600CFBF1C /* PurchaseManager.m */; };
 		D0DD22E7182A0C5200A51D34 /* texture49.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0DD22E6182A0C5200A51D34 /* texture49.bmp */; };
 		D0EECB201753E08B00B5B815 /* gamePlay.c in Sources */ = {isa = PBXBuildFile; fileRef = D0EECB1F1753E08B00B5B815 /* gamePlay.c */; };
 		D0EECB221753E27C00B5B815 /* gameAI.c in Sources */ = {isa = PBXBuildFile; fileRef = D0EECB211753E27C00B5B815 /* gameAI.c */; };
@@ -704,6 +706,8 @@
 		D0DA47AD18186E1000BD4DC2 /* MainWindow-iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "MainWindow-iPad.xib"; path = "iPad/MainWindow-iPad.xib"; sourceTree = "<group>"; };
 		D0DA47AF18186E6A00BD4DC2 /* app_icon120x120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon120x120.png; sourceTree = "<group>"; };
 		D0DA47B318186F2600BD4DC2 /* app_icon72x72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon72x72.png; sourceTree = "<group>"; };
+		D0DB605B2B619FE600CFBF1C /* PurchaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PurchaseManager.m; sourceTree = "<group>"; };
+		D0DB605E2B619FF900CFBF1C /* PurchaseManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PurchaseManager.h; sourceTree = "<group>"; };
 		D0DD22E6182A0C5200A51D34 /* texture49.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture49.bmp; sourceTree = "<group>"; };
 		D0EECB1F1753E08B00B5B815 /* gamePlay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gamePlay.c; sourceTree = "<group>"; };
 		D0EECB211753E27C00B5B815 /* gameAI.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gameAI.c; sourceTree = "<group>"; };
@@ -782,6 +786,8 @@
 				D05AED6621F138DE00692833 /* building2_model.h */,
 				D05C28A71F9FEBC700BC2194 /* sphere_model.h */,
 				D0CF62B514A919D600E08151 /* object.h */,
+				D0DB605E2B619FF900CFBF1C /* PurchaseManager.h */,
+				D0DB605B2B619FE600CFBF1C /* PurchaseManager.m */,
 				D015A3F620AA3D2600CB1C31 /* world_motion.h */,
 				D03ABA6414ADACF000C44538 /* world.h */,
 				D0280A622241BBF500E8C1E8 /* building3_model.h */,
@@ -815,6 +821,7 @@
 				6D3FF5F815FA7B40009A5388 /* mesh.c */,
 				6D262136163F3A6B00F7EC2D /* simple_hash.h */,
 				6D595F61164C867E00C21926 /* world_file.h */,
+				D0EF8AFD170CCF0C00BDD4B7 /* collision.h */,
 				6D595F5E164C80FE00C21926 /* world_file.c */,
 				D080490F22D2B7DB002684B7 /* gameTests.h */,
 				D080491022D2B7EC002684B7 /* gameTests.c */,
@@ -833,23 +840,22 @@
 				D03ADBA7178271E800D725F7 /* actions.c */,
 				D062ED5816E0278F00CA4374 /* glFlight.h */,
 				D062ED5916E0279B00CA4374 /* glFlight.c */,
+				D02B8F181964D6BA00830369 /* gameInput.h */,
+				D0EECB1F1753E08B00B5B815 /* gamePlay.c */,
+				D03ADBA617823B5B00D725F7 /* gameSettings.h */,
+				D02B8EFE195357FE00830369 /* gameSettings.c */,
 				D062ED5B16E0294A00CA4374 /* gameGraphics.h */,
+				D02B8F191964D7D700830369 /* gameInput.c */,
+				D0AF471118ECB19700081B81 /* gameDialogs.h */,
 				D062ED5C16E0295500CA4374 /* gameGraphics.c */,
 				D02D5BC1293EB15C00F62480 /* framebuffer.h */,
 				D0532FB32A14616C000D6891 /* framebuffer.c */,
 				6D262134163F243600F7EC2D /* simple_list.h */,
-				D0EF8AFD170CCF0C00BDD4B7 /* collision.h */,
 				D0C75A8C174190630098A509 /* gameTimeval.h */,
 				D0C75A8D1742F6710098A509 /* gamePlay.h */,
-				D0EECB1F1753E08B00B5B815 /* gamePlay.c */,
 				D0BCBFB3176136CF00003168 /* gameLock.h */,
-				D03ADBA617823B5B00D725F7 /* gameSettings.h */,
-				D02B8EFE195357FE00830369 /* gameSettings.c */,
 				D0FE6D09185839F0007D67CF /* sounds.h */,
-				D0AF471118ECB19700081B81 /* gameDialogs.h */,
 				D02B8F0019535AAB00830369 /* gameDialogs.c */,
-				D02B8F181964D6BA00830369 /* gameInput.h */,
-				D02B8F191964D7D700830369 /* gameInput.c */,
 				D02B8F1B1968938600830369 /* gameIncludes.h */,
 				D011EF5A19BE45C0004A56CB /* gamePlatform.h */,
 				D011EF5B19BE46EE004A56CB /* gameDebug.h */,
@@ -1748,6 +1754,7 @@
 				6D53C4D71693FDB4009D6C3C /* cocoaAudioThread.m in Sources */,
 				D062ED5A16E0279B00CA4374 /* glFlight.c in Sources */,
 				D062ED5D16E0295500CA4374 /* gameGraphics.c in Sources */,
+				D0DB605C2B619FE600CFBF1C /* PurchaseManager.m in Sources */,
 				D080491122D2B7EC002684B7 /* gameTests.c in Sources */,
 				D0EECB201753E08B00B5B815 /* gamePlay.c in Sources */,
 				D0EECB221753E27C00B5B815 /* gameAI.c in Sources */,
@@ -1788,6 +1795,7 @@
 				D0F4D9BC2B1568B500948122 /* cocoaAudioThread.m in Sources */,
 				D0F4D9BD2B1568B500948122 /* glFlight.c in Sources */,
 				D0F4D9BE2B1568B500948122 /* gameGraphics.c in Sources */,
+				D0DB605D2B619FE600CFBF1C /* PurchaseManager.m in Sources */,
 				D0F4D9BF2B1568B500948122 /* gameTests.c in Sources */,
 				D0F4D9C02B1568B500948122 /* gamePlay.c in Sources */,
 				D0F4D9C12B1568B500948122 /* gameAI.c in Sources */,
@@ -1823,10 +1831,10 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "gl_flight-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.10.2;
+				MARKETING_VERSION = 1.10.5;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
@@ -1861,10 +1869,10 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "gl_flight-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.10.2;
+				MARKETING_VERSION = 1.10.5;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
@@ -1997,6 +2005,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2018,10 +2027,10 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "gl_flight copy2-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.9.1;
+				MARKETING_VERSION = 1.10.3;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2046,6 +2055,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2065,10 +2075,10 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "gl_flight copy2-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight multiplayerftw";
+				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.9.1;
+				MARKETING_VERSION = 1.10.3;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "$(TARGET_NAME)";

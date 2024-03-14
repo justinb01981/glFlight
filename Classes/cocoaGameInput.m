@@ -77,17 +77,16 @@ static void ignore(void) {}
             CMAttitude* attitude = [(CMAttitude*) attitudeDev copy]; // mutable attitude modified in-place
             if(attitudeRef != nil) [attitude multiplyByInverseOfAttitude: attitudeRef];
 
-            if(needTrim)
-            {
-                needTrim = 0;
+//            if(needTrim)
+//            {
+//                NSLog(@"handleDeviceMotionUpdate: dispatch_async - needTrim ");
+//
+//                attitudeRef = (CMAttitude*) attitudeDev; // last recorded attitude is now our reference applied after
+//
+//            }
+//            else
 
-                NSLog(@"handleDeviceMotionUpdate: dispatch_async - needTrim ");
-
-                attitudeRef = (CMAttitude*) attitudeDev; // last recorded attitude is now our reference applied after
-
-                trimDoneCallback();
-            }
-            else
+            // JB: 1-23-2024 - reference-vector calculating is now handled in gameInput
             {
                 gameInputGyro([attitude roll], [attitude pitch], [attitude yaw]);
             }

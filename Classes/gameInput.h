@@ -40,9 +40,6 @@ void
 gameInputTrimBegin(void (*callback)(void));
 
 void
-gameInput_trimLock(void);
-
-void
 gameInputGyro(float roll, float pitch, float yaw);
 
 void

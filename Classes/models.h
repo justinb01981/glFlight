@@ -23,8 +23,8 @@ const static int MODEL_PRIMITIVES_NONE = 0;
 
 typedef GLfloat model_coord_t;
 // keep these in-sync
-#define index_type_enum GL_UNSIGNED_INT
-typedef GLuint model_index_t;
+#define index_type_enum GL_UNSIGNED_SHORT
+typedef GLushort model_index_t;
 typedef GLfloat model_texcoord_t;
 
 typedef struct
@@ -101,7 +101,7 @@ typedef enum {
     MODEL_SHIP2,
     MODEL_MISSLE,
     MODEL_SHIP3,
-    MODEL_ICOSAHEDRON = 16,
+    MODEL_ICOSAHEDRON,
     MODEL_CUBE_INVERTED,
     MODEL_SPHERE,
     MODEL_ENEMY_BASE,

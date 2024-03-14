@@ -14,14 +14,15 @@
 #define MESH_Y_FOR_COORD(mesh, idx) ((idx)/((mesh)->n_row_coords))
 
 //#include <OpenGLES/EAGL.h>
+#include "models.h"
 
 // TODO: include opengl types
 typedef /*GLfloat*/ float mesh_glfloat_t;
 typedef /*GLubyte*/ unsigned char mesh_glubyte_t;
 
 struct mesh_point_t {
-    unsigned int x;
-    unsigned int y;
+    model_index_t x;
+    model_index_t y;
 };
 
 struct mesh_triangle_t {
@@ -48,7 +49,7 @@ struct mesh_t {
 struct mesh_opengl_t
 {
     mesh_glfloat_t *coords;
-    /*mesh_glubyte_t*/unsigned int *indices;
+    /*mesh_glubyte_t*/model_index_t *indices;
     unsigned int n_indices;
     mesh_glfloat_t *tex_coords;
     unsigned int u;
@@ -56,10 +57,10 @@ struct mesh_opengl_t
 
 struct tess_storage_t
 {
-    unsigned int *Is, *Icur, *Ist;
+    model_index_t *Is, *Icur, *Ist;
     float *Ms, *Mcur;
     float *Ts, *Tcur;
-    unsigned int Inext, Imir;
+    model_index_t Inext, Imir;
     int Id;
     int Idc;
 };

@@ -1,5 +1,5 @@
+##https://developer.android.com/ndk/guides/application_mk
 APP_STL := c++_static
+APP_DEBUG := true
+APP_OPTIM := debug
 APP_PLATFORM := android-23
-# x86 fails to assemble for now
-#APP_ABI := all
-APP_ABI := armeabi armeabi-v7a

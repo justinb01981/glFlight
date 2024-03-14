@@ -45,6 +45,8 @@ typedef struct
     //WorldElemListNode elements_by_region[WORLD_MAX_REGIONS][WORLD_MAX_REGIONS][WORLD_MAX_REGIONS];
     
     WorldElemListNode elements_moving;
+
+    WorldElemListNode elements_intelligent;
     
     WorldElemListNode elements_expiring;
     
@@ -98,8 +100,7 @@ typedef struct
     float vec_gravity[3];
     
     float vec[6];
-    
-    int ignore_add:1;
+
     int ignore_remove:1;
     int visible_list_change:1;
     

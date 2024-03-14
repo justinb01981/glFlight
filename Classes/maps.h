@@ -86,7 +86,7 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
 "register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
 "set_world_size r\n"                                                     \
-"set_background_info " BACKGROUND_TEXTURE_STR "\n"                       \
+"set_background_info 47\n"                                               \
 "\n"
 
 //#define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
@@ -122,7 +122,7 @@ WORLD_CUBEGRID(y, tex, scale)
 "add_object 1 rndx rndy rndz rndr rndr rndr 2 18\n"
 
 #define BACKGROUND_TEX_SPACE                                                      \
-"register_params "BACKGROUND_TEX_BEGIN" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"          \
+"register_params 47 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"          \
 "register_params_update rnd_""1"" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n" \
 "set_background_info r""\n"
 
@@ -542,191 +542,9 @@ RANDOM_FLOATING_BLOCKS_1
 // MARK: -- map - collection
 const static char initial_map_collection[] = ""
 
-#if 0
 
-"set_background_info " BACKGROUND_TEXTURE_STR "\n"
-
-WORLD_SCALED_FRAME(1, /*57*/28, 4)
-
-"add_object " MAPMODEL_SPRITE_SCENERY " -175 75 -175 1.6 0.78 -1.6 100 ""114""\n"
-"object_set_info 16\n" // scenery
-
-// else
-//GREEN_TENDRILS_1
-
-/////////////
-
-// buildings
-MAP_GENERATED_MACRO
-
-// drifting asteroid example
-//"add_object "MAPMODEL_ICOSAHEDRON" rndx rndy rndz 0 0 0 2 14\n"
-//"object_set_info 4\n" // moving block
-//"object_set_velocity 0 0.5 0\n"
-
-// enemy base
-BASE_ENEMY_1
-
-// "core" that spits out data
-BASE_GENERIC(0, 0)
-
-"add_spawn 0 2 0 1.6 1.6 -1.6\n"
-
-/*
-"register_params 1 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 1 r r r 0 0 0 10 40\n"
-"register_params_update 0 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 1 r r r 0 0 0 10 40\n"
-"register_params_update 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 1 r r r 0 0 0 10 40\n"
-"register_params_update 0 -20 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 1 r r r 0 0 0 10 40\n"
-"register_params_update 0 10 10 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object 1 r r r 0 0 0 10 40\n"
- */
-#else
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
 "map_program_with_args 100 0 100\n"
-#endif
-;
-
-// MARK: -- map - turret
-const static char initial_map_turret[] = ""
-
-//"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
-
-"set_background_info " BACKGROUND_TEXTURE_STR "\n"
-
-//MESH_CUBES_2(28, 4)
-WORLD_SCALED_FRAME_TURRET(1, 57, 4)
-
-// else
-GREEN_TENDRILS_1
-
-/////////////
-
-// buildings
-BUILDING_1(rndx, 8, rndz, 0)
-BUILDING_1(rndx, 8, rndz, 0)
-BUILDING_1(rndx, 8, rndz, 0)
-BUILDING_1(rndx, 8, rndz, 0)
-BUILDING_1(rndx, 8, rndz, 0)
-BUILDING_1(rndx, 8, rndz, 0)
-
-// drifting asteroid example
-/*
- "add_object "MAPMODEL_CUBE2" 100 20 100 0 0 0 11 56\n"
- "object_set_info 4\n" // moving block
- "object_set_velocity 0 0.5 0\n"
- */
-
-// add test tower
-// add base
-BASE_TURRET_1
-
-// clear model
-"register_params_clear 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-// set model
-"register_params_update 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-
-// add "protect" points
-COLLECT_POINT_ADD(rnd_-10_10, 0, rnd_-10_10)
-COLLECT_POINT_ADD(rnd_-10_10, 0, rnd_-10_10)
-COLLECT_POINT_ADD(rnd_-10_10, 0, rnd_-10_10)
-
-// enemy base
-BASE_ENEMY_1
-
-// air platform
-"register_params 2 rndx 20 rndy 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"register_params_update 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 6 31\n"
-"register_params_update 0 -20 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 6 31\n"
-"register_params_update 0 10 0 10 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 6 31\n"
-"register_params_update 0 0 0 -20 0 0 0 0 0 0 0 0 0 0 0 0\n"
-"add_object r r r r 0 0 0 6 31\n"
-
-
-/*
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-RANDOM_DECORATION_1
-*/
-/*
- "register_params 1 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object 1 r r r 0 0 0 10 40\n"
- "register_params_update 0 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object 1 r r r 0 0 0 10 40\n"
- "register_params_update 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object 1 r r r 0 0 0 10 40\n"
- "register_params_update 0 -20 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object 1 r r r 0 0 0 10 40\n"
- "register_params_update 0 10 10 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object 1 r r r 0 0 0 10 40\n"
- */
-
-/*
- // turret tower
- "register_params 1 rndx 0 rndz 0 0 0 4 40 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object 11 r r r 0 0 0 4 35\n"
- "object_set_info 3\n"
- 
- // turret tower
- "register_params 1 rndx 0 rndz 0 0 0 4 40 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object 11 r r r 0 0 0 4 35\n"
- "object_set_info 3\n"
- 
- // turret tower
- "register_params 1 rndx 0 rndz 0 0 0 2 40 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object r r r r 0 0 0 r r\n"
- "register_params_update 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
- "add_object 11 r r r 0 0 0 4 35\n"
- "object_set_info 3\n"
- 
- */
 ;
 
 // MARK: -- map - deathmatch
@@ -1325,7 +1143,6 @@ const static char* maps_list[] =
     map_portal_lobby,
      */
     map_200x100x200_pits,
-    initial_map_turret,
     pokeball_map,
     map_speedrun,
     NULL
@@ -1347,12 +1164,32 @@ const static char* maps_list_names[] =
 };
 
 const static char* initial_map = ""
-WORLD_SCALED_FRAME(1, /*57*/28, 4)
-"map_program_with_args 100 0 100\n"
-MAP_GENERATED_MACRO
-"add_spawn_invis 0 5 -6 0.01 0.01 0.01\n"
-WORLD_ADD_OBJECT(12, -2, 5, -4, 0, 0, 0, 1.0 , 24)
-WORLD_ADD_OBJECT(14, 2, 5, -4, 0, 0, 0, 1.0 , 71)
+
+"register_params 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
+"register_params_mul 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
+"set_world_size r\n"                                                     \
+"set_background_info 47\n"                                               \
+//WORLD_SCALED_FRAME(1, /*57*/28, 4)
+//"map_program_with_args 100 0 100\n"
+//MAP_GENERATED_MACRO
+
+
+// 0 euler is default orientation @ center
+"add_spawn_invis 4 5 -8 "
+"3.14 3.14 0.0"// initial ship orient -- watch out ship doesnt slerp to cam afterwards tho!
+"\n"
+WORLD_ADD_OBJECT(13,
+                 -2, 5, -4,
+                 0,0,0,
+                 1.0 , 24)
+WORLD_ADD_OBJECT(15,
+                 2, 5, -4,
+                 0,0,0,
+                 1.0 , 71)
+WORLD_ADD_OBJECT(1,
+                 4, 5, -4,
+                 0,0,0,
+                 1.0 , 115)
 "";
 
 

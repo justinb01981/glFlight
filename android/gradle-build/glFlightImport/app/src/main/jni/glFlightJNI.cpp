@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <EGL/egl.h>
 #include <map>
 
 #include <android/log.h>
@@ -12,32 +13,28 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "game/gameIncludes.h"
-
-#include "game/textures.h"
-#include "game/gameCamera.h"
-#include "game/gameSettings.h"
-#include "game/gameAi.h"
-#include "game/gameInput.h"
-#include "game/world_file.h"
-#include "game/gameGraphics.h"
-#include "game/gameInterface.h"
-#include "game/gameAudio.h"
-#include "game/gameNetwork.h"
-#include "game/maps.h"
-#include "game/gameDebug.h"
-#include "game/gameDialogs.h"
+#include "gameIncludes.h"
+#include "textures.h"
+#include "gameCamera.h"
+#include "gameSettings.h"
+#include "gameAi.h"
+#include "gameInput.h"
+#include "world_file.h"
+#include "gameGraphics.h"
+#include "gameInterface.h"
+#include "gameAudio.h"
+#include "gameNetwork.h"
+#include "maps.h"
+#include "gameDebug.h"
+#include "gameDialogs.h"
     
 #include "stubs.h"
 
 void dbtrace(const char* x, int y) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d\n", x, y); }
 void dbtracelog(const char* x, int y, const char* s) { __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "%s:%d %s\n", x, y, s); }
-
-extern void update_time_ms_frame_tick();
 extern void (*trimDoneCallback)(void);
 
-#include "game/glFlight.h"
+#include "glFlight.h"
 
 // globals
 double sumroll, sumpitch, sumyaw, sumrolloff, sumpitchoff, sumyawoff;
@@ -88,8 +85,6 @@ glFlightSettingsPath()
 inline static const char*
 glFlightDefaultGameName()
 {
-
-
 	sprintf(glFlightDefaultGameName_, "android%d", rand() % 1024);
 	return glFlightDefaultGameName_;
 }
@@ -104,7 +99,7 @@ glFlightDefaultPlayerName()
 inline static void
 glFlightJNIInit()
 {
-	DBPRINTF(("glFlightJNIInit (%d)\n", 0));
+	DBPRINTF(("glFlightJNIInit called\n"));
 
 	gameCamera_init(0, 0, 0, 0, 0, 0);
 
@@ -115,6 +110,8 @@ glFlightJNIInit()
     rand_seed(time_ms);
 
 	world_lock_init();
+
+    world_lock();
 
 	gameSettingsPlatformInit(glFlightDefaultPlayerName(), glFlightDefaultGameName());
 
@@ -142,18 +139,15 @@ glFlightJNIInit()
 	gameMapSetMap(initial_map);
 
     // HACK: touch inputs are in portrait mode
-	gameInterfaceInit(viewWidth, viewHeight);
-    gameInterfaceControls.trim.blinking = 1;
 
+    gameInterfaceInit(viewWidth, viewHeight);
+
+	DBPRINTF(("glFlightJNIInit done!\n"));
+
+    world_unlock();
+
+    glFlightInited = true;
 }
-
-JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightResourcesInit(JNIEnv *e, jobject o)
-{
-    return 0;
-}
-
-static float xscale = 1;
-static float yscale = 1;
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
@@ -178,18 +172,11 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 	float f[16];
 	int l = env_float_copy(e, arr, f);
 
-	viewWidth = f[0]*xscale;
-	viewHeight = f[1]*yscale;
+	viewWidth = f[0];
+	viewHeight = f[1];
 
-	if(viewWidth == 0 || viewHeight == 0) return;
+    glViewport(0, 0, viewWidth, viewHeight);
 
-	DBPRINTF(("Java_com_example_glflight_GameRenderer_onDrawFrame calling glFlightJNIInit()"));
-
-	assert(!glFlightInited);
-	
-	glFlightJNIInit();
-
-	glFlightInited = true;
 }
 
 static game_timeval_t gameInputTimeLast = 0;
@@ -198,15 +185,15 @@ static game_timeval_t gameDrawTimeLast = 0;
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jobject o)
 {
     // TODO: draw a 'wait...loading' status string each frame until load
-	if(!glFlightInited) return;
-
-	if(time_ms_wall - gameInputTimeLast >= (1000/GYRO_SAMPLE_RATE))
-	{
-		gameInput();
-
-		gameInputTimeLast = time_ms_wall;
-		//DBPRINTF(("gameInput"));
+	if(!glFlightInited) {
+		glFlightJNIInit();
+		return;
 	}
+
+    assert(eglGetCurrentContext() != NULL);
+
+    // NOTE: 10-25 - removing timing for input events since drawframe is being paced at 60fps // ??
+    gameInput();
 
 	glFlightFrameStage1();
 	glFlightFrameStage2();
@@ -218,7 +205,12 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIEnv *e, jobject o)
 {
-    glFlightInited = false;
+//
+}
+
+JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightResourcesInit(JNIEnv *e, jobject o)
+{
+	return 0;
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNIEnv *e, jobject o)
@@ -250,7 +242,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JN
 
     gameInputUninit();
     tex_pass = 0;
-    glFlightDrawframeHook = gameDialogInitialCountdown;
+    glFlightDrawframeHook = gameDialogInitialCountdownDrawCallback;
 
     DBPRINTF(("Java_com_domain17_glflight_GameRunnable_glFlightUninit called + exiting"));
 }
@@ -299,44 +291,19 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 
 	// see FullScreenActivity.java
 
-    sumroll = sumrolloff - jf[0];
-    sumpitch = sumpitchoff - jf[2];
-    sumyaw = sumyawoff - jf[1];
+    sumroll = fmod(sumrolloff - jf[0], M_PI);
+    sumpitch = fmod(sumpitchoff - jf[2], M_PI);
+    sumyaw = fmod(sumyawoff - jf[1], M_PI);
 
-	if(!glFlightInited) return;
+    //DBPRINTF(("sensor: %03f %03f %03f", jf[0], jf[1], jf[2]));
 
-	if(needTrim && trimDoneCallback)
-	{
-		sumrolloff = jf[0];
-		sumpitchoff = jf[2];
-		sumyawoff = jf[1];
-
-        needTrim = 0;
-
-		trimDoneCallback();
-
-		return;
-	}
-
-	if(time_ms >= sensorInputNext)
-    {
-		if(time_ms - sensorInputNext > 1000) {
-			sensorInputNext = time_ms;
-			return;
-		}
-
-        // Z reversed
-//		gameInputGyro(-sumroll, sumyaw, -sumpitch);
-		gameInputGyro(-sumroll, sumpitch, -sumyaw);
-		sensorInputNext += 1000 / PLATFORM_TICK_RATE;
-	}
-
-	//gameInputMotion(sumroll, sumpitch, sumyaw);
+	// Z reversed
+	gameInputGyro(-sumroll, sumpitch, -sumyaw);
 }
 
-JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorNeedsCalibrate(JNIEnv *e, jobject o)
+JNIEXPORT jboolean JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorNeedsCalibrate(JNIEnv *e, jobject o)
 {
-	return needTrim;
+    return needTrim;
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInput(JNIEnv *e, jobject o, jfloatArray arr)

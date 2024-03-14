@@ -24,10 +24,9 @@
 #define GL_NONE 0
 #endif
 
-unsigned int texture_list[MAX_TEXTURES];
-unsigned int texture_list_loaded[MAX_TEXTURES];
+unsigned int texture_list[MAX_TEXTURES] = {0};
+unsigned int texture_list_loaded[MAX_TEXTURES] = {0};
 GLubyte* texture_data_table[MAX_TEXTURES];
-int n_textures = 0;
 int texture_preload_count = 12;
 const static unsigned char alpha_black = 0x00;
 const static unsigned char alpha_semitrans = 0xD0;
@@ -78,7 +77,7 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
     int width = max_bitmap_dim;
     int height = max_bitmap_dim;
     
-    sprintf(file_name, "%s""texture%d.bmp", initTexturesPrefix, n_textures);
+    sprintf(file_name, "%s""texture%d.bmp", initTexturesPrefix, tex_id);
 
     /*
      * bitmaps are 24-bit BMP files (usually 512x512 but some power of 2)
@@ -86,6 +85,8 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
      * exported with "do not write colorspace information checked
      * created with GIMP
      */
+
+    assert(texture_data_table[tex_id] == NULL);
     
     fp = fopen(file_name, "rb");
     if(fp)
@@ -184,7 +185,9 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
                     err = 0;
                 }
                 
+                // this is OK says openGL docs
                 free(data);
+                texture_data_table[tex_id] = NULL;
             }
         }
         
@@ -208,27 +211,27 @@ read_bitmap_to_gltexture(int tex_id)
 
 void initTextures(const char *prefix)
 {
+
+    uninitTextures();
+
+
     int i;
     strcpy(initTexturesPrefix, prefix);
     
-    n_textures = 0;
+    // for(i = 0; i < MAX_TEXTURES; i++)
+    // {
+    //     texture_list_loaded[i] = 0;
+    //
+    //     bindTextureRequestCore(i);
+    // }
+
     
-    for(i = 0; i < MAX_TEXTURES; i++)
-    {
-        texture_list_loaded[i] = 0;
-    }
-    
-    // load the first N textures
-    for(i = 0; i < texture_preload_count; i++)
-    {
-        bindTextureRequestCore(i);
-    }
 }
 
 int bindTextureRequestCore(int tex_id)
 {
 
-    if(tex_id == 0)
+    if(tex_id <= TEXTURE_ID_NONE)
     {
         return 0;
     }
@@ -240,16 +243,12 @@ int bindTextureRequestCore(int tex_id)
         
         //console_clear();
         //console_write("loading texture: %d", tex_id);
-        
 
-        if(tex_id != TEXTURE_ID_FRAMEBUFFER)
-        if(read_bitmap_to_gltexture(n_textures) != 0)
+        if(read_bitmap_to_gltexture(tex_id) != 0)
         {
-            printf("failed to load texture: %d\n", n_textures);
+            printf("failed to load texture: %d\n", tex_id);
             return 0;
         }
-
-        n_textures++;
     }
     
     return texture_list_loaded[tex_id];
@@ -267,4 +266,17 @@ void textures_hack_framebuffer_cleanup(void) {
     // accept new texture rendered from framebuf
 //    texture_list_loaded[TEXTURE_ID_BOUNDING] = 0;
 //    texture_list[TEXTURE_ID_BOUNDING] = -1;
+}
+
+
+void uninitTextures() {
+    int i;
+    for(i = 0; i < MAX_TEXTURES; i++)
+    {
+        if(texture_list_loaded[i]) {
+            glDeleteTextures(1, &texture_list[i]);
+            texture_list[i] = GL_NONE;
+            texture_list_loaded[i] = 0;
+        }
+    }
 }

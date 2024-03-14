@@ -127,20 +127,13 @@ enum {
 };
 
 const static char *game_variables_name[] = {
-    "ENEMY_SPAWN_MAX_COUNT",
-    "ENEMY_SPAWN_MAX_ALIVE",
     "ENEMY_SPAWN_MOVE_RATE",
-    "PHYSICS_FRICTION_C",
     "ENEMY1_FORGET_DISTANCE",
     "ENEMY1_PURSUE_DISTANCE",
     "ENEMY1_SPEED_MAX",
     "ENEMY1_TURN_MAX_RADIANS",
-    "ENEMY1_FIRES_MISSLES",
-    "ENEMY1_FIRES_LASERS",
     "ENEMY1_CHANGES_TARGET",
     "ENEMY1_PATROLS_NO_TARGET",
-    "ENEMY1_RUN_INTERVAL_MS",
-    "ENEMY1_LEAVES_TRAIL",
     "ENEMY1_SCAN_DISTANCE_MAX",
     "ENEMY1_MAX_TURN_SKILL_SCALE",
     "ENEMY1_JUKE_PCT",
@@ -153,20 +146,13 @@ const static char *game_variables_name[] = {
 extern float game_variables_val[GAME_VARIABLES_MAX];
 
 const static float game_variables_default[] = {
-    99999999,    // MAX_SPAWN_COUNT
-    10,          // MAX_ALIVE_COUNT
-    5,           // ENEMY_SPAWN_MOVE_RATE
-    1,           // PHYSICS_FRICTION_C
+    8,           // ENEMY_SPAWN_MOVE_RATE (speed of orbiting base)
     50,          // ENEMY1_FORGET_DISTANCE
     30,          // ENEMY1_PURSUE_DISTANCE
-    MAX_SPEED,   // MAX_SPEED
-    1.2,         // MAX_TURN_RADIANS
-    0,           // FIRES MISSLES
-    1,           // FIRES LASERS
+    MAX_SPEED,   // ENEMY1_SPEED_MAX
+    /*1.2*/ 0.8,         // ENEMY1_TURN_MAX_RADIANS
     1,           // CHANGES_TARGET
     1,           // PATROLS
-    50,          // RUN_INTERVAL_MS
-    1,           // LEAVES TRAIL
     800.0,       // SCAN_DISTANCE_MAX
     0.02,        // ENEMY1_MAX_TURN_SKILL_SCALE
     25,    // ENEMY1_JUKE_PCT
@@ -285,8 +271,8 @@ extern float game_ammo_missles;
 extern float game_ammo_bullets;
 extern float game_ammo_missle_recharge;
 extern float game_ammo_bullets_recharge;
-const static float GAME_BULLET_LIFETIME = (60*6);
-const static float GAME_MISSLE_LIFETIME = (60*10);
+const static float GAME_BULLET_LIFETIME = (80*6);
+const static float GAME_MISSLE_LIFETIME = (80*10);
 extern char *game_status_string;
 extern int model_my_ship;
 

@@ -1,4 +1,5 @@
 //
+//
 //  world.m
 //  gl_flight
 //
@@ -50,9 +51,9 @@ world_t *gWorld = NULL;
 game_lock_t gWorldLock;
 
 float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
+// TODO: DO NOT SET THIS HERE SEE gameVariables
 float C_FRICTION = /*0.04*/ 0.030; // higher values = more friction
 float GYRO_FEEDBACK = 0;
-
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
 
 static struct mesh_t* world_pending_mesh = NULL;
@@ -84,7 +85,12 @@ world_add_object_core(Model type,
     int new_durability = 1;
     int model_changed = 0;
     WorldElem* pElem;
-    
+
+    if(isnan(x) || isnan(y) || isnan(z)) {
+        DBPRINTF(("WARNING: world_add_object loc NaN! ignoring object"));
+        return WORLD_ELEM_ID_INVALID;
+    }
+
     MODEL_POLY_COMPONENTS_DECLARE();
     
     MODEL_POLY_COMPONENTS_INIT();
@@ -795,12 +801,7 @@ world_add_object_core(Model type,
     {
         pElem->durability = new_durability;
     }
-	
-	switch (texture_id)
-	{
-	default:
-		break;
-	}
+
     
     /*
     if(is_collideable && replace_id == WORLD_ELEM_ID_INVALID)
@@ -852,8 +853,45 @@ world_add_object_core(Model type,
 
 int world_add_object(Model type, float x, float y, float z, float yaw, float pitch, float roll, float scale, int texture_id)
 {
-    if(gWorld->ignore_add) return WORLD_ELEM_ID_INVALID;
     return world_add_object_core(type, x, y, z, yaw, pitch, roll, scale, texture_id, WORLD_ELEM_ID_INVALID);
+}
+
+
+void world_unlink_elem(WorldElem* pFreeElem)
+{
+    /*
+     * void
+world_remove_object(int elem_id)
+{
+    WorldElem* pElem = NULL;
+
+    if(gWorld->ignore_remove) return;
+
+    WorldElemListNode* pRemoveNode;
+    pRemoveNode = world_elem_list_find(elem_id, &gWorld->elements_list);
+    if(pRemoveNode) pElem = pRemoveNode->elem;
+
+    if(pElem && !pElem->remove_pending)
+    {
+        if(gWorld->world_update_state.world_remove_hook) gWorld->world_update_state.world_remove_hook(pElem);
+
+        remove_element_from_region(pElem);
+
+        world_elem_list_remove(pElem, &gWorld->elements_expiring);
+        world_elem_list_remove(pElem, &gWorld->elements_moving);
+        world_elem_list_remove(pElem, &gWorld->elements_intelligent);
+
+        world_elem_list_remove(pElem, &gWorld->elements_list);
+        world_elem_list_add(pElem, &gWorld->elements_to_be_freed);
+        pElem->remove_pending = 1;
+    }
+}
+     */
+        world_elem_list_remove(pFreeElem, &gWorld->elements_expiring);
+        world_elem_list_remove(pFreeElem, &gWorld->elements_moving);
+        world_elem_list_remove(pFreeElem, &gWorld->elements_intelligent);
+        // elements_collided is handled elsewhere (temporary list)
+        remove_element_from_region(pFreeElem);
 }
 
 void
@@ -871,12 +909,12 @@ world_remove_object(int elem_id)
     {
         if(gWorld->world_update_state.world_remove_hook) gWorld->world_update_state.world_remove_hook(pElem);
         
-        remove_element_from_region(pElem);
-        
-        world_elem_list_remove(pElem, &gWorld->elements_expiring);
-        world_elem_list_remove(pElem, &gWorld->elements_moving);
-        
-        world_elem_list_remove(pElem, &gWorld->elements_list);
+        world_unlink_elem(pElem);
+
+        // here, remove from elements list immediately instead of waiting for elements_to_be_freed-pending to do it
+        //world_elem_list_remove(pElem, &gWorld->elements_list);
+
+        // freed from the rest later in clear_pending
         world_elem_list_add(pElem, &gWorld->elements_to_be_freed);
         pElem->remove_pending = 1;
     }
@@ -955,15 +993,17 @@ world_find_elem_with_attrs(WorldElemListNode* head, int object_type, int affilia
 
 static void update_object_in_motion(WorldElem* pElem)
 {
+
+    pElem->physics.ptr->velocity = sqrt(pElem->physics.ptr->vx*pElem->physics.ptr->vx +
+                                    pElem->physics.ptr->vy*pElem->physics.ptr->vy +
+                                    pElem->physics.ptr->vz*pElem->physics.ptr->vz);
+
     // add to "elements-moving" list
     if(!world_elem_list_find_elem(pElem, &gWorld->elements_moving))
     {
         world_elem_list_add(pElem, &gWorld->elements_moving);
     }
     
-    pElem->physics.ptr->velocity = sqrt(pElem->physics.ptr->vx*pElem->physics.ptr->vx +
-                                        pElem->physics.ptr->vy*pElem->physics.ptr->vy +
-                                        pElem->physics.ptr->vz*pElem->physics.ptr->vz);
     pElem->moving = 1;
 }
 
@@ -1045,7 +1085,7 @@ int update_object_velocity_with_friction(int object_id, float v[3], float cthrus
         pElemNode->elem->physics.ptr->vx += ship_vnew[0];
         pElemNode->elem->physics.ptr->vy += ship_vnew[1];
         pElemNode->elem->physics.ptr->vz += ship_vnew[2];
-    
+
         update_object_in_motion(pElemNode->elem);
         
         return object_id;
@@ -1090,13 +1130,25 @@ void world_object_set_nametag(int object_id, char* nametag)
 void
 world_random_spawn_location(float loc[6], int affiliation)
 {
-    WorldElemListNode* pCur = gWorld->elements_list.next;
-    int n = rand() % 64;
-    int i = 0;
+//    WorldElemListNode* pCur = gWorld->elements_list.next;
+    int n = rand_in_range(1, 8);    // keep iterating some random # of points
     int found_spawns = 0;
-    
+
+    // no spawn point found, spawn randomly
+    loc[0] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
+    loc[1] = rand_in_range(1, gWorld->bound_radius/4);
+    loc[2] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
+
+    // heading should @ origin
+    loc[3] = 1.6;
+    loc[4] = atan2(loc[0], loc[2]); //rand_in_range(-M_PI+0.1, M_PI-0.1);
+    loc[5] = -1.6;
+
     while(n > 0)
     {
+        // TODO: guarantee spawnpoints are found in this list?
+        WorldElemListNode* pCur = gWorld->elements_moving.next;
+        int i = 0;
         while(pCur)
         {
             if(pCur->elem->object_type == OBJ_SPAWNPOINT)
@@ -1109,10 +1161,12 @@ world_random_spawn_location(float loc[6], int affiliation)
                     loc[i++] = pCur->elem->physics.ptr->x;
                     loc[i++] = pCur->elem->physics.ptr->y;
                     loc[i++] = pCur->elem->physics.ptr->z;
-                
-                    loc[i++] = pCur->elem->physics.ptr->alpha; // alpha
-                    loc[i++] = pCur->elem->physics.ptr->beta; // beta
-                    loc[i++] = pCur->elem->physics.ptr->gamma; // gamma
+
+                    // default orientation is aimed at origin parallel to ground
+                    loc[i++] = 1.6; // alpha, beta, gamma (euler)
+                    loc[i++] = atan2(loc[0], loc[2]); //rand_in_range(-M_PI+0.1, M_PI-0.1);
+                    loc[i++] = -1.6;
+
                     return;
                 }
             }
@@ -1120,18 +1174,7 @@ world_random_spawn_location(float loc[6], int affiliation)
         }
         
         if(!found_spawns) break;
-        
-        pCur = gWorld->elements_list.next;
     }
-    
-    // no spawn point found, spawn randomly
-    loc[0] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
-    loc[1] = rand_in_range(1, gWorld->bound_radius/2);
-    loc[2] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
-    
-    loc[3] = M_PI/2;
-    loc[4] = rand_in_range(-M_PI+0.1, M_PI-0.1);
-    loc[5] = -M_PI/2;
 }
 
 void world_free()
@@ -1238,8 +1281,8 @@ void world_init(float radius)
 {
     float ws = 25;
     
-	gWorld = malloc(sizeof(world_t));
-	memset(gWorld, 0, sizeof(world_t));
+    gWorld = malloc(sizeof(world_t));
+    memset(gWorld, 0, sizeof(world_t));
     
     gWorld->bound_radius = radius;
     gWorld->region_size = ws;
@@ -1401,10 +1444,8 @@ void world_clear_pending()
     {
         WorldElem* pFreeElem = pCur->elem;
         pCur = pCur->next;
-        
-        world_elem_list_remove(pFreeElem, &gWorld->elements_expiring);
-        world_elem_list_remove(pFreeElem, &gWorld->elements_moving);
-        remove_element_from_region(pFreeElem);
+
+        world_unlink_elem(pFreeElem);
         
         world_elem_list_remove(pFreeElem, &gWorld->elements_to_be_freed);
         

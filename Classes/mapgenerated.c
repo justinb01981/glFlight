@@ -240,11 +240,11 @@ world_build_run_program(float x, float y, float z)
         
         // MARK: -- add friendly spawn location
         world_add_object(MODEL_CUBE,
-                         0, gWorld->bound_radius/8, -gWorld->bound_radius/2,
-                         0.01, 0.01, 0.01,
+                         gWorld->bound_radius/2, gWorld->bound_radius/4, gWorld->bound_radius/2,
+                         0, M_PI*1.5, M_PI,
                          6, TEXTURE_ID_ANIMATED_STATIC);
         world_get_last_object()->object_type = OBJ_SPAWNPOINT;
-        //update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
+        update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
         world_object_set_lifetime(world_get_last_object()->elem_id, 300);
     }
     

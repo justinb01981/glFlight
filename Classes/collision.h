@@ -62,7 +62,7 @@ collision_actions_default[OBJ_LAST][OBJ_LAST] =
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // base
     {1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,       0, 1, 0, 0, 0, 0, 0, 0, 0}, // missle
     {0, 0, 7, 0, 0, 0, 0, 0, 0, 0, SPAWNXCAPT,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // spawnpoint
-    {0, 0, 3, 0, 0, 0, 0, 0, 3, 0, SPAWNXCAPT,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // spawnpoint enemy
+    {0, 0, /*3*/0, 0, 0, 0, 0, 0, 3, 0, SPAWNXCAPT,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // spawnpoint enemy
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // DISPLAYONLY
     {2, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // BALL
     {0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,       0, 0, 0, 0, 0, 0, 0, 0, 0}, // reserved
@@ -292,7 +292,6 @@ do_world_collision_handling(float tc)
                 else if(pCollisionB->elem->stuff.bullet.action == ACTION_BLOCK_TEXTURE)
                 {
                     pCollisionA->elem->texture_id++;
-                    if(pCollisionA->elem->texture_id >= n_textures) pCollisionA->elem->texture_id = 0;
                     
                     if(!world_elem_list_find(pCollisionB->elem->elem_id, &gWorld->elements_to_be_freed))
                     {
@@ -387,7 +386,7 @@ do_world_collision_handling(float tc)
                         if(pCollisionA->elem->moving &&
                             pCollisionB->elem->moving)
                         {
-                            float bullet_vtransfer = 0.2 * pCollisionA->elem->durability;
+                            float bullet_vtransfer = 0.2;
 
                             update_object_velocity(pCollisionA->elem->elem_id,
                                                    pCollisionB->elem->physics.ptr->vx*bullet_vtransfer,

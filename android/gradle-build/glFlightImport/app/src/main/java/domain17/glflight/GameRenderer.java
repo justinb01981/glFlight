@@ -11,6 +11,8 @@ import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.EGLExt;
 import android.view.Choreographer;
 
+import com.domain17.glflight.GameRunnable;
+
 public class GameRenderer implements Renderer {
 	
 	static {
@@ -28,6 +30,8 @@ public class GameRenderer implements Renderer {
 
 	public GLSurfaceView surfaceView;
 
+	boolean glflightInitDone = false;
+
 	@Override
 	public void onDrawFrame(GL10 arg0) {
 		onDrawFrame();
@@ -36,17 +40,27 @@ public class GameRenderer implements Renderer {
 	@Override
 	public void onSurfaceChanged(GL10 arg0, int arg1, int arg2) {
 		float f[] = {arg1, arg2};
+
 		onSurfaceChanged(f);
+
+		if(!glflightInitDone) {
+			glflightInitDone = true;
+			GameRunnable.glFlightInit();    // this is funky (but unused in the JNI code for now
+		}
 	}
 
 	@Override
 	public void onSurfaceCreated(GL10 arg0, EGLConfig arg1) {
 		onSurfaceCreated();
-
-		EGL14.eglSwapInterval(EGL14.eglGetCurrentDisplay(), 0);
 	}
 
 	public void requestRender() {
 		if(surfaceView != null) surfaceView.requestRender();
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		GameRunnable.glFlightUninit();
 	}
 }

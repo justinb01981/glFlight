@@ -1,4 +1,4 @@
-#include "game/gameNetwork.h"
+#include "gameNetwork.h"
 
 #ifdef __cplusplus
 extern "C" {
