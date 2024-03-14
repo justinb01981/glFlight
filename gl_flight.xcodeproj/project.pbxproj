@@ -1937,7 +1937,7 @@
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "";
 				SDKROOT = iphoneos;
-				VALID_ARCHS = "arm64 armv7 arm7s";
+				VALID_ARCHS = "arm64 arm64e armv7 arm7s x86_64";
 			};
 			name = Debug;
 		};
@@ -1990,6 +1990,7 @@
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "";
 				SDKROOT = iphoneos;
+				VALID_ARCHS = "arm64 arm64e armv7 arm7s x86_64";
 			};
 			name = Release;
 		};
@@ -2030,7 +2031,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.10.3;
+				MARKETING_VERSION = 1.10.6;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2040,7 +2041,6 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR/Firebase;
-				VALID_ARCHS = "arm64 arm64e armv7 arm7s x86_64";
 			};
 			name = Debug;
 		};
@@ -2078,7 +2078,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.10.3;
+				MARKETING_VERSION = 1.10.6;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "$(TARGET_NAME)";

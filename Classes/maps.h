@@ -1169,15 +1169,11 @@ const static char* initial_map = ""
 //"register_params_mul 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
 //"set_world_size r\n"                                                     \
 //"set_background_info 47\n"                                               \
-
-WORLD_SCALED_FRAME(1, /*57*/28, 4)
-"map_program_with_args 100 0 100\n"
-MAP_GENERATED_MACRO
-
-
 // 0 euler is default orientation @ center
-"add_spawn_invis 4 5 -8 "
-"3.14 3.14 0.0"// initial ship orient -- watch out ship doesnt slerp to cam afterwards tho!
+"set_world_size 25\n"
+"set_background_info 47\n"
+"add_spawn_invis 2 5 -3 "
+"0 0 0.0"// initial ship orient -- watch out ship doesnt slerp to cam afterwards tho!
 "\n"
 WORLD_ADD_OBJECT(13,
                  -2, 5, -4,

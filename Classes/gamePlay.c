@@ -2694,9 +2694,9 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.intelligent = 1;
     x->stuff.u.enemy.intelligence = 4.0;
     x->physics.ptr->friction = 1;
-//    x->bounding_remain = 1;   // needs testing
+//    x->bounding_remain = 1;   // needs testing -- cant do this because of boundary avoid code in gameAI
     x->stuff.u.enemy.changes_target = 0;
-    //x->stuff.u.enemy.patrols_no_target_jukes = 1;
+    x->stuff.u.enemy.patrols_no_target_jukes = 0;
     x->stuff.u.enemy.leaves_trail = 0;
     x->stuff.u.enemy.run_distance = 0;
     x->stuff.u.enemy.ignore_collect = 1;

@@ -2588,7 +2588,7 @@ do_game_network_read_core()
         }
         else if(gameNetwork_receive(&msg, &srcAddr, receive_block_ms) == GAME_NETWORK_ERR_NONE)
         {
-            printf("DEBUG: gameNetwork_receive cmd:%d\n", msg.cmd);
+            //printf("DEBUG: gameNetwork_receive cmd:%d\n", msg.cmd);
             
             // messages that don't require synchronizing with rendering/game thread
             if(msg.cmd == GAME_NETWORK_MSG_BEACON && gameNetworkState.hostInfo.hosting)

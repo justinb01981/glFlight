@@ -277,9 +277,6 @@ static int gameDialogInitialCountdownDrawCallbackCount = GAME_FRAME_RATE * 5;
 static void
 gameDialogInitialCountdownDrawCallback()
 {
-    const int sec = INTRO_ANIMATION_FRAMES;
-
-
     gameCamera_MoveZ(0.03);
 
 
@@ -296,6 +293,7 @@ gameDialogInitialCountdownDrawCallback()
                         M_PI/2.0, M_PI+ph, -M_PI/2.0);
         ph += 0.010;
     }
+    targetSpeed = 0.0;
     
     gameDialogInitialCountdownDrawCallbackCount--;
 

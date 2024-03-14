@@ -451,7 +451,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         // adjust target vector to intercept (with some fudge-factor)
         float fm = (1.0 + (1.0 / (float) rand_in_range(1, 100)));
         float bulletPredictTime = dist / bulletVel;
-        float interceptPredictTime = 2;
+        float interceptPredictTime = 1.1;
         
         // if not firing, intercept course
         if(!elem->stuff.u.enemy.fires)
