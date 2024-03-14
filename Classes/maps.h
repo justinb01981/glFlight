@@ -1165,13 +1165,14 @@ const static char* maps_list_names[] =
 
 const static char* initial_map = ""
 
-"register_params 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
-"register_params_mul 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-"set_world_size r\n"                                                     \
-"set_background_info 47\n"                                               \
-//WORLD_SCALED_FRAME(1, /*57*/28, 4)
-//"map_program_with_args 100 0 100\n"
-//MAP_GENERATED_MACRO
+//"register_params 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
+//"register_params_mul 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
+//"set_world_size r\n"                                                     \
+//"set_background_info 47\n"                                               \
+
+WORLD_SCALED_FRAME(1, /*57*/28, 4)
+"map_program_with_args 100 0 100\n"
+MAP_GENERATED_MACRO
 
 
 // 0 euler is default orientation @ center
@@ -1182,10 +1183,10 @@ WORLD_ADD_OBJECT(13,
                  -2, 5, -4,
                  0,0,0,
                  1.0 , 24)
-WORLD_ADD_OBJECT(15,
-                 2, 5, -4,
-                 0,0,0,
-                 1.0 , 71)
+//WORLD_ADD_OBJECT(15,
+//                 2, 5, -4,
+//                 0,0,0,
+//                 1.0 , 71)
 WORLD_ADD_OBJECT(1,
                  4, 5, -4,
                  0,0,0,

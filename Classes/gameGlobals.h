@@ -101,11 +101,11 @@ extern void (*glFlightOnPurchase)(void);
 /* reducing friction influences this... should be MAX_THRUST really */
 #define MAX_SPEED (8.25)
 
-const static char* GAME_VERSION_STR = "1.10.5_core";
+const static char* GAME_VERSION_STR = "1.10.6_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 
-const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2);
+const static float MAX_SPEED_MISSLE = (MAX_SPEED * 2.5);
 const static float SPEED_BOOST_FRAMES = 60 * 5;
 extern float C_THRUST;
 extern float C_FRICTION;    // SEE physics_friction_c gameVariable
@@ -114,7 +114,7 @@ extern float GYRO_FEEDBACK;
 const static int pooped_cube_interval_ms = 75;
 const static int pooped_cube_lifetime = 300;    // determines trail length
 
-const static float collision_repulsion_coeff = 1.1;
+const static float collision_repulsion_coeff = 1.01;
 
 const static float RADAR_MIN_VELOCITY = 1;
 
