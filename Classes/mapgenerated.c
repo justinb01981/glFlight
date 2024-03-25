@@ -229,23 +229,14 @@ world_build_run_program(float x, float y, float z)
         game_elem_setup_spawnpoint_enemy(world_get_last_object());
         
         // MARK: -- add friendly core (hemmoraging collect nodes)
-        
         world_add_object(MODEL_SPHERE,
                          0, gWorld->bound_radius/4, 0,
                          0.01, 0.01, 0.01,
                          8, TEXTURE_ID_ANIMATED_STATIC);
         world_get_last_object()->object_type = OBJ_BASE;
         update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
+        // MARK: -- add friendly spawn location with random orientation
         game_elem_setup_spawnpoint(world_get_last_object());
-        
-        // MARK: -- add friendly spawn location
-        world_add_object(MODEL_CUBE,
-                         gWorld->bound_radius/2, gWorld->bound_radius/4, gWorld->bound_radius/2,
-                         0, M_PI*1.5, M_PI,
-                         6, TEXTURE_ID_ANIMATED_STATIC);
-        world_get_last_object()->object_type = OBJ_SPAWNPOINT;
-        update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
-        world_object_set_lifetime(world_get_last_object()->elem_id, 300);
     }
     
 }

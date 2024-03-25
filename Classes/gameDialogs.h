@@ -277,25 +277,22 @@ static int gameDialogInitialCountdownDrawCallbackCount = GAME_FRAME_RATE * 5;
 static void
 gameDialogInitialCountdownDrawCallback()
 {
-    const int sec = INTRO_ANIMATION_FRAMES;
-
 
     gameCamera_MoveZ(0.03);
-
-
 //        // TODO: freeze camera here and display ship
     gameInterfaceControls.mainMenu.visible = 0;
     static float ph = 0.01;
-    const float rad = 4.0;
+    const float rad = 2.0;
     {
         float x = sin(ph) * rad;
         float z = cos(ph) * rad;
-        float y = -1.0;
+        float y = 0.0;
 
         gameCamera_init(my_ship_x - x, my_ship_y - y, my_ship_z - z,
                         M_PI/2.0, M_PI+ph, -M_PI/2.0);
         ph += 0.010;
     }
+    targetSpeed = 0;
     
     gameDialogInitialCountdownDrawCallbackCount--;
 

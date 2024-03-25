@@ -169,7 +169,7 @@ public:
 
         gameInputUninit();
         tex_pass = 0;
-        glFlightDrawframeHook = gameDialogInitialCountdown;
+        glFlightDrawframeHook = gameDialogInitialCountdownDrawCallback;
 
         openALUninit();
 

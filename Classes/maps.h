@@ -45,6 +45,9 @@
 #define WORLD_ADD_OBJECT(model, x, y, z, yaw, pitch, roll, scale, tx_id) \
 "add_object "#model" "#x" "#y" "#z" "#yaw" "#pitch" "#roll" "#scale" "#tx_id"\n"
 
+#define WORLD_ADD_OBJECT_ENUM(model, x, y, z, yaw, pitch, roll, scale, tx_id) \
+"add_object "model" "#x" "#y" "#z" "#yaw" "#pitch" "#roll" "#scale" "#tx_id"\n"
+
 #define MESH_CUBES_1(tex, scale)                                 \
 "mesh_manip_add wx0.0 " " 5" " wz0" " 5 0 0" " 0 0 5" " 40 40\n" \
 "mesh_manip_pull rnd_40 rnd_40"" 0 rnd_50 0"" 0.90\n"            \
@@ -86,7 +89,8 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
 "register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
 "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
 "set_world_size r\n"                                                     \
-"set_background_info 47\n"                                               \
+"set_background_info "BACKGROUND_TEXTURE_STR"\n"                         \
+"map_program_with_args 100 0 100\n"                                      \
 "\n"
 
 //#define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
@@ -541,10 +545,7 @@ RANDOM_FLOATING_BLOCKS_1
 
 // MARK: -- map - collection
 const static char initial_map_collection[] = ""
-
-
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
-"map_program_with_args 100 0 100\n"
 ;
 
 // MARK: -- map - deathmatch
@@ -616,7 +617,6 @@ FLOATING_ISLAND(100, 100, -100)
 #else
 
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
-"map_program_with_args 100 0 100\n"
 
 #endif
 ;
@@ -1164,32 +1164,38 @@ const static char* maps_list_names[] =
 };
 
 const static char* initial_map = ""
+//
+//-WORLD_SCALED_FRAME(1, /*57*/28, 4)
+//-"map_program_with_args 100 0 100\n"
+//-MAP_GENERATED_MACRO
+//-"add_spawn_invis 0 5 -6 0.01 0.01 0.01\n"
+//-WORLD_ADD_OBJECT(13, -2, 5, -4, 0, 0, 0, 1.0 , 24)
+//-WORLD_ADD_OBJECT(15, 2, 5, -4, 0, 0, 0, 1.0 , 71)
 
-"register_params 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
-"register_params_mul 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-"set_world_size r\n"                                                     \
-"set_background_info 47\n"                                               \
+"register_params 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
+"register_params_mul 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"
+"set_world_size r\n"
+"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+
 //WORLD_SCALED_FRAME(1, /*57*/28, 4)
 //"map_program_with_args 100 0 100\n"
 //MAP_GENERATED_MACRO
 
 
 // 0 euler is default orientation @ center
-"add_spawn_invis 4 5 -8 "
-"3.14 3.14 0.0"// initial ship orient -- watch out ship doesnt slerp to cam afterwards tho!
+"add_spawn_invis 0 5 -4 "
+"0 3.14 3.14"// initial ship orient -- watch out ship doesnt slerp to cam afterwards tho!
 "\n"
+
 WORLD_ADD_OBJECT(13,
                  -2, 5, -4,
-                 0,0,0,
+                 0,3.14,3.14,
                  1.0 , 24)
 WORLD_ADD_OBJECT(15,
                  2, 5, -4,
-                 0,0,0,
+                 0,3.14,3.14,
                  1.0 , 71)
-WORLD_ADD_OBJECT(1,
-                 4, 5, -4,
-                 0,0,0,
-                 1.0 , 115)
+
 "";
 
 

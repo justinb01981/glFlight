@@ -62,7 +62,7 @@ double speed = 0;
 double maxAccelDecel = 0;
 double targetSpeed = 0;
 double maxSpeed = MAX_SPEED;
-double minSpeed;
+const double minSpeed = 0.1;
 double speedBoost = 0;
 double bulletVel;
 int needTrim = 1;
@@ -71,8 +71,9 @@ double motionRoll, motionPitch, motionYaw;
 double devicePitch, deviceYaw, deviceRoll;
 
 double motionRollMotion, motionPitchMotion, motionYawMotion;
-static const float maxInputShipRotate = 0.2;
-float yprResponse[3] = {0, 0, 0}, yprD = maxInputShipRotate/360.0;
+#define maxInputShipRotate 0.2
+float yprResponse[3] = { 0, 0, 0 };
+float yprD = (maxInputShipRotate / 360.0);
 float rollOffset = 0, pitchOffset = 0, yawOffset = 0;
 double devicePitchFrac = 0, deviceYawFrac = 0;  // used for controls rendering in gameGraphics
 float gyroSenseScale = PLATFORM_GYRO_SENSE_SCALE;
@@ -104,10 +105,11 @@ gameInputInit()
     //dz_pitch = /*0.005*/ 0.1;
     //dz_yaw = /*0.005*/ 0.1;
     // movement speed
-    speed = minSpeed;
+    assert(minSpeed > 0);
+
+    speed = minSpeed; // 
     targetSpeed = speed;
-    maxAccelDecel = /*5*/ MAX_SPEED/2; // change per second
-    minSpeed = MAX_SPEED / 20;  // careful this doesn't round to 0
+    maxAccelDecel = /*5*/ MAX_SPEED/3; // change per second
     bulletVel = MAX_SPEED*3;
 
     needTrim = 1;
@@ -324,9 +326,8 @@ gameInput()
 //                gameShip_roll(r);
 //            }
 //        }
-
-        float INPUT_SPEED = (  1.0 + log(speed)  ) / maxSpeed; // speed
-        // TODO: prevent  < 0
+          float INPUT_SPEED = (  1.0 + log(speed)  ) / maxSpeed; // speed
+          // TODO: prevent  < 0
         
         if(fabs(input_roll) > dz_min
 //           && gameSettingsComplexControls
@@ -335,7 +336,7 @@ gameInput()
 //            printf("-----------ROLLING-----------\n");
             
             //double s = input_roll * fabs(input_roll) * GYRO_DC * tc * (0.01 + speed/MAX_SPEED); // "roll dominant" multiplier
-            float s = input_roll * (INPUT_SPEED);
+            float s = input_roll * (speed/MAX_SPEED + 0.01);
 
             if(fabs(yprResponse[0]) < maxInputShipRotate) yprResponse[0] += yprD /* * (s/fabs(s)) */;
             //s = s / (1.0 - yprResponse[0]);
@@ -348,7 +349,7 @@ gameInput()
 //            printf("-----------PITCHING-----------\n");
             
             //double s = input_pitch * fabs(input_pitch) * GYRO_DC * tc * (0.01 + speed/MAX_SPEED);
-            float s = input_pitch * (INPUT_SPEED);
+            float s = input_pitch * (speed/MAX_SPEED + 0.01);
 
             if(fabs(yprResponse[1]) < maxInputShipRotate) yprResponse[1] += yprD /* * (s/fabs(s)) */;
             //s = s / (1.0 - yprResponse[1]);
@@ -361,7 +362,7 @@ gameInput()
 //            printf("-----------YAWING-----------\n");
             
             //double s = input_yaw * fabs(input_yaw) * GYRO_DC * tc * (0.01 + speed/MAX_SPEED);
-            float s = input_yaw * (INPUT_SPEED);
+            float s = input_yaw * (speed/MAX_SPEED + 0.01);
 
             if(fabs(yprResponse[2]) < maxInputShipRotate) yprResponse[2] += yprD /* * (s/fabs(s)) */;
             //s = s / (1.0 - yprResponse[2]);

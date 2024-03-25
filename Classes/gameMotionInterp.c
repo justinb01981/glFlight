@@ -10,8 +10,8 @@
 #include "world.h"
 
 const static float velo_interp_update_mult = 4;
-//extern unsigned long update_frequency_ms;
-unsigned long gameNetwork_frequencyMs(void);
+
+extern long update_frequency_ms;
 
 gameNetworkError
 gameNetwork_updatePlayerObject(gameNetworkPlayerInfo* playerInfo,
@@ -103,7 +103,7 @@ motion_interpolate_velocity(game_timeval_t network_time_ms, motion_interp_st* mo
     float time_win = motion->timestamp_last[0] - motion->timestamp_last[2];
     //printf("time_win:%f", time_win);
 
-    if(interp_velo && time_win <= (gameNetwork_frequencyMs() * velo_interp_update_mult) && time_win > 0)
+    if(interp_velo && time_win <= (update_frequency_ms * velo_interp_update_mult) && time_win > 0)
     {
         // predict velocity
         float v1[3];
@@ -120,11 +120,11 @@ motion_interpolate_velocity(game_timeval_t network_time_ms, motion_interp_st* mo
         if(distance(plottedLess[0], plottedLess[1], plottedLess[2], plottedCompare[0], plottedCompare[1], plottedCompare[2]) <
            distance(plottedMore[0], plottedMore[1], plottedMore[2], plottedCompare[0], plottedCompare[1], plottedCompare[2]))
         {
-            if(motion->timestamp_adjust > gameNetwork_frequencyMs()*2) motion->timestamp_adjust--;
+            if(motion->timestamp_adjust > update_frequency_ms*2) motion->timestamp_adjust--;
         }
         else
         {
-            if(motion->timestamp_adjust < gameNetwork_frequencyMs()*2) motion->timestamp_adjust++;
+            if(motion->timestamp_adjust < update_frequency_ms*2) motion->timestamp_adjust++;
         }
 //        printf("timestamp_adjust:%f\n", motion->timestamp_adjust);
         

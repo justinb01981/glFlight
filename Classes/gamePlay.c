@@ -910,7 +910,7 @@ game_start(float difficulty, int type)
         gameStateSinglePlayer.enemy_durability = 3;
         
         gameStateSinglePlayer.rate_enemy_skill_increase = 1/10;
-        
+
         gameStateSinglePlayer.enemy1_ignore_player_pct = 100;
         
         gameMapSetMap(initial_map_collection);
@@ -1608,7 +1608,7 @@ game_run()
                     
                     // MARK: spawn enemies
 
-                    DBPRINTF(("gameStateSinglePlayer.max_enemies:%f", gameStateSinglePlayer.max_enemies));
+                    //DBPRINTF(("gameStateSinglePlayer.max_enemies:%f", gameStateSinglePlayer.max_enemies));
 
                     if (gameStateSinglePlayer.counter_enemies_spawned > 0 &&
                         enemies_found < floor(gameStateSinglePlayer.max_enemies) &&
@@ -1909,7 +1909,7 @@ game_run()
                 // MARK: spawn collect points randomly
                 if(obj_id_base != WORLD_ELEM_ID_INVALID)
                 {
-                    gameStateSinglePlayer.base_spawn_collect_m += rand_in_range(-gameStateSinglePlayer.base_spawn_collect_w/3, gameStateSinglePlayer.base_spawn_collect_w/2) / 65535;
+                    gameStateSinglePlayer.base_spawn_collect_m += fabs( rand_in_range(-gameStateSinglePlayer.base_spawn_collect_w/3, gameStateSinglePlayer.base_spawn_collect_w/2) ) / 65535;
                     
                     if(gameStateSinglePlayer.base_spawn_collect_m < 0) gameStateSinglePlayer.base_spawn_collect_m = 0;
                     
@@ -2694,8 +2694,8 @@ game_elem_setup_missle(WorldElem* x)
     x->stuff.intelligent = 1;
     x->stuff.u.enemy.intelligence = 4.0;
     x->physics.ptr->friction = 1;
-//    x->bounding_remain = 1;   // needs testing
-    x->stuff.u.enemy.changes_target = 1;
+//    x->bounding_remain = 1;   // this wont work
+    x->stuff.u.enemy.changes_target = 0;
     //x->stuff.u.enemy.patrols_no_target_jukes = 1;
     x->stuff.u.enemy.leaves_trail = 0;
     x->stuff.u.enemy.run_distance = 0;
@@ -2744,6 +2744,15 @@ void
 game_elem_setup_spawnpoint(WorldElem* elem)
 {
     elem->renderInfo.priority = 1;
+
+    // MARK: -- add friendly spawn location with random orientation -- todo: make this map argument
+    world_add_object(MODEL_CUBE,
+                     gWorld->bound_radius/2, gWorld->bound_radius/4, gWorld->bound_radius/2,
+                     1.6, rand_in_range(-3.14,3.14), -1.6,  // horizon parallel
+                     6, TEXTURE_ID_ANIMATED_STATIC);
+    world_get_last_object()->object_type = OBJ_SPAWNPOINT;
+    update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
+//    world_object_set_lifetime(world_get_last_object()->elem_id, 300);
 }
 
 void

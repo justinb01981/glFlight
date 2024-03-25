@@ -74,7 +74,8 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
     viewWidth = viewSize.width;
     viewHeight = viewSize.height;
     
-    //gameCamera_init(0, 0, 0, 0, 0, 0);
+    gameCamera_init(0, 0, 0, 0, 0, 0); // this is inited elsewhere too
+
     game_init();
     gameAudioInit();
     world_lock_init();

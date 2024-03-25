@@ -1141,15 +1141,16 @@ world_random_spawn_location(float loc[6], int affiliation)
     loc[2] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
 
     // heading should @ origin
-    loc[3] = 1.6;
+    loc[3] = 0;
     loc[4] = atan2(loc[0], loc[2]); //rand_in_range(-M_PI+0.1, M_PI-0.1);
-    loc[5] = -1.6;
+    loc[5] = 0;
 
     while(n > 0)
     {
         // TODO: guarantee spawnpoints are found in this list?
         WorldElemListNode* pCur = gWorld->elements_moving.next;
-        int i = 0;
+        int i;
+        
         while(pCur)
         {
             if(pCur->elem->object_type == OBJ_SPAWNPOINT)
@@ -1163,10 +1164,13 @@ world_random_spawn_location(float loc[6], int affiliation)
                     loc[i++] = pCur->elem->physics.ptr->y;
                     loc[i++] = pCur->elem->physics.ptr->z;
 
-                    // default orientation is aimed at origin parallel to ground
-                    loc[i++] = 1.6; // alpha, beta, gamma (euler)
-                    loc[i++] = atan2(loc[0], loc[2]); //rand_in_range(-M_PI+0.1, M_PI-0.1);
-                    loc[i++] = -1.6;
+                    // default orientation is aimed at origin parallel to ground - not from map argument
+//                    loc[i++] = 1.6; // alpha, beta, gamma (euler)
+//                    loc[i++] = atan2(loc[0], loc[2]); //rand_in_range(-M_PI+0.1, M_PI-0.1);
+//                    loc[i++] = -1.6;
+                    loc[i++] = pCur->elem->physics.ptr->alpha;
+                    loc[i++] = pCur->elem->physics.ptr->beta;
+                    loc[i++] = pCur->elem->physics.ptr->gamma;
 
                     return;
                 }

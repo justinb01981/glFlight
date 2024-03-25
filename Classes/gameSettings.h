@@ -271,6 +271,9 @@ gameSettingsRead(const char *filename)
     // OVERRIDE SOME SETTINGS I REGRET
     gameSettingsNetworkFrequency = 50;
     gameSettingsPortNumber = GAME_NETWORK_PORT_DEFAULT;
+
+    if(strlen(gameSettingsPlayerName) < 1) sprintf(gameSettingsPlayerName, "player%u", rand() % 1000);
+    if(strlen(gameSettingGameTitle) < 1) sprintf(gameSettingGameTitle, "game%u", rand() % 100);
     
     if(fp) fclose(fp);
     return err;

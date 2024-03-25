@@ -33,7 +33,7 @@ extern volatile float time_ms_wall;
 extern double speed;
 extern double maxAccelDecel;
 extern double maxSpeed;
-extern double minSpeed;
+extern const  double minSpeed;
 extern double speedBoost;
 extern double targetSpeed;
 extern double bulletVel;

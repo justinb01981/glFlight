@@ -140,8 +140,6 @@ glFlightFrameStage1()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
-    float ship_z_vec_prev[3];
-    gameShip_getZVector(ship_z_vec_prev);
     
     world_lock();
     
@@ -311,16 +309,16 @@ calibrate_bail:
     int update_ship_stats = 0;
     static int model_my_ship_last = 0;
 
-    if(pWorldElemMyShip && model_my_ship != model_my_ship_last)
+    if(pWorldElemMyShip && model_my_ship != model_my_ship_last) // just changing ship model
     {
         update_ship_stats = 1;
         
         spawn[0] = pWorldElemMyShip->physics.ptr->x;
         spawn[1] = pWorldElemMyShip->physics.ptr->y;
         spawn[2] = pWorldElemMyShip->physics.ptr->z;
-        spawn[3] = pWorldElemMyShip->physics.ptr->alpha;
-        spawn[4] = pWorldElemMyShip->physics.ptr->beta;
-        spawn[5] = pWorldElemMyShip->physics.ptr->gamma;
+        spawn[3] = my_ship_alpha;//pWorldElemMyShip->physics.ptr->alpha;
+        spawn[4] = my_ship_beta; //pWorldElemMyShip->physics.ptr->beta;
+        spawn[5] = my_ship_gamma; //pWorldElemMyShip->physics.ptr->gamma;
         
         world_remove_object(my_ship_id);
         my_ship_id = WORLD_ELEM_ID_INVALID;
@@ -348,7 +346,7 @@ calibrate_bail:
         gameShip_init(spawn[0], spawn[1], spawn[2],
                       spawn[3], spawn[4], spawn[5]);
 
-        update_ship_stats = 1;
+//        update_ship_stats = 1;
 
         my_ship_id =
             world_add_object(model_my_ship,
@@ -420,7 +418,7 @@ calibrate_bail:
                                 my_ship_y,
                                 my_ship_z,
                                 -ship_alpha, -ship_beta, -ship_gamma);
-                
+
                 gameCamera_yawRadians((viewRotationDegrees/180.0) * M_PI);
                 gameCamera_MoveZ(-camera_z_trail);
                 gameCamera_MoveY(1);
@@ -609,7 +607,7 @@ calibrate_bail:
     
     // walk list of new elements, adding to visible list
     // TODO: THIS IS NOT WORKING because added-list is being cleaned in clear_pending
-    WorldElemListNode* pAddedPtr = gWorld->elements_to_be_added.next;
+    WorldElemListNode* pAddedPtr = gWorld->elements_to_be_added.next, *pAddedPtrNext;
     while(pAddedPtr)
     {
         pAddedPtr->elem->in_visible_list = 1;
@@ -627,9 +625,10 @@ calibrate_bail:
         // insert into all visible-trees immediately
         world_elem_btree_insert(visibleBtreeRootBuilding, pAddedPtr->elem, pAddedPtr->elem->renderInfo.distance);
 
+        pAddedPtrNext = pAddedPtr->next;    // mind the order removing below
         world_elem_list_remove(pAddedPtr->elem, &gWorld->elements_to_be_added);
+        pAddedPtr = pAddedPtrNext;
 
-        pAddedPtr = pAddedPtr->next;
     }
 
 

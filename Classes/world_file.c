@@ -558,7 +558,7 @@ void map_render(char *map_buf)
                                          spawn_scaling, TEXTURE_ID_ANIMATED_STATIC);
                         update_object_velocity(last_object_id, 0, 0, 0, 0);
                         world_get_last_object()->object_type = OBJ_SPAWNPOINT;
-                        world_object_set_lifetime(last_object_id, 300);
+                        //world_object_set_lifetime(last_object_id, 300); // ?? why was this here
                         break;
                         
                     case MAP_ADD_MESH:

@@ -76,7 +76,7 @@ void
 drawBackground();
 
 void
-drawBounding();
+drawBounding(int);
 
 void
 drawBillboardInit(float xVec[3], float yVec[3]);

@@ -1064,7 +1064,7 @@ void gameInterfaceProcessAction(void)
             console_write("C_FRICTION:%f", C_FRICTION);
             appWriteSettings();
             break;
-            
+
         case ACTION_SETTING_SHIP_TEXTURE:
             switch(texture_id_playership)
         {
@@ -1075,12 +1075,15 @@ void gameInterfaceProcessAction(void)
                 texture_id_playership = TEXTURE_ID_SHIP3;
                 break;
             case TEXTURE_ID_SHIP3:
-                texture_id_playership = TEXTURE_ID_ENEMYSHIP_ACE;
+                texture_id_playership = TEXTURE_ID_SHIP4;
+                break;
+            case TEXTURE_ID_SHIP4:
+                texture_id_playership = TEXTURE_ID_SHIP5;
                 break;
             case TEXTURE_ID_ENEMYSHIP_ACE:
                 texture_id_playership = TEXTURE_ID_ENEMYSHIP;
                 break;
-            case TEXTURE_ID_ENEMYSHIP:
+            case TEXTURE_ID_SHIP5:
                 texture_id_playership = TEXTURE_ID_SHIP6;
                 break;
             case TEXTURE_ID_SHIP6:
