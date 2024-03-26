@@ -1441,12 +1441,11 @@ game_handle_destruction(WorldElem* elem)
             break;
             
         case OBJ_PLAYER:
-            if(gameStateSinglePlayer.game_type != GAME_TYPE_DEATHMATCH)
+            add_wreck = 1;
+            if(gameStateSinglePlayer.game_type != GAME_TYPE_DEATHMATCH) // network game
             {
                 console_write(game_log_messages[GAME_LOG_GAMEOVER_KILLED]);
                 gameDialogGameOver();
-                
-                add_wreck = 1;
             }
             
             if(elem->stuff.flags.mask &= STUFF_FLAGS_TURRET)

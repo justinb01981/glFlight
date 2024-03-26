@@ -1141,9 +1141,9 @@ world_random_spawn_location(float loc[6], int affiliation)
     loc[2] = rand_in_range(-gWorld->bound_radius/2, gWorld->bound_radius/2);
 
     // heading should @ origin
-    loc[3] = 0;
+    loc[3] = 1.6;
     loc[4] = atan2(loc[0], loc[2]); //rand_in_range(-M_PI+0.1, M_PI-0.1);
-    loc[5] = 0;
+    loc[5] = -1.6;
 
     while(n > 0)
     {
@@ -1179,6 +1179,10 @@ world_random_spawn_location(float loc[6], int affiliation)
         }
         
         if(!found_spawns) break;
+    }
+
+    if(!found_spawns) {
+        DBPRINTF(("map: no spawn found random position"));
     }
 }
 

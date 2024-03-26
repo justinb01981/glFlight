@@ -1191,6 +1191,8 @@ drawElem(WorldElem* pElem)
             }
 
             // TODO: only sort faces on "complex" objects
+#if 0
+            // TODO: zbuffer makes this unnecessary now
             if(pElem->renderInfo.priority ||
                pElem->renderInfo.concavepoly)
             {
@@ -1227,6 +1229,7 @@ drawElem(WorldElem* pElem)
                     sorted ++;
                 }
             }
+#endif
 
             iFace = 0;
             idx = 0;
@@ -1325,7 +1328,7 @@ drawElemStart(WorldElemListNode* pVisibleList)
 }
 
 void
-drawElemEnd()
+drawElemEnd(void)
 {
     drawElemBatch();
 

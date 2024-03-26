@@ -33,7 +33,6 @@ extern volatile float time_ms_wall;
 extern double speed;
 extern double maxAccelDecel;
 extern double maxSpeed;
-extern const  double minSpeed;
 extern double speedBoost;
 extern double targetSpeed;
 extern double bulletVel;
@@ -105,6 +104,7 @@ const static char* GAME_VERSION_STR = "1.10.5_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 
+static const double minSpeed = MAX_SPEED/16;
 const static float MAX_SPEED_MISSLE = (MAX_SPEED * 3);
 const static float SPEED_BOOST_FRAMES = 60 * 5;
 extern float C_THRUST;

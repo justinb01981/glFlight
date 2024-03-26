@@ -138,8 +138,6 @@ do_world_collision_handling(float tc)
         sprintf(pStrDst, " (%ld) (%ld)", (long)pCollisionA->elem->object_type,
                (long) pCollisionB->elem->object_type);
 
-
-        
         if(pCollisionB)
         {
 
@@ -404,12 +402,6 @@ do_world_collision_handling(float tc)
                     if(world_coll_act == COLLISION_ACTION_DAMAGE)
                     {
                         float durability_tmp = pCollisionA->elem->durability;
-
-                        if(pCollisionB->elem->object_type == OBJ_POWERUP_GENERIC ||
-                           pCollisionA->elem->object_type == OBJ_POWERUP_GENERIC)
-                        {
-                            DBPRINTF(("powerup collided with %d\n", pCollisionA->elem->object_type));
-                        }
                         
                         pCollisionA->elem->durability -= pCollisionB->elem->durability;
                         pCollisionB->elem->durability -= durability_tmp;
@@ -488,13 +480,6 @@ do_world_collision_handling(float tc)
                                 {
                                     extern int camera_locked_frames;
                                     camera_locked_frames = 240;
-                                    
-                                    /*
-                                    gameAudioPlaySoundAtLocation("dead",
-                                                                 my_ship_x,
-                                                                 my_ship_y,
-                                                                 my_ship_z);
-                                    */
                                     
                                     // add wreckage
                                     world_add_object(MODEL_SPRITE, my_ship_x, my_ship_y, my_ship_z,

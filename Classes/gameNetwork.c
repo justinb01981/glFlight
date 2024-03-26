@@ -1646,7 +1646,7 @@ do_game_network_write()
     gameNetworkMessage netMsg;
     WorldElemListNode* pNode;
     static game_timeval_t network_objects_update_time_last = 0;
-    static float net_obj_update_vel_ignore_min = 0.01;
+    static float net_obj_update_vel_ignore_min = 0.1;// dont fuck with this again - objects wont be visible on clients
     float network_time_ms = get_time_ms_wall();
     
     if(!gameNetworkState.connected)
@@ -1721,12 +1721,14 @@ do_game_network_write()
                 
                 // object velocity sufficient
                 if(pNode->elem->physics.ptr->velocity > net_obj_update_vel_ignore_min &&
-                   network_time_ms - pObjectInfo->update_time >= update_frequency_ms)
+                   network_time_ms - pObjectInfo->update_time >= update_frequency_ms) {
                     net_obj_update = 1;
+                }
                 
                 // or time interval sufficient
-                if(network_time_ms - pObjectInfo->update_time >= 500)
+                if(network_time_ms - pObjectInfo->update_time >= 500) {
                     net_obj_update = 1;
+                }
                 
                 if(net_obj_update)
                 {
