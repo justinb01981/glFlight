@@ -21,10 +21,10 @@
 #include "gameGlobals.h"
 #include "gameUtils.h"
 #include "gameShip.h"
-#include "textures.h"
 #include "gameUtils.h"
 #include "gameNetwork.h"
 #include "mesh.h"
+#include "maps.h"
 #include "textures.h"
 #include "framebuffer.h"
 

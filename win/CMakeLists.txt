@@ -16,7 +16,7 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 add_definitions(-DGAME_PLATFORM_OGL=1)
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-DGLEW_STATIC)
-add_definitions(-D_NOT_POSIX=1)
+add_definitions(-D_NOT_POSIX)
 
 set(OGL_DIR ogl-samples-master)
 

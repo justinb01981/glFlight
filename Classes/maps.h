@@ -85,13 +85,7 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
 "mesh_manip_complete 1 "#tex" 1 "#scale"\n"
 
 // WARN: this contains 2 \n\n trailing so nothing after it in the string will be read
-#define WORLD_SCALED_FRAME(x, tex, scale)                                \
-"register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                    \
-"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-"set_world_size r\n"                                                     \
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"                         \
-"map_program_with_args 100 0 100\n"                                      \
-"\n"
+#define WORLD_SCALED_FRAME(x, tex, scale)         "register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n""set_world_size r\n""set_background_info 107\n""map_program_with_args 100 0 100\n"                
 
 //#define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
 //"register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
@@ -544,82 +538,16 @@ RANDOM_FLOATING_BLOCKS_1
 ;
 
 // MARK: -- map - collection
-const static char initial_map_collection[] = ""
-WORLD_SCALED_FRAME(1, /*57*/28, 4)
+const static char initial_map_collection[] = \
+WORLD_SCALED_FRAME(1, /*57*/28, 4) \
 ;
+
 
 // MARK: -- map - deathmatch
-const static char initial_map_deathmatch[] = ""
-
-#if 0
-"set_world_size 200\n" // all must be divisible by MAX_WORLD_REGIONS
-///WORLD_SCALED_FRAME_TERRAIN(-10, 28, 4)
-"set_background_info " BACKGROUND_TEXTURE_STR "\n"
-
-// drifting asteroid example
-"add_object "  MAPMODEL_ICOSAHEDRON  " rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-// drifting asteroid example
-"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 4 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-// drifting asteroid example
-"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 4 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-// drifting asteroid example
-"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 8 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-// drifting asteroid example
-"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 8 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-// drifting asteroid example
-"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 4 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-// drifting asteroid example
-"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 16 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-// drifting asteroid example
-"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 8 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-// drifting asteroid example
-"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 8 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-// drifting asteroid example
-"add_object " MAPMODEL_ICOSAHEDRON " rndx rndy rndz 0 0 0 2 14\n"
-"object_set_info 4\n" // moving block
-"object_set_velocity 0 0.5 0\n"
-
-// buildings
-MAP_GENERATED_MACRO
-
-FLOATING_ISLAND(0, 75, 0)
-
-FLOATING_ISLAND(100, 50, 100)
-FLOATING_ISLAND(100, 100, 100)
-
-FLOATING_ISLAND(-100, 50, 100)
-FLOATING_ISLAND(-100, 100, 100)
-
-FLOATING_ISLAND(-100, 50, -100)
-FLOATING_ISLAND(-100, 100, -100)
-
-FLOATING_ISLAND(100, 50, -100)
-FLOATING_ISLAND(100, 100, -100)
-
-#else
-
+const static char initial_map_deathmatch[] = 
 WORLD_SCALED_FRAME(1, /*57*/28, 4)
-
-#endif
 ;
+
 
 // MARK: -- map - debugging collisions
 const static char map_debug[] = ""
@@ -632,7 +560,8 @@ BASE_ENEMY_1
 const static char initial_map_survival[] = ""
 
 WORLD_SCALED_FRAME(1, 28, 4)
-"set_background_info " BACKGROUND_TEXTURE_STR "\n"
+"set_background_info " 
+BACKGROUND_TEXTURE_STR "\n"
 
 // else
 "register_params 2 rndx 20 rndy 0 0 0 10 0 0 0 0 0 0 0 0\n"
@@ -1175,7 +1104,9 @@ const static char* initial_map = ""
 "register_params 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
 "register_params_mul 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"
 "set_world_size r\n"
-"set_background_info "BACKGROUND_TEXTURE_STR"\n"
+"set_background_info "
+BACKGROUND_TEXTURE_STR
+"\n"
 
 //WORLD_SCALED_FRAME(1, /*57*/28, 4)
 //"map_program_with_args 100 0 100\n"
