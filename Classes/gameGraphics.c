@@ -1190,47 +1190,7 @@ drawElem(WorldElem* pElem)
                 coord_table[idx] = coord_inval;
             }
 
-            // TODO: only sort faces on "complex" objects
-#if 0
-            // TODO: zbuffer makes this unnecessary now
-            if(pElem->renderInfo.priority ||
-               pElem->renderInfo.concavepoly)
-            {
-                int sorted = 0;
-
-                while(sorted < (pElemIndicesCount/3))
-                {
-                    iFace = sorted+1;
-                    int iMin = sorted;
-                    while(iFace < pElemIndicesCount/3)
-                    {
-                        model_index_t *Ta = face_table[iFace];
-                        model_coord_t *Ca = &pElem->coords[*Ta * coord_size];
-                        model_index_t *Tb = face_table[iMin];
-                        model_coord_t *Cb = &pElem->coords[*Tb * coord_size];
-
-                        model_coord_t a[] = {
-                            Ca[0]+(Ca[3]-Ca[0])*0.5, Ca[1]+(Ca[4]-Ca[1])*0.5, Ca[2]+(Ca[5]-Ca[2])*0.5
-                        };
-                        model_coord_t b[] = {
-                            Cb[0]+(Cb[3]-Cb[0])*0.5, Cb[1]+(Cb[4]-Cb[1])*0.5, Cb[2]+(Cb[5]-Cb[2])*0.5
-                        };
-                        if(cam_distance(a[0], a[1], a[2]) > cam_distance(b[0], b[1], b[2]))
-                        {
-                            iMin = iFace;
-                        }
-
-                        iFace++;
-                    }
-
-                    model_index_t* tmp = face_table[sorted];
-                    face_table[sorted] = face_table[iMin];
-                    face_table[iMin] = tmp;
-                    sorted ++;
-                }
-            }
-#endif
-
+            // TODO: only sort faces on "complex" objects - zbuffer makes this unnecessary i think but test w/convex poly e.g. enemy floating spawn doodad
             iFace = 0;
             idx = 0;
             while(iFace < pElemIndicesCount/3)

@@ -14,9 +14,11 @@ add_definitions(/FI"gameWinTypes.h")
 add_definitions(-fpermissive)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 add_definitions(-DGAME_PLATFORM_OGL=1)
+
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-DGLEW_STATIC)
 add_definitions(-D_NOT_POSIX)
+add_definitions(-DGAME_NETWORK_USE_NBO=0)
 
 set(OGL_DIR ogl-samples-master)
 

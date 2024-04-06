@@ -270,7 +270,8 @@ public:
         }
         else
         {
-            eulerO[1] = eulerO[2] = 0.0;
+            eulerO[1] = eulerO[2] = 0.0;    /// back to center
+            // TODO: smooth joystick inputs
         }
 
         if (!joyActivated)

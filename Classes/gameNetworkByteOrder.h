@@ -10,15 +10,16 @@
 
 #include <assert.h>
 
-#if GAME_PLATFORM_ANDROID
+#ifdef _NOT_POSIX
+#else
 #include <sys/endian.h>
+#endif
 
 #define ntohll(x) (x)
 #define htonll(x) (x)
 
 #define GAME_NETWORK_USE_NBO 0
 
-#endif
 
 static gameNetworkArgsType
 gameMessage_args_for_type(int type)
