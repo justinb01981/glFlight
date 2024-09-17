@@ -63,3 +63,8 @@ glFlightDefaultPlayerName()
     sprintf(glFlightDefaultPlayerName_, "player%d", rand() % 1024);
     return glFlightDefaultPlayerName_;
 }
+
+// https://stackoverflow.com/questions/12933309/linker-error-unresolved-external-symbol-imp-iob-func-in-libpng-lib
+void iob_func(void* p) {
+
+}
