@@ -4,8 +4,6 @@ android {
     compileSdk 30
     defaultConfig {
         applicationId "com.domain17.glflight"
-        minSdkVersion 22
-        targetSdkVersion 33
 
         ndk {
             moduleName "glFlight"
@@ -15,12 +13,17 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.debug
         }
         debug {
             jniDebuggable true
         }
     }
     defaultConfig {
+
+
+        targetSdk 34
+        minSdk 19
         sourceSets.main {
             jniLibs.srcDir 'src/main/libs'
             jni.srcDirs = []

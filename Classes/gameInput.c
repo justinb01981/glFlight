@@ -255,10 +255,11 @@ gameInput()
 
     }
 
-    if(!needTrim && trimDoneCallback)
+    if(needTrim && trimDoneCallback)
     {  // falling-edge of trim btn pushf(trimDoneCallback)
         trimDoneCallback();
         trimDoneCallback = NULL;
+        needTrim = 0;
     }
 
     /*

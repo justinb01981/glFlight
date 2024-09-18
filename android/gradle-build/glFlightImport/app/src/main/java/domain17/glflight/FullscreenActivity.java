@@ -19,6 +19,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.SurfaceView;
@@ -56,8 +57,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     Context appCtx;
     int accuracyLast = SensorManager.SENSOR_STATUS_UNRELIABLE;
 
-    double viewWidthScaled;
-    double viewHeightScaled;
+    double viewWidthScaled, viewHeightScaled;
 
     public class GameGLConfigChooser implements EGLConfigChooser {
 
@@ -124,13 +124,10 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         SurfaceHolder h = gameRenderer.surfaceView.getHolder();
 
         /* iOS on iPhone5:320/568 */
-        double sh = 640;
-        double sw = sh * 1.5;
+        viewHeightScaled = 640;
+        viewWidthScaled = viewHeightScaled * 1.5;
 
-        viewWidthScaled = sw;
-        viewHeightScaled = sh;
-
-        h.setFixedSize((int) sw, (int) sh);
+        h.setFixedSize((int) viewWidthScaled, (int) viewHeightScaled);
 
         GameGLConfigChooser glConfigChooser = new GameGLConfigChooser();
         gameRenderer.surfaceView.setEGLConfigChooser(glConfigChooser);
@@ -183,8 +180,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         gameRenderer.surfaceView.onResume();
         // moved registereListener from here to bg thread
-
-
     }
     
     /**
@@ -227,47 +222,50 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     float touchLastAct = 0;
 	float touchFudge = 5;
     
-    public boolean onTouchEvent(MotionEvent motionEvent) {
+    public boolean onTouchEvent(MotionEvent event) {
     	float action = 0;
     	float x = 0;
     	float y = 0;
-    	float hackNavBar = (float) viewWidthScaled*0.065f; // from gameInterfaceInit (gameInterface.c)
+    	//float hackNavBar = (float) contentView.getWidth()*0.065f; // from gameInterfaceInit (gameInterface.c)
 
-		InputDevice dev = motionEvent.getDevice();
+		InputDevice dev = event.getDevice();
 
-		for(int i = 0; i < motionEvent.getPointerCount(); i++)
+		for(int i = 0; i < event.getPointerCount(); i++)
         {
-            int pointerID = motionEvent.getPointerId(i);
-			double tX = (motionEvent.getX(i) / dev.getMotionRange(InputDevice.MOTION_RANGE_X).getMax()) * (viewWidthScaled+hackNavBar);
-			double tY = (motionEvent.getY(i) / dev.getMotionRange(InputDevice.MOTION_RANGE_Y).getMax()) * viewHeightScaled;
+            int pointerID = event.getPointerId(i);
+
+            // convert touch coordinate to scaled screen coordinate
+            double Xr = contentView.getWidth(), Yr = contentView.getHeight();
+			double tX = viewWidthScaled * (event.getX() / Xr);
+			double tY = viewHeightScaled * (event.getY() / Yr);
 
 			System.out.println("touched at [" + tX + "," + tY +
-					"] action:" + motionEvent.getActionMasked() + "\n");
+					"] action:" + event.getActionMasked() + " tstamp:"+ event.getEventTime() + "\n");
 
 			x = (int) tX;
 			y = (int) tY;
 
-	    	if(motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN)
+	    	if(event.getActionMasked() == MotionEvent.ACTION_DOWN)
 	    	{
 	    		action = 0;
 	    	}
-	    	else if(motionEvent.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN)
+	    	else if(event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN)
 	    	{
 	    		action = 0;
 	    	}
-	    	else if(motionEvent.getActionMasked() == MotionEvent.ACTION_UP)
+	    	else if(event.getActionMasked() == MotionEvent.ACTION_UP)
 	    	{
 	    		action = 1;
 	    	}
-	    	else if(motionEvent.getActionMasked() == MotionEvent.ACTION_POINTER_UP)
+	    	else if(event.getActionMasked() == MotionEvent.ACTION_POINTER_UP)
 	    	{
 	    		action = 1;
 	    	}
-	    	else if(motionEvent.getActionMasked() == MotionEvent.ACTION_MOVE)
+	    	else if(event.getActionMasked() == MotionEvent.ACTION_MOVE)
 	    	{
 	    		action = 2;
 	    	}
-	    	else if(motionEvent.getActionMasked() == MotionEvent.ACTION_CANCEL)
+	    	else if(event.getActionMasked() == MotionEvent.ACTION_CANCEL)
 	    	{
 	    		action = 3;
 	    	}
@@ -284,7 +282,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 	    	}
 		}
     	
-    	return super.onTouchEvent(motionEvent);
+    	return super.onTouchEvent(event);
     }
 
     /**

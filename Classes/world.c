@@ -56,6 +56,7 @@ float C_FRICTION = /*0.04*/ 0.030; // higher values = more friction
 float GYRO_FEEDBACK = 0;
 float GYRO_DC = 0.05; // no longer used in gameInput - remove this
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
+float collision_dot_min = 0.0;
 
 static struct mesh_t* world_pending_mesh = NULL;
 static float world_pending_mesh_info[3];
@@ -1662,7 +1663,7 @@ check_collision(WorldElem* pElemA, WorldElem* pElemB)
         };
         
         float d = dot2(vP, vD);
-        if(d < 0.0)
+        if(d < collision_dot_min)
         {
             if(d > dmin)
             {
@@ -2000,7 +2001,7 @@ world_update(float tc)
 
                             float dot = dot2(V, P);
 
-                            if(dot < 0.00000001)
+                            if(dot < WORLD_BOUNDING_MIN)
                             {
                                 if(pElem->bounding_remain)
                                 {
@@ -2554,7 +2555,7 @@ world_bounding_violations(float location[3], float vnormal[3])
         
         float dot = dot2(V, P);
         
-        if(dot < 0.001)
+        if(dot < WORLD_BOUNDING_MIN/2)
         {
             for(d = 0; d < 3; d++)
             {

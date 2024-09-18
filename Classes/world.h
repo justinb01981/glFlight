@@ -27,6 +27,9 @@
 #define WORLD_BOUNDING_SPHERE_STEPS ((float) 8)
 #define WORLD_TERRAIN_COMPLEXITY 64
 
+// a little fudgey - see world.c
+#define WORLD_BOUNDING_MIN 0.000001
+
 extern float visible_distance;
 
 typedef struct {

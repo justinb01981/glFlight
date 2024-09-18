@@ -151,11 +151,17 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     memset(&hints, 0, sizeof(hints));
 
     hints.ai_family = AF_UNSPEC;
-    hints.ai_flags = AI_PASSIVE | AI_V4MAPPED;
+    hints.ai_flags = AI_PASSIVE
+                     #if GAME_PLATFORM_ANDROID
+                     #else
+            | AI_V4MAPPED
+                     #endif
+                    ;
     hints.ai_socktype = SOCK_DGRAM;
 
     if (getaddrinfo(NULL, "52000", &hints, &addrResult) < 0 || !addrResult)
     {
+        // android: https://stackoverflow.com/questions/39674147/getaddrinfo-on-android-returning-error-eai-badflags
         DBPRINTF(("%s:%d %s (%s)\n", __func__, __LINE__, "getaddrinfo failure", strerror(errno)));
         return -1;
     }
@@ -261,7 +267,8 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
         return;
     }
 
-    assert(((struct sockaddr_in6*) &sa)->sin6_family == AF_INET6);
+    // REMOVED -- android ndk uses ipv4 we can be agnostic from here to send tho
+    //assert(((struct sockaddr_in6*) &sa)->sin6_family == AF_INET6);
     
     r = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg),
                0, (struct sockaddr*)(address->storage), address->len);
@@ -379,9 +386,14 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
     ADDRINFO *addrInfoResultp = NULL, hints;
     memset(&hints, 0, sizeof(hints));
 
-    hints.ai_family = AF_INET6;
+    hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_DGRAM;
-    hints.ai_flags = AI_PASSIVE | AI_V4MAPPED; // leftovers from AF_INET6
+    hints.ai_flags = AI_PASSIVE
+#if GAME_PLATFORM_ANDROID
+#else
+        | AI_V4MAPPED
+#endif
+    ; // leftovers from AF_INET6
 
     sprintf(portnum, "%u", GAME_NETWORK_PORT_DEFAULT);
 
@@ -403,8 +415,11 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
 
     if(addrInfoResultp->ai_family == AF_INET)
     {
-        assert(0);
-        // only ipv6 handled
+        // YES we still need to handle AF_INET for android NDK which has no concept of V4ADDRMAPPED
+        struct sockaddr_in* sin = (struct sockaddr_in*) addrInfoResultp->ai_addr;
+        memcpy(addr->storage, sin, addrInfoResultp->ai_addrlen);
+        addr->len = addrInfoResultp->ai_addrlen;
+        console_write("server DNS resolved: (android) (ipv4) addrlen=%d\n", addr->len);
     }
     else
     if(addrInfoResultp->ai_family == AF_INET6)

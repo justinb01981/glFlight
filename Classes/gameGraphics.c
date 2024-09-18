@@ -766,7 +766,7 @@ void drawControls()
             game_timeval_t blink_d = time_ms - blink_time_last;
             if(blink_d < 200 && controls[i]->blinking)
             {
-                tex_id_controls = 0;
+                tex_id_controls = TEXTURE_ID_TAPWARN;
             }
             if(blink_d > 400) blink_time_last = time_ms;
 

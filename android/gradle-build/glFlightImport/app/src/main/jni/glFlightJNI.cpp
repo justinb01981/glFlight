@@ -101,6 +101,8 @@ glFlightJNIInit()
 {
 	DBPRINTF(("glFlightJNIInit called\n"));
 
+	assert(errno == 0);
+
 	gameCamera_init(0, 0, 0, 0, 0, 0);
 
 	game_init();
@@ -151,6 +153,7 @@ glFlightJNIInit()
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
+
 	/* http://developer.android.com/training/articles/perf-jni.html */
 	DBPRINTF(("JNI_OnLoad (%d)\n", 0));
 
@@ -161,13 +164,16 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 JNIEXPORT
 void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceCreated(JNIEnv *e, jobject o)
 {
-	// surface doesnt have bounds yet
+	// surface doesn't have bounds yet
+    errno = 0;  // doesn't start at 0 so clear it
 }
 
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(JNIEnv *e, jobject o, jfloatArray arr)
 {
 	// surface bounds have changed and we can init
+
+    assert(errno == 0);
 
 	float f[16];
 	int l = env_float_copy(e, arr, f);
@@ -177,6 +183,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 
     glViewport(0, 0, viewWidth, viewHeight);
 
+    glFlightJNIInit();
 }
 
 static game_timeval_t gameInputTimeLast = 0;
@@ -185,10 +192,10 @@ static game_timeval_t gameDrawTimeLast = 0;
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jobject o)
 {
     // TODO: draw a 'wait...loading' status string each frame until load
-	if(!glFlightInited) {
-		glFlightJNIInit();
-		return;
-	}
+//	if(!glFlightInited) {
+//		glFlightJNIInit();
+//		return;
+//	}
 
     assert(eglGetCurrentContext() != NULL);
 

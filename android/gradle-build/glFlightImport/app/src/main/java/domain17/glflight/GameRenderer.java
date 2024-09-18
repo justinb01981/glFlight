@@ -22,6 +22,8 @@ public class GameRenderer implements Renderer {
 	static native void onSurfaceCreated();
 	static native void onSurfaceChanged(float f[]);
 	static native void onDrawFrame();
+
+	public static float surfaceW, surfaceH;
 	
 	public static int clientVersion = 1;
 
@@ -40,6 +42,9 @@ public class GameRenderer implements Renderer {
 	@Override
 	public void onSurfaceChanged(GL10 arg0, int arg1, int arg2) {
 		float f[] = {arg1, arg2};
+
+		surfaceW = arg1;
+		surfaceH = arg2;
 
 		onSurfaceChanged(f);
 
