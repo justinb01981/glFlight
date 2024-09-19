@@ -32,8 +32,6 @@
 #define BACKGROUND_MODEL_TEXCOORDS /*model_cube_texcoords_alt*/ model_background_texcoords
 #define BACKGROUND_MODEL_INDICES1 model_background_indices1
 
-extern int isLandscape;
-
 extern int game_target_missle_id;
 extern int game_target_objective_id;
 
@@ -453,14 +451,10 @@ int drawRadar()
             pitchdot = dot2(ev, yvec);
             yawdot = dot2(ev, xvec);
 
-            float vw = viewWidth;
-            float vh = viewHeight;
 
-            if(!isLandscape)
-            {
-                vw = viewHeight;
-                vh = viewWidth;
-            }
+            // HACK: -- LANDSCAPE MODE!!!!
+            float vw = viewHeight;
+            float vh = viewWidth;
 
             er = (controlRect) {0, 0, vw, vh};
 
@@ -1663,11 +1657,6 @@ drawBackgroundCore()
     glOrthof(-1, 1,
              -1, 1,
              1, -1);
-
-    if(isLandscape)
-    {
-        glRotatef(-90, 0, 0, 1);
-    }
 
     glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerGamma()), 0, 0, 1);
     // X'

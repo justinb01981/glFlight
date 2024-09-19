@@ -51,7 +51,7 @@ extern int needFire;
 extern game_timeval_t firedLast;
 extern game_timeval_t player_fire_rate;
 extern float viewRotationDegrees;
-extern float drawDistanceFar;
+extern float drawDistanceNear, drawDistanceFar;
 extern char consoleMessage[2048];
 extern int numEnemies;
 extern float block_scale;
@@ -72,7 +72,6 @@ extern void (*glFlightOnPurchase)(void);
 #endif
 
 #if GAME_PLATFORM_ANDROID
-#define GAME_PLATFORM_IS_LANDSCAPE 0
 #define PLATFORM_TICK_RATE 60
 #define PLATFORM_DRAW_ELEMS_MAX 1000
 #define GYRO_SAMPLE_RATE (60)
@@ -81,7 +80,6 @@ extern void (*glFlightOnPurchase)(void);
 #define PLATFORM_CALIBRATE_COEFF 0.5
 #define PLATFORM_GYRO_SENSE_SCALE 1
 #else
-#define GAME_PLATFORM_IS_LANDSCAPE 0
 #define PLATFORM_TICK_RATE 60
 #define PLATFORM_DRAW_ELEMS_MAX 1000
 #define GYRO_SAMPLE_RATE (30)

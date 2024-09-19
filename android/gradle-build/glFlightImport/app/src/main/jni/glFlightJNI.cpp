@@ -173,8 +173,6 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 {
 	// surface bounds have changed and we can init
 
-    assert(errno == 0);
-
 	float f[16];
 	int l = env_float_copy(e, arr, f);
 
@@ -183,7 +181,9 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 
     glViewport(0, 0, viewWidth, viewHeight);
 
-    glFlightJNIInit();
+    if(!glFlightInited) {    // dont reinitialize when boundaries change or onResume
+        glFlightJNIInit();
+    }
 }
 
 static game_timeval_t gameInputTimeLast = 0;
@@ -192,10 +192,6 @@ static game_timeval_t gameDrawTimeLast = 0;
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jobject o)
 {
     // TODO: draw a 'wait...loading' status string each frame until load
-//	if(!glFlightInited) {
-//		glFlightJNIInit();
-//		return;
-//	}
 
     assert(eglGetCurrentContext() != NULL);
 
@@ -234,7 +230,6 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNI
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JNIEnv *e, jobject o)
 {
-    glFlightInited = false;
 
     gameNetwork_disconnect();
     if(save_map)

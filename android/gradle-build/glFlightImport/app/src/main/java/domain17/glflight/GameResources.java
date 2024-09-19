@@ -16,7 +16,7 @@ public class GameResources {
 
     // this needs to be bumped every time you add/modify a resource
     // so that the java code unpacks resource so that JNI code can reach it
-    public static int version = /* TODO: use android-version-string */ 101191;
+    public static int version = /* TODO: use android-version-string */ 101193;
 
     public static String resPrefix = /*"gameResources/"*/ "";
     public static String resVersionFilename = "resVersion";

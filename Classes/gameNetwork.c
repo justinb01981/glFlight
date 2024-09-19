@@ -417,20 +417,19 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
     {
         // YES we still need to handle AF_INET for android NDK which has no concept of V4ADDRMAPPED
         struct sockaddr_in* sin = (struct sockaddr_in*) addrInfoResultp->ai_addr;
+        inet_ntop(AF_INET, &sin->sin_addr, buf, sizeof(buf));
+        console_write("server DNS resolved: %s \n", buf);
+
         memcpy(addr->storage, sin, addrInfoResultp->ai_addrlen);
         addr->len = addrInfoResultp->ai_addrlen;
-        console_write("server DNS resolved: (android) (ipv4) addrlen=%d\n", addr->len);
     }
     else
     if(addrInfoResultp->ai_family == AF_INET6)
     {
         // copy over
         struct sockaddr_in6* sa6 = (struct sockaddr_in6*) addrInfoResultp->ai_addr;
-
         DBPRINTF(("result sockaddr6: fam:%d port:%u", sa6->sin6_family, ntohs(sa6->sin6_port)));
-
         inet_ntop(AF_INET6, &sa6->sin6_addr, buf, sizeof(buf));
-
         console_write("server DNS resolved: %s (ipv6)\n", buf);
 
         memcpy(addr->storage, sa6, addrInfoResultp->ai_addrlen);

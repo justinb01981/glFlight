@@ -114,8 +114,6 @@ gameInputInit()
 
     needTrim = 1;
 
-    isLandscape = GAME_PLATFORM_IS_LANDSCAPE;
-
 //    controlsCalibrated = 0;
     
     initialized = 1;

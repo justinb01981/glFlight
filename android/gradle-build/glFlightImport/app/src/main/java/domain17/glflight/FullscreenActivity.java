@@ -124,8 +124,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         SurfaceHolder h = gameRenderer.surfaceView.getHolder();
 
         /* iOS on iPhone5:320/568 */
-        viewHeightScaled = 640;
-        viewWidthScaled = viewHeightScaled * 1.5;
+        viewHeightScaled = 320;
+        viewWidthScaled = viewHeightScaled * 1.7;
 
         h.setFixedSize((int) viewWidthScaled, (int) viewHeightScaled);
 

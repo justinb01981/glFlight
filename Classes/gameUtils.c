@@ -41,7 +41,7 @@ volatile float time_ms_wall = 1;
 unsigned long g_time_frames = 0;
 volatile float g_time_ms_start = 0;
 
-float drawDistanceFar = 400;
+float drawDistanceNear = 1.999, drawDistanceFar = 400.0;
 
 const int console_write_append_thresh_ms = 1000;
 

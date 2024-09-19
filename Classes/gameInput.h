@@ -17,7 +17,6 @@ extern double roll;
 extern float qw, qx, qy, qz;
 extern double speed, maxSpeed, targetSpeed;
 extern int needTrim;
-extern int isLandscape;
 extern double bulletVel;
 extern quaternion_t bx, by, bz, b;
 extern double dc;

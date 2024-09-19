@@ -37,8 +37,6 @@
 static void clear_world_pending_removals(void);
 static void draw_btree_elements(WorldElem* pElem, float priority);
 
-int isLandscape;
-
 int world_inited = 0;
 int game_terminated_gracefully = 0;
 char *world_data = NULL;
@@ -538,14 +536,10 @@ calibrate_bail:
 	
 	// set up perspective projection...
 	// http://www.songho.ca/opengl/gl_transform.html
-	float xfrust = 1;
-	float yfrust = xfrust * (viewHeight/viewWidth);
-    if(!isLandscape)
-    {
-        yfrust = 1;
-        xfrust = yfrust * (viewWidth/viewHeight);
-    }
-	glFrustumf(-xfrust, xfrust, -yfrust, yfrust, 2.0, drawDistanceFar);
+    float yfrust = 1.0;
+    float R = viewWidth / viewHeight;
+    float xfrust = yfrust * R;
+	glFrustumf(-xfrust, xfrust, -yfrust, yfrust, drawDistanceNear, drawDistanceFar);
     
     /*
     glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
@@ -586,12 +580,7 @@ calibrate_bail:
     // building the transform matrix myself and using glMultMatrix
     // but keep in mind that each operation is relative to the current
     // reference-frame...
-    
-    if(isLandscape)
-    {
-        glRotatef(-90, 0, 0, 1);
-    }
-    
+
     // building a stack here, so reverse order..
     // translate->yaw->pitch->roll
     // (worth noting that the terms are misleading because we're using euler
@@ -686,16 +675,16 @@ calibrate_bail:
 
     WorldElemListNode* pDrawCur = gWorld->elements_visible.next;
     
-    // draw mesh
-    WorldElemListNode* cur = gWorld->triangle_mesh_head.next;
-    while(cur)
-    {
-        float c[] = {gameCamera_getX(), gameCamera_getY(), gameCamera_getZ()};
-        struct mesh_opengl_t* mesh = (struct mesh_opengl_t*) cur->elem->pVoid;
-        mesh_opengl_index_sort(c, mesh);
-        drawTriangleMesh(mesh, cur->elem->texture_id);
-        cur = cur->next;
-    }
+//    // draw mesh
+//    WorldElemListNode* cur = gWorld->triangle_mesh_head.next;
+//    while(cur)
+//    {
+//        float c[] = {gameCamera_getX(), gameCamera_getY(), gameCamera_getZ()};
+//        struct mesh_opengl_t* mesh = (struct mesh_opengl_t*) cur->elem->pVoid;
+//        mesh_opengl_index_sort(c, mesh);
+//        drawTriangleMesh(mesh, cur->elem->texture_id);
+//        cur = cur->next;
+//    }
 
     // actual drawing (happens asynchronouly)
     drawElemStart(pDrawCur);
