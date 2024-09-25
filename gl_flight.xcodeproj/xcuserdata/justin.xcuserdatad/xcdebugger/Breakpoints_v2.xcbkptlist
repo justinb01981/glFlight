@@ -51,7 +51,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2957"
             endingLineNumber = "2957"
-            landmarkName = "do_game_network_write()"
+            landmarkName = "gameNetwork_handle_collision(elemA, elemB, collision_action)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -68,7 +68,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2328"
             endingLineNumber = "2328"
-            landmarkName = "do_game_network_write()"
+            landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -170,7 +170,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "884"
             endingLineNumber = "884"
-            landmarkName = "gameNetwork_startGame(sec)"
+            landmarkName = "gameNetwork_countPlayers()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -187,7 +187,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3101"
             endingLineNumber = "3101"
-            landmarkName = "do_game_network_write()"
+            landmarkName = "gameNetwork_onBonjourConnecting3(msg, srcAddr)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -204,7 +204,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3112"
             endingLineNumber = "3112"
-            landmarkName = "do_game_network_write()"
+            landmarkName = "gameNetwork_onBonjourConnecting3(msg, srcAddr)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -253,7 +253,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2858"
             endingLineNumber = "2858"
-            landmarkName = "do_game_network_write()"
+            landmarkName = "gameNetwork_sendStatsAlert()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -269,7 +269,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2368"
             endingLineNumber = "2368"
-            landmarkName = "do_game_network_write()"
+            landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -285,7 +285,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2363"
             endingLineNumber = "2363"
-            landmarkName = "do_game_network_write()"
+            landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -301,7 +301,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2382"
             endingLineNumber = "2382"
-            landmarkName = "do_game_network_write()"
+            landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -333,56 +333,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2861"
             endingLineNumber = "2861"
-            landmarkName = "do_game_network_write()"
+            landmarkName = "gameNetwork_sendStatsAlert()"
             landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "2021CB13-F099-453F-A18C-DC2927365D2F"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/gameDialogs.h"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "572"
-            endingLineNumber = "572"
-            landmarkName = "gameDialogDisconnectAndDequeue()"
-            landmarkType = "9">
-            <Locations>
-               <Location
-                  uuid = "2021CB13-F099-453F-A18C-DC2927365D2F - 7377d8a97aab5129"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "gameDialogDisconnectAndDequeue"
-                  moduleName = "gl_flight_debug"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "576"
-                  endingLineNumber = "576"
-                  offsetFromSymbolStart = "8">
-               </Location>
-               <Location
-                  uuid = "2021CB13-F099-453F-A18C-DC2927365D2F - 7377d8a97aab51ad"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "gameDialogDisconnectAndDequeue"
-                  moduleName = "gl_flight_debug"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/justin/workspace/glFlight/Classes/gameDialogs.h"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "572"
-                  endingLineNumber = "572"
-                  offsetFromSymbolStart = "8">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

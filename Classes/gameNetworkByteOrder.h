@@ -11,8 +11,15 @@
 #include <assert.h>
 
 #ifdef _NOT_POSIX
+
 #else
-#include <sys/endian.h>
+
+    #if GAME_PLATFORM_IOS
+    #include <Endian.h>
+    #else
+    #include <sys/endian.h>
+    #endif
+
 #endif
 
 #define ntohll(x) (x)

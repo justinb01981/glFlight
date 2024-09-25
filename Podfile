@@ -6,5 +6,6 @@ target 'gl_flight' do
   use_frameworks!
 
   # Pods for gl_flight
+  pod 'FirebaseCore'
   pod 'FirebaseAnalytics'
 end
