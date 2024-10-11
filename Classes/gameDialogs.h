@@ -292,7 +292,7 @@ gameDialogInitialCountdownDrawCallback()
                         M_PI/2.0, M_PI+ph, -M_PI/2.0);
         ph += 0.010;
     }
-    targetSpeed = 0;
+    targetSpeed = minSpeed;
     
     gameDialogInitialCountdownDrawCallbackCount--;
 
