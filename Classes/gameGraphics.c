@@ -27,6 +27,7 @@
 #include "maps.h"
 #include "textures.h"
 #include "framebuffer.h"
+#include "gameGraphicsTerrain.h"
 
 #define BACKGROUND_MODEL model_background
 #define BACKGROUND_MODEL_TEXCOORDS /*model_cube_texcoords_alt*/ model_background_texcoords
@@ -1345,7 +1346,7 @@ drawBackgroundBuildTerrain(DrawBackgroundData* bgData, float Tk_)
         if(step == step_generate)
         {
             tess_begin(M, T, bgData->tess.S);
-        }
+}
 
         while(Vi <= Ve)
         {
@@ -1679,14 +1680,16 @@ drawBackgroundCore()
 
     // draw terrain
     bindTexture(TEXTURE_ID_TERRAIN);
-    tess_walk(bgData->tess.S, drawBackground_tess);
+    //tess_walk(bgData->tess.S, drawBackground_tess);
+
+    terrainDraw();
 }
 
 void drawBackground()
 {
     drawBackgroundCore();
 
-    drawBounding(texture_id_background);
+    //drawBounding(texture_id_background);
 }
 
 void drawBounding(int boundtex_id)
@@ -2005,6 +2008,8 @@ gameGraphicsInit(void)
     drawBoundingInit(texture_id_background);
 
     //frameBufInit(&gFrameBufSt);
+
+    terrainBuild();
 }
 
 void

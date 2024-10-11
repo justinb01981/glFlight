@@ -674,17 +674,6 @@ calibrate_bail:
 
 
     WorldElemListNode* pDrawCur = gWorld->elements_visible.next;
-    
-//    // draw mesh
-//    WorldElemListNode* cur = gWorld->triangle_mesh_head.next;
-//    while(cur)
-//    {
-//        float c[] = {gameCamera_getX(), gameCamera_getY(), gameCamera_getZ()};
-//        struct mesh_opengl_t* mesh = (struct mesh_opengl_t*) cur->elem->pVoid;
-//        mesh_opengl_index_sort(c, mesh);
-//        drawTriangleMesh(mesh, cur->elem->texture_id);
-//        cur = cur->next;
-//    }
 
     // actual drawing (happens asynchronouly)
     drawElemStart(pDrawCur);
