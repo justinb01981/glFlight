@@ -325,8 +325,10 @@ gameInput()
 //                gameShip_roll(r);
 //            }
 //        }
-        float INPUT_SPEED = (  1.0 + log(targetSpeed)  ) / maxSpeed; // targetSpeed - not effective-speed/momentum
-        // TODO: prevent  < 0.
+
+
+        float INPUT_SPEED = (  log(MAX(targetSpeed,2.0))  ) / maxSpeed; // targetSpeed - not effective-speed/momentum
+        // preventing - results by ensure > log(1)
         
         if(fabs(input_roll) > dz_min
 //           && gameSettingsComplexControls
