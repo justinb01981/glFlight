@@ -29,10 +29,10 @@ struct WorldElemListNode;
 
 typedef struct
 {
-    GLfloat vx, vy, vz;
-    GLfloat x, y, z;
-    GLfloat alpha, beta, gamma; //euler
-    GLfloat velocity;
+    float vx, vy, vz;
+    float x, y, z;
+    float alpha, beta, gamma; //euler
+    float velocity;
     
     int     gravity:1, friction:1;
     
@@ -40,9 +40,9 @@ typedef struct
 
 typedef struct
 {
-    GLfloat x_min, x_max;
-    GLfloat y_min, y_max;
-    GLfloat z_min, z_max;
+    float x_min, x_max;
+    float y_min, y_max;
+    float z_min, z_max;
 } bounding_box;
 
 struct ListNode_t

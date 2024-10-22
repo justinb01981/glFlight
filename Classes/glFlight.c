@@ -545,7 +545,7 @@ calibrate_bail:
     glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
     
     glFogf(GL_FOG_MODE, GL_LINEAR);        // Fog Mode
-    GLfloat fogColor[4]= {0.5f, 0.5f, 0.5f, 1.0f};
+    float fogColor[4]= {0.5f, 0.5f, 0.5f, 1.0f};
     glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
     glFogf(GL_FOG_DENSITY, 1.0f);              // How Dense Will The Fog Be
     glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value

@@ -24,7 +24,7 @@ typedef struct Terrain_ {
 static Terrain terrain;
 
 void terrainBuildSanity(void) {
-    GLfloat R = 50;
+    float R = 50;
     int i, ti;
 
     terrain.nIndices = 3;
@@ -61,25 +61,53 @@ void terrainBuildSanity(void) {
 
 }
 
+// 2d data types
+typedef struct Point_ {
+    float X, Y;
+}Point;
+
 typedef struct Vector_ {
-    float x, y, z;
-    float dx, dy, dz;
+    Point A, B;
 } Vector;
 
+Terrain* T = &terrain;
+
+model_index_t allocVertex3(Point p, float Y, float Stex)
+{
+    model_index_t inext = T->nVertices, tnext = T->nVertices;
+
+    // new modelview vertex d
+    T->vertices[inext*3 + 0] = p.X;
+    T->vertices[inext*3 + 1] = Y;
+    T->vertices[inext*3 + 2] = p.Y;
+
+    // new textureview vertex
+    T->texvertices[tnext*2 + 0] = p.X*Stex;
+    T->texvertices[tnext*2 + 1] = p.Y*Stex;
+
+    T->nVertices += 1;
+    return inext;
+}
+
+Point castPoint(Point origin, Vector vec, float Xs, float Ys) {
+    Point P = { 
+        origin.X + (vec.B.X - vec.A.X)*Xs,
+        origin.Y + (vec.B.Y - vec.A.Y)*Ys
+    };
+
+    return P;
+}
+
 static void terrainBuildHelper(
-        Vector u,
-        Vector v,
+        Vector U,
+        Vector V,
         model_index_t vIndex,
         int depth
         ) {
-    
-    Terrain* T = &terrain;
-    int i, a, b, c, d;
 
-    unsigned off = 3;
-    GLfloat* pI =  &T->vertices[T->nVertices*3 - off*3];
-    GLfloat* pT = &T->texvertices[T->nVertices * 2 - off * 2];
- 
+    float Y = 0.0;
+    
+
     if (depth >= 3) return;
 
     // growing down/left(?) - in a single direction anyway
@@ -100,106 +128,64 @@ static void terrainBuildHelper(
      *
      */
 
+    // vertex A passed in already
+    // add b = a+U
+    // add c = a+V
 
-    a = 0, b = 3, c = 6;    // vertex positions for t1
+    Point A = 
+    { 
+        U.A.X,
+        U.A.Y 
+    };
 
-    GLfloat bax = (pI[b * 3 + 0] - pI[a * 3 + 0]); 
-    GLfloat baz = (pI[b * 3 + 2] - pI[a * 3 + 2]);
+    Point B = castPoint(A, U, 1, 1), C = castPoint(A, V, 1, 1); // advancing counters for next triangle
+    Point D = castPoint(A, U, -1, -1), E = castPoint(A, V, -1, -1);
 
-    GLfloat X = pI[a * 3 + 0] - bax;
-    GLfloat Z = pI[a * 3 + 2] - baz;
-    GLfloat bcx = (pI[b * 3 + 0] - pI[a * 3 + 0]);
-    GLfloat bcz = (pI[b * 3 + 2] - pI[a * 3 + 2]);
+    model_index_t vnextB = allocVertex3(B, Y, 0.1);
+    model_index_t vnextC = allocVertex3(C, Y, 0.1);
+    model_index_t vnextD = allocVertex3(D, Y, 0.1);
+    model_index_t vnextE = allocVertex3(E, Y, 0.1);
 
-    GLfloat X1 = X - bcx;
-    GLfloat Z1 = Z - bcz;
-    GLfloat Y = T->yOff;
+    model_index_t ord[] = {vnextC, vnextB, vnextE, vnextD};
 
-    int i3 = terrain.nVertices * 3, t2 = terrain.nVertices * 2;
-
-    // triangle from indices N,N-1,N-2
-    int iD = terrain.nVertices, iB = terrain.nVertices-2, iE = terrain.nVertices + 1, iA = terrain.nVertices - 3, iC =
-            terrain.nVertices - 1;   // indices
-    GLfloat *pD = &terrain.vertices[iD*3], *pE = &terrain.vertices[iE*3], *pC = &terrain.vertices[iC*3], *pA = &terrain.vertices[iA*3];
-    GLfloat *pDt = &terrain.texvertices[iD*2], *pEt = &terrain.texvertices[iE*2], *pCt = &terrain.texvertices[iC*2], *pAt = &terrain.texvertices[iA*2];
-    
-    // new modelview vertex d
-    T->vertices[i3 + 0] = X;
-    T->vertices[i3 + 1] = Y;
-    T->vertices[i3 + 2] = Z;
-    // new texture vertex (u,v) for d
-    T->texvertices[t2 + 0] = pT[a * 2 + 0] - (pT[b * 2 + 0] - pT[a * 2 + 0]);
-    T->texvertices[t2 + 1] = pT[a * 2 + 1] - (pT[b * 2 + 1] - pT[a * 2 + 1]);
-    terrain.nVertices += 1;  // done
-
-    terrain.indices[terrain.nIndices] = iD;
-    terrain.indices[terrain.nIndices + 1] = iA;
-    terrain.indices[terrain.nIndices + 2] = iE;// pt e forthcoming
+    // add indices to new points designated as triangle
+    terrain.indices[terrain.nIndices] = vIndex;
+    terrain.indices[terrain.nIndices + 1] = ord[1];
+    terrain.indices[terrain.nIndices + 2] = ord[0];
+    terrain.nIndices += 3;
+    terrain.indices[terrain.nIndices] = vIndex;
+    terrain.indices[terrain.nIndices + 1] = ord[3];
+    terrain.indices[terrain.nIndices + 2] = ord[2];
+    terrain.nIndices += 3;
+    terrain.indices[terrain.nIndices] = vIndex;
+    terrain.indices[terrain.nIndices + 1] = ord[2];
+    terrain.indices[terrain.nIndices + 2] = ord[1];
+    terrain.nIndices += 3;
+    terrain.indices[terrain.nIndices] = vIndex;
+    terrain.indices[terrain.nIndices + 1] = ord[0];
+    terrain.indices[terrain.nIndices + 2] = ord[3];
     terrain.nIndices += 3;
 
-    // advance counters for next triangle
+    // flip vectors and continue
 
-    int i4 = i3 + 3;
-    // new modelview vertex e
-    T->vertices[i4 + 0] = X1;
-    T->vertices[i4 + 1] = Y;
-    T->vertices[i4 + 2] = Z1;
-    int t3 = t2 + 2;    // new texture vertex (u,v) for e
-    T->texvertices[t3 + 0] = T->texvertices[t2 + 0] - (pT[c * 2 + 0] - pT[a * 2 + 0]);
-    T->texvertices[t3 + 1] = T->texvertices[t2 + 1] - (pT[c * 2 + 1] - pT[a * 2 + 1]);
-    terrain.nVertices += 1;  // add vertex e
-
-    terrain.indices[terrain.nIndices] = iE;
-    terrain.indices[terrain.nIndices + 1] = iA;
-    terrain.indices[terrain.nIndices + 2] = iB; // pt e forthcoming
-    terrain.nIndices += 3;
-    
-    // rotate vectors and continue
-    terrainBuildHelper(depth + 1);
-    terrainBuildHelper(depth + 1);
-
+   
+    //terrainBuildHelper(depth + 1);
 
 }
 
 void terrainBuild(void) {
 
-    GLfloat R = 1;
+    float R = 5;
     int i, ti;
 
-    terrain.nVertices = 3;
-    terrain.nIndices = 3;
+    terrain.nVertices = 0;
+    terrain.nIndices = 0;
 
-    i = 0; ti = 0;
-    terrain.vertices[i++] = R;
-    terrain.vertices[i++] = 0;
-    terrain.vertices[i++] = 0;
-    terrain.texvertices[ti++] = 0.1;
-    terrain.texvertices[ti++] = 0.0;
+    Vector U = { {0,0},{5,5} }, V = { {0,0},{5,-5} };
 
-    terrain.vertices[i++] = R*2;
-    terrain.vertices[i++] = 0;
-    terrain.vertices[i++] = R;
-    terrain.texvertices[ti++] = 0.2;
-    terrain.texvertices[ti++] = 0.1;
+    model_index_t m = allocVertex3((Point) {U.A.X, U.A.Y}, 0, 0.1);
 
-    terrain.vertices[i++] = 0;
-    terrain.vertices[i++] = 0.0;
-    terrain.vertices[i++] = R;
-    terrain.texvertices[ti++] = 0.0;
-    terrain.texvertices[ti++] = 0.1;
-
-    i = 0;
-    terrain.indices[i++] = 0;
-    terrain.indices[i++] = 2;
-    terrain.indices[i++] = 1;
-
-//    terrain.indices[i++] = 0;   // BOTH sides!?
-//    terrain.indices[i++] = 1;
-//    terrain.indices[i++] = 2;
-
-    GLfloat *ptrVtx = (GLfloat*) &terrain.vertices;
-    GLfloat *ptrTtx = (GLfloat*) &terrain.texvertices;
-    terrainBuildHelper(0);
+    terrainBuildHelper(U,V, m, 0);
 }
 
 void terrainDraw(void) {

@@ -21,11 +21,11 @@
 
 const static int MODEL_PRIMITIVES_NONE = 0;
 
-typedef GLfloat model_coord_t;
+typedef float model_coord_t;
 // keep these in-sync
 #define index_type_enum GL_UNSIGNED_SHORT
 typedef GLushort model_index_t;
-typedef GLfloat model_texcoord_t;
+typedef float model_texcoord_t;
 
 typedef struct
 {

@@ -19,9 +19,9 @@
 #define FB_TEXTURE_WIDTHHEIGHT (512)
 
 struct FrameBufInst {
-    GLfloat coords[512];
+    float coords[512];
     GLuint indices[256];
-    GLfloat colors[256];
+    float colors[256];
     float width, height;
     size_t count;
     

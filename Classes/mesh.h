@@ -17,7 +17,7 @@
 #include "models.h"
 
 // TODO: include opengl types
-typedef /*GLfloat*/ float mesh_glfloat_t;
+typedef /*float*/ float mesh_glfloat_t;
 typedef /*GLubyte*/ unsigned char mesh_glubyte_t;
 
 struct mesh_point_t {
