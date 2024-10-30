@@ -2009,7 +2009,7 @@ gameGraphicsInit(void)
 
     //frameBufInit(&gFrameBufSt);
 
-    terrainBuild();
+    //terrainBuild();
 }
 
 void

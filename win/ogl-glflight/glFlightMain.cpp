@@ -139,11 +139,13 @@ public:
 
         glFlightInitialize();
 
-        glFlightInited = true;
-
         openALInit();
 
         CreateThread(NULL, 1024 * 64, GLFlightGame::backgroundWorker, &glFlightInited, 0, &bgThreadId);
+
+
+        glFlightInited = true;
+
 
         return true;
     }

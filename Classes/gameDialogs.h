@@ -289,7 +289,7 @@ gameDialogInitialCountdownDrawCallback()
         float y = 0.0;
 
         gameCamera_init(my_ship_x - x, my_ship_y - y, my_ship_z - z,
-                        M_PI, M_PI+ph, -M_PI/2.0);
+                        M_PI/2, M_PI+ph, -M_PI/2.0);
         ph += 0.010;
     }
     targetSpeed = minSpeed;

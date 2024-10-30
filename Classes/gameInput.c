@@ -327,7 +327,8 @@ gameInput()
 //        }
 
 
-        float INPUT_SPEED = (  log(MAX(targetSpeed,2.0))  ) / maxSpeed; // targetSpeed - not effective-speed/momentum
+        //float INPUT_SPEED = (  log(MAX(targetSpeed,2.0))  ) / maxSpeed; // targetSpeed - not effective-speed/momentum
+        float INPUT_SPEED = 0.5;
         // preventing - results by ensure > log(1)
         
         if(fabs(input_roll) > dz_min
