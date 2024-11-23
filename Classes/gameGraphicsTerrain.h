@@ -41,7 +41,7 @@ int rows = 96;
 
 float Xt = 0;
 float Zt = 0;
-float Tsc = 0.1;
+float Tsc = 0.05;
 
 
 model_index_t allocVertex3(Point p, float Stex)
@@ -64,12 +64,12 @@ model_index_t allocVertex3(Point p, float Stex)
 float YcalculateFromXZ(float X, float Z) {
 
     //return sin((X - Xt) / 3.14) - cos((Z - Zt) / 3.14) + 5;
-    return sin(X-Xt)*fmod(Z,3); // ignoring Zt
+    return sin(X-Xt)* log(fabs(Z)); // ignoring Zt
 }
 
-Point castPoint(Point origin, Vector vec, float S) {
-    float X = origin.X + (vec.B.X - vec.A.X) * S;
-    float Z = origin.Z + (vec.B.Z - vec.A.Z) * S;
+Point castPoint(Point origin, Vector vec, float Sx, float Sy) {
+    float X = origin.X + (vec.B.X - vec.A.X) * Sx;
+    float Z = origin.Z + (vec.B.Z - vec.A.Z) * Sy;
 
     float Ycalc = YcalculateFromXZ(X, Z);
 
@@ -88,7 +88,6 @@ static void terrainBuildHelper(
         model_index_t vIndex
         ) 
 {
-
     // THIS CALL ALLOCATES 4 VERTICES(?) MAKE SURE SPACE IS AVAILABLE IN TERRAIN
 
     // growing down/left(?) - in a single direction anyway
@@ -126,6 +125,7 @@ static void terrainBuildHelper(
 
     model_index_t vnextB = allocVertex3(B, Tsc);
     model_index_t vnextC = allocVertex3(C, Tsc);
+
     model_index_t vnextD = allocVertex3(D, Tsc);
     model_index_t vnextE = allocVertex3(E, Tsc);
 
