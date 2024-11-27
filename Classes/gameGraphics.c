@@ -103,7 +103,7 @@ typedef struct
     int tex_id;
 } drawSubElement;
 
-void radarDrawTextDone()
+void radarDrawTextDone(void)
 {
     glMatrixMode(GL_TEXTURE); // hack
     glEnable(GL_BLEND);
@@ -139,14 +139,14 @@ setupGLModelView(float scrWidth, float scrHeight)
 }
 
 static void
-setupGLModelViewDone()
+setupGLModelViewDone(void)
 {
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
 }
 
 static void
-setupGLTextureView()
+setupGLTextureView(void)
 {
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
@@ -156,7 +156,7 @@ setupGLTextureView()
 }
 
 static void
-setupGLTextureViewDone()
+setupGLTextureViewDone(void)
 {
     glMatrixMode(GL_TEXTURE);
     glPopMatrix();
@@ -348,7 +348,7 @@ void drawText(char *str, float x, float y, float scale)
 
 static gameGraphics_drawState2d drawRadar_ds;
 
-int drawRadar()
+int drawRadar(void)
 {
     float screenWidth = viewWidth;
     float screenHeight = viewHeight;
@@ -711,7 +711,7 @@ int drawControlsRadar(drawSubElement subElemRadarList[], int max)
     return subElementsN;
 }
 
-void drawControls()
+void drawControls(void)
 {
     float screenWidth = viewWidth;
     float screenHeight = viewHeight;
@@ -1018,7 +1018,7 @@ void drawControls()
 }
 
 void
-drawElem_newFrame()
+drawElem_newFrame(void)
 {
     gl_vertex_ptr_last = gl_texcoord_ptr_last = NULL;
 
@@ -1049,14 +1049,14 @@ drawState2dSet(gameGraphics_drawState2d* state)
 }
 
 void
-drawState2dDraw()
+drawState2dDraw(void)
 {
     glDrawElements(GL_TRIANGLES, sizeof(drawState_2d.indices)/sizeof(model_index_t),
                    index_type_enum, drawState_2d.indices);
 }
 
 void
-drawElemBatch()
+drawElemBatch(void)
 {
     if(drawElem_indicesBatchBuffer_count > 0)
     {
@@ -1607,7 +1607,7 @@ drawBackgroundInit(int tex_id,
 
 
 static void
-drawBackgroundUninit()
+drawBackgroundUninit(void)
 {
     DrawBackgroundData* pFree;
     if(bgData)
@@ -1643,7 +1643,7 @@ drawBackground_tess(float* modelC, float* textureC, unsigned int* indicesC, unsi
 }
 
 void
-drawBackgroundCore()
+drawBackgroundCore(void)
 {
     if(!bgData) return;
 
@@ -1669,7 +1669,7 @@ drawBackgroundCore()
     glTexCoordPointer(2, GL_FLOAT, 0, bgData->texcoords);
 
     // background (skybox) drawing (disabled now in favor of bounding textures
-    // bindTexture(bgData->tex_id);
+    //bindTexture(bgData->tex_id);
     //glDrawElements(GL_TRIANGLES, bgData->n_indices,
     //               index_type_enum, bgData->indices);
 
@@ -1685,11 +1685,11 @@ drawBackgroundCore()
     terrainDraw();
 }
 
-void drawBackground()
+void drawBackground(void)
 {
     drawBackgroundCore();
 
-    //drawBounding(texture_id_background);
+    drawBounding(texture_id_background);
 }
 
 void drawBounding(int boundtex_id)
@@ -1825,14 +1825,14 @@ struct
 } drawLineData;
 
 void
-drawLineBegin()
+drawLineBegin(void)
 {
     glDisable(GL_TEXTURE_2D);
     glColor4f(0.0, 1.0, 0.0, 1.0);
 }
 
 void
-drawLineEnd()
+drawLineEnd(void)
 {
     glEnable(GL_TEXTURE_2D);
     glColor4f(1.0, 1.0, 1.0, 1.0);
@@ -2009,7 +2009,7 @@ gameGraphicsInit(void)
 
     //frameBufInit(&gFrameBufSt);
 
-    //terrainBuild();
+    terrainBuild();
 }
 
 void

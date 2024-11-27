@@ -133,10 +133,11 @@ struct WorldElem {
     {
         int affiliation;
         int subtype;
-        int radar_visible:1;
-        int intelligent:1;
+        unsigned int
+            radar_visible:1,
+            intelligent:1,
+            network_created:1;
         int game_object_id;
-        int network_created:1;
         char *nametag;
         
         struct

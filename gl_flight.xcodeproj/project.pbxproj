@@ -939,6 +939,7 @@
 		D0F4D8F62B14F9C500948122 /* boolean.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = boolean.h; sourceTree = "<group>"; };
 		D0F4D9D32B1568B500948122 /* gl_flight_debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = gl_flight_debug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0F4D9D42B1568B700948122 /* gl_flight copy2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "gl_flight copy2-Info.plist"; path = "/Users/justin/workspace/glFlight/gl_flight copy2-Info.plist"; sourceTree = "<absolute>"; };
+		D0F761462CF2FBF800F86483 /* gameGraphicsTerrain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gameGraphicsTerrain.h; sourceTree = "<group>"; };
 		D0FE6D0318553E6E007D67CF /* texture51.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture51.bmp; sourceTree = "<group>"; };
 		D0FE6D051856F528007D67CF /* texture52.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture52.bmp; sourceTree = "<group>"; };
 		D0FE6D0718570BD0007D67CF /* texture53.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture53.bmp; sourceTree = "<group>"; };
@@ -1077,6 +1078,7 @@
 				D0EECB1F1753E08B00B5B815 /* gamePlay.c */,
 				D03ADBA617823B5B00D725F7 /* gameSettings.h */,
 				D02B8EFE195357FE00830369 /* gameSettings.c */,
+				D0F761462CF2FBF800F86483 /* gameGraphicsTerrain.h */,
 				D062ED5B16E0294A00CA4374 /* gameGraphics.h */,
 				D062ED5C16E0295500CA4374 /* gameGraphics.c */,
 				D02B8F191964D7D700830369 /* gameInput.c */,

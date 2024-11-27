@@ -194,12 +194,9 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     //setsockopt(sock, sol_socket, so_reuseaddr, &so_arg, sizeof(so_arg));
 
     // necessary on windows to get ip4 ADDDR4MAPPED as sockaddr6
-#ifdef BSD_SOCKETS
-    //cool
-#else
+    // but problems on ios (BSD_SOCKETS)
     so_arg = 0; // yes - turn it off
     setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &so_arg, sizeof(so_arg));
-#endif
 
     /* bind */
     if(do_bind)
@@ -248,6 +245,8 @@ send_lan_broadcast(gameNetworkMessage* msg)
     
     r = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg),
                0, (struct sockaddr*) &sa_bc6, sizeof(sa_bc6));
+
+    assert(r > 0);
 }
 
 static void
@@ -281,7 +280,8 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
             DBPRINTF(("sendto errno=%u)\n", errno));
         }
 #endif
-        DBPRINTF(("sendto: %ld - errno:%s\n", r, strerror(errno)));
+        DBPRINTF(("sendto: %d - errno:%s\n", r, strerror(errno)));
+        assert(0);
     }
 
     gameMessage_from_nbo(msg);
@@ -386,7 +386,13 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
     ADDRINFO *addrInfoResultp = NULL, hints;
     memset(&hints, 0, sizeof(hints));
 
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family =
+#ifdef BSD_SOCKETS
+    AF_INET6
+#else
+    AF_UNSPEC
+#endif
+    ;
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE
 #if GAME_PLATFORM_ANDROID
@@ -395,7 +401,7 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
 #endif
     ; // leftovers from AF_INET6
 
-    sprintf(portnum, "%u", GAME_NETWORK_PORT_DEFAULT);
+    sprintf(portnum, "%ld", GAME_NETWORK_PORT_DEFAULT);
 
     addrInfoResultp = NULL;
     
@@ -530,7 +536,7 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
     game_lock_init(&gameNetworkState.msgQueue.lock);
 
     if(!gameNetwork_test()) assert(0);
-    
+
     return GAME_NETWORK_ERR_NONE;
 }
 
@@ -1785,7 +1791,7 @@ do_game_network_write()
 }
 
 void
-do_game_network_world_update()
+do_game_network_world_update(void)
 {
     gameNetworkMessage netMsg;
     WorldElemListNode* pNode;
@@ -2124,13 +2130,6 @@ do_game_network_handle_msg(gameNetworkMessage* msg, gameNetworkAddress* srcAddr,
                     motion_interp_st* motion = &playerInfo->motion;
                     
                     t = msg->params.f[16];
-
-                    float velDetected[3] =
-                    {
-                        (msg->params.f[1] - pPlayerElem->physics.ptr->x) * (1000.0 / (t - motion->timestamp_last[0])),
-                        (msg->params.f[2] - pPlayerElem->physics.ptr->y) * (1000.0 / (t - motion->timestamp_last[0])),
-                        (msg->params.f[3] - pPlayerElem->physics.ptr->z) * (1000.0 / (t - motion->timestamp_last[0]))
-                    };
                     
                     motion_interpolate_velocity(network_time_ms, motion, pPlayerElem, msg, interp_velo);
                     
@@ -3209,7 +3208,7 @@ int gameNetwork_onDirectoryRegister1(gameNetworkMessage* msg, gameNetworkAddress
     return 0;
 }
     
-void load_map_and_host_game()
+void load_map_and_host_game(void)
 {
     actions_menu_reset();
     save_map = 0;

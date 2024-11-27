@@ -34,11 +34,8 @@ typedef struct Vector_ {
 
 // MARK: -- API exposed global defines here
 Terrain* T = &terrain;
-
-float R = 1;    // 1/2 width of triangles
 int cols = 96;
 int rows = 96;
-
 float Xt = 0;
 float Zt = 0;
 float Tsc = 0.05;
@@ -64,7 +61,7 @@ model_index_t allocVertex3(Point p, float Stex)
 float YcalculateFromXZ(float X, float Z) {
 
     //return sin((X - Xt) / 3.14) - cos((Z - Zt) / 3.14) + 5;
-    return sin(X-Xt)* log(fabs(Z)); // ignoring Zt
+    return 0; ///sin(X-Xt)* log(fabs(Z)); // ignoring Zt
 }
 
 Point castPoint(Point origin, Vector vec, float Sx, float Sy) {
@@ -83,10 +80,11 @@ Point castPoint(Point origin, Vector vec, float Sx, float Sy) {
 }
 
 static void terrainBuildHelper(
-        Vector U,
-        Vector V,
-        model_index_t vIndex
-        ) 
+                               Vector U,
+                               Vector V,
+                               model_index_t vIndex,
+                               const float R
+        )
 {
     // THIS CALL ALLOCATES 4 VERTICES(?) MAKE SURE SPACE IS AVAILABLE IN TERRAIN
 
@@ -162,6 +160,8 @@ void terrainBuild(void) {
         
     assert(cols * rows * 4 < N);
 
+    float R = gWorld->bound_radius / 10;    // 1/2 width of triangles
+
     terrain.nVertices = 0;
     terrain.nIndices = 0;
 
@@ -174,22 +174,24 @@ void terrainBuild(void) {
 
             model_index_t m = allocVertex3((Point) { U.A.X, U.A.Y, U.A.Z }, /* tex scale */ Tsc);
 
-            terrainBuildHelper(U, V, m);
+            terrainBuildHelper(U, V, m, R);
         }
     }
 }
 
 void terrainDraw(void) {
 
-    terrainBuild();// dude try moving this to async without locking and see what it looks like drawing
+    //terrainBuild();// dude try moving this to async without locking and see what it looks like drawing
 
     glVertexPointer(3, GL_FLOAT, 0, terrain.vertices);
     glTexCoordPointer(2, GL_FLOAT, 0, terrain.texvertices);
 
     // background (skybox) drawing (disabled now in favor of bounding textures
     bindTexture(TEXTURE_ID_TERRAIN);
-    glDrawElements(GL_TRIANGLES, terrain.nIndices,
-                   index_type_enum, terrain.indices);
+    glDrawElements(GL_TRIANGLES,
+                   (GLsizei) terrain.nIndices,
+                   index_type_enum,
+                   terrain.indices);
 
     Xt += 3.141 / 240.0;
     Zt += 0.3;

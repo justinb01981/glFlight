@@ -90,6 +90,8 @@ int playSound = 1;
 
 - (void) playSound: (NSString*)soundFileName withVolume:(float)volume andRate:(float)rate
 {
+    if(rate <= 0) return;// wtf
+    
 #if 0
     AVAudioPlayer* audioPlayer = NULL;
     int i;
