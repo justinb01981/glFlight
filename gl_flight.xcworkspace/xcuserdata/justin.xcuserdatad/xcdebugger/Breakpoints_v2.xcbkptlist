@@ -7,22 +7,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "1903538B-FB29-405D-BBDB-1ACED70D0B99"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Classes/collision.h"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "473"
-            endingLineNumber = "473"
-            landmarkName = "do_world_collision_handling(tc)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "708E14C8-C52D-412C-BABB-21FE867D37DC"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -30,8 +14,8 @@
             filePath = "Classes/gameNetwork.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2124"
-            endingLineNumber = "2124"
+            startingLineNumber = "2125"
+            endingLineNumber = "2125"
             landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
             landmarkType = "9">
          </BreakpointContent>
@@ -39,32 +23,48 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "6D62F814-D156-4419-949F-4CBFE28681E3"
+            uuid = "67C8B6CB-8CBC-4FAE-BA65-4602FAE12C55"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Classes/gameNetwork.c"
+            filePath = "Classes/collision.h"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3197"
-            endingLineNumber = "3197"
-            landmarkName = "gameNetwork_onDirectoryRegister1(msg, srcAddr)"
+            startingLineNumber = "474"
+            endingLineNumber = "474"
+            landmarkName = "do_world_collision_handling(tc)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "9B3A87C3-DA02-4FCD-8674-7B5332C2ACAC"
+            uuid = "606014F7-8EC7-4AD7-8F1B-C1688DB498A9"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Classes/gameNetwork.c"
+            filePath = "Classes/collision.h"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "454"
-            endingLineNumber = "454"
-            landmarkName = "gameNetwork_initsockets()"
+            startingLineNumber = "412"
+            endingLineNumber = "412"
+            landmarkName = "do_world_collision_handling(tc)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "A5BE9330-5CC3-4881-8E1E-4B78F349F669"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/gamePlay.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1496"
+            endingLineNumber = "1496"
+            landmarkName = "game_handle_destruction(elem)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

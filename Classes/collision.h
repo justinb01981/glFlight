@@ -428,8 +428,8 @@ do_world_collision_handling(float tc)
                                                  pCollisionA->elem->physics.ptr->beta,
                                                  pCollisionA->elem->physics.ptr->gamma,
                                                  pCollisionA->elem->scale, TEXTURE_ID_EXPLOSION);
-                                world_get_last_object()->object_type = OBJ_BLOCK;
-                                
+                                world_get_last_object()->object_type = OBJ_WRECKAGE;
+
                                 world_get_last_object()->destructible = 0;
                                 world_object_set_lifetime(obj_id, 30);
                                 update_object_velocity(obj_id, 0, 0, 0, 0);
@@ -487,7 +487,7 @@ do_world_collision_handling(float tc)
                                     world_get_last_object()->object_type = OBJ_WRECKAGE;
                                     world_get_last_object()->destructible = 0;
                                     update_object_velocity(obj_id, 0, 0, 0, 0);
-                                    world_object_set_lifetime(obj_id, 300);
+                                    world_object_set_lifetime(obj_id, 3600);
                                 }
                             }
                         }
