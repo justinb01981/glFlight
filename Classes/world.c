@@ -52,9 +52,7 @@ game_lock_t gWorldLock;
 
 float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
 // TODO: DO NOT SET THIS HERE SEE gameVariables
-float C_FRICTION = /*0.04*/ 0.030; // higher values = more friction
-float GYRO_FEEDBACK = 0;
-float GYRO_DC = 0.05; // no longer used in gameInput - remove this
+float C_FRICTION = /*0.04*/ 0.04; // higher values = more friction
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
 float collision_dot_min = 0.0;
 

@@ -281,7 +281,7 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
         }
 #endif
         DBPRINTF(("sendto: %d - errno:%s\n", r, strerror(errno)));
-        assert(0);
+        // assert(0);
     }
 
     gameMessage_from_nbo(msg);

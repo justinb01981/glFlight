@@ -107,8 +107,6 @@ const static float MAX_SPEED_MISSLE = (MAX_SPEED * 3);
 const static float SPEED_BOOST_FRAMES = 60 * 5;
 extern float C_THRUST;
 extern float C_FRICTION;    // SEE physics_friction_c gameVariable
-extern float GYRO_FEEDBACK;
-extern float GYRO_DC;
 
 const static int pooped_cube_interval_ms = 75;
 const static int pooped_cube_lifetime = 300;    // determines trail length

@@ -476,7 +476,7 @@ gameDialogStartNetworkGame2()
 static void
 gameDialogStartNetworkGameWait()
 {
-    gameInterfaceModalDialog("[WAITING FOR GUESTS]\nclick check ONLY when everyone\nhas joined\nuntil then click\n[CANCEL]  to wait\n    (every 10s)... ", "", "",
+    gameInterfaceModalDialog("[WAITING FOR GUESTS]\nclick  ^?  ONLY when everyone has joined\nclick  ^*  to wait 10sec more...", "", "",
                              gameDialogStartNetworkGame2, gameDialogCancelNetworkWaiting);
 }
 
