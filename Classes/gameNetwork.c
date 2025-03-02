@@ -281,7 +281,7 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
         }
 #endif
         DBPRINTF(("sendto: %d - errno:%s\n", r, strerror(errno)));
-        assert(0);
+        //assert(0);
     }
 
     gameMessage_from_nbo(msg);
@@ -424,7 +424,7 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
         // YES we still need to handle AF_INET for android NDK which has no concept of V4ADDRMAPPED
         struct sockaddr_in* sin = (struct sockaddr_in*) addrInfoResultp->ai_addr;
         inet_ntop(AF_INET, &sin->sin_addr, buf, sizeof(buf));
-        console_write("server DNS resolved: %s \n", buf);
+        console_write("directory/server DNS resolved: %s \n", buf);
 
         memcpy(addr->storage, sin, addrInfoResultp->ai_addrlen);
         addr->len = addrInfoResultp->ai_addrlen;
@@ -467,8 +467,8 @@ gameNetwork_initsockets()
 
     if (gameNetworkState.hostInfo.socket.s < 0 || gameNetworkState.hostInfo.map_socket.s < 0 || gameNetworkState.hostInfo.stream_socket.s < 0)
     {
-        console_append("incrementing GAME_NETWORK_PORT");
-        GAME_NETWORK_PORT += 1;
+        //console_append("incrementing GAME_NETWORK_PORT");
+        //GAME_NETWORK_PORT += 1;
     }
 }
 
@@ -535,7 +535,9 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
     
     game_lock_init(&gameNetworkState.msgQueue.lock);
 
+#if DEBUG
     if(!gameNetwork_test()) assert(0);
+#endif
 
     return GAME_NETWORK_ERR_NONE;
 }
@@ -559,7 +561,7 @@ gameNetwork_connect_core(int hosting, char* server_name, void (*callback_becameh
     int directory_search_retries = 1;
     unsigned short server_port_resolved = gameNetworkState.hostInfo.port;
     int retries_udp = 1;
-    int server_ports = 10;
+    int server_ports = 1;   // 3-2-2025: disabing port retry by setting = 1, test with gameSettings-save
     char strtmp[256];
     
     gameAddress.len = 0;
@@ -1152,8 +1154,8 @@ gameNetwork_receive(gameNetworkMessage* msg, gameNetworkAddress* src_addr, unsig
         break;
     }
 
-    if (r != sizeof(*msg)) DBPRINTF((" ERROR: msg size wrong (%u/%u)", r, sizeof(*msg)));
-    
+    if (r != sizeof(*msg)) DBPRINTF((" ERROR: snd result size wrong (%u/%u)", r, sizeof(*msg)));
+
     return r == sizeof(*msg)? GAME_NETWORK_ERR_NONE: GAME_NETWORK_ERR_FAIL;
 }
 
@@ -2677,7 +2679,7 @@ do_game_network_read_core()
     
     if(retries <= 0)
     {
-        //printf("Warning: network thread lagging\n");
+        DBPRINTF(("Warning: network thread lagging\n"));
     }
 }
     

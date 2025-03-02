@@ -224,8 +224,8 @@ gameDialogGameOver()
 static void
 gameDialogWelcome()
 {
-    gameInterfaceControls.calibrateRect.visible = 0;
-    
+    gameInterfaceControls.calibrateRect.visible = 1;
+
     if(/*gameSettingsLaunchCount % 2 == 1 &&  */ !gameSettingsRatingGiven && gameSettingsLaunchCount >= 2)
     {
         gameInterfaceModalDialog(WELCOMESTR

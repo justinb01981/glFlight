@@ -14,8 +14,8 @@
             filePath = "Classes/gameNetwork.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2125"
-            endingLineNumber = "2125"
+            startingLineNumber = "2127"
+            endingLineNumber = "2127"
             landmarkName = "do_game_network_handle_msg(msg, srcAddr, network_time_ms)"
             landmarkType = "9">
          </BreakpointContent>
@@ -40,7 +40,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "606014F7-8EC7-4AD7-8F1B-C1688DB498A9"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/collision.h"
@@ -55,16 +55,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A5BE9330-5CC3-4881-8E1E-4B78F349F669"
-            shouldBeEnabled = "Yes"
+            uuid = "8A375D21-1447-480A-9B0C-881BA343A953"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Classes/gamePlay.c"
+            filePath = "Classes/gameDialogs.h"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1496"
-            endingLineNumber = "1496"
-            landmarkName = "game_handle_destruction(elem)"
+            startingLineNumber = "227"
+            endingLineNumber = "227"
+            landmarkName = "gameDialogWelcome()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9CEDC920-78EA-42D6-96C1-D2285BCF3CBD"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Classes/world.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "92"
+            endingLineNumber = "92"
+            landmarkName = "world_add_object_core(type, x, y, z, alpha, beta, gamma, scale, texture_id, replace_id)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

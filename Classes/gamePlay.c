@@ -1497,7 +1497,7 @@ game_handle_destruction(WorldElem* elem)
                          0, 0, 0, 4, TEXTURE_ID_WRECKAGE);
         world_get_last_object()->destructible = 0;
         world_get_last_object()->object_type = OBJ_WRECKAGE;
-        world_object_set_lifetime(wreck_id, GAME_FRAME_RATE * 5);
+        world_object_set_lifetime(wreck_id, GAME_FRAME_RATE * 5);   // TODO: SLOW when we already have object
         update_object_velocity(wreck_id, 0, 0, 0, 0);
     }
     
