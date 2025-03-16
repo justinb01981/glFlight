@@ -1096,11 +1096,24 @@ int update_object_velocity_with_friction(int object_id, float v[3], float cthrus
 
 int world_object_set_lifetime(int object_id, int tex_passes)
 {
-    WorldElemListNode* pElemNode = world_elem_list_find(object_id, &gWorld->elements_list);
-    
-    if (pElemNode)
+    WorldElem* pElem = gWorld->last_elem_added;
+
+    if(pElem && pElem->elem_id == object_id)    // check last-added prior to search
     {
-        WorldElem* pElem = pElemNode->elem;
+        
+    }
+    else
+    {
+        WorldElemListNode* pElemNode = world_elem_list_find(object_id, &gWorld->elements_list);
+
+        if (pElemNode)
+        {
+            pElem = pElemNode->elem;
+        }
+    }
+
+    if(pElem)
+    {
         pElem->lifetime = tex_passes;
 
         if (!world_elem_list_find_elem(pElem, &gWorld->elements_expiring))
