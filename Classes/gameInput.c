@@ -72,8 +72,8 @@ double devicePitch, deviceYaw, deviceRoll;
 
 double motionRollMotion, motionPitchMotion, motionYawMotion;
 #define maxInputShipRotate 0.2
-float yprResponse[3] = { 0, 0, 0 };
-float yprD = (maxInputShipRotate / 360.0);
+//float yprResponse[3] = { 0, 0, 0 };
+//float yprD = (maxInputShipRotate / 360.0);
 float rollOffset = 0, pitchOffset = 0, yawOffset = 0;
 double devicePitchFrac = 0, deviceYawFrac = 0;  // used for controls rendering in gameGraphics
 float gyroSenseScale = PLATFORM_GYRO_SENSE_SCALE;
@@ -211,6 +211,15 @@ gyro_calibrate_log(float pct)
     console_flush();
 }
 
+float calcS(float s)
+{
+    //float INPUT_SPEED = (  log(MAX(targetSpeed,2.0))  ) / maxSpeed; // targetSpeed - not effective-speed/momentum
+
+    // preventing - results by ensure > log(1)
+    const float R = 2*M_PI;
+    return (s)/R;
+}
+
 void
 gameInput()
 {
@@ -268,11 +277,12 @@ gameInput()
           gyroSenseScale * (Rmax-Rmin)
      
      */
-    const float R = M_PI*2;
-    float input_roll = (deviceRoll - rollOffset) / R;
-    float input_pitch = (devicePitch - pitchOffset) / R;
-    float input_yaw = (deviceYaw - yawOffset) / R;
-    
+
+    float input_roll = calcS(deviceRoll - rollOffset);
+    float input_pitch = calcS(devicePitch - pitchOffset);
+    float input_yaw = calcS(deviceYaw - yawOffset);
+
+    // vars used for rendering orientation in gamegraphics
     devicePitchFrac = devicePitch / M_PI;
     deviceYawFrac =  deviceYaw / M_PI;
     
@@ -326,47 +336,28 @@ gameInput()
 //            }
 //        }
 
-
-        //float INPUT_SPEED = (  log(MAX(targetSpeed,2.0))  ) / maxSpeed; // targetSpeed - not effective-speed/momentum
-        float INPUT_SPEED = 0.3;
-        // preventing - results by ensure > log(1)
         
         if(fabs(input_roll) > dz_min
 //           && gameSettingsComplexControls
            )
         {
 //            printf("-----------ROLLING-----------\n");
-            
-            float s = input_roll * INPUT_SPEED;
 
-            if(fabs(yprResponse[0]) < maxInputShipRotate) yprResponse[0] += yprD /* * (s/fabs(s)) */;
-            //s = s / (1.0 - yprResponse[0]);
-            
-            gameShip_roll(s);
+            gameShip_roll(input_roll);
         }
         
         if(fabs(input_pitch) > dz_min)
         {
 //            printf("-----------PITCHING-----------\n");
-            
-            float s = input_pitch * INPUT_SPEED;
 
-            if(fabs(yprResponse[1]) < maxInputShipRotate) yprResponse[1] += yprD /* * (s/fabs(s)) */;
-            //s = s / (1.0 - yprResponse[1]);
-            
-            gameShip_pitch(s);
+            gameShip_pitch(input_pitch);
         }
         
         if(fabs(input_yaw) > dz_min)
         {
 //            printf("-----------YAWING-----------\n");
-            
-            float s = input_yaw * INPUT_SPEED;
 
-            if(fabs(yprResponse[2]) < maxInputShipRotate) yprResponse[2] += yprD /* * (s/fabs(s)) */;
-            //s = s / (1.0 - yprResponse[2]);
-            
-            gameShip_yaw(s);
+            gameShip_yaw(input_yaw);
         }
         
 //        if(!gameSettingsComplexControls)
