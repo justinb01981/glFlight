@@ -114,19 +114,18 @@ struct WorldElem {
     int lifetime;
     float scale;
     
-    int spans_regions:1;
+    int spans_regions:1,
+        invisible:1,
+        bounding_wrap:1,
+        bounding_remain:1,
+        bounding_reflect:1,
 
-    int invisible:1;
-    
-    int bounding_wrap:1;
-    int bounding_remain:1;
-    int bounding_reflect:1;
-    
-    int in_visible_list:1;
-    int visible_list_by_region_sorted:1;
-    int collision_handle_remove:1;
-    int remove_pending:1;
-    int moving:1;
+        in_visible_list:1,
+        visible_list_by_region_sorted:1,
+        collision_handle_remove:1,
+        remove_pending:1,
+        moving:1;
+
     game_timeval_t collision_start_time;
     
     struct

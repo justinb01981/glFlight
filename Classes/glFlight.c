@@ -101,7 +101,7 @@ WorldElemListNode* btreeVisibleTest = NULL;
 unsigned int draw_elem_max = PLATFORM_DRAW_ELEMS_MAX;
 
 static void
-world_elem_btree_restart()
+world_elem_btree_restart(void)
 {
     world_elem_btree_destroy_root(&visibleBtreeRootStorage1);
     btreeVisibleTest = NULL;
@@ -114,7 +114,7 @@ world_elem_btree_add_all(WorldElem* pElem)
 }
 
 void
-glFlightFrameStage1()
+glFlightFrameStage1(void)
 {
     int dynamic_draw_distance = 0;
     int backface_culling = 1;
@@ -199,15 +199,17 @@ calibrate_bail:
     }
     
     // calculate time since last pass and use that to update world physics
+#if GAME_PLATFORM_IOS
+    tc = 16.667/1000.0;
+#else
     tc = ((float) time_ms - (float) world_update_time_last) / 1000.0;
-    
+#endif
+
     if(tc > 1.0)
     {
         world_update_time_last = time_ms;
         goto draw_bail;
     }
-
-    // DBPRINTF(("tc:%f", tc));
 
     world_update(tc);
     world_update_time_last = time_ms;
@@ -217,33 +219,32 @@ calibrate_bail:
     
     // play engine sound
     const char* engine_sounds[] = {"engine", "engineslow"};
-    const float engine_sounds_duration[] = {1250, 347};
+    const float engine_sounds_duration[] = {2000, 347};
 
-    if(time_ms >= time_engine_sound_next
-//       && controlsCalibrated
-       )
+    if(time_ms >= time_engine_sound_next)
     {
-        if(targetSpeed/maxSpeed >= minSpeed)
+        if(targetSpeed/maxSpeed >= minSpeed
+           && speed >= 0.25 )
         {
             int sound_idx = 0;
-            float rate = 0.25 + 2.0*(speed/maxSpeed);
-            
-            const char* sndName = engine_sounds[sound_idx];
-            
-            /*
-            if(speed/maxSpeed < 0.33)
+            float rate = 0.25 + (speed/maxSpeed);
+
+            if(speed/maxSpeed < 0.5)
             {
-                sndName = "engineslow";
+                sound_idx = 1;
             }
+            /*
             else if(speed/ maxSpeed >= 0.66)
             {
                 sndName = "enginefast";
             }
              */
-            
+
+            const char* sndName = engine_sounds[sound_idx];
+
             gameAudioPlaySoundAtLocationWithRate(sndName, 0.75, my_ship_x, my_ship_y, my_ship_z, rate);
             
-            time_engine_sound_next = time_ms + (engine_sounds_duration[sound_idx] * (1.0/rate));
+            time_engine_sound_next = time_ms + (engine_sounds_duration[sound_idx] / (rate));
         }
     }
 
@@ -343,8 +344,6 @@ calibrate_bail:
 
         gameShip_init(spawn[0], spawn[1], spawn[2],
                       spawn[3], spawn[4], spawn[5]);
-
-//        update_ship_stats = 1;
 
         my_ship_id =
             world_add_object(model_my_ship,
@@ -513,21 +512,21 @@ calibrate_bail:
     
      // TODO: may be possible to unlock world-state here
      
-     drawElem_newFrame();
+    drawElem_newFrame();
      
-     // set up drawing modes
-     if(backface_culling)
-     {
-         glEnable(GL_CULL_FACE);
-         glCullFace(GL_BACK);
-     }
-     else
-     {
-         glDisable(GL_CULL_FACE);
-         glCullFace(GL_BACK);
-     }
+    // set up drawing modes
+    if(backface_culling)
+    {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    }
+    else
+    {
+        glDisable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    }
 
-     glFrontFace(GL_CCW);
+    glFrontFace(GL_CCW);
     
     drawBackground();
 	
@@ -728,7 +727,7 @@ draw_bail:
 }
 
 void
-glFlightFrameStage2()
+glFlightFrameStage2(void)
 {
     tex_pass++;
     

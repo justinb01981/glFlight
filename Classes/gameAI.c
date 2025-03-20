@@ -39,8 +39,6 @@ const float boundary_avoid_distance = 2.0;
 
 float juke_distance = 20.0, juke_distance_patrol = 50.0;
 
-gameAIState_t gameAIState;
-
 
 static float
 pursuit_speed_for_object(WorldElem* elem, float zdot);

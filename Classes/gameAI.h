@@ -27,13 +27,6 @@ enum
     ENEMY_COLLIDE_BOUNDARY = 2
 };
 
-typedef struct
-{
-    int started;
-} gameAIState_t;
-
-extern gameAIState_t gameAIState;
-
 void
 game_ai_init(void);
 

@@ -60,19 +60,19 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     assert( ACTION_LAST ==  sizeof(action_strings)/sizeof(char*) );
 
     int i;
-    controlRect tmpRect = {
-        screenWidth-(screenWidth * 0.15),
-        screenHeight-(screenHeight * 0.15),
-        screenWidth * 0.15,
-        screenHeight * 0.15
-    };
+//    controlRect tmpRect = {
+//        screenWidth-(screenWidth * 0.15),
+//        screenHeight-(screenHeight * 0.15),
+//        screenWidth * 0.15,
+//        screenHeight * 0.15
+//    };
     
     gameInterfaceControls.interfaceHeight = screenHeight;
     gameInterfaceControls.interfaceWidth = screenWidth;
     
-    gameInterfaceControls.textWidth = ceil(screenWidth / 164);
-    gameInterfaceControls.textHeight = ceil(gameInterfaceControls.textWidth * 2.2 * (screenWidth/screenHeight));
-    
+    gameInterfaceControls.textWidth = ceil(screenHeight / 120);
+    gameInterfaceControls.textHeight = gameInterfaceControls.textWidth * 5; //ceil(gameInterfaceControls.textWidth * 2.2 * (screenWidth/screenHeight));
+
     // origin (in non-landscape mode) is upper left
     // (in landscape mode, screenWidth = Y-axis, screenHeight = X-axis
     controlRect accelRect = {0, 0, screenWidth-(screenWidth*0.30), (screenHeight * 0.4507)/4};
@@ -109,7 +109,8 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.look.tex_id = 5;
     gameInterfaceControls.look.visible = 1;
     
-    controlRect actionRect = {screenWidth - (screenWidth*0.30),
+    controlRect actionRect = {
+        screenWidth - (screenWidth*0.30),
         screenHeight-(screenHeight*0.15),
         screenWidth * 0.15,
         screenHeight * 0.15};

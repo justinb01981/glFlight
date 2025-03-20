@@ -102,7 +102,7 @@ static const char* action_strings[ACTION_LAST] =
     "High Scores",
     "help/about",
     "rate d0gf1ght",
-    "$ ship upgrades $",
+    "$ buy upgrades $",
     "host game (internet)",
     "multiplayer internet game",
     "multiplayer local game",

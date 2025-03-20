@@ -11,8 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface glFlightGLKViewController: GLKViewController <GLKViewControllerDelegate, GLKViewDelegate>
 
-@property (nonatomic, retain) GLKView* view;
-
 @property (nonatomic, nullable) void (^initBlock)(CGSize);
 @property (nonatomic, retain) NSMutableArray *activeTouches;
 

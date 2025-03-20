@@ -228,20 +228,14 @@ void glFlightResume(time_t time_last_suspend)
     [super dealloc];
 }
 
-- (void) doAlertMessage:(NSString*)str
-{
-    UIAlertView* v = [[UIAlertView alloc] initWithTitle:@"Alert" message:str delegate:self cancelButtonTitle:@"OK" otherButtonTitles:NULL, nil];
-    
-    [v show];
-    [v release];
-}
-
 @end
 
 void
 AppDelegateOpenURL(const char* url)
 {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:url]]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:url]] options:@{} completionHandler: ^(BOOL a){
+        DBPRINTF(("openURL complete"));
+    }];
 }
 
 int

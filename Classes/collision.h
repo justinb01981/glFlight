@@ -115,15 +115,12 @@ do_world_collision_handling(float tc)
     // collisions
 
     world_update_state_t *state = &gWorld->world_update_state;
-    char collisionStr[255] = {0}, *collisionStrPfx = "collision omeboi:";
 
     // BEgin walking recorded collisions
     state->collision_recs_iterate_cur = gWorld->elements_collided.next;
 
     // IDEA: set a hook for objects which get removed during the course of collision-handling as a half-ass step to collision-callbacks
     gWorld->world_update_state.world_remove_hook = collision_handling_remove_hook;
-
-    strcat(collisionStr, collisionStrPfx);
 
     while(state->collision_recs_iterate_cur && state->collision_recs_iterate_cur->next)
     {
@@ -134,13 +131,8 @@ do_world_collision_handling(float tc)
         WorldElemListNode* pCollisionA = state->collision_recs_iterate_cur;
         WorldElemListNode* pCollisionB = world_elem_list_find_elem(pCollisionA->elem_collided, &gWorld->elements_collided);
 
-        char* pStrDst = collisionStr + strlen(collisionStr);
-        sprintf(pStrDst, " (%ld) (%ld)", (long)pCollisionA->elem->object_type,
-               (long) pCollisionB->elem->object_type);
-
         if(pCollisionB)
         {
-
             // a,b priority determined by object-id ascending in world.c - e.g. pCollisionB will point at the OBJ_BULLET, pCollisionA at the OBJ_SHIP
             if(pCollisionA->elem->object_type > pCollisionB->elem->object_type)
             {
@@ -151,9 +143,6 @@ do_world_collision_handling(float tc)
 
 
             // action recorded by world-boundary-checks
-            //collision_action_t world_coll_act = pCollisionA->userarg;
-
-            //assert(world_coll_act == collision_actions[pCollisionA->elem->object_type][pCollisionB->elem->object_type]);
             collision_action_t world_coll_act = collision_actions[pCollisionA->elem->object_type][pCollisionB->elem->object_type];
             
             // HACK: always trigger collision logic in certain cases (map building)
@@ -534,12 +523,6 @@ do_world_collision_handling(float tc)
         {
             state->collision_recs_iterate_cur = state->collision_recs_iterate_cur->next;
         }
-    }
-
-    if(strlen(collisionStr) > strlen(collisionStrPfx))// debug printing
-    {
-        strcat(collisionStr, "\t END collision omeboi\n");
-        DBPRINTF((collisionStr));
     }
     
     gWorld->world_update_state.world_remove_hook = NULL;

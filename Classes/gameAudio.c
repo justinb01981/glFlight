@@ -12,6 +12,7 @@
 #include "gameAudio.h"
 #include "gameUtils.h"
 #include "gameLock.h"
+#include "gameDebug.h"
 
 cocoaMessage cocoaMessageAudioList;
 
@@ -99,7 +100,9 @@ gameAudioPlaySoundAtLocationWithRate(const char* filename, float volumescale, fl
     float vol_distance_max = 25;
     float v = (vol_distance / vol_distance_max);
     float vol_c[] = {0.5, 0.3, 0.3, 0.2, 0.2, 0.1, 0}; //{1, 0.8, 0.5, 0.2, 0.1, 0, 0};
-    
+
+    DBPRINTF(("playSound %s at speed %f", filename, rate));
+
     if(v > 1.0) v = 1.0;
     
     if(vol_distance < vol_distance_max)
@@ -127,6 +130,9 @@ gameAudioPlaySoundAtLocationWithRate(const char* filename, float volumescale, fl
 void
 gameAudioPlaySoundAtLocationWithDuration(const char* filename, float volumescale, float x, float y, float z, float duration_ms)
 {
+
+    DBPRINTF(("playSound %s at duration %f ms", filename, duration_ms));
+
     if(gameAudioMuted) return;
     
     // TODO: audio panning

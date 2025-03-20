@@ -2617,6 +2617,8 @@ do_game_network_read_core()
         }
         else if(gameNetwork_receive(&msg, &srcAddr, receive_block_ms) == GAME_NETWORK_ERR_NONE)
         {
+            retries++;  // continue receiving until socket empty
+
 //            printf("DEBUG: gameNetwork_receive cmd:%d\n", msg.cmd);
             
             // messages that don't require synchronizing with rendering/game thread
@@ -2648,6 +2650,11 @@ do_game_network_read_core()
             // add to queue
             pMsgNew = (gameNetworkMessageQueued*) malloc(sizeof(gameNetworkMessageQueued));
         }
+        else {
+            // receive() error
+            if(retries < 10) DBPRINTF(("gameNetwork_recv() fail, bail (retries %d)", retries));
+            retries = 1;
+        }
 
         // clean up processed messages
         game_lock_lock(&gameNetworkState.msgQueue.lock);
@@ -2675,11 +2682,6 @@ do_game_network_read_core()
         game_lock_unlock(&gameNetworkState.msgQueue.lock);
         
         retries--;
-    }
-    
-    if(retries <= 0)
-    {
-        DBPRINTF(("Warning: network thread lagging\n"));
     }
 }
     

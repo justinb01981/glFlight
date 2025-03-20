@@ -947,7 +947,7 @@ world_replace_add_object(int* elem_id_storage,
     if(elem_out && foundNode) *elem_out = foundNode->elem;
 }
 
-WorldElem* world_get_last_object()
+WorldElem* world_get_last_object(void)
 {
     return gWorld->last_elem_added;
 }
@@ -1571,17 +1571,17 @@ world_repulse_elem(WorldElem* pCollisionB, WorldElem* pCollisionA, float tc, flo
     
     for(i = 0; i < 3; i++)
     {
-        //mv[i] = check_bounding_box_overlap_result[i] * (*p[i]+repulse_min) * s;
-        mv[i] = check_bounding_box_overlap_result[i] * pCollisionA->physics.ptr->velocity * tc;
+        mv[i] = (check_bounding_box_overlap_result[i] * pCollisionA->physics.ptr->velocity+0.01) * tc;
     }
     
     move_elem_relative(pCollisionA, mv[0], mv[1], mv[2]);
-    
+
+    //DBPRINTF(("move rel: %f %f %f", mv[0], mv[1], mv[2]));
+
     // reverse velocity
     
     for(i = 0; i < 3; i++)
     {
-        //*p[i] = check_bounding_box_overlap_result[i] * (s/tc);
         *p[i] += mv[i]*Frepulse / tc;
     }
 }
@@ -1710,9 +1710,9 @@ check_collision(WorldElem* pElemA, WorldElem* pElemB)
 WorldElemListNode*
 get_region_list_head(float x, float y, float z)
 {
-    if(x < -gWorld->bound_radius || x >= gWorld->bound_radius ||
-       y < -gWorld->bound_radius || y >= gWorld->bound_radius ||
-       z < -gWorld->bound_radius || z >= gWorld->bound_radius) return NULL;
+    if(x < -gWorld->bound_radius || x > gWorld->bound_radius ||
+       y < -gWorld->bound_radius || y > gWorld->bound_radius ||
+       z < -gWorld->bound_radius || z > gWorld->bound_radius) return NULL;
     
     return world_region_head(x, y, z);
 }
@@ -1924,23 +1924,6 @@ world_update(float tc)
 
             if(!pElem->head_elem) // not a child elem
             {
-
-//                float* pFloatCheckIsNan[] = {
-//                    &pElem->physics.ptr->vx,
-//                    &pElem->physics.ptr->vy,
-//                    &pElem->physics.ptr->vz
-//                };
-//                for(iF = 0; iF < sizeof(pFloatCheckIsNan)/sizeof(float*); iF++)
-//                {
-//                    if(isnan(*pFloatCheckIsNan[iF]))
-//                    {
-//                        // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
-//                        *pFloatCheckIsNan[iF] = 0;
-//                        printf("isnan: %p\n", pElem);
-//                    }
-//                }
-
-
                 if(pElem->physics.ptr->vx != 0 || pElem->physics.ptr->vy+Fmin != 0 || pElem->physics.ptr->vz != 0 || pElem->physics.ptr->gravity)
                 {
                     int out_of_bounds_remove = 0;
@@ -2073,7 +2056,6 @@ world_update(float tc)
                                 if(pRegionElemsHead)
                                 {
                                     WorldElem* pRegionElem, *pElemCollided = pElem;
-                                    int pElem = 0;  // remove this sanity
 
                                     //region_collision_retry:
 
@@ -2088,6 +2070,9 @@ world_update(float tc)
                                         {
                                             if(check_collision(pElemCollided, pRegionElem))
                                             {
+                                                //DBPRINTF(("check_collision %02x(%d) -> %02x(%d)",
+                                                //          pElemCollided, pElemCollided->object_type, pRegionElem, pRegionElem->object_type));
+
                                                 // SWAP to enforce object type priority ?
                                                 if(pRegionElem->object_type > pElemCollided->object_type)
                                                 {
@@ -2109,18 +2094,6 @@ world_update(float tc)
                                                     goto world_update_collision_ignore;
                                                 }
 
-                                                //pElem->physics.ptr->x = collision_rollback_coord[0];
-                                                //pElem->physics.ptr->y = collision_rollback_coord[1];
-                                                //pElem->physics.ptr->z = collision_rollback_coord[2];
-                                                //                                                pElem->physics.ptr->velocity = collision_rollback_velocity;
-                                                //
-                                                //                                                // move all coordinates (for bounding boxes)
-                                                //                                                if(!rollback_done)
-                                                //                                                {
-                                                //                                                    move_elem_relative(pElem, -vm[0] * tc, vm[1] * tc, vm[2] * tc);
-                                                //                                                    rollback_done = 1;
-                                                //                                                }
-
                                                 // HACK: removed a hack that enforced elemA had higher velocity than B and swapped
 
                                                 if(colact == COLLISION_ACTION_REPULSE)
@@ -2137,6 +2110,8 @@ world_update(float tc)
                                                                                      pElemCollided->physics.ptr->y,
                                                                                      pElemCollided->physics.ptr->z);
                                                     }
+
+                                                    goto world_update_collision_ignore;
                                                 }
 
                                             collision_list_add_retry:
@@ -2162,24 +2137,7 @@ world_update(float tc)
                                                     }
                                                     else
                                                     {
-                                                        // allow some collisions to override others based on priority
-                                                        if((nA && nA->userarg < colact) ||
-                                                           (nB && nB->userarg < colact))
-                                                        {
-                                                            if(nA)
-                                                            {
-                                                                if(nA->elem_collided) world_elem_list_remove(nA->elem_collided, &gWorld->elements_collided);
-                                                                world_elem_list_remove(nA->elem, &gWorld->elements_collided);
-                                                            }
-
-                                                            if(nB)
-                                                            {
-                                                                if(nB->elem_collided) world_elem_list_remove(nB->elem_collided, &gWorld->elements_collided);
-                                                                world_elem_list_remove(nB->elem, &gWorld->elements_collided);
-                                                            }
-
-                                                            goto collision_list_add_retry;
-                                                        }
+                                                        DBPRINTF((" CONFLICT while colliding"));
                                                     }
                                                 }
                                             }

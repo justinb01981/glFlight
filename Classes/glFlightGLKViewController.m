@@ -63,6 +63,7 @@ static void fulfillShipPurchase(void) {
     [EAGLContext setCurrentContext:((GLKView*)self.view).context];
 
     //shrink inside of safe-area insets (iphone x)
+    /*
     if (@available(iOS 11.0, *))
     {
         UIEdgeInsets insets = [self.view safeAreaInsets];
@@ -76,7 +77,8 @@ static void fulfillShipPurchase(void) {
 
         [[self.view superview] setBackgroundColor:[UIColor blackColor]];
     }
-    
+    */
+
     if(self.initBlock != nil) {
         self.initBlock(self.view.frame.size);
         self.initBlock = nil;

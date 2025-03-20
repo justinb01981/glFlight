@@ -955,8 +955,6 @@ game_start(float difficulty, int type)
     }
 #endif
     
-    gameAIState.started = 1;
-    
     gameStateSinglePlayer.time_elapsed = 0;
     
     console_write(gameStateSinglePlayer.game_help_message);
@@ -2490,7 +2488,7 @@ addEngineExhaust(WorldElem *elem)
     pElem->object_type = OBJ_POOPEDCUBE;
     pElem->renderInfo.priority = 1;
     pElem->destructible = 0;
-    pElem->physics.ptr->friction = 1;
+    pElem->physics.ptr->friction = 0;
     world_object_set_lifetime(obj, pooped_cube_lifetime);
     
     update_object_velocity(obj, elem->physics.ptr->vx, elem->physics.ptr->vy, elem->physics.ptr->vz, 0);

@@ -10,7 +10,7 @@
 #import "AVFoundation/AVAudioPlayer.h"
 #include "sounds.h"
 
-#define GAME_SOUND_INSTANCES_MAX 4
+#define GAME_SOUND_INSTANCES_MAX 8
 
 @interface cocoaGameAudio : NSObject <AVAudioPlayerDelegate>
 {

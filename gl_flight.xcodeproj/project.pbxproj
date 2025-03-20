@@ -136,6 +136,12 @@
 		D077557E152588C800DF2E0B /* quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = D077557C152588C800DF2E0B /* quaternions.c */; };
 		D077BA4B1DB435DB00B4C701 /* texture102.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D077BA4A1DB435DB00B4C701 /* texture102.bmp */; };
 		D079A83320217FFD0098641B /* texture108.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D079A83220217FFC0098641B /* texture108.bmp */; };
+		D07AA9A62D89F06300470F12 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0BD22D92054F28100D4AEE3 /* LaunchScreen.xib */; };
+		D07AA9A72D89F06300470F12 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0BD22D92054F28100D4AEE3 /* LaunchScreen.xib */; };
+		D07AA9A82D89F06300470F12 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0BD22D92054F28100D4AEE3 /* LaunchScreen.xib */; };
+		D07AA9A92D89F19400470F12 /* Default.sc.png in Resources */ = {isa = PBXBuildFile; fileRef = D0BD22E520556F4800D4AEE3 /* Default.sc.png */; };
+		D07AA9AA2D89F19400470F12 /* Default.sc.png in Resources */ = {isa = PBXBuildFile; fileRef = D0BD22E520556F4800D4AEE3 /* Default.sc.png */; };
+		D07AA9AB2D89F19400470F12 /* Default.sc.png in Resources */ = {isa = PBXBuildFile; fileRef = D0BD22E520556F4800D4AEE3 /* Default.sc.png */; };
 		D07B356618527FE200900D60 /* texture50.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D07B356518527FE200900D60 /* texture50.bmp */; };
 		D07B35681853A5CF00900D60 /* missle.wav in Resources */ = {isa = PBXBuildFile; fileRef = D07B35671853A5CF00900D60 /* missle.wav */; };
 		D080491122D2B7EC002684B7 /* gameTests.c in Sources */ = {isa = PBXBuildFile; fileRef = D080491022D2B7EC002684B7 /* gameTests.c */; };
@@ -1540,6 +1546,7 @@
 				D034416A1A1E7B8A00C89475 /* texture81.bmp in Resources */,
 				D0DD22E7182A0C5200A51D34 /* texture49.bmp in Resources */,
 				6D595F6C1655A85600C21926 /* texture12.bmp in Resources */,
+				D07AA9A62D89F06300470F12 /* LaunchScreen.xib in Resources */,
 				D0C225F01CB9361300A08AEB /* teleport.wav in Resources */,
 				6D595F6D1655A85600C21926 /* texture13.bmp in Resources */,
 				D0EFCAAB1C54A2CD00731FAF /* texture94.bmp in Resources */,
@@ -1551,6 +1558,7 @@
 				D00D78CA19FB18EC00E701B9 /* flyby.wav in Resources */,
 				6D91DEA7166C73FD00362864 /* texture18.bmp in Resources */,
 				D04256671DA75CFB00E9C17B /* texture98.bmp in Resources */,
+				D07AA9A92D89F19400470F12 /* Default.sc.png in Resources */,
 				D065B0FF1888412E002C1980 /* highscore.wav in Resources */,
 				6D91DEA9166C74F400362864 /* texture19.bmp in Resources */,
 				6D91DEAE167A9C6B00362864 /* shipicon.png in Resources */,
@@ -1714,6 +1722,7 @@
 				D0EC72B52CA4B73600B0D40A /* texture81.bmp in Resources */,
 				D0EC72B62CA4B73600B0D40A /* texture49.bmp in Resources */,
 				D0EC72B72CA4B73600B0D40A /* texture12.bmp in Resources */,
+				D07AA9A82D89F06300470F12 /* LaunchScreen.xib in Resources */,
 				D0EC72B82CA4B73600B0D40A /* teleport.wav in Resources */,
 				D0EC72B92CA4B73600B0D40A /* texture13.bmp in Resources */,
 				D0EC72BA2CA4B73600B0D40A /* texture94.bmp in Resources */,
@@ -1725,6 +1734,7 @@
 				D0EC72C02CA4B73600B0D40A /* flyby.wav in Resources */,
 				D0EC72C22CA4B73600B0D40A /* texture18.bmp in Resources */,
 				D0EC72C32CA4B73600B0D40A /* texture98.bmp in Resources */,
+				D07AA9AB2D89F19400470F12 /* Default.sc.png in Resources */,
 				D0EC72C42CA4B73600B0D40A /* highscore.wav in Resources */,
 				D0EC72C52CA4B73600B0D40A /* texture19.bmp in Resources */,
 				D0EC72C62CA4B73600B0D40A /* shipicon.png in Resources */,
@@ -1888,6 +1898,7 @@
 				D0F4D92B2B1568B500948122 /* texture81.bmp in Resources */,
 				D0F4D92C2B1568B500948122 /* texture49.bmp in Resources */,
 				D0F4D92D2B1568B500948122 /* texture12.bmp in Resources */,
+				D07AA9A72D89F06300470F12 /* LaunchScreen.xib in Resources */,
 				D0F4D92E2B1568B500948122 /* teleport.wav in Resources */,
 				D0F4D92F2B1568B500948122 /* texture13.bmp in Resources */,
 				D0F4D9302B1568B500948122 /* texture94.bmp in Resources */,
@@ -1899,6 +1910,7 @@
 				D0F4D9362B1568B500948122 /* flyby.wav in Resources */,
 				D0F4D9382B1568B500948122 /* texture18.bmp in Resources */,
 				D0F4D9392B1568B500948122 /* texture98.bmp in Resources */,
+				D07AA9AA2D89F19400470F12 /* Default.sc.png in Resources */,
 				D0F4D93A2B1568B500948122 /* highscore.wav in Resources */,
 				D0F4D93B2B1568B500948122 /* texture19.bmp in Resources */,
 				D0F4D93C2B1568B500948122 /* shipicon.png in Resources */,
@@ -2314,7 +2326,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.11.0;
+				MARKETING_VERSION = 1.13.0;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
@@ -2349,7 +2361,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.11.0;
+				MARKETING_VERSION = 1.13.0;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
