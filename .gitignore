@@ -4,3 +4,4 @@
 .gradle
 android/gradle-build/glFlightImport/app/build/intermediates/
 gl_flight.xcworkspace/xcuserdata/
+android/gradle-build/glFlightImport/local.properties
