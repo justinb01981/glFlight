@@ -123,7 +123,7 @@ glFlightJNIInit()
 	}
 
 	// TODO: hack!
-	gameSettingsPortNumber = 52000;
+	gameSettingsPortNumber = GAME_NETWORK_PORT_DEFAULT;
 
 	game_ai_init();
 
@@ -162,14 +162,14 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 
 /*** native methods ***/
 JNIEXPORT
-void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceCreated(JNIEnv *e, jobject o)
+void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceCreated(JNIEnv *e, jclass o)
 {
 	// surface doesn't have bounds yet
     errno = 0;  // doesn't start at 0 so clear it
 }
 
 
-JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(JNIEnv *e, jobject o, jfloatArray arr)
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(JNIEnv *e, jclass o, jfloatArray arr)
 {
 	// surface bounds have changed and we can init
 
@@ -189,7 +189,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onSurfaceChanged(
 static game_timeval_t gameInputTimeLast = 0;
 static game_timeval_t gameDrawTimeLast = 0;
 
-JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jobject o)
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEnv *e, jclass o)
 {
     // TODO: draw a 'wait...loading' status string each frame until load
 
@@ -206,17 +206,17 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRenderer_onDrawFrame(JNIEn
     gameDrawTimeLast = time_ms_wall;
 }
 
-JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIEnv *e, jobject o)
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightInit(JNIEnv *e, jclass o)
 {
 //
 }
 
-JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightResourcesInit(JNIEnv *e, jobject o)
+JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightResourcesInit(JNIEnv *e, jclass o)
 {
 	return 0;
 }
 
-JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNIEnv *e, jobject o)
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNIEnv *e, jclass o)
 {
     gameNetwork_disconnect();
     if(save_map)
@@ -228,7 +228,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNI
 	gameSettingsWrite(glFlightSettingsPath());
 }
 
-JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JNIEnv *e, jobject o)
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JNIEnv *e, jclass o)
 {
 
     gameNetwork_disconnect();
@@ -249,7 +249,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JN
     DBPRINTF(("Java_com_domain17_glflight_GameRunnable_glFlightUninit called + exiting"));
 }
 
-JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightRunBGThread(JNIEnv *e, jobject o)
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightRunBGThread(JNIEnv *e, jclass o)
 {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
@@ -260,7 +260,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightRunBGThre
 	}
 }
 
-JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAudioEvent(JNIEnv *e, jobject o, jchar str)
+JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAudioEvent(JNIEnv *e, jclass o, jstring str)
 {
 	char audioStr[255];
 	cocoaMessage msgNext;
@@ -285,7 +285,7 @@ JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAu
     return s;
 }
 
-JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInput(JNIEnv *e, jobject o, jfloatArray arr)
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInput(JNIEnv *e, jclass o, jfloatArray arr)
 {
 	float jf[16];
 
@@ -303,12 +303,12 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 	gameInputGyro(-sumroll, sumpitch, -sumyaw);
 }
 
-JNIEXPORT jboolean JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorNeedsCalibrate(JNIEnv *e, jobject o)
+JNIEXPORT jboolean JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorNeedsCalibrate(JNIEnv *e, jclass o)
 {
     return needTrim;
 }
 
-JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInput(JNIEnv *e, jobject o, jfloatArray arr)
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInput(JNIEnv *e, jclass o, jfloatArray arr)
 {
 	float f[16];
 	int l = env_float_copy(e, arr, f);
@@ -353,7 +353,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInpu
 	}
 }
 
-JNIEXPORT void JNICALL Java_com_domain17_glflight_GameResources_glFlightGameResourceInit(JNIEnv *e, jobject o, jstring pathPrefix)
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameResources_glFlightGameResourceInit(JNIEnv *e, jclass o, jstring pathPrefix)
 {
 	jboolean b = false;
 	const char* p = e->GetStringUTFChars(pathPrefix, &b);
@@ -367,7 +367,7 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameResources_glFlightGameReso
 	e->ReleaseStringUTFChars(pathPrefix, p);
 }
 
-JNIEXPORT void JNICALL Java_com_domain17_glflight_GameResources_glFlightGameResourceRead(JNIEnv *e, jobject o, jstring name)
+JNIEXPORT void JNICALL Java_com_domain17_glflight_GameResources_glFlightGameResourceRead(JNIEnv *e, jclass o, jstring name)
 {
 	jboolean b = false;
 	const char* filename = e->GetStringUTFChars(name, &b);

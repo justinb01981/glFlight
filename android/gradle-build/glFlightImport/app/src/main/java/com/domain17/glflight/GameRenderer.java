@@ -1,17 +1,10 @@
 package com.domain17.glflight;
 
-import static android.opengl.GLES10.*;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
-import android.opengl.EGLExt;
-import android.view.Choreographer;
-
-import com.domain17.glflight.GameRunnable;
 
 public class GameRenderer implements Renderer {
 	

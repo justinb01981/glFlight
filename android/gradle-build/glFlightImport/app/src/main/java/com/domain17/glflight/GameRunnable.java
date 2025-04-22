@@ -6,7 +6,7 @@ public class GameRunnable  {
 		System.loadLibrary("glFlight");
 	}
 	
-	static native void glFlightInit();
+	public static native void glFlightInit();
 	static native void glFlightUninit();
 	static native void glFlightRunBGThread();
 	static native void glFlightTouchInput(float f[]);

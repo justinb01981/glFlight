@@ -6,7 +6,6 @@ import java.util.Map;
 
 import android.content.Context;
 import android.content.res.*;
-import android.os.Environment;
 import android.media.*;
 
 public class GameResources {

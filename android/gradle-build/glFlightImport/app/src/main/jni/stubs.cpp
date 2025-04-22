@@ -1,4 +1,5 @@
 #include "gameNetwork.h"
+#include "gameDebug.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,6 +37,7 @@ extern "C" {
     void
     AppDelegateOpenURL(const char* url)
     {
+        DBPRINTF(("AppDelegateOpenURL: %s", url));
         return;
     }
     

@@ -20,12 +20,10 @@ android {
         }
     }
     defaultConfig {
-
-
         targetSdk 34
         minSdk 19
-        versionCode 1110000
-        versionName '1.11.0'
+        versionCode 1130000
+        versionName '1.13.0'
         sourceSets.main {
             jniLibs.srcDir 'src/main/libs'
             jni.srcDirs = []
@@ -33,8 +31,6 @@ android {
     }
     productFlavors {
     }
-
-
     externalNativeBuild {
         ndkBuild {
             path file('src/main/jni/Android.mk')
@@ -46,8 +42,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
     }
     namespace 'com.domain17.glflight'
-
-
 }
 
 // copy {

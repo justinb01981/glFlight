@@ -1,44 +1,24 @@
 package com.domain17.glflight;
 
-import java.math.RoundingMode;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.*;
-
-import android.app.*;
-
-import java.time.*;
-
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
+import android.text.Layout;
+import android.view.WindowManager.*;
 //import android.opengl.EGLConfig;
-import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.view.*;
 import android.hardware.*;
-import android.media.*;
 import android.opengl.GLSurfaceView.*;
 //import android.opengl.EGLDisplay;
-import android.opengl.EGLExt;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
-import javax.microedition.khronos.opengles.GL10;
 
-import com.domain17.glflight.GameRenderer;
-import com.domain17.glflight.GameRunnable;
 import com.domain17.glflight.util.*;
 
 //import javax.microedition.khronos.egl.EGL10;
@@ -54,7 +34,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
     public boolean running = false;
     public boolean renderContinuously = false;  // targeting 60fps
-    Context appCtx;
+    public static Context appCtx;
     int accuracyLast = SensorManager.SENSOR_STATUS_UNRELIABLE;
 
     double viewWidthScaled, viewHeightScaled;
@@ -117,7 +97,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         //this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        
+        this.getWindow().setFlags(0xffffffff, LayoutParams.FLAG_FULLSCREEN | LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         gameRenderer.surfaceView = new GLSurfaceView(this);
 
@@ -193,12 +174,13 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
         // thanks to
         // https://github.com/tutsplus/android-sensors-in-depth-proximity-and-gyroscope/blob/master/app/src/main/java/com/tutsplus/sensorstutorial/RotationVectorActivity.java
 
+        // event contains vector
     	if(e.sensor == mSensorGyro)
     	{
             float[] Rm = new float[16];
             float[] orientations = new float[3];
 
-            SensorManager.getRotationMatrixFromVector(Rm, e.values);
+            SensorManager.getRotationMatrixFromVector(Rm, e.values);        // convert to full matrix
 
             // no need to do remapCoordinateSystem but do change order and invert z
             int col_sz = 4;
@@ -377,7 +359,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
             }
 
             mSensorManager.unregisterListener(this);
-            mSensorManager.registerListener(this, mSensorGyro, 20000);
+            mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_GAME);
         }
     }
 }

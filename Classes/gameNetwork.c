@@ -195,8 +195,10 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
 
     // necessary on windows to get ip4 ADDDR4MAPPED as sockaddr6
     // but problems on ios (BSD_SOCKETS)
+#ifdef _NOT_POSIX
     so_arg = 0; // yes - turn it off
     setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &so_arg, sizeof(so_arg));
+#endif
 
     /* bind */
     if(do_bind)
@@ -216,7 +218,7 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
             console_write("%s:%d %s\n", __func__, __LINE__, "socket failure (listen)");
             // listen failed
             close(sock);
-            gameDialogError("listen() failed (kill/restart app)");
+            gameDialogError("listen() failed");
             return -1;
         }
     }
