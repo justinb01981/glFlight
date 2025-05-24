@@ -2,6 +2,7 @@ package com.domain17.glflight;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Layout;
 import android.view.WindowManager.*;
 //import android.opengl.EGLConfig;
@@ -30,7 +31,7 @@ import com.domain17.glflight.util.*;
  *
  * @see SystemUiHider
  */
-public class FullscreenActivity extends Activity implements SensorEventListener {
+public class FullscreenActivity extends AppCompatActivity {
 
     public boolean running = false;
     public boolean renderContinuously = false;  // targeting 60fps
@@ -137,7 +138,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
     protected void onDestroy() {
         super.onDestroy();
 
-        mSensorManager.unregisterListener(this);
+        mSensorManager.unregisterListener(listenr);
 
         running = false;
 
@@ -150,10 +151,6 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
     }
 
-//    @Override
-//    protected void onPostCreate(Bundle savedInstanceState) {
-//        super.onPostCreate(savedInstanceState);
-//    }
 
     @Override
     protected void onResume() {
@@ -161,22 +158,15 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
         gameRenderer.surfaceView.onResume();
         // moved registereListener from here to bg thread
+
+        resetGyroSensorMaybe();
+
     }
-    
-    /**
-     * SensorEventListener
-     */
 
+    SensorEventListener listenr = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent e) {
 
-
-    public void onSensorChanged(SensorEvent e) {
-
-        // thanks to
-        // https://github.com/tutsplus/android-sensors-in-depth-proximity-and-gyroscope/blob/master/app/src/main/java/com/tutsplus/sensorstutorial/RotationVectorActivity.java
-
-        // event contains vector
-    	if(e.sensor == mSensorGyro)
-    	{
             float[] Rm = new float[16];
             float[] orientations = new float[3];
 
@@ -191,13 +181,14 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
             //System.out.println("orientations: " + orientations[0] + "," + orientations [1] + "," + orientations[2]);
 
             GameRunnable.glFlightSensorInput(orientations);
-    	}
-    }
 
-    public void onAccuracyChanged(Sensor s, int a) {
-    	accuracyLast = a;
-		//System.out.println("onAccuracyChanged\n");
-    }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int a) {
+            accuracyLast = a;
+        }
+    };
     
     float touchLastX = 0;
     float touchLastY = 0;
@@ -218,8 +209,8 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
             // convert touch coordinate to scaled screen coordinate
             double Xr = contentView.getWidth(), Yr = contentView.getHeight();
-			double tX = viewWidthScaled * (event.getX() / Xr);
-			double tY = viewHeightScaled * (event.getY() / Yr);
+			double tX = viewWidthScaled * (event.getX(i) / Xr);
+			double tY = viewHeightScaled * (event.getY(i) / Yr);
 
 			System.out.println("touched at [" + tX + "," + tY +
 					"] action:" + event.getActionMasked() + " tstamp:"+ event.getEventTime() + "\n");
@@ -252,10 +243,10 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 	    		action = 3;
 	    	}
 	    	
-	    	if(action == 2 && Math.abs(x - touchLastX) < touchFudge && Math.abs(y - touchLastY) < touchFudge)
-	    	{
-	    	}
-	    	else
+	    	//if(action == 2 && Math.abs(x - touchLastX) < touchFudge && Math.abs(y - touchLastY) < touchFudge)
+	    	//{
+	    	//}
+	    	//else
 	    	{
 	    		touchLastX = x;
 	    		touchLastY = y;
@@ -317,8 +308,7 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
     			while(running) {
 
-                    // check for gyro reset
-                    resetGyroSensorMaybe();
+                    // check for gyro reset??
 
 					GameRunnable.runBGThread();
 	    			
@@ -351,15 +341,15 @@ public class FullscreenActivity extends Activity implements SensorEventListener 
 
 
     private void resetGyroSensorMaybe() {
-        if(GameRunnable.glFlightSensorNeedsCalibrate()) {
 
-            if(mSensorManager == null) {
-                mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-                mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+        if(mSensorManager == null) {
+            mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+            mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+
+            if (!mSensorManager.registerListener(listenr, mSensorGyro, SensorManager.SENSOR_DELAY_GAME, 0)) {
+                System.out.println("sensor failed to listen");
+                return;
             }
-
-            mSensorManager.unregisterListener(this);
-            mSensorManager.registerListener(this, mSensorGyro, SensorManager.SENSOR_DELAY_GAME);
         }
     }
 }

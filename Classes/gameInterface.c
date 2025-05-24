@@ -341,12 +341,6 @@ gameInterfaceFindControl(float x, float y)
 void
 gameInterfaceHandleTouchMove(float x, float y)
 {
-    if(gameInterfaceControls.touchId-1 >= TOUCHES_MAX)
-    {
-        DBPRINTF(("gameInterfaceControls.touchId %d > TOUCHES_MAX (%d), ignoring", gameInterfaceControls.touchId, TOUCHES_MAX));
-        return;
-    }
-    
     controlRect* touchedControl = gameInterfaceFindControl(x, y);
     if(touchedControl)
     {
@@ -356,8 +350,6 @@ gameInterfaceHandleTouchMove(float x, float y)
     }
     else
     {
-        // HACK: cancel all touches
-        gameInterfaceHandleAllTouchEnd();
         return;
     }
     
@@ -484,6 +476,7 @@ gameInterfaceEditDone(void)
 void
 gameInterfaceTouchIDSet(int id)
 {
+    // copied to any controls this touch event intersects with
     gameInterfaceControls.touchId = id;
 }
 
@@ -1139,31 +1132,25 @@ void gameInterfaceProcessAction(void)
 void
 gameInterfaceHandleTouchEnd(float x, float y)
 {
-    controlRect *touchedControl = gameInterfaceFindControl(x, y);
+    int endId = gameInterfaceControls.touchId;
+    controlRect** controlSet = gameInterfaceControls.controlArray;
+    
+    for(int i = 0; controlSet[i] != NULL; i++) {
+        controlRect *cont = controlSet[i];
 
-    if (touchedControl)
-    {
-        touchedControl->touch_began = 0;
-        //gameInterfaceHandleTouchMove(x, y);
-        touchedControl->touch_end_last = time_ms;
-    }
-
-    // clear controls touched by this touchid
-    for (int i = 0; gameInterfaceControls.controlArray[i] != NULL; i++)
-    {
-        if (gameInterfaceControls.controlArray[i]->touch_id == gameInterfaceControls.touchId)
+        if (cont->touch_began && cont->touch_id == endId)
         {
-            gameInterfaceControls.controlArray[i]->touch_began = 0;
-            gameInterfaceControls.controlArray[i]->touch_end_last = time_ms;
+            cont->touch_id = 0;
+            cont->touch_began = 0;
+        }
 
-            // identify control tap ending and apply in some cases here
-            if(gameInterfaceControls.controlArray[i] == &gameInterfaceControls.trim) {
-                gameInterfaceControls.calibrateRect.visible = 0;
-                gameInputTrimEnd();
-            }
+        // identify control tap ending and apply in some cases here
+        if(&gameInterfaceControls.trim == cont)
+        {
+            gameInputTrimEnd();
         }
     }
-    
+
     gameInterfaceControls.touchUnmapped = 0;
     gameInterfaceControls.touchUnmappedX = gameInterfaceControls.touchUnmappedY = -1;
     
@@ -1187,6 +1174,7 @@ gameInterfaceHandleAllTouchEnd(void)
     
     gameInterfaceControls.touchUnmapped = 0;
     gameInterfaceControls.touchUnmappedX = gameInterfaceControls.touchUnmappedY = -1;
+    
 }
 
 void

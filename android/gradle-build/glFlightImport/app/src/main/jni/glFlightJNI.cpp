@@ -303,13 +303,10 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInp
 	gameInputGyro(-sumroll, sumpitch, -sumyaw);
 }
 
-JNIEXPORT jboolean JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorNeedsCalibrate(JNIEnv *e, jclass o)
-{
-    return needTrim;
-}
-
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInput(JNIEnv *e, jclass o, jfloatArray arr)
 {
+    static int counter = 1;
+
 	float f[16];
 	int l = env_float_copy(e, arr, f);
 
@@ -319,38 +316,38 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightTouchInpu
 	float action = f[2];
 	float pointerID = f[3];
 
-	//assert(pointerID > 0);
-
 	x = viewHeight - x; // invert
 
 	x = x * (viewWidth/viewHeight); // scale for aspect
 
 	y = y * (viewHeight/viewWidth); // scale for aspect
-
-    DBPRINTF(("action=%f", action));
-	DBPRINTF(("x=%f", x));
-	DBPRINTF((" y=%f\n", y));
-	DBPRINTF((" touchMap: %d", touchIDMap.size()));
+    
+    DBPRINTF(("glFlightTouchInput: action=%f x=%f y=%f ptrId=%f", action, x, y, pointerID));
 
 	if(action == 0)
 	{
-        int touchID = touchIDMap.size()+1;
+        int touchID = counter++;
+
         touchIDMap[pointerID] = touchID;
-    	gameInterfaceTouchIDSet(touchID);
+
+    	gameInterfaceTouchIDSet(touchID);       // this is a hack to add an argument to touch events in the api
 
 		gameInterfaceHandleTouchBegin(x, y);
 	}
-	else if(action == 1 || action == 3)
+	else if(action == 1  || action == 3)
 	{
 	    gameInterfaceTouchIDSet(touchIDMap[pointerID]);
+        gameInterfaceHandleTouchEnd(x, y);
         touchIDMap.erase(pointerID);
-		gameInterfaceHandleTouchEnd(x, y);
 	}
 	else if(action == 2)
 	{
 	    gameInterfaceTouchIDSet(touchIDMap[pointerID]);
 	    gameInterfaceHandleTouchMove(x, y);
 	}
+    else {
+        DBPRINTF(("ignoring touch event"));
+    }
 }
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameResources_glFlightGameResourceInit(JNIEnv *e, jclass o, jstring pathPrefix)

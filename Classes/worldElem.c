@@ -706,7 +706,11 @@ world_elem_btree_disconnect_max_child(world_elem_btree_node* root)
 void
 world_elem_btree_remove_fast_core(world_elem_btree_node* root, WorldElem* elem, float order)
 {
-    assert(!isnan(order));
+    if(isnan(order)) {
+        //assert(0);
+        DBPRINTF(("WARNING: world_elem_btree_remove ignoring elem-ordinal: NaN (race)"));
+    }
+
     assert(root != NULL);
     
     world_elem_btree_node* pFree = NULL;

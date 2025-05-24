@@ -28,8 +28,6 @@ JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAu
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInput(JNIEnv *e, jobject o, jfloatArray arr);
 
-JNIEXPORT jint JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorNeedsCalibrate(JNIEnv *e, jobject o);
-
 JNIEXPORT void JNICALL Java_com_example_glflight_GameRunnable_glFlightTouchInput(JNIEnv *e, jobject o, jfloatArray arr);
 
 #ifdef __cplusplus

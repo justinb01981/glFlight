@@ -177,15 +177,9 @@ calibrate_bail:
 
     // TODO: move timer handleing to platform code - i think this is only for android?
     time_ms = time_ms_wall;
-
-//    if(gameInputInitialTrimPending())
-//    {
-//        speed = 0.0;
-//    }
     
     if(gameInterfaceControls.textMenuControl.visible ||
        gameInterfaceControls.keyboardEntry.visible
-//       || gameInputInitialTrimPending()
        )
     {
         game_paused = 1;
@@ -199,11 +193,8 @@ calibrate_bail:
     }
     
     // calculate time since last pass and use that to update world physics
-#if GAME_PLATFORM_IOS
     tc = 16.667/1000.0;
-#else
-    tc = ((float) time_ms - (float) world_update_time_last) / 1000.0;
-#endif
+    //    tc = ((float) time_ms - (float) world_update_time_last) / 1000.0;
 
     if(tc > 1.0)
     {
@@ -219,7 +210,7 @@ calibrate_bail:
     
     // play engine sound
     const char* engine_sounds[] = {"engine", "engineslow"};
-    const float engine_sounds_duration[] = {2000, 347};
+    const float engine_sounds_duration[] = {1200, 347};
 
     if(time_ms >= time_engine_sound_next)
     {

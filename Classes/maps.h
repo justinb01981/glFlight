@@ -85,7 +85,7 @@ WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
 "mesh_manip_complete 1 "#tex" 1 "#scale"\n"
 
 // WARN: this contains 2 \n\n trailing so nothing after it in the string will be read
-#define WORLD_SCALED_FRAME(x, tex, scale)         "register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n""set_world_size r\n""set_background_info 107\n""map_program_with_args 100 0 100\n"                
+#define WORLD_SCALED_FRAME(x, tex, scale)         "register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n""set_world_size r\n""map_program_with_args 100 0 100\n"
 
 //#define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
 //"register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \

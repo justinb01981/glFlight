@@ -573,12 +573,14 @@ world_add_object_core(Model type,
         case MODEL_BULLET:
             pElem->destructible = 1;
             pElem->spans_regions = 0;
+            pElem->bounding_remain = 0;
             pElem->object_type = OBJ_BULLET;
             break;
             
         case MODEL_MISSLE:
             pElem->destructible = 1;
             pElem->spans_regions = 0;
+            pElem->bounding_remain = 0;
             pElem->object_type = OBJ_MISSLE;
             break;
             
@@ -731,6 +733,7 @@ world_add_object_core(Model type,
     int offset = 0;
     WorldElem* pElemHead = pElem;
     pElem->head_elem = NULL;
+    // TODO: THIS IS DEAD CODE AND MODELS ARE NO LONGER SUBDIVIDED and linked
     for(p = 0; p < model_primitives_sizeof/sizeof(int); p++)
     {
         // clone this element

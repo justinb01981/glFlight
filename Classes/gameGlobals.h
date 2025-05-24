@@ -78,7 +78,6 @@ extern void (*glFlightOnPurchase)(void);
 #define VISIBLE_DISTANCE_PLATFORM 200
 #define PLATFORM_GYRO_RANGE_DEFAULT 0.5
 #define PLATFORM_CALIBRATE_COEFF 0.5
-#define PLATFORM_GYRO_SENSE_SCALE 1
 #else
 #define PLATFORM_TICK_RATE 60
 #define PLATFORM_DRAW_ELEMS_MAX 1000
@@ -86,7 +85,6 @@ extern void (*glFlightOnPurchase)(void);
 #define VISIBLE_DISTANCE_PLATFORM 200
 #define PLATFORM_GYRO_RANGE_DEFAULT (3.14159/10)
 #define PLATFORM_CALIBRATE_COEFF 0.5
-#define PLATFORM_GYRO_SENSE_SCALE 1
 #endif
 
 #ifdef GAME_NAME_SC95
@@ -129,6 +127,7 @@ const static long GAME_NETWORK_PORT_DEFAULT = 52000;
 #define game_ammo_missles_max 4
 #define game_ammo_bullets_max 32
 #define GAME_POWERUP_DROP_TABLE_LEN 10
+#define GAME_CONTROL_SCALAR (M_PI * 5.0)
 
 #define GAME_CAPTURE_TOW_FORCE 0.60 // based on brief testing of stickiness
 

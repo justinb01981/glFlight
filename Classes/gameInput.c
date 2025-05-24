@@ -76,7 +76,6 @@ double motionRollMotion, motionPitchMotion, motionYawMotion;
 //float yprD = (maxInputShipRotate / 360.0);
 float rollOffset = 0, pitchOffset = 0, yawOffset = 0;
 double devicePitchFrac = 0, deviceYawFrac = 0;  // used for controls rendering in gameGraphics
-float gyroSenseScale = PLATFORM_GYRO_SENSE_SCALE;
 double gyroLastRange[3];
 void (*trimDoneCallback)(void);
 
@@ -113,12 +112,9 @@ gameInputInit()
     bulletVel = MAX_SPEED*3;
 
     needTrim = 1;
-
-//    controlsCalibrated = 0;
     
     initialized = 1;
-
-    //    needTrim = 1;
+    
     gameInputTrimBegin(trimDoneIgnore);
 }
 
@@ -211,15 +207,6 @@ gyro_calibrate_log(float pct)
     console_flush();
 }
 
-float calcS(float s)
-{
-    //float INPUT_SPEED = (  log(MAX(targetSpeed,2.0))  ) / maxSpeed; // targetSpeed - not effective-speed/momentum
-
-    // preventing - results by ensure > log(1)
-    const float R = 2*M_PI;
-    return (s)/R;
-}
-
 void
 gameInput()
 {
@@ -249,24 +236,12 @@ gameInput()
         rollOffset = deviceRoll;
         pitchOffset = devicePitch;
         yawOffset = deviceYaw;
-
-        //gameInterfaceSetInterfaceState(INTERFACE_STATE_CLOSE_MENU);   // NOT HERE - in gameDialogs
-
-//        if(!controlsCalibrated)
-//        {
-//            controlsCalibrated = 1;
-//            if(trimDoneCallback) trimDoneCallback();
-//        }
-
-        // HACK: moving trim callback to gameInterface button handling
-
     }
 
     if(needTrim && trimDoneCallback)
     {  // falling-edge of trim btn pushf(trimDoneCallback)
         trimDoneCallback();
         trimDoneCallback = NULL;
-        needTrim = 0;
     }
 
     /*
@@ -278,9 +253,9 @@ gameInput()
      
      */
 
-    float input_roll = calcS(deviceRoll - rollOffset);
-    float input_pitch = calcS(devicePitch - pitchOffset);
-    float input_yaw = calcS(deviceYaw - yawOffset);
+    float input_roll = (deviceRoll - rollOffset) / GAME_CONTROL_SCALAR;
+    float input_pitch = (devicePitch - pitchOffset) / GAME_CONTROL_SCALAR;
+    float input_yaw = (deviceYaw - yawOffset) / GAME_CONTROL_SCALAR;
 
     // vars used for rendering orientation in gamegraphics
     devicePitchFrac = devicePitch / M_PI;
@@ -364,17 +339,6 @@ gameInput()
 //        {
 //            gameShip_fakeRoll(input_roll);
 //        }
-    }
-    
-    // HACK: in extreme cases the quaternion becomes NaN and we will crash - catch that here
-    if(!isnormal(gameShip_getEulerAlpha()) || !isnormal(gameShip_getEulerBeta()) || !isnormal(gameShip_getEulerGamma()))
-    {
-        // copy camera values
-        extern quaternion_t my_ship_bx, my_ship_by, my_ship_bz;
-        
-        my_ship_bx = cam_pos.bx;
-        my_ship_by = cam_pos.by;
-        my_ship_bz = cam_pos.bz;
     }
     
     deviceLast[0] = deviceRoll;

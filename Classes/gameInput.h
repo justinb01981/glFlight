@@ -27,8 +27,6 @@ extern double gyroLastRange[3];
 const static float GYRO_GRAPHIC_S = 3.3;
 
 
-static unsigned int TOUCHES_MAX = 4;
-
 void
 gameInputInit(void);
 

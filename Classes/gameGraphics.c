@@ -842,12 +842,12 @@ void drawControls(void)
                     //extern double motionRollMotion, motionPitchMotion, motionYawMotion, roll_m, pitch_m, yaw_m;
                     float S = 0.2;
                     float O[] = {0.5, 0.5};
-                    float gyroCoefForCalibrate = PLATFORM_CALIBRATE_COEFF;
+
                     subElements[0].tex_id = TEXTURE_ID_CALIBRATE_CURSOR;
-                    subElements[0].x = (O[0] - S/2) + devicePitchFrac / (PLATFORM_CALIBRATE_COEFF/gyroSenseScale);
+                    subElements[0].x = (O[0] - S/2) + devicePitchFrac / PLATFORM_CALIBRATE_COEFF;
                     if(subElements[0].x > 1) subElements[0].x = 1;
                     if(subElements[0].x < -0.3) subElements[0].x = -0.3;
-                    subElements[0].y = (O[0] - S/2) + deviceYawFrac / (PLATFORM_CALIBRATE_COEFF/gyroSenseScale);
+                    subElements[0].y = (O[0] - S/2) + deviceYawFrac / PLATFORM_CALIBRATE_COEFF;
                     if(subElements[0].y > 1) subElements[0].y = 1;
                     if(subElements[0].y < -0.3) subElements[0].y = -0.3;
                     subElements[0].xw = S;
