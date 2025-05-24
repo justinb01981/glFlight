@@ -545,9 +545,25 @@ gameNetwork_init(int broadcast_mode, const char* server_name,
 }
 
 gameNetworkError
+gameNetwork_reinit(const char* server_name, const char* player_name,  const char* local_inet_addr)
+{
+    strcpy(gameNetworkState.hostInfo.name, server_name);
+    strcpy(gameNetworkState.my_player_name, player_name);
+
+    gameNetworkState.game_object_id_next = GAME_NETWORK_OBJECT_ID_MIN;
+
+
+    GAME_NETWORK_ADDRESS_INADDR(&gameNetworkState.hostInfo.local_inet_addr) = in6addr_any;
+    if(strlen(local_inet_addr) > 0 && inet_addr(local_inet_addr) != INADDR_NONE && inet_addr(local_inet_addr) != INADDR_ANY)
+    {
+        inet_pton(AF_INET6, local_inet_addr, &(GAME_NETWORK_ADDRESS_INADDR(&gameNetworkState.hostInfo.local_inet_addr)));
+    }
+}
+
+gameNetworkError
 gameNetwork_resume()
 {
-    gameNetwork_initsockets();
+    gameNetwork_initsockets();  // cant remember why this was added but at some point resuming with reinited sockets was necessary maybe on android i saw something
     return GAME_NETWORK_ERR_NONE;
 }
 

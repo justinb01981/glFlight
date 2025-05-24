@@ -135,6 +135,10 @@ gameInputTrimBegin(void (*callback)(void))
 
 void
 gameInputTrimEnd(void) {
+    if(trimDoneCallback) {
+        trimDoneCallback();
+        trimDoneCallback = NULL;
+    }
     needTrim = 0;
 }
 
@@ -236,12 +240,6 @@ gameInput()
         rollOffset = deviceRoll;
         pitchOffset = devicePitch;
         yawOffset = deviceYaw;
-    }
-
-    if(needTrim && trimDoneCallback)
-    {  // falling-edge of trim btn pushf(trimDoneCallback)
-        trimDoneCallback();
-        trimDoneCallback = NULL;
     }
 
     /*

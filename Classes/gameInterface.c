@@ -460,9 +460,7 @@ gameInterfaceEditDone(void)
     gameInterfaceControls.keyboardEntry.visible = 0;
     
     // re-init with new values
-    gameNetwork_init(0, gameSettingGameTitle, gameSettingsPlayerName, gameSettingsNetworkFrequency,
-                     gameSettingsPortNumber,
-                     gameSettingsLocalIPOverride);
+    gameNetwork_reinit(gameSettingGameTitle, gameSettingsPlayerName, gameSettingsLocalIPOverride);
     
     gameInterfaceControls.keyboardEntry.text[0] = '\0';
     
@@ -471,6 +469,8 @@ gameInterfaceEditDone(void)
     gameInterfaceProcessAction();
     
     appWriteSettings();
+
+    gameInterfaceSetInterfaceState(INTERFACE_STATE_SETTINGS_MENU);
 }
 
 void
@@ -1162,18 +1162,6 @@ gameInterfaceHandleTouchEnd(float x, float y)
 void
 gameInterfaceHandleAllTouchEnd(void)
 {
-    controlRect** controlSet = gameInterfaceControls.controlArray;
-    
-    for(int i = 0; controlSet[i] != NULL; i++)
-    {
-        if(controlSet[i]->touch_began)
-        {
-            gameInterfaceHandleTouchEnd(controlSet[i]->x, controlSet[i]->y);
-        }
-    }
-    
-    gameInterfaceControls.touchUnmapped = 0;
-    gameInterfaceControls.touchUnmappedX = gameInterfaceControls.touchUnmappedY = -1;
     
 }
 
@@ -1282,6 +1270,11 @@ gameInterfaceSetInterfaceState(InterfaceMiscState state)
             gameInterfaceControls.calibrateRect.visible = 0;
             gameInterfaceControls.textMenuButton.visible = 1;
             gameInterfaceControls.trim.visible = 1;
+            break;
+
+        case INTERFACE_STATE_SETTINGS_MENU:
+            gameInterfaceControls.textMenuControl.visible = 1;
+            gameInterfaceControls.menuControl.visible = 1;
             break;
             
         default:
