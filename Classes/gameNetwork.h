@@ -315,6 +315,9 @@ gameNetwork_init(int broadcast_mode,
                  const char* local_inet_addr);
 
 gameNetworkError
+gameNetwork_reinit(const char* server_name, const char* player_name,  const char* local_inet_addr);
+
+gameNetworkError
 gameNetwork_resume();
 
 int

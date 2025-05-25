@@ -51,8 +51,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2961"
             endingLineNumber = "2961"
-            landmarkName = "gameNetwork_handle_collision(elemA, elemB, collision_action)"
-            landmarkType = "9">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -170,7 +170,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "892"
             endingLineNumber = "892"
-            landmarkName = "gameNetwork_countPlayers()"
+            landmarkName = "gameNetwork_disconnect()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

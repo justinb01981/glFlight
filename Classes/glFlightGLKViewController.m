@@ -199,100 +199,77 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
     return p;
 }
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event
 {
-    int i;
-    
     touchStateTouchCount += [touches count];
     
-    for (i = 0; i < [touches count]; i++)
+    for (UITouch* touch in touches)
     {
         // coords ignore device orientation.
         // 0,0 origin is at upper-left corner
         // if phone is held straight up/down
-        UITouch *touch = [[touches allObjects] objectAtIndex:i];
+
         if(touch)
         {
-            [self.activeTouches addObject:touch];
-            
             CGPoint pt = touchPointInView(touch, self.view);
-            gameInterfaceControls.touchId = [self.activeTouches indexOfObject:touch]+1;
+            gameInterfaceTouchIDSet((int)(long)touch);
             gameInterfaceHandleTouchBegin(pt.x, pt.y);
         }
     }
     
     [super touchesBegan:touches withEvent:event];
-    
-    gameInterfaceControls.touchId = 0;
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event
 {
-    int i;
-    
-    for (i = 0; i < [touches count]; i++)
+    for (UITouch* touch in touches)
     {
-        UITouch *touch = [[touches allObjects] objectAtIndex:i];
         if(touch)
         {
             CGPoint pt = touchPointInView(touch, self.view);
-            gameInterfaceControls.touchId = [self.activeTouches indexOfObject:touch]+1;
+            gameInterfaceTouchIDSet((int)(long)touch);
             gameInterfaceHandleTouchMove(pt.x, pt.y);
         }
     }
     
     [super touchesMoved:touches withEvent:event];
-    gameInterfaceControls.touchId = 0;
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event;
 {
-    int i;
-    
     touchStateTouchCount -= [touches count];
     
-    for (i = 0; i < [touches count]; i++)
+    for (UITouch* touch in touches)
     {
-        UITouch *touch = [[touches allObjects] objectAtIndex:i];
-        
         if(touch)
         {
-            [self.activeTouches removeObject:touch];
-            
             CGPoint pt = touchPointInView(touch, self.view);
-            gameInterfaceControls.touchId = [self.activeTouches indexOfObject:touch]+1;
+            gameInterfaceTouchIDSet((int) (long) touch);
             gameInterfaceHandleTouchEnd(pt.x, pt.y);
         }
     }
     
     if(touchStateTouchCount == 0)
     {
-        gameInterfaceHandleAllTouchEnd();
+        gameInterfaceHandleAllTouchEnd(); // dead
     }
     
     [super touchesEnded:touches withEvent:event];
-    gameInterfaceControls.touchId = 0;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    int i;
-    for (i = 0; i < [touches count]; i++)
-    {
-        UITouch *touch = [[touches allObjects] objectAtIndex:i];
+    for (UITouch* touch in touches) {
+
         if(touch)
         {
-            [self.activeTouches removeObject:touch];
-            
             CGPoint pt = [touch locationInView: self.view];
             int x = pt.x;
             int y = pt.y;
-            gameInterfaceControls.touchId = [self.activeTouches indexOfObject:touch]+1;
+            gameInterfaceTouchIDSet((int) (long) touch);
             gameInterfaceHandleTouchEnd(x, y);
         }
     }
-    
-    gameInterfaceControls.touchId = 0;
 }
 
 -(BOOL)shouldAutorotate

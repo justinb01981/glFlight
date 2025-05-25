@@ -22,8 +22,8 @@ android {
     defaultConfig {
         targetSdk 34
         minSdk 19
-        versionCode 1130000
-        versionName '1.13.0'
+        versionCode 1140000
+        versionName '1.14.0'
         sourceSets.main {
             jniLibs.srcDir 'src/main/libs'
             jni.srcDirs = []

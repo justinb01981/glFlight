@@ -2009,7 +2009,7 @@ gameGraphicsInit(void)
 
     //frameBufInit(&gFrameBufSt);
 
-    terrainBuild();
+    terrainInit();
 }
 
 void
@@ -2027,4 +2027,6 @@ gameGraphicsUninit(void)
 
     drawBackgroundUninit();
     //frameBufCleanup(&gFrameBufSt);
+
+    terrainUninit();
 }

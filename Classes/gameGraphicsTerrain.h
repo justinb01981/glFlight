@@ -38,7 +38,7 @@ int cols = 96;
 int rows = 96;
 float Xt = 0;
 float Zt = 0;
-float Tsc = 0.05;
+float Tsc = 0.02;
 
 
 model_index_t allocVertex3(Point p, float Stex)
@@ -60,7 +60,7 @@ model_index_t allocVertex3(Point p, float Stex)
 
 float YcalculateFromXZ(float X, float Z) {
 
-    //return sin((X - Xt) / 3.14) - cos((Z - Zt) / 3.14) + 5;
+    //return sin((X - Xt) / 3.14) - cos((Z - Zt) / 3.14);
     return 0; ///sin(X-Xt)* log(fabs(Z)); // ignoring Zt
 }
 
@@ -144,11 +144,11 @@ static void terrainBuildHelper(
         terrain.indices[terrain.nIndices + 1] = ord[PAIRS[i]];
         terrain.indices[terrain.nIndices + 2] = ord[PAIRS[i+1]];
         terrain.nIndices += 3;
-        // triangles on both sides
-        terrain.indices[terrain.nIndices] = vIndex;
-        terrain.indices[terrain.nIndices + 1] = ord[PAIRS[i+1]];
-        terrain.indices[terrain.nIndices + 2] = ord[PAIRS[i]];
-        terrain.nIndices += 3;
+        // triangles on both sides why the fuck not
+//        terrain.indices[terrain.nIndices] = vIndex;
+//        terrain.indices[terrain.nIndices + 1] = ord[PAIRS[i+1]];
+//        terrain.indices[terrain.nIndices + 2] = ord[PAIRS[i]];
+//        terrain.nIndices += 3;
     }
 
 
@@ -156,19 +156,23 @@ static void terrainBuildHelper(
 
 }
 
+void terrainUninit(void) {
+    // dealloc
+}
+
 void terrainBuild(void) {
-        
+
     assert(cols * rows * 4 < N);
 
-    float R = gWorld->bound_radius / 10;    // 1/2 width of triangles
+    float R = gWorld->bound_radius / (cols/rows);    // 1/2 width of triangles
 
     terrain.nVertices = 0;
     terrain.nIndices = 0;
 
     // steps are 2R apart bc this is width of triangles terrainBuildHelper creates
-    for (float col = cols/-2; col < cols/2; col += R) {
+    for (float col = cols/-2; col < cols/2; col += 2*R) {
 
-        for (float row = rows/-2; row < rows/2; row += R) {
+        for (float row = rows/-2; row < rows/2; row += 2*R) {
 
             Vector U = { {col,YcalculateFromXZ(col,row),row},{col+R,YcalculateFromXZ(col+R,row+R),row+R} }, V = { {col,YcalculateFromXZ(col,row),row},{col+R,YcalculateFromXZ(col+R,row-R),row-R} };
 
@@ -177,6 +181,12 @@ void terrainBuild(void) {
             terrainBuildHelper(U, V, m, R);
         }
     }
+}
+
+void terrainInit(void) {
+    // only called on gameGraphicsInit
+
+    terrainBuild();
 }
 
 void terrainDraw(void) {
