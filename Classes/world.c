@@ -726,7 +726,7 @@ world_add_object_core(Model type,
      * need to be added to pending-free list.. */
     if(model_changed && pElem->linked_elem)
     {
-        printf("linked elem left behind\n");
+        printf("WARN: world.c add_object_core linked elem left behind\n");
     }
     
     int p;
@@ -2018,7 +2018,8 @@ world_update(float tc)
                                 }
                                 else
                                 {
-                                    out_of_bounds_remove = 1;
+                                    // TODO: why bother removing when out  of bounds if expiration time is good enough
+                                    //out_of_bounds_remove = 1;
                                 }
                             }
                         }

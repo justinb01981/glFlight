@@ -1689,7 +1689,7 @@ void drawBackground(void)
 {
     drawBackgroundCore();
 
-    drawBounding(texture_id_background);
+    //drawBounding(texture_id_background);
 }
 
 void drawBounding(int boundtex_id)

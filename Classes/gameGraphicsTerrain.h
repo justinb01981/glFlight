@@ -9,7 +9,8 @@
 #include "gameIncludes.h"
 #include "textures.h"
 
-#define N 327680 
+#define N 327680
+#define TRAD 4
 
 typedef struct Terrain_ {
     model_coord_t vertices[N];
@@ -34,16 +35,44 @@ typedef struct Vector_ {
 
 // MARK: -- API exposed global defines here
 Terrain* T = &terrain;
-int cols = 96;
-int rows = 96;
 float Xt = 0;
 float Zt = 0;
 float Tsc = 0.02;
 
+Point DVertex( model_index_t idx, Point a) {
+    Point r = {
+        .X = a.X - T->vertices[idx*3],
+        .Y = a.Y - T->vertices[idx*3+1],
+        .Z = a.Z - T->vertices[idx*3+2]
+    };
+
+    return r;
+}
+
+int substituteVertexFind(Point a) {
+    int i;
+    const float MAX = 0.0001;
+    for(i = 0; i < T->nVertices; i++)
+    {
+        Point p = DVertex(i, a);
+
+        // guess what mergy Y vertices
+        if(fabs(p.X) > MAX /* || fabs(p.Y) > MAX */ || fabs(p.Z) > MAX)
+        {
+            continue;
+        }
+        return i;
+    }
+    return -1;
+}
 
 model_index_t allocVertex3(Point p, float Stex)
 {
     model_index_t inext = T->nVertices, tnext = T->nVertices;
+
+    //int vtx = substituteVertexFind(p);
+
+    //if(vtx != -1) return vtx; // sharing vertices
 
     // new modelview vertex d
     T->vertices[inext*3 + 0] = p.X;
@@ -60,11 +89,10 @@ model_index_t allocVertex3(Point p, float Stex)
 
 float YcalculateFromXZ(float X, float Z) {
 
-    //return sin((X - Xt) / 3.14) - cos((Z - Zt) / 3.14);
-    return 0; ///sin(X-Xt)* log(fabs(Z)); // ignoring Zt
+    return -0.1;
 }
 
-Point castPoint(Point origin, Vector vec, float Sx, float Sy) {
+Point projectPointVec(Point origin, Vector vec, float Sx, float Sy) {
     float X = origin.X + (vec.B.X - vec.A.X) * Sx;
     float Z = origin.Z + (vec.B.Z - vec.A.Z) * Sy;
 
@@ -79,12 +107,12 @@ Point castPoint(Point origin, Vector vec, float Sx, float Sy) {
     return P;
 }
 
-static void terrainBuildHelper(
+static void terrainBuildHelper(Point A,
                                Vector U,
                                Vector V,
-                               model_index_t vIndex,
-                               const float R
-        )
+                               const float R,
+                               const float width
+                               )
 {
     // THIS CALL ALLOCATES 4 VERTICES(?) MAKE SURE SPACE IS AVAILABLE IN TERRAIN
 
@@ -110,81 +138,88 @@ static void terrainBuildHelper(
     // add b = a+U
     // add c = a+V
 
-    Point A = 
-    { 
-        U.A.X,
-        U.A.Y,
-        U.A.Z
-    };
+    Point rowPt = A;    // mutate this
 
-    float Ks = R;
-    Point B = castPoint(A, U, Ks, Ks), C = castPoint(A, V, Ks, Ks); // advancing counters for next triangle
-    Point D = castPoint(A, U, -Ks, -Ks), E = castPoint(A, V, -Ks, -Ks);
 
-    model_index_t vnextB = allocVertex3(B, Tsc);
-    model_index_t vnextC = allocVertex3(C, Tsc);
+    while(rowPt.X <= width) {   // walk U
 
-    model_index_t vnextD = allocVertex3(D, Tsc);
-    model_index_t vnextE = allocVertex3(E, Tsc);
+        Point colPt = rowPt;
 
-    model_index_t ord[] = {vnextC, vnextB, vnextE, vnextD};
+        while(colPt.Z <= width) {   // walk V
 
-    // add indices to new points designated as triangle
+            Point curPt = projectPointVec(projectPointVec(colPt,U,R/2,R/2), V, R/2, R/2);   // offset to middle of quad
 
-    model_index_t PAIRS[] = {
-        1,0,
-        3,2,
-        2,1,
-        0,3
-    };
+            model_index_t vIndex = allocVertex3(curPt, Tsc); // vtx of pt A + offset currently
 
-    for (int i = 0; i < sizeof(PAIRS) / sizeof(model_index_t); i += 2) 
-    {
-        terrain.indices[terrain.nIndices] = vIndex;
-        terrain.indices[terrain.nIndices + 1] = ord[PAIRS[i]];
-        terrain.indices[terrain.nIndices + 2] = ord[PAIRS[i+1]];
-        terrain.nIndices += 3;
-        // triangles on both sides why the fuck not
-//        terrain.indices[terrain.nIndices] = vIndex;
-//        terrain.indices[terrain.nIndices + 1] = ord[PAIRS[i+1]];
-//        terrain.indices[terrain.nIndices + 2] = ord[PAIRS[i]];
-//        terrain.nIndices += 3;
+            Point B = projectPointVec(curPt, U, R, R);
+            Point D = projectPointVec(curPt, U, -R, -R);
+            Point C = projectPointVec(curPt, V, R, R); // advancing counters for next triangle
+            Point E = projectPointVec(curPt, V, -R, -R);
+
+            model_index_t vnextB = allocVertex3(B, Tsc);
+            model_index_t vnextC = allocVertex3(C, Tsc);
+            model_index_t vnextD = allocVertex3(D, Tsc);
+            model_index_t vnextE = allocVertex3(E, Tsc);
+
+            model_index_t ord[] = {vnextC, vnextB, vnextE, vnextD};
+
+            // add indices to new points designated as triangle
+
+            model_index_t PAIRS[] = {
+                1,0,
+                3,2,
+                2,1,
+                0,3
+            };
+
+            // terrain indices, only visible from one side
+            for (int i = 0; i < sizeof(PAIRS) / sizeof(model_index_t); i += 2)
+            {
+                terrain.indices[terrain.nIndices] = vIndex;
+                terrain.indices[terrain.nIndices + 1] = ord[PAIRS[i+1]];
+                terrain.indices[terrain.nIndices + 2] = ord[PAIRS[i]];
+                terrain.nIndices += 3;
+            }
+
+            colPt = projectPointVec(colPt, V, R, R);
+        }
+
+        rowPt = projectPointVec(rowPt, U, R, R); // rowPt advancing along U
     }
-
-
-    // flip vectors and continue
-
 }
 
 void terrainUninit(void) {
     // dealloc
+    terrain.nVertices = 0;
+    terrain.nIndices = 0;
 }
 
 void terrainBuild(void) {
 
-    assert(cols * rows * 4 < N);
+    float R = TRAD;
+    float width = gWorld->bound_radius;
 
-    float R = gWorld->bound_radius / (cols/rows);    // 1/2 width of triangles
+    float col = -gWorld->bound_radius;
+    float row = -gWorld->bound_radius;
 
-    terrain.nVertices = 0;
-    terrain.nIndices = 0;
+    Point A = {col, YcalculateFromXZ(col,row), row};
 
-    // steps are 2R apart bc this is width of triangles terrainBuildHelper creates
-    for (float col = cols/-2; col < cols/2; col += 2*R) {
+    Vector
+    U = { A,
+        {col+R,YcalculateFromXZ(col+R,row),row} },
+    V = { A,
+        {col,YcalculateFromXZ(col,row+R),row+R} };
 
-        for (float row = rows/-2; row < rows/2; row += 2*R) {
+    //model_index_t iA = allocVertex3((Point) { U.A.X, U.A.Y, U.A.Z }, /* tex scale */ Tsc);
 
-            Vector U = { {col,YcalculateFromXZ(col,row),row},{col+R,YcalculateFromXZ(col+R,row+R),row+R} }, V = { {col,YcalculateFromXZ(col,row),row},{col+R,YcalculateFromXZ(col+R,row-R),row-R} };
-
-            model_index_t m = allocVertex3((Point) { U.A.X, U.A.Y, U.A.Z }, /* tex scale */ Tsc);
-
-            terrainBuildHelper(U, V, m, R);
-        }
-    }
+    terrainBuildHelper(A, U, V, R, width);
 }
 
 void terrainInit(void) {
     // only called on gameGraphicsInit
+
+    terrain.nVertices = 0;
+    terrain.nIndices = 0;
 
     terrainBuild();
 }

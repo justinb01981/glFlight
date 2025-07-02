@@ -1022,9 +1022,6 @@
 				D0CF62B514A919D600E08151 /* object.h */,
 				D0DB605E2B619FF900CFBF1C /* PurchaseManager.h */,
 				D0DB605B2B619FE600CFBF1C /* PurchaseManager.m */,
-				D015A3F620AA3D2600CB1C31 /* world_motion.h */,
-				D03ABA6414ADACF000C44538 /* world.h */,
-				6D91DE9F16697F0B00362864 /* world.c */,
 				D0280A622241BBF500E8C1E8 /* building3_model.h */,
 				D02F630E14C6ABD80028601F /* textures.h */,
 				D0C3743D193EC5FC000C2915 /* textures.c */,
@@ -1054,6 +1051,9 @@
 				6D3FF5FA15FA7B61009A5388 /* mesh.h */,
 				6D3FF5F815FA7B40009A5388 /* mesh.c */,
 				6D262136163F3A6B00F7EC2D /* simple_hash.h */,
+				D015A3F620AA3D2600CB1C31 /* world_motion.h */,
+				D03ABA6414ADACF000C44538 /* world.h */,
+				6D91DE9F16697F0B00362864 /* world.c */,
 				6D595F61164C867E00C21926 /* world_file.h */,
 				6D595F5E164C80FE00C21926 /* world_file.c */,
 				D0EF8AFD170CCF0C00BDD4B7 /* collision.h */,
@@ -2306,7 +2306,7 @@
 			baseConfigurationReference = 63B6B5347A025D149BD2A158 /* Pods-gl_flight.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
+				ASSETCATALOG_COMPILER_APPICON_NAME = shipicon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -2343,7 +2343,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 08104D2FDA5F6DF1DE37E876 /* Pods-gl_flight.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
+				ASSETCATALOG_COMPILER_APPICON_NAME = shipicon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;

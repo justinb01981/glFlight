@@ -101,8 +101,6 @@ glFlightJNIInit()
 {
 	DBPRINTF(("glFlightJNIInit called\n"));
 
-	assert(errno == 0);
-
 	gameCamera_init(0, 0, 0, 0, 0, 0);
 
 	game_init();
@@ -230,7 +228,6 @@ JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightPause(JNI
 
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightUninit(JNIEnv *e, jclass o)
 {
-
     gameNetwork_disconnect();
     if(save_map)
     {
