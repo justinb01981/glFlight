@@ -10,7 +10,7 @@
 #include "textures.h"
 
 #define N 327680
-#define TRAD 4
+#define TRAD 4 // triangle size
 
 typedef struct Terrain_ {
     model_coord_t vertices[N];
@@ -49,30 +49,26 @@ Point DVertex( model_index_t idx, Point a) {
     return r;
 }
 
-int substituteVertexFind(Point a) {
-    int i;
-    const float MAX = 0.0001;
-    for(i = 0; i < T->nVertices; i++)
-    {
-        Point p = DVertex(i, a);
-
-        // guess what mergy Y vertices
-        if(fabs(p.X) > MAX /* || fabs(p.Y) > MAX */ || fabs(p.Z) > MAX)
-        {
-            continue;
-        }
-        return i;
-    }
-    return -1;
-}
+//int substituteVertexFind(Point a) {
+//    int i;
+//    const float MAX = 0.0001;
+//    for(i = 0; i < T->nVertices; i++)
+//    {
+//        Point p = DVertex(i, a);
+//
+//        // guess what mergy Y vertices
+//        if(fabs(p.X) > MAX /* || fabs(p.Y) > MAX */ || fabs(p.Z) > MAX)
+//        {
+//            continue;
+//        }
+//        return i;
+//    }
+//    return -1;
+//}
 
 model_index_t allocVertex3(Point p, float Stex)
 {
     model_index_t inext = T->nVertices, tnext = T->nVertices;
-
-    //int vtx = substituteVertexFind(p);
-
-    //if(vtx != -1) return vtx; // sharing vertices
 
     // new modelview vertex d
     T->vertices[inext*3 + 0] = p.X;
@@ -147,14 +143,15 @@ static void terrainBuildHelper(Point A,
 
         while(colPt.Z <= width) {   // walk V
 
-            Point curPt = projectPointVec(projectPointVec(colPt,U,R/2,R/2), V, R/2, R/2);   // offset to middle of quad
+            float tW = R;
+            Point curPt = projectPointVec(projectPointVec(colPt,U,tW,tW), V, tW, tW);   // offset to middle of quad
 
             model_index_t vIndex = allocVertex3(curPt, Tsc); // vtx of pt A + offset currently
 
-            Point B = projectPointVec(curPt, U, R, R);
-            Point D = projectPointVec(curPt, U, -R, -R);
-            Point C = projectPointVec(curPt, V, R, R); // advancing counters for next triangle
-            Point E = projectPointVec(curPt, V, -R, -R);
+            Point B = projectPointVec(curPt, U, tW, tW);
+            Point D = projectPointVec(curPt, U, -tW,-tW);
+            Point C = projectPointVec(curPt, V, tW, tW); // advancing counters for next triangle
+            Point E = projectPointVec(curPt, V, -tW, -tW);
 
             model_index_t vnextB = allocVertex3(B, Tsc);
             model_index_t vnextC = allocVertex3(C, Tsc);
