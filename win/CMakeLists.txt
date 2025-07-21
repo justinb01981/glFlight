@@ -64,8 +64,8 @@ target_link_libraries(glFlightMain opengl32)
 
 install(TARGETS glFlightMain DESTINATION glFlight.build)
 
-file(GLOB resourcesBmp ../../../../*.bmp)
-file(GLOB resourcesWav ../../../../*.wav)
+file(GLOB resourcesBmp ${CMAKE_CURRENT_SOURCE_DIR}/../*.bmp)
+file(GLOB resourcesWav ${CMAKE_CURRENT_SOURCE_DIR}/../*.wav)
 
 foreach(resFile ${resourcesBmp})
     add_custom_command(TARGET glFlightMain POST_BUILD
