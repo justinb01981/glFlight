@@ -53,7 +53,7 @@ ai_debug(char* msg, WorldElem* elem, float f) {
 }
 
 void
-game_ai_init()
+game_ai_init(void)
 {
 }
 
@@ -195,11 +195,12 @@ game_ai_find_target(WorldElem *pElem)
 }
 
 void
-game_ai_run()
+game_ai_run(void)
 {
-    // TODO: problem here where placed objects may not be moving, but should get AI time
+    int found = 0;
+
     WorldElemListNode* pCur = gWorld->elements_intelligent.next, *pNext;
-    while(pCur)
+    while(pCur && found < MAX_AI_RUN_PER_FRAME)
     {
         pNext = pCur->next;
         WorldElem* pCurElem = pCur->elem;
@@ -218,7 +219,9 @@ game_ai_run()
             {
                 goto game_ai_run_skip_ai;
             }
-            
+
+            found++;
+
             /*
             if(pCurElem->stuff.u.enemy.collided != 0)
             {

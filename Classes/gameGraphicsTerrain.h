@@ -9,8 +9,9 @@
 #include "gameIncludes.h"
 #include "textures.h"
 
-#define N 327680
-#define TRAD 4 // triangle size
+#define N 3276800
+#define TRAD 2 // triangle size
+#define STRIDE 1.5 // spacing between triangles
 
 typedef struct Terrain_ {
     model_coord_t vertices[N];
@@ -76,16 +77,16 @@ model_index_t allocVertex3(Point p, float Stex)
     T->vertices[inext*3 + 2] = p.Z;
 
     // new textureview vertex
-    T->texvertices[tnext*2 + 0] = p.X*Stex;
-    T->texvertices[tnext*2 + 1] = p.Z*Stex;
+    T->texvertices[tnext*2 + 0] = p.X*Stex + 0.25;
+    T->texvertices[tnext*2 + 1] = p.Z*Stex + 0.25;
 
     T->nVertices += 1;
     return inext;
 }
 
 float YcalculateFromXZ(float X, float Z) {
-
-    return -0.1;
+//    return sin(X/8+Xt)*5;
+    return 0.0;
 }
 
 Point projectPointVec(Point origin, Vector vec, float Sx, float Sy) {
@@ -166,10 +167,16 @@ static void terrainBuildHelper(Point A,
                 1,0,
                 3,2,
                 2,1,
-                0,3
+                0,3,
+
+                // also in reverse
+                0,1,
+                2,3,
+                1,2,
+                3,0,
             };
 
-            // terrain indices, only visible from one side
+            // terrain indices, only visible from one side ?
             for (int i = 0; i < sizeof(PAIRS) / sizeof(model_index_t); i += 2)
             {
                 terrain.indices[terrain.nIndices] = vIndex;
@@ -194,6 +201,7 @@ void terrainUninit(void) {
 void terrainBuild(void) {
 
     float R = TRAD;
+    float X = STRIDE;
     float width = gWorld->bound_radius;
 
     float col = -gWorld->bound_radius;
@@ -203,9 +211,9 @@ void terrainBuild(void) {
 
     Vector
     U = { A,
-        {col+R,YcalculateFromXZ(col+R,row),row} },
+        {col+X,YcalculateFromXZ(col+X,row),row} },
     V = { A,
-        {col,YcalculateFromXZ(col,row+R),row+R} };
+        {col,YcalculateFromXZ(col,row+X),row+X} };
 
     //model_index_t iA = allocVertex3((Point) { U.A.X, U.A.Y, U.A.Z }, /* tex scale */ Tsc);
 
@@ -223,7 +231,8 @@ void terrainInit(void) {
 
 void terrainDraw(void) {
 
-    //terrainBuild();// dude try moving this to async without locking and see what it looks like drawing
+    terrainInit();
+    terrainBuild();// dude try moving this to async without locking and see what it looks like drawing
 
     glVertexPointer(3, GL_FLOAT, 0, terrain.vertices);
     glTexCoordPointer(2, GL_FLOAT, 0, terrain.texvertices);

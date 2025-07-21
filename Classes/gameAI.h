@@ -11,6 +11,8 @@
 #ifndef __GAME_AI_H__
 #define __GAME_AI_H__
 
+#define MAX_AI_RUN_PER_FRAME 3
+
 enum
 {
     ENEMY_STATE_PURSUE = 0,

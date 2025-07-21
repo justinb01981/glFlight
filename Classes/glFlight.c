@@ -376,7 +376,7 @@ calibrate_bail:
                 -ship_z_vec[2]*speed
             };
             update_object_velocity_with_friction(my_ship_id, tv, C_THRUST, C_FRICTION);
-            
+
             if(camera_locked_frames > 0)
             {
                 camera_locked_frames--;

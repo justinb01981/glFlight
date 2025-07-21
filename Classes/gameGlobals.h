@@ -61,6 +61,7 @@ extern int game_map_custom_loaded;
 extern int controls_simple;
 extern int fireAction;
 extern int fireActionQueuedAfterEdit;
+extern game_timeval_t time_engine_sound_next;
 
 extern void (*glFlightOnPurchase)(void);
 
@@ -109,7 +110,7 @@ extern float C_FRICTION;    // SEE physics_friction_c gameVariable
 const static int pooped_cube_interval_ms = 75;
 const static int pooped_cube_lifetime = 300;    // determines trail length
 
-const static float collision_repulsion_coeff = 1.05;
+const static float collision_repulsion_coeff = 1.2;
 
 const static float RADAR_MIN_VELOCITY = 1;
 
@@ -133,6 +134,5 @@ const static long GAME_NETWORK_PORT_DEFAULT = 52000;
 
 #define GAME_AI_DEBUG 0
 
-extern game_timeval_t time_engine_sound_next;
 
 #endif
