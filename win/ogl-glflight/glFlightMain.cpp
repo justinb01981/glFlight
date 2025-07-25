@@ -182,7 +182,13 @@ public:
 
     bool render()
 	{
+        static float renderLast = 0, test;
+
 		if (!glFlightInited) return true;
+
+        test = get_time_ms();
+        //if (test - renderLast < (1000/GAME_FRAME_RATE)) return true;
+        renderLast = test;
 
         glfwPollEvents();
         

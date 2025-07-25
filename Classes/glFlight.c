@@ -193,8 +193,8 @@ calibrate_bail:
     }
     
     // calculate time since last pass and use that to update world physics
-    tc = 16.667/1000.0;
-    //    tc = ((float) time_ms - (float) world_update_time_last) / 1000.0;
+    //tc = 16.667/1000.0;
+    tc = ((float) time_ms - (float) world_update_time_last) / 1000.0;
 
     if(tc > 1.0)
     {
