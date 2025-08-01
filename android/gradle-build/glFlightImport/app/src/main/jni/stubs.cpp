@@ -1,5 +1,6 @@
 #include "gameNetwork.h"
 #include "gameDebug.h"
+#include "glFlightJNI.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,7 +39,8 @@ extern "C" {
     AppDelegateOpenURL(const char* url)
     {
         DBPRINTF(("AppDelegateOpenURL: %s", url));
-        return;
+        // trigger activity in java
+        openUrlRequest = jstring("https://www.domain17.net/d0gf1ght/");
     }
     
     int

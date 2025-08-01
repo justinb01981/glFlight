@@ -282,6 +282,17 @@ JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightNextAu
     return s;
 }
 
+// set in openUrl
+jstring openUrlRequest = NULL;
+
+JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightOpenURL(JNIEnv *e, jclass o) {
+    // TODO: add a java/intent method to gameRunnable called from here
+    if(openUrlRequest != NULL) {
+        return e->NewStringUTF((char*) openUrlRequest);
+    }
+	return NULL;
+}
+
 JNIEXPORT void JNICALL Java_com_domain17_glflight_GameRunnable_glFlightSensorInput(JNIEnv *e, jclass o, jfloatArray arr)
 {
 	float jf[16];

@@ -48,51 +48,8 @@
 #define WORLD_ADD_OBJECT_ENUM(model, x, y, z, yaw, pitch, roll, scale, tx_id) \
 "add_object "model" "#x" "#y" "#z" "#yaw" "#pitch" "#roll" "#scale" "#tx_id"\n"
 
-#define MESH_CUBES_1(tex, scale)                                 \
-"mesh_manip_add wx0.0 " " 5" " wz0" " 5 0 0" " 0 0 5" " 40 40\n" \
-"mesh_manip_pull rnd_40 rnd_40"" 0 rnd_50 0"" 0.90\n"            \
-"mesh_manip_pull rnd_40 rnd_40"" 0 rnd_50 0"" 0.90\n"            \
-"mesh_manip_pull rnd_40 rnd_40"" 0 rnd_50 0"" 0.90\n"            \
-"mesh_manip_pull rnd_40 rnd_40"" 0 rnd_50 0"" 0.90\n"            \
-"mesh_manip_pull rnd_40 rnd_40"" 0 rnd_50 0"" 0.90\n"            \
-"mesh_manip_pull rnd_40 rnd_40"" 0 rnd_50 0"" 0.90\n"            \
-"mesh_manip_complete 1 "#tex" 1 "#scale"\n"
-
-#define WORLD_SCALED_FRAME_MESH_PULL_RANDOM(height, range)       \
-"register_params rndx rndz 0 "#height" 0 0 0 0 0 0 0 0 0 0 0 0\n"       \
-"register_params_mul 0.2 0.2 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"      \
-"mesh_manip_pull r r r r 0"" "#range"\n" \
-"register_params_update 0 0 8 0 0 0 0 0 0 0 0 0 0 0 0 0\n"  \
-"add_object 1 r r r 0 0 0 4 16\n"
-
-#define WORLD_CUBEGRID(y, tex, scale) \
-"mesh_manip_add 0 " #y" 0" " 4 0 0" " 0 0 4" " wx0.25 wz0.25\n" \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(50, 0.85) \
-"mesh_manip_round 0 1 0\n" \
-"mesh_manip_complete 1 "#tex" 1 "#scale"\n"
-
 // WARN: this contains 2 \n\n trailing so nothing after it in the string will be read
 #define WORLD_SCALED_FRAME(x, tex, scale)         "register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n""set_world_size r\n""map_program_with_args 100 0 100\n"
-
-//#define WORLD_SCALED_FRAME_GL_TERRAIN(x, tex, scale)                                \
-//"register_params 200 100 200 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
-//"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-//"set_world_size r\n"                                                 \
-//"mesh_manip_add 0 " "0" " 0" " 4 0 0" " 0 0 4" " wx0.25 wz0.25\n" \
-//"mesh_manip_gltriangles_complete "#tex"\n"
 
 #define WORLD_SCALED_FRAME_TERRAIN(y, tex, scale) \
 WORLD_CUBEGRID(y, tex, scale)
@@ -298,15 +255,6 @@ ASTEROID_FIELD_ADD_AT_Y(16, rnd_8, 0)
 "set_vector "#x" "#y" "#z" 1 1 1\n"    \
 "add_object 21 vecx_0 vecy_0 vecz_0 0 0 0 20 31\n"
 
-#define WORLD_SCALED_FRAME_TURRET(x, tex, scale)                         \
-"register_params 100 50 100 0 0 0 0 0 0 0 0 0 0 0 0 0\n"                \
-"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n"         \
-"set_world_size r\n"                                                 \
-"mesh_manip_add wx0.2 " "wy0.2" " wz0.1" " 4 0 0" " 0 0 4" " wx0.2 wz0.2\n" \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
-WORLD_SCALED_FRAME_MESH_PULL_RANDOM(25, 0.93) \
-"mesh_manip_round 0 4 0\n" \
-"mesh_manip_complete 2 "#tex" 1 "#scale"\n"
 
 ///////////////////////////////////////////////////////
 const static char initial_map_200x100x200[] = ""
@@ -365,7 +313,7 @@ const static char initial_map_200x100x200[] = ""
 //"add_mesh 200 -10 200" " -10 0 0" " 0 0 -10" " 20 20" " -1 1 -1 4 1\n"
 
 // mesh of cubes
-MESH_CUBES_1(19, 5)
+//MESH_CUBES_1(19, 5)
 
 /*
 "mesh_manip_add rnd_200 5 rnd_200 ""2 0 0 " "0 0 2 " "10 10\n"
@@ -992,7 +940,7 @@ const static char pokeball_map[] = ""
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
 
 "set_background_info " BACKGROUND_TEXTURE_STR "\n"
-MESH_CUBES_1(19, 5)
+//MESH_CUBES_1(19, 5)
 
 // add test tower
 // add base

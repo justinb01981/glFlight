@@ -2,6 +2,8 @@ package com.domain17.glflight;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Layout;
 import android.view.WindowManager.*;
@@ -14,13 +16,14 @@ import android.view.WindowManager;
 import android.view.*;
 import android.hardware.*;
 import android.opengl.GLSurfaceView.*;
+
 //import android.opengl.EGLDisplay;
+
+import java.net.URI;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
-
-import com.domain17.glflight.util.*;
 
 //import javax.microedition.khronos.egl.EGL10;
 //import javax.microedition.khronos.egl.EGLDisplay;
@@ -98,7 +101,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         //this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        
+
         this.getWindow().setFlags(0xffffffff, LayoutParams.FLAG_FULLSCREEN | LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         gameRenderer.surfaceView = new GLSurfaceView(this);
@@ -131,7 +134,7 @@ public class FullscreenActivity extends AppCompatActivity {
         running = true;
         mBGThread.start();
 
-        if(!renderContinuously) mRenderThread.start();
+        if (!renderContinuously) mRenderThread.start();
     }
 
     @Override
@@ -189,73 +192,61 @@ public class FullscreenActivity extends AppCompatActivity {
             accuracyLast = a;
         }
     };
-    
+
     float touchLastX = 0;
     float touchLastY = 0;
     float touchLastAct = 0;
-	float touchFudge = 5;
-    
+    float touchFudge = 5;
+
     public boolean onTouchEvent(MotionEvent event) {
-    	float action = 0;
-    	float x = 0;
-    	float y = 0;
-    	//float hackNavBar = (float) contentView.getWidth()*0.065f; // from gameInterfaceInit (gameInterface.c)
+        float action = 0;
+        float x = 0;
+        float y = 0;
+        //float hackNavBar = (float) contentView.getWidth()*0.065f; // from gameInterfaceInit (gameInterface.c)
 
-		InputDevice dev = event.getDevice();
+        InputDevice dev = event.getDevice();
 
-		for(int i = 0; i < event.getPointerCount(); i++)
-        {
+        for (int i = 0; i < event.getPointerCount(); i++) {
             int pointerID = event.getPointerId(i);
 
             // convert touch coordinate to scaled screen coordinate
             double Xr = contentView.getWidth(), Yr = contentView.getHeight();
-			double tX = viewWidthScaled * (event.getX(i) / Xr);
-			double tY = viewHeightScaled * (event.getY(i) / Yr);
+            double tX = viewWidthScaled * (event.getX(i) / Xr);
+            double tY = viewHeightScaled * (event.getY(i) / Yr);
 
-			System.out.println("touched at [" + tX + "," + tY +
-					"] action:" + event.getActionMasked() + " tstamp:"+ event.getEventTime() + "\n");
+            System.out.println("touched at [" + tX + "," + tY +
+                    "] action:" + event.getActionMasked() + " tstamp:" + event.getEventTime() + "\n");
 
-			x = (int) tX;
-			y = (int) tY;
+            x = (int) tX;
+            y = (int) tY;
 
-	    	if(event.getActionMasked() == MotionEvent.ACTION_DOWN)
-	    	{
-	    		action = 0;
-	    	}
-	    	else if(event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN)
-	    	{
-	    		action = 0;
-	    	}
-	    	else if(event.getActionMasked() == MotionEvent.ACTION_UP)
-	    	{
-	    		action = 1;
-	    	}
-	    	else if(event.getActionMasked() == MotionEvent.ACTION_POINTER_UP)
-	    	{
-	    		action = 1;
-	    	}
-	    	else if(event.getActionMasked() == MotionEvent.ACTION_MOVE)
-	    	{
-	    		action = 2;
-	    	}
-	    	else if(event.getActionMasked() == MotionEvent.ACTION_CANCEL)
-	    	{
-	    		action = 3;
-	    	}
-	    	
-	    	//if(action == 2 && Math.abs(x - touchLastX) < touchFudge && Math.abs(y - touchLastY) < touchFudge)
-	    	//{
-	    	//}
-	    	//else
-	    	{
-	    		touchLastX = x;
-	    		touchLastY = y;
-	    		touchLastAct = action;
-	    		GameRunnable.touchInput(x, y, action, pointerID);
-	    	}
-		}
-    	
-    	return super.onTouchEvent(event);
+            if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                action = 0;
+            } else if (event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN) {
+                action = 0;
+            } else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+                action = 1;
+            } else if (event.getActionMasked() == MotionEvent.ACTION_POINTER_UP) {
+                action = 1;
+            } else if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+                action = 2;
+            } else if (event.getActionMasked() == MotionEvent.ACTION_CANCEL) {
+                action = 3;
+            }
+
+            //if(action == 2 && Math.abs(x - touchLastX) < touchFudge && Math.abs(y - touchLastY) < touchFudge)
+            //{
+            //}
+            //else
+            {
+                touchLastX = x;
+                touchLastY = y;
+                touchLastAct = action;
+                GameRunnable.touchInput(x, y, action, pointerID);
+            }
+        }
+
+        return super.onTouchEvent(event);
     }
 
     /**
@@ -271,7 +262,6 @@ public class FullscreenActivity extends AppCompatActivity {
     };
 
     double mRenderNext = (double) java.lang.System.currentTimeMillis();
-
 
 
     /**
@@ -295,7 +285,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 }
 
                 try {
-                    if(delta > 0) java.lang.Thread.sleep((long) delta);
+                    if (delta > 0) java.lang.Thread.sleep((long) delta);
                 } catch (InterruptedException e) {
                 }
             }
@@ -303,34 +293,40 @@ public class FullscreenActivity extends AppCompatActivity {
     });
 
     Thread mBGThread = new Thread(new Runnable() {
-    		public void run() {
-    			long sleep_ms = 1000/(GameRenderer.fps);
+        public void run() {
+            long sleep_ms = 1000 / (GameRenderer.fps);
 
-    			while(running) {
+            while (running) {
 
-                    // check for gyro reset??
+                // check for gyro reset??
 
-					GameRunnable.runBGThread();
-	    			
-	    			while(true) {
-	    				String sndName = GameRunnable.nextSoundEvent();
-	    				if(sndName.length() <= 0) break;
+                GameRunnable.runBGThread();
 
-	    				GameResources.playSound(sndName);
-	    			}
+                while (true) {
+                    String sndName = GameRunnable.nextSoundEvent();
+                    if (sndName.length() <= 0) break;
 
-	        		try 
-	        		{
-	        			java.lang.Thread.sleep(sleep_ms); 
-	        		}
-	        		catch (InterruptedException e)
-	        		{
-	        		}
-    			}
-    		}
-    	});
-    
-    
+                    GameResources.playSound(sndName);
+                }
+
+                String nativeURL = GameRunnable.glFlightOpenURL();
+                if (nativeURL != null) {
+                    Uri dest = Uri.parse(nativeURL);
+                    if (dest != null) {
+                        Intent i = new Intent(Intent.ACTION_VIEW, dest);
+                        startActivity(i);
+                    }
+                }
+
+                try {
+                    java.lang.Thread.sleep(sleep_ms);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+    });
+
+
     private GameRenderer gameRenderer = new GameRenderer();
     private View contentView;
     private SensorManager mSensorManager;
@@ -342,7 +338,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private void resetGyroSensorMaybe() {
 
-        if(mSensorManager == null) {
+        if (mSensorManager == null) {
             mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
             mSensorGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
 

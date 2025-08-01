@@ -212,7 +212,7 @@ public:
         static int joyActivated = 0;
         static float* joyAxes;
         static unsigned char* joyButtons;
-        size_t joyAxes_n, joyButtons_n;
+        size_t joyAxes_n = 0, joyButtons_n = 0;
         static int joyLast[GLFW_KEY_LAST] = { 0 };
         static unsigned int joyZero[64] = { 0 };
 
@@ -222,7 +222,11 @@ public:
         float x = (viewHeight - MouseCurrent.y) * (viewWidth/viewHeight);
         float y = (MouseCurrent.x) * (viewHeight / viewWidth);
 
-        gameFramework::pollJoystick((float**) &joyAxes, &joyAxes_n, &joyButtons, &joyButtons_n);
+        // jb: i had to plug in to usb while app running to detect gamepad
+        if (glfwJoystickPresent(GLFW_JOYSTICK_1))
+        {
+            gameFramework::pollJoystick((float**)&joyAxes, &joyAxes_n, &joyButtons, &joyButtons_n);
+        }
 
         for (int i = 0; i < joyButtons_n; i++)
         {
