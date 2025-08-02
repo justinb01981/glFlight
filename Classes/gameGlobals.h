@@ -65,14 +65,17 @@ extern game_timeval_t time_engine_sound_next;
 
 extern void (*glFlightOnPurchase)(void);
 
+#if GAME_PLATFORM_IOS
 #define APP_ITUNES_URL_BASE "itms://itunes.apple.com/us/app/apple-store/"
 #ifdef BUILD_SC95
 #define APP_ITUNES_URL APP_ITUNES_URL_BASE"id1348498612?mt=8"
 #else
 #define APP_ITUNES_URL APP_ITUNES_URL_BASE"id698938088?mt=8"
 #endif
+#endif
 
 #if GAME_PLATFORM_ANDROID
+#define APP_ITUNES_URL "https://www.domain17.net/d0gf1ght"
 #define PLATFORM_TICK_RATE 60
 #define PLATFORM_DRAW_ELEMS_MAX 1000
 #define GYRO_SAMPLE_RATE (60)

@@ -101,7 +101,7 @@ gameAudioPlaySoundAtLocationWithRate(const char* filename, float volumescale, fl
     float v = (vol_distance / vol_distance_max);
     float vol_c[] = {0.5, 0.3, 0.3, 0.2, 0.2, 0.1, 0}; //{1, 0.8, 0.5, 0.2, 0.1, 0, 0};
 
-    DBPRINTF(("playSound %s at speed %f", filename, rate));
+    //DBPRINTF(("playSound %s at speed %f", filename, rate));
 
     if(v > 1.0) v = 1.0;
     

@@ -40,7 +40,7 @@ extern "C" {
     {
         DBPRINTF(("AppDelegateOpenURL: %s", url));
         // trigger activity in java
-        openUrlRequest = jstring("https://www.domain17.net/d0gf1ght/");
+        openUrlRequest = jstring(url);
     }
     
     int
