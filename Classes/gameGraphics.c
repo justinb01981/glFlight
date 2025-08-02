@@ -480,7 +480,7 @@ int drawRadar(void)
             if(/*cur->elem->object_type == OBJ_PLAYER*/ zdot >= 0)
             {
                 // skip drawing when too close
-                if(dist <= 20 && zdot > 0.5 &&
+                if(dist <= 5 && zdot > 0.5 &&
                    cur->elem->elem_id != game_target_missle_id &&
                    cur->elem->elem_id != game_target_objective_id)
                     goto radar_draw_end;

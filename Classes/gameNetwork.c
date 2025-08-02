@@ -2616,7 +2616,7 @@ do_game_network_read_core()
     gameNetworkMessage msg;
     gameNetworkAddress srcAddr;
     int receive_block_ms = 5;
-    int retries = 10;
+    int retries = 100;
     gameNetworkMessageQueued* pMsgNew;
     
     if(!gameNetworkState.connected)
@@ -2649,7 +2649,7 @@ do_game_network_read_core()
                 strncpy(msg.params.c, gameNetworkState.hostInfo.name, sizeof(msg.params.c));
 
                 send_to_address_udp(&msg, &srcAddr);
-                DBPRINTF(("GAME_NETWORK_MSG_BEACON\n"));
+                DBPRINTF(("handling GAME_NETWORK_MSG_BEACON\n"));
                 continue;
             }
             /*
