@@ -288,7 +288,9 @@ jstring openUrlRequest = NULL;
 JNIEXPORT jstring JNICALL Java_com_domain17_glflight_GameRunnable_glFlightOpenURL(JNIEnv *e, jclass o) {
     // TODO: add a java/intent method to gameRunnable called from here
     if(openUrlRequest != NULL) {
-        return e->NewStringUTF((char*) openUrlRequest);
+        jstring result = e->NewStringUTF((char*) openUrlRequest);	// leak?
+		openUrlRequest = NULL;
+		return result;
     }
 	return NULL;
 }

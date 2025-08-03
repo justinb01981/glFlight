@@ -1534,8 +1534,6 @@ drawBackgroundInit(int tex_id,
     if(!bgData)
     {
         bgData = malloc(sizeof(*bgData));
-
-
         if(!bgData)
         {
             return;
