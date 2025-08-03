@@ -75,7 +75,7 @@ extern void (*glFlightOnPurchase)(void);
 #endif
 
 #if GAME_PLATFORM_ANDROID
-#define APP_ITUNES_URL "https://www.domain17.net/d0gf1ght"
+#define APP_ITUNES_URL "https://play.google.com/store/apps/details?id=com.domain17.glflight"
 #define PLATFORM_TICK_RATE 60
 #define PLATFORM_DRAW_ELEMS_MAX 1000
 #define GYRO_SAMPLE_RATE (60)

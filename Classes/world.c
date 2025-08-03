@@ -1338,18 +1338,6 @@ void world_init(float radius)
         *(gWorld->terrain_height_map + i*(WORLD_TERRAIN_COMPLEXITY/2-j)) = sin((float) j/(WORLD_TERRAIN_COMPLEXITY/2)) * 10;
      }
     
-    // build bounding vectors (rectangle)
-    /*
-    boundingRegion* br = boundingRegionInit(6);
-    boundingRegionAddVec(br, 0, 0, 0, 1, 0, 0);
-    boundingRegionAddVec(br, 0, 0, 0, 0, 1, 0);
-    boundingRegionAddVec(br, 0, 0, 0, 0, 0, 1);
-    boundingRegionAddVec(br, gWorld->bound_x, gWorld->bound_y, gWorld->bound_z, -1, 0, 0);
-    boundingRegionAddVec(br, gWorld->bound_x, gWorld->bound_y, gWorld->bound_z, 0, -1, 0);
-    boundingRegionAddVec(br, gWorld->bound_x, gWorld->bound_y, gWorld->bound_z, 0, 0, -1);
-    gWorld->boundingRegion = br;
-    */
-    
     // build spherical bounding
     float Ty, Tx;
     float I = WORLD_BOUNDING_SPHERE_STEPS;
@@ -1425,13 +1413,13 @@ void world_init(float radius)
                     }
                 }
                 
-                float LColor[] = {
-                    0, 0xff, 0
-                };
-                
-                world_add_drawline(L1, L2, LColor, 999999);
-                
-                world_add_drawline(L3, L4, LColor, 999999);
+//                float LColor[] = {
+//                    0, 0xff, 0
+//                };
+//
+//                world_add_drawline(L1, L2, LColor, 0);
+//
+//                world_add_drawline(L3, L4, LColor, 0);
             }
             
             quaternion_rotate_inplace(&U, &V, R/I);
