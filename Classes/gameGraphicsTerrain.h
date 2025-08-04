@@ -85,8 +85,10 @@ model_index_t allocVertex3(Point p, float Stex)
 }
 
 float YcalculateFromXZ(float X, float Z) {
-//    return sin(X/8+Xt)*5;
-    return 0.0;
+//    return sin(X/8+Xt)*2 - 1.0;
+//    return  16 / -(sqrt( pow(my_ship_x-X,2) + pow(my_ship_z-Z,2))) + 8;
+    return 0;
+
 }
 
 Point projectPointVec(Point origin, Vector vec, float Sx, float Sy) {
@@ -138,11 +140,11 @@ static void terrainBuildHelper(Point A,
     Point rowPt = A;    // mutate this
 
 
-    while(rowPt.X <= width) {   // walk U
+    while(rowPt.X-A.X < width) {   // walk U
 
         Point colPt = rowPt;
 
-        while(colPt.Z <= width) {   // walk V
+        while(colPt.Z-A.Z < width) {   // walk V
 
             float tW = R;
             Point curPt = projectPointVec(projectPointVec(colPt,U,tW,tW), V, tW, tW);   // offset to middle of quad
@@ -204,8 +206,8 @@ void terrainBuild(void) {
     float X = STRIDE;
     float width = gWorld->bound_radius;
 
-    float col = -gWorld->bound_radius;
-    float row = -gWorld->bound_radius;
+    float col = my_ship_x - width/2;
+    float row = my_ship_z - width/2;
 
     Point A = {col, YcalculateFromXZ(col,row), row};
 

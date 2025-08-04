@@ -1308,113 +1308,6 @@ visible_list_remove(WorldElem* elem, unsigned int* n_visible, WorldElemListNode*
     }
 }
 
-static void
-drawBackgroundBuildTerrain(DrawBackgroundData* bgData, float Tk_)
-{
-    float I_Mk = 25.0; // model - step size
-    float Mk = I_Mk;
-    float Cr = /*1.5*/ /*2.2*/ 0.33;
-    float Tk = Tk_; // texture - step-size multiplier
-    float terrain_height_y = 0;
-
-    float Ub = -gWorld->bound_radius*Cr;
-    float Vb = -gWorld->bound_radius*Cr;
-    float Ue = gWorld->bound_radius*Cr;
-    float Ve = gWorld->bound_radius*Cr;
-
-    const int step_allocate = 0, step_generate = 1;
-
-    size_t n_coords = 3*2;
-    size_t n_indices = 3*2;
-    size_t n_tcoords = 2*2;
-    size_t n_indices_last;
-
-    int step = step_allocate;
-
-    do{
-        float Vi = Vb;
-        float Ui = Ub;
-
-        float M[] = {Ui, 0, Vi};
-        float T[] = {0, 0};
-
-        #define TexU (((Ui/(Ue*2))- 0.5) * Tk)
-        #define TexV (((Vi/(Ve*2))- 0.5) * Tk)
-
-        n_indices_last = n_indices;
-
-        if(step == step_generate)
-        {
-            tess_begin(M, T, bgData->tess.S);
-}
-
-        while(Vi <= Ve)
-        {
-            while(Ui+Mk >= Ub && Ui+Mk <= Ue)
-            {
-                Ui += Mk;
-
-                if(step == step_generate)
-                {
-//                    terrain_height_y += ((int)floor(rand_in_range(0, 100)) % 2 == 0) ? 0.05: -0.05;
-//                    float D = (Ue*2 / (WORLD_TERRAIN_COMPLEXITY));
-//                    float R = Ue;
-//                    terrain_height_y = *(gWorld->terrain_height_map + ((int) floor((Ui+R)/D) * (int) floor((Vi+R)/D)));
-
-                    M[0] = Ui;
-                    M[1] = terrain_height_y;
-                    M[2] = Vi;
-                    T[0] = TexU;
-                    T[1] = TexV;
-
-                    tess_step(M, T, bgData->tess.S);
-                }
-                else
-                {
-                    n_coords += 3 * 2;
-                    n_tcoords += 2 * 2;
-                    n_indices += 3 * 2;
-                }
-            }
-
-            Vi += fabs(Mk);
-            if(step == step_generate)
-            {
-                M[0] = Ui;
-                M[2] = Vi;
-                T[0] = TexU;
-                T[1] = TexV;
-
-                tess_step_row(M, T, bgData->tess.S);
-            }
-
-            // TODO: if a row is out-of-bounds, invalidate its triangle
-            Mk *= -1;
-        }
-
-        if(step == step_allocate)
-        {
-            step = step_generate;
-            bgData->tess.coords = malloc(sizeof(model_coord_t) * n_coords);
-            bgData->tess.indices = malloc(sizeof(model_index_t) * n_indices);
-            bgData->tess.texcoords = malloc(sizeof(model_texcoord_t) * n_tcoords);
-
-            // tesselate - init
-            bgData->tess.S = &bgData->tess.S_;
-            bgData->tess.S->Icur = bgData->tess.S->Is = bgData->tess.indices;
-            bgData->tess.S->Mcur = bgData->tess.S->Ms = bgData->tess.coords;
-            bgData->tess.S->Tcur = bgData->tess.S->Ts = bgData->tess.texcoords;
-
-            Mk = I_Mk;
-        }
-
-    } while(n_indices != n_indices_last);
-
-    tess_end(bgData->tess.S);
-
-    // tesselate - done
-}
-
 static void drawBoundingInit(int tex_id)
 {
     int iC = 0, iV = 0, iT = 0, i;
@@ -1597,8 +1490,6 @@ drawBackgroundInit(int tex_id,
             bgData->coords[i+1] =  pt.y;
             bgData->coords[i+2] =  pt.z;
         }
-
-        drawBackgroundBuildTerrain(bgData, bgRepeatScale);
     }
 }
 
