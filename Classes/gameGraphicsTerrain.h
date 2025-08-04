@@ -140,11 +140,11 @@ static void terrainBuildHelper(Point A,
     Point rowPt = A;    // mutate this
 
 
-    while(rowPt.X-A.X < width) {   // walk U
+    while(distance(rowPt.X,rowPt.Y,rowPt.Z, A.X,A.Y,A.Z) < width) {   // walk U
 
         Point colPt = rowPt;
 
-        while(colPt.Z-A.Z < width) {   // walk V
+        while(distance(colPt.X,colPt.Y,colPt.Z, A.X,A.Y,A.Z) < width) {   // walk V
 
             float tW = R;
             Point curPt = projectPointVec(projectPointVec(colPt,U,tW,tW), V, tW, tW);   // offset to middle of quad
@@ -204,7 +204,7 @@ void terrainBuild(void) {
 
     float R = TRAD;
     float X = STRIDE;
-    float width = gWorld->bound_radius;
+    float width = gWorld->bound_radius*2;
 
     float col = my_ship_x - width/2;
     float row = my_ship_z - width/2;
