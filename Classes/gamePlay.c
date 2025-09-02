@@ -223,7 +223,7 @@ score_kill(WorldElem* pElem)
             break;
             
         case OBJ_SHIP:
-            if(pElem->stuff.u.enemy.fires_missles)
+            if(!pElem->stuff.u.enemy.ignore_player)
             {
                 gameStateSinglePlayer.stats.enemies_bh_killed++;
                 console_write(game_log_messages[GAME_LOG_KILLED_ENEMY2]);
