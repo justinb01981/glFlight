@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" colorMatched="YES">
-    <device id="ipad9_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
+    <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -29,8 +27,13 @@
             <connections>
                 <outlet property="rootViewController" destination="kzW-bb-fBd" id="m2s-6z-SL6"/>
             </connections>
+            <point key="canvasLocation" x="103" y="6"/>
         </window>
         <glkViewController preferredFramesPerSecond="30" id="kzW-bb-fBd" customClass="glFlightGLKViewController">
+            <layoutGuides>
+                <viewControllerLayoutGuide type="top" id="AbE-kG-psy"/>
+                <viewControllerLayoutGuide type="bottom" id="gDW-Iu-g8Q"/>
+            </layoutGuides>
             <glkView key="view" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" enableSetNeedsDisplay="NO" id="kzq-Es-Edh">
                 <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -38,6 +41,7 @@
                     <outlet property="delegate" destination="kzW-bb-fBd" id="h8a-4O-xf2"/>
                 </connections>
             </glkView>
+            <point key="canvasLocation" x="-375" y="-23"/>
         </glkViewController>
     </objects>
 </document>

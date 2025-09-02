@@ -89,7 +89,6 @@
 		D02B8F1A1964D7D700830369 /* gameInput.c in Sources */ = {isa = PBXBuildFile; fileRef = D02B8F191964D7D700830369 /* gameInput.c */; };
 		D02B8F1D1969E7AF00830369 /* texture72.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F1C1969E7AF00830369 /* texture72.bmp */; };
 		D02B8F1F1969E7B800830369 /* texture73.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D02B8F1E1969E7B800830369 /* texture73.bmp */; };
-		D02D2CC217D5C5F200C03EB5 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC117D5C5F200C03EB5 /* Default@2x.png */; };
 		D02D2CC417D5C5FF00C03EB5 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC317D5C5FF00C03EB5 /* Default.png */; };
 		D02D2CC917D67C9B00C03EB5 /* screenshot1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC717D67C9A00C03EB5 /* screenshot1.jpg */; };
 		D02D2CCA17D67C9B00C03EB5 /* screenshot2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC817D67C9B00C03EB5 /* screenshot2.jpg */; };
@@ -154,7 +153,6 @@
 		D098934D1937F44400298C8E /* speedboost.wav in Resources */ = {isa = PBXBuildFile; fileRef = D098934C1937F44400298C8E /* speedboost.wav */; };
 		D098934F1937FA4100298C8E /* texture66.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D098934E1937FA4100298C8E /* texture66.bmp */; };
 		D09893511937FD7D00298C8E /* texture67.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09893501937FD7D00298C8E /* texture67.bmp */; };
-		D09A4E321840196E004C73F2 /* Default-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = D09A4E311840196E004C73F2 /* Default-Landscape.png */; };
 		D09A5F3B208172D9009F9618 /* texture110.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3A208172D8009F9618 /* texture110.bmp */; };
 		D09A5F3E208174EB009F9618 /* texture111.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09A5F3D208174EB009F9618 /* texture111.bmp */; };
 		D09E3BE22207A95900131247 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D05AEDA121FD5DE300692833 /* GLKit.framework */; };
@@ -168,6 +166,8 @@
 		D0A5537518C13C7100F7E798 /* texture59.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A5537418C13C7100F7E798 /* texture59.bmp */; };
 		D0A6367217F382A60088F0AD /* texture46.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A6367117F382A50088F0AD /* texture46.bmp */; };
 		D0A66F41194B9497004A5E42 /* texture68.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A66F40194B9497004A5E42 /* texture68.bmp */; };
+		D0A7FF412E4A80F900C6128B /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB311757D9B200B5B815 /* Default-568h@2x.png */; };
+		D0A7FF422E4A859200C6128B /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D02D2CC117D5C5F200C03EB5 /* Default@2x.png */; };
 		D0A8D74619F9983C006FE907 /* texture75.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0A8D74519F9983C006FE907 /* texture75.bmp */; };
 		D0A8D74819F9BFE6006FE907 /* lockedon.wav in Resources */ = {isa = PBXBuildFile; fileRef = D0A8D74719F9BFE6006FE907 /* lockedon.wav */; };
 		D0AD4F6616D6F11600664895 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0AD4F6516D6F11600664895 /* AVFoundation.framework */; };
@@ -423,7 +423,6 @@
 		D0EECB2C1757CEA100B5B815 /* texture34.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2B1757CEA000B5B815 /* texture34.bmp */; };
 		D0EECB2E1757CFFE00B5B815 /* texture33.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2D1757CFFD00B5B815 /* texture33.bmp */; };
 		D0EECB301757D69300B5B815 /* texture35.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB2F1757D69200B5B815 /* texture35.bmp */; };
-		D0EECB321757D9B300B5B815 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0EECB311757D9B200B5B815 /* Default-568h@2x.png */; };
 		D0EFCAA91C3A4E3700731FAF /* texture93.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EFCAA81C3A4E3700731FAF /* texture93.bmp */; };
 		D0EFCAAB1C54A2CD00731FAF /* texture94.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0EFCAAA1C54A2CD00731FAF /* texture94.bmp */; };
 		D0F33ADE1BBF453C00215953 /* texture87.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D0F33ADD1BBF453C00215953 /* texture87.bmp */; };
@@ -1535,6 +1534,7 @@
 				6D4F2F3E1618241000286C16 /* shoot.wav in Resources */,
 				D0AF471018ECAE8200081B81 /* texture63.bmp in Resources */,
 				6D4F2F401618241A00286C16 /* boom.wav in Resources */,
+				D0A7FF412E4A80F900C6128B /* Default-568h@2x.png in Resources */,
 				D04EB4D51BDE0F8E0089D9F0 /* app_icon152x152.png in Resources */,
 				D04EB4D31BDE0F720089D9F0 /* app_icon114x114.png in Resources */,
 				D0A5535C189868B800F7E798 /* texture48.bmp in Resources */,
@@ -1589,6 +1589,7 @@
 				D09E7FC816EFBFC500343CE6 /* texture27.bmp in Resources */,
 				D0AF470E18E2546000081B81 /* texture62.bmp in Resources */,
 				D0EC73632CA4BB0A00B0D40A /* texture117.bmp in Resources */,
+				D0A7FF422E4A859200C6128B /* Default@2x.png in Resources */,
 				D08AC6C31DAAE3DA00E367B7 /* texture101.bmp in Resources */,
 				D0A5537518C13C7100F7E798 /* texture59.bmp in Resources */,
 				D087BAEB204707B400F4D6E0 /* texture109.bmp in Resources */,
@@ -1597,7 +1598,6 @@
 				D0EECB2C1757CEA100B5B815 /* texture34.bmp in Resources */,
 				D0EECB2E1757CFFE00B5B815 /* texture33.bmp in Resources */,
 				D0EECB301757D69300B5B815 /* texture35.bmp in Resources */,
-				D0EECB321757D9B300B5B815 /* Default-568h@2x.png in Resources */,
 				D04EB4D11BDE0F5F0089D9F0 /* app_icon76x76.png in Resources */,
 				D0C133C519F448BF003A6949 /* Default2.png in Resources */,
 				D0309F201770F3A600100357 /* texture37.bmp in Resources */,
@@ -1626,9 +1626,7 @@
 				D02DAC1417D147E600035601 /* dropoff.wav in Resources */,
 				D02B8F11195DF2E700830369 /* texture39.bmp in Resources */,
 				D03665E520162CF000B106AE /* texture103.bmp in Resources */,
-				D09A4E321840196E004C73F2 /* Default-Landscape.png in Resources */,
 				D02DAC1617D14AE400035601 /* texture41.bmp in Resources */,
-				D02D2CC217D5C5F200C03EB5 /* Default@2x.png in Resources */,
 				D0A8D74619F9983C006FE907 /* texture75.bmp in Resources */,
 				D077BA4B1DB435DB00B4C701 /* texture102.bmp in Resources */,
 				D02D2CC417D5C5FF00C03EB5 /* Default.png in Resources */,
@@ -2326,7 +2324,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.racing-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.15.0;
+				MARKETING_VERSION = 1.15.4;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
@@ -2361,7 +2359,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.racing-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.15.0;
+				MARKETING_VERSION = 1.15.4;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "d0gf1ght 95";
@@ -2554,12 +2552,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
+				ASSETCATALOG_COMPILER_APPICON_NAME = shipicon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -2580,7 +2578,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.10.4;
+				MARKETING_VERSION = 1.15.4;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2596,12 +2594,12 @@
 		D0F4D9D22B1568B500948122 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = shipiconspacecombat;
+				ASSETCATALOG_COMPILER_APPICON_NAME = shipicon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = ZQVH66AQJ9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2620,7 +2618,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "d0gfight 95";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.action-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
-				MARKETING_VERSION = 1.10.4;
+				MARKETING_VERSION = 1.15.4;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.domain17.d0gfight2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
