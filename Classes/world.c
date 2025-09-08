@@ -42,6 +42,7 @@ void update_regions(void);
 void convert_mesh_to_world_elems(struct mesh_t* mesh, unsigned int texture_id, float tile_div, struct mesh_coordinate_t* vis_normal);
 void world_build_visibility_data(void);
 void world_update(float tc);
+void world_handle_impact(WorldElem*, WorldElem*);
 int check_collision(WorldElem*, WorldElem*);
 
 extern volatile WorldElemListNode* btreeVisibleTest;
@@ -50,11 +51,11 @@ extern world_elem_btree_node* visibleBtreeRootBuilding;
 world_t *gWorld = NULL;
 game_lock_t gWorldLock;
 
-float C_THRUST = /*0.05*/ 0.050; // higher values = more speed
+float C_THRUST = /*0.05*/ 0.100; // higher values = more speed
 // TODO: DO NOT SET THIS HERE SEE gameVariables
-float C_FRICTION = /*0.04*/ 0.04; // higher values = more friction
+float C_FRICTION = /*0.04*/ 0.05; // higher values = more friction
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
-float collision_dot_min = 0.0;
+float collision_dot_min = 0.0; 
 
 static struct mesh_t* world_pending_mesh = NULL;
 static float world_pending_mesh_info[3];
@@ -726,7 +727,7 @@ world_add_object_core(Model type,
      * need to be added to pending-free list.. */
     if(model_changed && pElem->linked_elem)
     {
-        printf("WARN: world.c add_object_core linked elem left behind\n");
+        DBPRINTF(("WARN: world.c add_object_core linked elem left behind\n"));
     }
     
     int p;
@@ -1068,7 +1069,7 @@ int update_object_velocity_with_friction(int object_id, float v[3], float cthrus
      */
     
     WorldElemListNode* pElemNode = world_elem_list_find(object_id, &gWorld->elements_list);
-    
+
     if(pElemNode)
     {
         float ship_vnew[3] =
@@ -1303,7 +1304,7 @@ world_region_head(float x, float y, float z)
 
 void world_init(float radius)
 {
-    float ws = 25;
+    float ws = /*25*/ 5;
     
     gWorld = malloc(sizeof(world_t));
     memset(gWorld, 0, sizeof(world_t));
@@ -1552,29 +1553,23 @@ world_move_elem(WorldElem* pElem, float x, float y, float z, int relative)
 void
 world_repulse_elem(WorldElem* pCollisionB, WorldElem* pCollisionA, float tc, float Frepulse)
 {
-    float mv[3];
     int i;
     float* p[] = {
         &pCollisionA->physics.ptr->vx,
         &pCollisionA->physics.ptr->vy,
         &pCollisionA->physics.ptr->vz
     };
-    
+
+    float *O = check_bounding_box_overlap_result;
+    float nD = sqrt(O[0] * O[0] + O[1] * O[1] + O[2] * O[2]);
+
+    // apply reverse velocity
     for(i = 0; i < 3; i++)
     {
-        mv[i] = (check_bounding_box_overlap_result[i] * pCollisionA->physics.ptr->velocity+0.01) * tc;
-    }
-    
-    move_elem_relative(pCollisionA, mv[0], mv[1], mv[2]);
+        *p[i] += (O[i] / nD) * Frepulse;
+    } 
 
-    //DBPRINTF(("move rel: %f %f %f", mv[0], mv[1], mv[2]));
-
-    // reverse velocity
-    
-    for(i = 0; i < 3; i++)
-    {
-        *p[i] += mv[i]*Frepulse / tc;
-    }
+    // NOT calling move_elem_relative because that is done outside 
 }
 
 static void
@@ -2028,9 +2023,6 @@ world_update(float tc)
                             collision_vorigin[1] = pElem->physics.ptr->y;
                             collision_vorigin[2] = pElem->physics.ptr->z;
 
-                            // MARK: -- attempt to move along vm
-                            //move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
-
                             // MARK: -- resolve collisions with other objects
 
                             collision_action_table_t *collision_actions_cur = &collision_actions;
@@ -2086,11 +2078,9 @@ world_update(float tc)
                                                     goto world_update_collision_ignore;
                                                 }
 
-                                                // HACK: removed a hack that enforced elemA had higher velocity than B and swapped
-
                                                 if(colact == COLLISION_ACTION_REPULSE)
                                                 {
-                                                    momentum = 0;
+                                                    //momentum = 0;// cancel forward momentum?
 
                                                     world_repulse_elem(pRegionElem, pElemCollided, tc, collision_repulsion_coeff);
 
@@ -2106,8 +2096,10 @@ world_update(float tc)
                                                     goto world_update_collision_ignore;
                                                 }
 
-                                            collision_list_add_retry:
-                                                {
+                                                collision_handle_impact(pRegionElem, pElemCollided, tc);
+
+                                                
+                                                /*{
                                                     WorldElemListNode *nA, *nB;
 
                                                     nA = world_elem_list_find_elem(pElemCollided, &gWorld->elements_collided);
@@ -2131,7 +2123,7 @@ world_update(float tc)
                                                     {
                                                         DBPRINTF((" CONFLICT while colliding"));
                                                     }
-                                                }
+                                                }*/
                                             }
                                         }
 

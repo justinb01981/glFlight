@@ -2615,7 +2615,7 @@ do_game_network_read_core()
 {
     gameNetworkMessage msg;
     gameNetworkAddress srcAddr;
-    int receive_block_ms = 5;
+    int receive_block_ms = 2;
     int retries = 100;
     gameNetworkMessageQueued* pMsgNew;
     

@@ -73,7 +73,7 @@ private:
 public:
 
     GLFlightGame(int argc, char* argv[]) :
-        gameFramework(argc, argv, "glFlightMain", gameFramework::CORE, 3, 0, 2, MATCH_TEMPLATE, glm::uvec2(1280, 640))
+        gameFramework(argc, argv, "glFlightMain", gameFramework::CORE, 3, 0, 2, MATCH_TEMPLATE, glm::uvec2(GLM_VIEW_WIDTH, GLM_VIEW_HEIGHT))
     {
     }
 

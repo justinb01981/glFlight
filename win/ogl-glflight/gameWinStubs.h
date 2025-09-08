@@ -16,3 +16,6 @@ const char* glFlightSettingsPath();
 const char* glFlightDefaultGameName();
 
 const char* glFlightDefaultPlayerName();
+
+const unsigned long GLM_VIEW_WIDTH = 1280;
+const unsigned long GLM_VIEW_HEIGHT = 720;

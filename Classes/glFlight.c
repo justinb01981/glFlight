@@ -341,6 +341,7 @@ calibrate_bail:
                              my_ship_x, my_ship_y, my_ship_z,
                              my_ship_alpha, my_ship_beta, my_ship_gamma,
                              1, texture_id_playership);
+        
         world_get_last_object()->object_type = OBJ_PLAYER;
         targetSpeed = MAX_SPEED/10;
 
@@ -348,100 +349,96 @@ calibrate_bail:
 
         world_get_last_object()->bounding_remain = 1;
         world_get_last_object()->durability = ship_durability;
+
+        pWorldElemMyShip = world_get_last_object();
         
         console_write(game_log_messages[GAME_LOG_TELEPORT]);
         gameAudioPlaySoundAtLocationWithRate("teleport", 1.0, gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
 
-        return; // HACK: is this necessary anymore - testing needed
+        //return; // HACK: is this necessary anymore - testing needed
     }
-    else
-    {
-        if(pWorldElemMyShip)
-        {
-            my_ship_x = pWorldElemMyShip->physics.ptr->x;
-            my_ship_y = pWorldElemMyShip->physics.ptr->y;
-            my_ship_z = pWorldElemMyShip->physics.ptr->z;
-            
-            pWorldElemMyShip->stuff.affiliation = gameNetworkState.my_player_id;
-            
-            world_replace_object(pWorldElemMyShip->elem_id, model_my_ship,
-                                 my_ship_x, my_ship_y, my_ship_z,
-                                 ship_alpha, ship_beta, ship_gamma,
-                                 1, texture_id_playership);
-            
-            // sliding physics -- I just found the mathematical formula for "whee!"
-            float tv[3] = {
-                -ship_z_vec[0]*speed,
-                -ship_z_vec[1]*speed,
-                -ship_z_vec[2]*speed
-            };
-            update_object_velocity_with_friction(my_ship_id, tv, C_THRUST, C_FRICTION);
+   
 
-            if(camera_locked_frames > 0)
-            {
-                camera_locked_frames--;
-            }
-            else if(camera_fix.frames > 0 && (pCameraWatchNode = world_elem_list_find(camera_fix.elem_id, &gWorld->elements_moving)))
-            {
-                camera_fix.frames--;
+    if(pWorldElemMyShip)
+    {
+        my_ship_x = pWorldElemMyShip->physics.ptr->x;
+        my_ship_y = pWorldElemMyShip->physics.ptr->y;
+        my_ship_z = pWorldElemMyShip->physics.ptr->z;
+            
+        pWorldElemMyShip->stuff.affiliation = gameNetworkState.my_player_id;
+            
+        world_replace_object(pWorldElemMyShip->elem_id, model_my_ship,
+                                my_ship_x, my_ship_y, my_ship_z,
+                                ship_alpha, ship_beta, ship_gamma,
+                                1, texture_id_playership);
+            
+        // sliding physics -- I just found the mathematical formula for "whee!"
+        float tv[3] = {
+            -ship_z_vec[0]*speed,
+            -ship_z_vec[1]*speed,
+            -ship_z_vec[2]*speed
+        };
+        update_object_velocity_with_friction(my_ship_id, tv, C_THRUST, C_FRICTION);
+
+        if(camera_locked_frames > 0)
+        {
+            camera_locked_frames--;
+        }
+        else if(camera_fix.frames > 0 && (pCameraWatchNode = world_elem_list_find(camera_fix.elem_id, &gWorld->elements_moving)))
+        {
+            camera_fix.frames--;
                 
-                if(pCameraWatchNode)
-                {
-                    gameCamera_initWithHeading(my_ship_x, my_ship_y, my_ship_z,
-                                               pCameraWatchNode->elem->physics.ptr->x - my_ship_x,
-                                               pCameraWatchNode->elem->physics.ptr->y - my_ship_y,
-                                               pCameraWatchNode->elem->physics.ptr->z - my_ship_z);
-                    gameCamera_MoveZ(-5);
-                    gameCamera_MoveY(1);
-                }
-                else
-                {
-                    camera_fix.frames = 0;
-                    camera_fix.elem_id = WORLD_ELEM_ID_INVALID;
-                }
+            if(pCameraWatchNode)
+            {
+                gameCamera_initWithHeading(my_ship_x, my_ship_y, my_ship_z,
+                                            pCameraWatchNode->elem->physics.ptr->x - my_ship_x,
+                                            pCameraWatchNode->elem->physics.ptr->y - my_ship_y,
+                                            pCameraWatchNode->elem->physics.ptr->z - my_ship_z);
+                gameCamera_MoveZ(-5);
+                gameCamera_MoveY(1);
             }
             else
             {
-                gameCamera_init(my_ship_x,
-                                my_ship_y,
-                                my_ship_z,
-                                -ship_alpha, -ship_beta, -ship_gamma);
-
-                gameCamera_yawRadians((viewRotationDegrees/180.0) * M_PI);
-                gameCamera_MoveZ(-camera_z_trail);
-                gameCamera_MoveY(1);
+                camera_fix.frames = 0;
+                camera_fix.elem_id = WORLD_ELEM_ID_INVALID;
             }
-            
-            // updating targeting reticle
-            targetingReticleElem.physics.ptr = &targetingReticleElem.physics.data;
-            targetingReticleElem.physics.ptr->x = pWorldElemMyShip->physics.ptr->x + ship_z_vec[0] * reticleZDist;
-            targetingReticleElem.physics.ptr->y = pWorldElemMyShip->physics.ptr->y + ship_z_vec[1] * reticleZDist;
-            targetingReticleElem.physics.ptr->z = pWorldElemMyShip->physics.ptr->z + ship_z_vec[2] * reticleZDist;
-            targetingReticleElem.texture_id = TEXTURE_ID_CONTROLS_FIRE;
-            targetingReticleElem.scale = 2;
-            
-            sprintf(statsMessage, "%.0f %.0f  %.0f   %03d %03d\n"
-                    "^2^2^C   ^B   ^A    ^P   ^O   ^1^1  %s",
-                    (pWorldElemMyShip->durability / (float) DURABILITY_PLAYER) * 100.0,
-                    (game_ammo_bullets / game_ammo_bullets_max) * 100,
-                    game_ammo_missles,
-                    //gameStateSinglePlayer.caps_owned, gameStateSinglePlayer.caps_found,
-                    //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_TURRET? 1: 0,
-                    //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_SHIP? 1: 0,
-                    gameStateSinglePlayer.stats.score,
-                    gameNetworkState.connected ?
-                    (int) gameNetworkState.time_game_remaining :
-                    game_time_elapsed(),
-                    game_status_string);
-            strcpy(gameInterfaceControls.statsTextRect.text, statsMessage);
-
-            respawned = 0;
         }
         else
         {
-            // failed, we probably died
-            my_ship_id = WORLD_ELEM_ID_INVALID;
+            gameCamera_init(my_ship_x,
+                            my_ship_y,
+                            my_ship_z,
+                            -ship_alpha, -ship_beta, -ship_gamma);
+
+            gameCamera_yawRadians((viewRotationDegrees/180.0) * M_PI);
+            gameCamera_MoveZ(-camera_z_trail);
+            gameCamera_MoveY(1);
         }
+            
+        // updating targeting reticle
+        targetingReticleElem.physics.ptr = &targetingReticleElem.physics.data;
+        targetingReticleElem.physics.ptr->x = pWorldElemMyShip->physics.ptr->x + ship_z_vec[0] * reticleZDist;
+        targetingReticleElem.physics.ptr->y = pWorldElemMyShip->physics.ptr->y + ship_z_vec[1] * reticleZDist;
+        targetingReticleElem.physics.ptr->z = pWorldElemMyShip->physics.ptr->z + ship_z_vec[2] * reticleZDist;
+        targetingReticleElem.texture_id = TEXTURE_ID_CONTROLS_FIRE;
+        targetingReticleElem.scale = 2;
+            
+        sprintf(statsMessage, "%.0f %.0f  %.0f   %03d %03d\n"
+                "^2^2^C   ^B   ^A    ^P   ^O   ^1^1  %s",
+                (pWorldElemMyShip->durability / (float) DURABILITY_PLAYER) * 100.0,
+                (game_ammo_bullets / game_ammo_bullets_max) * 100,
+                game_ammo_missles,
+                //gameStateSinglePlayer.caps_owned, gameStateSinglePlayer.caps_found,
+                //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_TURRET? 1: 0,
+                //pWorldElemMyShip->stuff.flags.mask & STUFF_FLAGS_SHIP? 1: 0,
+                gameStateSinglePlayer.stats.score,
+                gameNetworkState.connected ?
+                (int) gameNetworkState.time_game_remaining :
+                game_time_elapsed(),
+                game_status_string);
+        strcpy(gameInterfaceControls.statsTextRect.text, statsMessage);
+
+        respawned = 0;
     }
     
     gameCamera_sanity();

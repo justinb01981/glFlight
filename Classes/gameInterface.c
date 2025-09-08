@@ -1061,35 +1061,35 @@ void gameInterfaceProcessAction(void)
 
         case ACTION_SETTING_SHIP_TEXTURE:
             switch(texture_id_playership)
-        {
-            case TEXTURE_ID_SHIP1:
-                texture_id_playership = TEXTURE_ID_SHIP2;
-                break;
-            case TEXTURE_ID_SHIP2:
-                texture_id_playership = TEXTURE_ID_SHIP3;
-                break;
-            case TEXTURE_ID_SHIP3:
-                texture_id_playership = TEXTURE_ID_SHIP4;
-                break;
-            case TEXTURE_ID_SHIP4:
-                texture_id_playership = TEXTURE_ID_SHIP5;
-                break;
-            case TEXTURE_ID_ENEMYSHIP_ACE:
-                texture_id_playership = TEXTURE_ID_ENEMYSHIP;
-                break;
-            case TEXTURE_ID_SHIP5:
-                texture_id_playership = TEXTURE_ID_SHIP6;
-                break;
-            case TEXTURE_ID_SHIP6:
-                texture_id_playership = TEXTURE_ID_SHIP7;
-                break;
-            case TEXTURE_ID_SHIP7:
-                texture_id_playership = TEXTURE_ID_SHIP8;
-                break;
-            default:
-                texture_id_playership = TEXTURE_ID_SHIP1;
-                break;
-        }
+            {
+                case TEXTURE_ID_SHIP1:
+                    texture_id_playership = TEXTURE_ID_SHIP2;
+                    break;
+                case TEXTURE_ID_SHIP2:
+                    texture_id_playership = TEXTURE_ID_SHIP3;
+                    break;
+                case TEXTURE_ID_SHIP3:
+                    texture_id_playership = TEXTURE_ID_SHIP4;
+                    break;
+                case TEXTURE_ID_SHIP4:
+                    texture_id_playership = TEXTURE_ID_SHIP5;
+                    break;
+                case TEXTURE_ID_ENEMYSHIP_ACE:
+                    texture_id_playership = TEXTURE_ID_ENEMYSHIP;
+                    break;
+                case TEXTURE_ID_SHIP5:
+                    texture_id_playership = TEXTURE_ID_SHIP6;
+                    break;
+                case TEXTURE_ID_SHIP6:
+                    texture_id_playership = TEXTURE_ID_SHIP7;
+                    break;
+                case TEXTURE_ID_SHIP7:
+                    texture_id_playership = TEXTURE_ID_SHIP8;
+                    break;
+                default:
+                    texture_id_playership = TEXTURE_ID_SHIP1;
+                    break;
+            }
             
             WorldElemListNode* pShip = world_elem_list_find(my_ship_id, &gWorld->elements_list);
             if(pShip)

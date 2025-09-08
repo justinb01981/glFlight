@@ -74,7 +74,7 @@ extern void (*glFlightOnPurchase)(void);
 #endif
 #endif
 
-#if GAME_PLATFORM_ANDROID
+#if !GAME_PLATFORM_IOS
 #define APP_ITUNES_URL "https://play.google.com/store/apps/details?id=com.domain17.glflight"
 #define PLATFORM_TICK_RATE 60
 #define PLATFORM_DRAW_ELEMS_MAX 1000
@@ -100,7 +100,7 @@ extern void (*glFlightOnPurchase)(void);
 /* reducing friction influences this... should be MAX_THRUST really */
 #define MAX_SPEED (8.25)
 
-const static char* GAME_VERSION_STR = "1.15.0_core";
+const static char* GAME_VERSION_STR = "1.15.4_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 
@@ -113,7 +113,7 @@ extern float C_FRICTION;    // SEE physics_friction_c gameVariable
 const static int pooped_cube_interval_ms = 75;
 const static int pooped_cube_lifetime = 300;    // determines trail length
 
-const static float collision_repulsion_coeff = 1.2;
+const static float collision_repulsion_coeff = 2.0;
 
 const static float RADAR_MIN_VELOCITY = 1;
 
