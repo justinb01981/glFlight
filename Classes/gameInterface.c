@@ -1054,7 +1054,7 @@ void gameInterfaceProcessAction(void)
             
         case ACTION_SETTING_TWEAK_PHYSICS:
             C_FRICTION *= 1.5;
-            if(C_FRICTION >= 0.5) C_FRICTION = 0.005;
+            if(C_FRICTION >= 0.5) C_FRICTION = C_FRICTION_DEFAULT;
             console_write("C_FRICTION:%f", C_FRICTION);
             appWriteSettings();
             break;

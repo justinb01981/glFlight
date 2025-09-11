@@ -742,7 +742,7 @@ game_start(float difficulty, int type)
     gameStateSinglePlayer.points_enemy_bh_killed = gameStateSinglePlayer.points_enemy_killed*2;
     gameStateSinglePlayer.points_turret_killed = 25;
     gameStateSinglePlayer.points_per_second_elapsed = 0;
-    gameStateSinglePlayer.powerup_lifetime_frames = GAME_FRAME_RATE * 10;
+    gameStateSinglePlayer.powerup_lifetime_frames = GAME_FRAME_RATE * POWERUP_LIFETIME_SEC;
     gameStateSinglePlayer.player_drops_powerup = 0;
     gameStateSinglePlayer.enemy1_ignore_player_pct = 0;
     gameStateSinglePlayer.score_pop_threshold = 10;
@@ -2424,7 +2424,7 @@ fireBullet(int bulletAction)
     bv = (missle? 4.0 : 2.0) * listNodeShip->elem->scale;
     blr = missle? 0: 0.3 * listNodeShip->elem->scale;
     
-    int shots = listNodeShip->elem->type == MODEL_SHIP3 && !missle? 2: 1;
+    int shots = listNodeShip->elem->type == MODEL_SHIP3 && !missle? 2: 1;   // hack: ship type 3 fires 2 bullets
     
     while(shots > 0)
     {

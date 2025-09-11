@@ -110,11 +110,7 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
 
     switch (world_coll_act) {
     case COLLISION_ACTION_REPULSE:
-        /*
-        game_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
-        gameNetwork_handle_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
-        game_ai_collision(pCollisionA->elem, pCollisionB->elem, world_coll_act);
-        */
+        // ignored and handled in world_update
         break;
 
     case COLLISION_ACTION_NONE:
@@ -129,22 +125,20 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
     case COLLISION_ACTION_POWERUP_GRAB_OR_TOW:
 
     case COLLISION_ACTION_DAMAGE:
-        if (1)
+        
         {
-
             int object_destroyed = 0;
-            int durability_a = a->durability;
-            int durability_b = b->durability;
-
 
             // MARK: -- apply force (in some collision cases)
             if (world_coll_act == COLLISION_ACTION_DAMAGE)
             {
+                DBPRINTF(("impact dmg exchanged: %d->%d", a->durability, b->durability));
+
                 // pCollisionA points at OBJ_SHIP instead of OBJ_BULLET
                 if (a->moving &&
                     b->moving)
                 {
-                    float bullet_vtransfer = 0.2;
+                    float bullet_vtransfer = 0.05;
 
                     update_object_velocity(a->elem_id,
                         b->physics.ptr->vx * bullet_vtransfer,
@@ -161,10 +155,11 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
             // MARK: -- BY NOW all logical collision handling applicable to  game state is done
             if (world_coll_act == COLLISION_ACTION_DAMAGE)
             {
-                float durability_tmp = a->durability;
+                
+                int pD[] = { a->durability, b->durability };    // prior to assigning damage
 
-                a->durability -= b->durability;
-                b->durability -= durability_tmp;
+                if(a->durability >= b->durability) a->durability -= b->durability;
+                if(b->durability >= pD[0]) b->durability -= pD[0];
 
                 // moving object destroyed
                 if (a->durability <= 0)
@@ -177,7 +172,7 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
                         world_elem_list_add(a, &gWorld->elements_to_be_freed);
                     }
 
-                    if (durability_a > 0)
+                    if (pD[0] > 0)
                     {
                         int obj_id =
                             world_add_object(MODEL_ICOSAHEDRON,
@@ -208,7 +203,7 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
                         world_elem_list_add(b, &gWorld->elements_to_be_freed);
                     }
 
-                    if (durability_b > 0)
+                    if (pD[1] > 0)
                     {
                         // add explosion graphic
                         int obj_id =
@@ -247,7 +242,7 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
                             world_get_last_object()->object_type = OBJ_WRECKAGE;
                             world_get_last_object()->destructible = 0;
                             update_object_velocity(obj_id, 0, 0, 0, 0);
-                            world_object_set_lifetime(obj_id, 3600);
+                            world_object_set_lifetime(obj_id, OBJ_LIFETIME_WRECKAGE_FRAMES);
                         }
                     }
                 }

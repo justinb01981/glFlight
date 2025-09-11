@@ -23,7 +23,7 @@ typedef struct {
 } terrain_t;
 
 static float SCALE_MAX = 4;
-static int num_asteroids = 0;
+static int num_asteroids = 3;
 static int cube_groups = 16;
 
 WorldElemListNode*
@@ -181,6 +181,8 @@ world_build_run_program(float x, float y, float z)
                 {
                     world_add_object(model_t[iSet], C[0], C[1], C[2], M_PI/2, rand_in_range(-M_PI, M_PI), -M_PI/2, model_scales[iSet], model_tex[iSet]);
                     world_elem_list_add(world_get_last_object(), &head);
+
+                    world_get_last_object()->durability = DURABILITY_BLOCK;
                 }
             }
         }

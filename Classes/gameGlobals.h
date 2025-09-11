@@ -98,9 +98,9 @@ extern void (*glFlightOnPurchase)(void);
 #endif
 
 /* reducing friction influences this... should be MAX_THRUST really */
-#define MAX_SPEED (8.25)
+#define MAX_SPEED (6.25)
 
-const static char* GAME_VERSION_STR = "1.15.4_core";
+const static char* GAME_VERSION_STR = "1.16.0_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 
@@ -108,30 +108,35 @@ static const double minSpeed = /*MAX_SPEED/16*/ /*0.25*/ 0.00001;
 const static float MAX_SPEED_MISSLE = (MAX_SPEED * 3.5);
 const static float SPEED_BOOST_FRAMES = 60 * 5;
 extern float C_THRUST;
-extern float C_FRICTION;    // SEE physics_friction_c gameVariable
+extern float C_FRICTION;    
 
-const static int pooped_cube_interval_ms = 75;
+#define C_FRICTION_DEFAULT (0.06)
+
+const static int OBJ_LIFETIME_WRECKAGE_FRAMES = 3600;
+
+const static int pooped_cube_interval_ms = 150;
 const static int pooped_cube_lifetime = 300;    // determines trail length
 
-const static float collision_repulsion_coeff = 2.0;
+const static float collision_repulsion_coeff = 5.0;
 
 const static float RADAR_MIN_VELOCITY = 1;
 
 const static float TOW_DISTANCE_MAX = 20;
 const static float TOW_DISTANCE_MIN = -3.0; // hack: work around collision competition when towing
 
-const static float GAME_AI_UPDATE_INTERVAL_MS = 120;
+const static float GAME_AI_UPDATE_INTERVAL_MS = 32;
 const static long GAME_NETWORK_PORT_DEFAULT = 52000;
 
 #define GAME_FRAME_RATE 60
-#define GAME_FRAME_RATE_TIMES_4 240
-#define GAME_FRAME_RATE_TIMES_10 600
 #define GAME_TICK_RATE PLATFORM_TICK_RATE
+#define MAX_AI_RUN_PER_FRAME 16 // careful this has resullted in stalled enemies due to starvation
 
 #define game_ammo_missles_max 4
 #define game_ammo_bullets_max 32
 #define GAME_POWERUP_DROP_TABLE_LEN 10
 #define GAME_CONTROL_SCALAR (M_PI * 5.0)
+#define POWERUP_LIFETIME_SEC 20
+#define BULLET_VELOCITY_DEFAULT (MAX_SPEED*5)
 
 #define GAME_CAPTURE_TOW_FORCE 0.60 // based on brief testing of stickiness
 

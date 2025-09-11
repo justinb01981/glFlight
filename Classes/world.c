@@ -53,7 +53,7 @@ game_lock_t gWorldLock;
 
 float C_THRUST = /*0.05*/ 0.100; // higher values = more speed
 // TODO: DO NOT SET THIS HERE SEE gameVariables
-float C_FRICTION = /*0.04*/ 0.05; // higher values = more friction
+float C_FRICTION = /*0.04*/ C_FRICTION_DEFAULT; // higher values = more friction
 float visible_distance = VISIBLE_DISTANCE_PLATFORM;
 float collision_dot_min = 0.0; 
 
@@ -573,6 +573,7 @@ world_add_object_core(Model type,
             
         case MODEL_BULLET:
             pElem->destructible = 1;
+            new_durability = 1;
             pElem->spans_regions = 0;
             pElem->bounding_remain = 0;
             pElem->object_type = OBJ_BULLET;
@@ -580,6 +581,7 @@ world_add_object_core(Model type,
             
         case MODEL_MISSLE:
             pElem->destructible = 1;
+            new_durability = 5;
             pElem->spans_regions = 0;
             pElem->bounding_remain = 0;
             pElem->object_type = OBJ_MISSLE;
@@ -863,34 +865,6 @@ int world_add_object(Model type, float x, float y, float z, float yaw, float pit
 
 void world_unlink_elem(WorldElem* pFreeElem)
 {
-    /*
-     * void
-world_remove_object(int elem_id)
-{
-    WorldElem* pElem = NULL;
-
-    if(gWorld->ignore_remove) return;
-
-    WorldElemListNode* pRemoveNode;
-    pRemoveNode = world_elem_list_find(elem_id, &gWorld->elements_list);
-    if(pRemoveNode) pElem = pRemoveNode->elem;
-
-    if(pElem && !pElem->remove_pending)
-    {
-        if(gWorld->world_update_state.world_remove_hook) gWorld->world_update_state.world_remove_hook(pElem);
-
-        remove_element_from_region(pElem);
-
-        world_elem_list_remove(pElem, &gWorld->elements_expiring);
-        world_elem_list_remove(pElem, &gWorld->elements_moving);
-        world_elem_list_remove(pElem, &gWorld->elements_intelligent);
-
-        world_elem_list_remove(pElem, &gWorld->elements_list);
-        world_elem_list_add(pElem, &gWorld->elements_to_be_freed);
-        pElem->remove_pending = 1;
-    }
-}
-     */
         world_elem_list_remove(pFreeElem, &gWorld->elements_expiring);
         world_elem_list_remove(pFreeElem, &gWorld->elements_moving);
         world_elem_list_remove(pFreeElem, &gWorld->elements_intelligent);
@@ -913,12 +887,7 @@ world_remove_object(int elem_id)
     {
         if(gWorld->world_update_state.world_remove_hook) gWorld->world_update_state.world_remove_hook(pElem);
         
-        world_unlink_elem(pElem);
-
-        // here, remove from elements list immediately instead of waiting for elements_to_be_freed-pending to do it
-        //world_elem_list_remove(pElem, &gWorld->elements_list);
-
-        // freed from the rest later in clear_pending
+        // freed from the rest later in clear_pending and unlinked
         world_elem_list_add(pElem, &gWorld->elements_to_be_freed);
         pElem->remove_pending = 1;
     }
@@ -1304,7 +1273,7 @@ world_region_head(float x, float y, float z)
 
 void world_init(float radius)
 {
-    float ws = /*25*/ 5;
+    float ws = 25;
     
     gWorld = malloc(sizeof(world_t));
     memset(gWorld, 0, sizeof(world_t));
@@ -1554,22 +1523,35 @@ void
 world_repulse_elem(WorldElem* pCollisionB, WorldElem* pCollisionA, float tc, float Frepulse)
 {
     int i;
+    float* O = check_bounding_box_overlap_result;
     float* p[] = {
         &pCollisionA->physics.ptr->vx,
         &pCollisionA->physics.ptr->vy,
         &pCollisionA->physics.ptr->vz
     };
 
-    float *O = check_bounding_box_overlap_result;
+    float* r[] = {
+    &pCollisionB->physics.ptr->vx,
+    &pCollisionB->physics.ptr->vy,
+    &pCollisionB->physics.ptr->vz
+    };
+
+
     float nD = sqrt(O[0] * O[0] + O[1] * O[1] + O[2] * O[2]);
 
     // apply reverse velocity
     for(i = 0; i < 3; i++)
     {
-        *p[i] += (O[i] / nD) * Frepulse;
+        float Fx = (O[i] / nD)* Frepulse;
+        *p[i] += Fx;
+
+        // apply force back unless static
+        //if(pCollisionB->moving) *r[i] -= Fx;
     } 
 
     // NOT calling move_elem_relative because that is done outside 
+
+    if(pCollisionB->moving) update_object_in_motion(pCollisionB); // must do it here tho for right-hand collided object
 }
 
 static void
@@ -1696,7 +1678,15 @@ check_collision(WorldElem* pElemA, WorldElem* pElemB)
 WorldElemListNode*
 get_region_list_head(float x, float y, float z)
 {
-    if(x < -gWorld->bound_radius || x > gWorld->bound_radius ||
+    float test[] = { x, y, z };
+    for (int i = 0; i < 3; i++) {
+        if (isnan(test[i]))
+        {
+            return NULL;
+        }
+    }
+
+    if(x < -gWorld->bound_radius || x >= gWorld->bound_radius ||
        y < -gWorld->bound_radius || y > gWorld->bound_radius ||
        z < -gWorld->bound_radius || z > gWorld->bound_radius) return NULL;
     
@@ -1821,14 +1811,16 @@ remove_element_from_region(WorldElem* pElem)
 void
 world_update_elem_removed_hook(WorldElem* pElem)
 {
+    /*
     world_update_state_t *state = &gWorld->world_update_state;
     if(!state->world_region_iterate_cur) return;
 
     if(state->world_region_iterate_cur && state->world_region_iterate_cur->elem == pElem)
     {
         // our position in the list was invalidated (previously changed iterate_cur to *next but this MIGHT not be optimal?
-        state->world_region_iterate_cur = state->world_region_iterate_cur->next;
-        if(!state->world_region_iterate_cur) state->world_region_iterate_cur = state->world_region_iterate_retry_head;
+        //state->world_region_iterate_cur = state->world_region_iterate_cur->next;
+        //if(!state->world_region_iterate_cur) state->world_region_iterate_cur = state->world_region_iterate_retry_head;
+        state->world_region_iterate_cur = NULL; // jb 9-2025: testing
     }
     
     if(state->ptr_objects_moving && state->ptr_objects_moving->elem == pElem)
@@ -1836,6 +1828,7 @@ world_update_elem_removed_hook(WorldElem* pElem)
         state->ptr_objects_moving = state->ptr_objects_moving->next;
         if(!state->ptr_objects_moving) state->ptr_objects_moving = gWorld->elements_moving.next;   // reset back to moving elements head
     }
+    */
 }
 
 static BOOL updatefilterPass1Objects(WorldElem* e)
@@ -2030,9 +2023,12 @@ world_update(float tc)
                             if(do_check_collisions && pElem->collision_start_time <= time_ms)
                             {
                                 int sound_played = 0;
+                                WorldElemListNode* pRegionElemsHead;
+
+                            region_collision_retry:
 
                                 // check collisions
-                                WorldElemListNode* pRegionElemsHead =
+                                pRegionElemsHead =
                                 get_region_list_head(pElem->physics.ptr->x,
                                                      pElem->physics.ptr->y,
                                                      pElem->physics.ptr->z);
@@ -2041,7 +2037,7 @@ world_update(float tc)
                                 {
                                     WorldElem* pRegionElem, *pElemCollided = pElem;
 
-                                    //region_collision_retry:
+                                    
 
                                     gWorld->world_update_state.world_region_iterate_retry_head = pRegionElemsHead;
                                     gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_retry_head->next;
@@ -2049,6 +2045,10 @@ world_update(float tc)
                                     while(gWorld->world_update_state.world_region_iterate_cur)
                                     {
                                         pRegionElem = gWorld->world_update_state.world_region_iterate_cur->elem;
+
+                                        WorldElemListNode* rgniterNext = gWorld->world_update_state.world_region_iterate_cur->next;
+
+                                        if (pRegionElem->remove_pending) goto world_update_collision_ignore;
 
                                         if(pRegionElem != pElemCollided)
                                         {
@@ -2130,15 +2130,16 @@ world_update(float tc)
                                     world_update_collision_ignore:
 
                                         // check if this was invalidated by the remove-callback
-                                        // TODO: -- I don't think this can happen anymore fixed with a callback handling when collisions modify world+visibility state
-                                        if(!gWorld->world_update_state.world_region_iterate_cur)
-                                        {
-                                            DBPRINTF(("gWorld->world_update_state.world_region_iterate_cur invalidated!"));
-                                            assert(0);
-                                            //gWorld->world_update_state.world_region_iterate_cur = pRegionElemsHead;
-                                        }
+                                        
+                                        //if(!gWorld->world_update_state.world_region_iterate_cur)
+                                        //{
+                                        //    DBPRINTF(("gWorld->world_update_state.world_region_iterate_cur invalidated! (modified jb 9-2025)"));
+                                        //    
+                                        //    goto region_collision_retry;
+                                        //    
+                                        //}
 
-                                        gWorld->world_update_state.world_region_iterate_cur = gWorld->world_update_state.world_region_iterate_cur->next;
+                                        gWorld->world_update_state.world_region_iterate_cur = rgniterNext;
                                     }
                                 }
                             }

@@ -174,7 +174,7 @@ element_visible(WorldElem* pElem, float visibleDistance, float min_dot)
 }
 
 unsigned long n_elements_out_of_order = 0;
-unsigned int visibility_test_freq = 10;
+//unsigned int visibility_test_freq = 10;
 
 int
 element_dist_compare(WorldElem* pElemA, WorldElem* pElemB)

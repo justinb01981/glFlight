@@ -110,7 +110,7 @@ struct WorldElem {
     
     unsigned char destructible;
     int destroyed_by_id;
-    float durability;
+    int durability;
     int lifetime;
     float scale;
     

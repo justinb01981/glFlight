@@ -243,7 +243,6 @@ calibrate_bail:
     
     get_time_ms();
     
-    // moved game_ai_run to do_networkd_world_update
     if(gameNetworkState.hostInfo.hosting || !gameNetworkState.connected) game_ai_run();
     
     // JB: moved to background thread

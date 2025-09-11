@@ -73,7 +73,7 @@ private:
 public:
 
     GLFlightGame(int argc, char* argv[]) :
-        gameFramework(argc, argv, "glFlightMain", gameFramework::CORE, 3, 0, 2, MATCH_TEMPLATE, glm::uvec2(GLM_VIEW_WIDTH, GLM_VIEW_HEIGHT))
+        gameFramework(argc, argv, "glFlightMain", gameFramework::CORE, 2, 0, 0, MATCH_TEMPLATE, glm::uvec2(GLM_VIEW_WIDTH, GLM_VIEW_HEIGHT))
     {
     }
 
@@ -175,7 +175,7 @@ public:
 
         openALUninit();
 
-        DBPRINTF(("Java_com_domain17_glflight_GameRunnable_glFlightUninit called + exiting"));
+        DBPRINTF(("glFlightMain.cpp end() called + exiting"));
 
         return true;
     }
@@ -187,7 +187,7 @@ public:
 		if (!glFlightInited) return true;
 
         test = get_time_ms();
-        //if (test - renderLast < (1000/GAME_FRAME_RATE)) return true;
+        if (test - renderLast < /*(1000 / GAME_FRAME_RATE)*/16) return true;    // cap frame rate
         renderLast = test;
 
         glfwPollEvents();

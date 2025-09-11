@@ -166,7 +166,7 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
         return -1;
     }
     memcpy(addr6, addrResult->ai_addr, addrResult->ai_addrlen);
-
+    
 #ifdef BSD_SOCKETS
     addr6->sin6_len = sizeof(addr);
 #endif
@@ -205,7 +205,7 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     if(bind(sock, (struct sockaddr*) &addr, sizeof(addr)) < 0)
     {
         // remember to not pass sizeof(sockaddr_storage) to bind()
-        console_write("%s:%d %s\n", __func__, __LINE__, "socket failure (bind)");
+        console_write("%s:%d %s\n", __func__, __LINE__, "socket failure (bind) continuing...");
         close(sock);
         gameDialogError("bind failed (kill/restart app)");
         return -1;
@@ -1819,7 +1819,7 @@ do_game_network_world_update(void)
     float network_time_ms = get_time_ms_wall();
 
     // HACK: also calling game_ai_run here
-    if(!gameNetworkState.connected || gameNetworkState.hostInfo.hosting) game_ai_run();
+    /*if(!gameNetworkState.connected || gameNetworkState.hostInfo.hosting) game_ai_run();*/
     
     if(!gameNetworkState.connected)
     {

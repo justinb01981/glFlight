@@ -109,7 +109,7 @@ gameInputInit()
     speed = minSpeed; // 
     targetSpeed = speed;
     maxAccelDecel = /*5*/ MAX_SPEED/3; // change per second
-    bulletVel = MAX_SPEED*3;
+    bulletVel = BULLET_VELOCITY_DEFAULT;
 
     needTrim = 1;
     
