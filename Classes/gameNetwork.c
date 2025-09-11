@@ -206,9 +206,9 @@ prepare_listen_socket(int stream, unsigned int port, unsigned int do_bind)
     {
         // remember to not pass sizeof(sockaddr_storage) to bind()
         console_write("%s:%d %s\n", __func__, __LINE__, "socket failure (bind) continuing...");
-        close(sock);
+        //close(sock);
         gameDialogError("bind failed (kill/restart app)");
-        return -1;
+        //return -1;
     }
     
     if(do_bind && stream)
@@ -389,11 +389,7 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
     memset(&hints, 0, sizeof(hints));
 
     hints.ai_family =
-#ifdef BSD_SOCKETS
-    AF_INET6
-#else
-    AF_UNSPEC
-#endif
+    AF_INET6    // todo: test android is okay with change from AF_UNSPEC 
     ;
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE
