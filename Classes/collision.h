@@ -132,13 +132,11 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
             // MARK: -- apply force (in some collision cases)
             if (world_coll_act == COLLISION_ACTION_DAMAGE)
             {
-                DBPRINTF(("impact dmg exchanged: %d->%d", a->durability, b->durability));
-
                 // pCollisionA points at OBJ_SHIP instead of OBJ_BULLET
                 if (a->moving &&
                     b->moving)
                 {
-                    float bullet_vtransfer = 0.05;
+                    float bullet_vtransfer = 0.2;
 
                     update_object_velocity(a->elem_id,
                         b->physics.ptr->vx * bullet_vtransfer,
@@ -160,6 +158,26 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
 
                 if(a->durability >= b->durability) a->durability -= b->durability;
                 if(b->durability >= pD[0]) b->durability -= pD[0];
+
+                if (pD[1] > 0)
+                {
+                    // add explosion graphic
+                    int obj_id =
+                        world_add_object(MODEL_ICOSAHEDRON,
+                            b->physics.ptr->x + (b->physics.ptr->vx * -tc),
+                            b->physics.ptr->y + (b->physics.ptr->vy * -tc),
+                            b->physics.ptr->z + (b->physics.ptr->vz * -tc),
+                            b->physics.ptr->alpha,
+                            b->physics.ptr->beta,
+                            b->physics.ptr->gamma,
+                            b->scale, TEXTURE_ID_EXPLOSION);
+                    world_get_last_object()->object_type = OBJ_BLOCK;
+
+                    world_get_last_object()->destructible = 0;
+                    world_object_set_lifetime(obj_id, 30);
+                    update_object_velocity(obj_id, 0, 0, 0, 0);
+                    
+                }
 
                 // moving object destroyed
                 if (a->durability <= 0)
@@ -190,6 +208,7 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
                         update_object_velocity(obj_id, 0, 0, 0, 0);
                         object_destroyed = 1;
                     }
+
                 }
 
                 // "static" object destroyed
@@ -203,25 +222,6 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
                         world_elem_list_add(b, &gWorld->elements_to_be_freed);
                     }
 
-                    if (pD[1] > 0)
-                    {
-                        // add explosion graphic
-                        int obj_id =
-                            world_add_object(MODEL_ICOSAHEDRON,
-                                b->physics.ptr->x + (b->physics.ptr->vx * -tc),
-                                b->physics.ptr->y + (b->physics.ptr->vy * -tc),
-                                b->physics.ptr->z + (b->physics.ptr->vz * -tc),
-                                b->physics.ptr->alpha,
-                                b->physics.ptr->beta,
-                                b->physics.ptr->gamma,
-                                b->scale, TEXTURE_ID_EXPLOSION);
-                        world_get_last_object()->object_type = OBJ_BLOCK;
-
-                        world_get_last_object()->destructible = 0;
-                        world_object_set_lifetime(obj_id, 30);
-                        update_object_velocity(obj_id, 0, 0, 0, 0);
-                        object_destroyed = 1;
-                    }
 
                     // handle spawned-objects (bullets)
                     if (b->object_type == OBJ_SHIP || b->object_type == OBJ_PLAYER)
