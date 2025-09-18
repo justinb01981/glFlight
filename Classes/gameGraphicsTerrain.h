@@ -9,7 +9,7 @@
 #include "gameIncludes.h"
 #include "textures.h"
 
-#define N 3276800
+#define N 32768000
 #define TRAD 2 // triangle size
 #define STRIDE 1.5 // spacing between triangles
 
@@ -140,52 +140,36 @@ static void terrainBuildHelper(Point A,
     Point rowPt = A;    // mutate this
 
 
-    while(distance(rowPt.X,rowPt.Y,rowPt.Z, A.X,A.Y,A.Z) < width) {   // walk U
+    while(distance(rowPt.X,rowPt.Y,rowPt.Z, A.X,A.Y,A.Z) <= width) {   // walk U
 
         Point colPt = rowPt;
 
-        while(distance(colPt.X,colPt.Y,colPt.Z, A.X,A.Y,A.Z) < width) {   // walk V
+        while(distance(colPt.X,colPt.Y,colPt.Z, A.X,A.Y,A.Z) <= width) {   // walk V
 
             float tW = R;
-            Point curPt = projectPointVec(projectPointVec(colPt,U,tW,tW), V, tW, tW);   // offset to middle of quad
+            Point curPt = colPt; //projectPointVec(projectPointVec(colPt,U,tW,tW), V, tW, tW);   // offset to top left
 
             model_index_t vIndex = allocVertex3(curPt, Tsc); // vtx of pt A + offset currently
 
             Point B = projectPointVec(curPt, U, tW, tW);
-            Point D = projectPointVec(curPt, U, -tW,-tW);
-            Point C = projectPointVec(curPt, V, tW, tW); // advancing counters for next triangle
-            Point E = projectPointVec(curPt, V, -tW, -tW);
+            Point C = projectPointVec(B, V, tW, tW); // advancing counters for next triangle
+            Point D = projectPointVec(curPt, V, tW,tW);
+            
+            
 
             model_index_t vnextB = allocVertex3(B, Tsc);
             model_index_t vnextC = allocVertex3(C, Tsc);
             model_index_t vnextD = allocVertex3(D, Tsc);
-            model_index_t vnextE = allocVertex3(E, Tsc);
 
-            model_index_t ord[] = {vnextC, vnextB, vnextE, vnextD};
+            model_index_t ord[] = {vnextB, vnextC, vnextC, vnextD};
 
             // add indices to new points designated as triangle
-
-            model_index_t PAIRS[] = {
-                1,0,
-                3,2,
-                2,1,
-                0,3,
-
-                // also in reverse
-                0,1,
-                2,3,
-                1,2,
-                3,0,
-            };
-
-            // terrain indices, only visible from one side ?
-            for (int i = 0; i < sizeof(PAIRS) / sizeof(model_index_t); i += 2)
-            {
-                terrain.indices[terrain.nIndices] = vIndex;
-                terrain.indices[terrain.nIndices + 1] = ord[PAIRS[i+1]];
-                terrain.indices[terrain.nIndices + 2] = ord[PAIRS[i]];
-                terrain.nIndices += 3;
-            }
+            terrain.indices[terrain.nIndices++] = vIndex;
+            terrain.indices[terrain.nIndices++] = ord[1];
+            terrain.indices[terrain.nIndices++] = ord[0];
+            terrain.indices[terrain.nIndices++] = vIndex;
+            terrain.indices[terrain.nIndices++] = ord[3];
+            terrain.indices[terrain.nIndices++] = ord[2];
 
             colPt = projectPointVec(colPt, V, R, R);
         }
@@ -204,10 +188,10 @@ void terrainBuild(void) {
 
     float R = TRAD;
     float X = STRIDE;
-    float width = gWorld->bound_radius*2;
+    float width = gWorld->bound_radius*3;
 
-    float col = my_ship_x - width/2;
-    float row = my_ship_z - width/2;
+    float col = -gWorld->bound_radius ; //my_ship_x - width/2;
+    float row = -gWorld->bound_radius ; //my_ship_z - width/2;
 
     Point A = {col, YcalculateFromXZ(col,row), row};
 

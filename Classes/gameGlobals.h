@@ -46,7 +46,6 @@ extern float my_ship_z;
 extern float my_ship_alpha;
 extern float my_ship_beta;
 extern float my_ship_gamma;
-static const float brick_size = 1;
 extern int needFire;
 extern game_timeval_t firedLast;
 extern game_timeval_t player_fire_rate;
@@ -136,7 +135,7 @@ const static long GAME_NETWORK_PORT_DEFAULT = 52000;
 #define GAME_POWERUP_DROP_TABLE_LEN 10
 #define GAME_CONTROL_SCALAR (M_PI * 5.0)
 #define POWERUP_LIFETIME_SEC 20
-#define BULLET_VELOCITY_DEFAULT (MAX_SPEED*5)
+#define BULLET_VELOCITY_DEFAULT (MAX_SPEED*7)
 
 #define GAME_CAPTURE_TOW_FORCE 0.60 // based on brief testing of stickiness
 

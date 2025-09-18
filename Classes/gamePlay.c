@@ -2749,7 +2749,7 @@ game_elem_setup_spawnpoint(WorldElem* elem)
                      6, TEXTURE_ID_ANIMATED_STATIC);
     world_get_last_object()->object_type = OBJ_SPAWNPOINT;
     update_object_velocity(world_get_last_object()->elem_id, 0, 0, 0, 0);
-//    world_object_set_lifetime(world_get_last_object()->elem_id, 300);
+    world_object_set_lifetime(world_get_last_object()->elem_id, 300);
 }
 
 void

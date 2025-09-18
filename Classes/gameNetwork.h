@@ -13,8 +13,8 @@
 #include "gameLock.h"
 
 #define GAME_NETWORK_MAX_PLAYERS 64
-#define GAME_NETWORK_MAX_STRING_LEN 128
-#define GAME_NETWORK_MAX_MAP_STRING_LEN 256
+#define GAME_NETWORK_MAX_STRING_LEN 512
+#define GAME_NETWORK_MAX_MAP_STRING_LEN 1024
 #define GAME_NETWORK_PORT_BONJOUR 52010
 #define GAME_NETWORK_PLAYER_ID_HOST 16000
 #define GAME_NETWORK_PLAYER_ID_MAX (GAME_NETWORK_PLAYER_ID_HOST-1)
@@ -244,6 +244,11 @@ typedef struct
         gameNetworkAddress local_inet_addr;
         game_timeval_t time_last_stats_alert;
     } hostInfo;
+
+    struct
+    {
+        gameNetworkAddress addrBeaconResp;
+    } client;
     
     gameNetworkObjectInfo game_object_list_head;
     int game_object_id_next;

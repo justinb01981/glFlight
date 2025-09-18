@@ -101,6 +101,7 @@ public:
         game_ai_init();
 
         console_init();
+        console_write("kbd/mouse: w,a,s,d,q,e,space,shift hold rightclick to steer");
 
         initTextures(glFlightGameResourceInfo.pathPrefix);
 
@@ -142,7 +143,6 @@ public:
         openALInit();
 
         CreateThread(NULL, 1024 * 64, GLFlightGame::backgroundWorker, &glFlightInited, 0, &bgThreadId);
-
 
         glFlightInited = true;
 
@@ -187,7 +187,7 @@ public:
 		if (!glFlightInited) return true;
 
         test = get_time_ms();
-        if (test - renderLast < /*(1000 / GAME_FRAME_RATE)*/16) return true;    // cap frame rate
+        if (test - renderLast < floor(1000.0 / GAME_FRAME_RATE)) return true;    // cap frame rate
         renderLast = test;
 
         glfwPollEvents();

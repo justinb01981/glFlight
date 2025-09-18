@@ -331,8 +331,11 @@ gameInterfaceFindControl(float x, float y)
     if(gameInterfaceControls.dialogRect.visible &&
        gameInterfaceControls.dialogRect.modal)
     {
-        if(f != &gameInterfaceControls.dialogRect &&
-           f != &gameInterfaceControls.trim) return NULL;
+        if (f != &gameInterfaceControls.dialogRect &&
+            f != &gameInterfaceControls.trim)
+        {
+                                   return NULL;
+        }
     }
     
     return f;
@@ -493,7 +496,8 @@ gameInterfaceHandleTouchBegin(float x, float y)
     {
         touchedControl->touch_began = 1;
         touchedControl->touch_id = gameInterfaceControls.touchId;
-        gameInterfaceHandleTouchMove(x, y);
+
+        gameInterfaceHandleTouchMove(x, y); // hack: immediately calling move handler ?
         
         gameInterfaceControls.textMenuControl.tex_id = TEXTURE_ID_CONTROLS_TEXTMENU;
     }
@@ -691,13 +695,13 @@ gameInterfaceHandleTouchBegin(float x, float y)
 static void
 gameInterfaceBrowseFoundGame(char* name)
 {
-    if(gameNetworkState.hostInfo.bonjour_lan)
-    {
-        glFlightDrawframeHook = NULL;
-        gameNetworkState.gameNetworkHookGameDiscovered = NULL;
-        gameNetwork_connect(name, load_map_and_host_game);
-    }
-    else
+    //if(gameNetworkState.hostInfo.bonjour_lan)
+    //{
+    //    glFlightDrawframeHook = NULL;
+    //    gameNetworkState.gameNetworkHookGameDiscovered = NULL;
+    //    //gameNetwork_connect(name, load_map_and_host_game);
+    //}
+    //else
     {
         if(glFlightDrawframeHook)
         {
@@ -730,10 +734,11 @@ gameInterfaceMultiplayerConfigure(int action)
                 gameNetworkState.hostInfo.bonjour_lan = 1;
                 GameNetworkBonjourManagerBrowseBegin();
                 
-                return 1;
+                //return 1;
             }
-            else
-            {
+
+           if(1) 
+           {
                 // browse directory
                 if(gameNetwork_connect(gameSettingGameTitle, load_map_and_host_game) != GAME_NETWORK_ERR_NONE)
                 {
@@ -1069,22 +1074,10 @@ void gameInterfaceProcessAction(void)
                     texture_id_playership = TEXTURE_ID_SHIP3;
                     break;
                 case TEXTURE_ID_SHIP3:
-                    texture_id_playership = TEXTURE_ID_SHIP4;
-                    break;
-                case TEXTURE_ID_SHIP4:
-                    texture_id_playership = TEXTURE_ID_SHIP5;
+                    texture_id_playership = TEXTURE_ID_SHIP1;
                     break;
                 case TEXTURE_ID_ENEMYSHIP_ACE:
                     texture_id_playership = TEXTURE_ID_ENEMYSHIP;
-                    break;
-                case TEXTURE_ID_SHIP5:
-                    texture_id_playership = TEXTURE_ID_SHIP6;
-                    break;
-                case TEXTURE_ID_SHIP6:
-                    texture_id_playership = TEXTURE_ID_SHIP7;
-                    break;
-                case TEXTURE_ID_SHIP7:
-                    texture_id_playership = TEXTURE_ID_SHIP8;
                     break;
                 default:
                     texture_id_playership = TEXTURE_ID_SHIP1;
@@ -1198,7 +1191,7 @@ gameInterfaceModalDialogEnqueue(const char* msg, const char *buttonLeft, const c
     pdialog->d.dialogRectActionLeft = cbLeft;
     pdialog->d.dialogRectActionRight = cbRight;
     pdialog->visible = 1;
-    pdialog->modal = 1;
+    pdialog->modal = 0;
     
     pcur = &gameInterfaceControls.dialogRect;
     while(pcur->pnext) pcur = pcur->pnext;
@@ -1223,9 +1216,18 @@ gameInterfaceModalDialogDequeue(void)
 }
 
 void
-gameInterfaceModalDialog(const char* msg, const char *buttonLeft, const char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void))
+gameInterfaceModalDialog(const char* msg, const char* buttonLeft, const char* buttonRight, void (*cbLeft)(void), void (*cbRight)(void))
 {
     gameInterfaceModalDialogEnqueue(msg, buttonLeft, buttonRight, cbLeft, cbRight, &gameInterfaceControls.dialogRectDefault, GAME_DIALOG_LIFE_MAX);
+    gameInterfaceControls.dialogRect.modal = 1; // click-thru blocked
+}
+
+void
+gameInterfaceNotify(const char* msg) // non modal
+{
+    void (*cbIgnore)(void) = NULL;
+    // todo: this is no longer modal by default
+    gameInterfaceModalDialogEnqueue(msg, "", "", cbIgnore, cbIgnore, &gameInterfaceControls.dialogRectDefault, GAME_DIALOG_LIFE_MAX); 
 }
 
 controlRect*

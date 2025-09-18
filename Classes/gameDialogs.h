@@ -21,6 +21,7 @@
 
 #define GAME_DIALOG_LIFE_MAX 999999
 #define INTRO_ANIMATION_FRAMES (GAME_FRAME_RATE*3)
+#define TIMEOUT GAME_FRAME_RATE * 6;
 
 struct gameDialogStateStruct
 {
@@ -273,7 +274,7 @@ gameDialogInitial()
 }
 
 // MARK: -- first draw-callback called to render intro and finally pop welcome
-static int gameDialogInitialCountdownDrawCallbackCount = GAME_FRAME_RATE * 5;
+static int gameDialogInitialCountdownDrawCallbackCount = TIMEOUT;
 static void
 gameDialogInitialCountdownDrawCallback()
 {
@@ -367,7 +368,7 @@ gameDialogBrowseGames()
 static void
 gameDialogNetworkHostRegister()
 {
-    static int passes = GAME_FRAME_RATE * 10;
+    static int passes = TIMEOUT;
     
     passes--;
     if(passes <= 0)
@@ -375,14 +376,15 @@ gameDialogNetworkHostRegister()
         glFlightDrawframeHook = NULL;
         gameNetworkState.gameNetworkHookOnMessage = NULL;
         
-        passes = GAME_FRAME_RATE * 10;
+        passes = TIMEOUT;
     }
 }
 
 static void
 gameDialogNetworkCountdownEnded()
 {
-    static int passes = GAME_FRAME_RATE * 8;
+
+    static int passes = TIMEOUT;
     
     passes--;
     if(passes <= 0)
@@ -393,7 +395,7 @@ gameDialogNetworkCountdownEnded()
         
         fireAction = ACTION_HOST_GAME_OR_COMMIT;
         gameInterfaceProcessAction();
-        passes = GAME_FRAME_RATE * 8;
+        passes = TIMEOUT;
     }
 }
 

@@ -202,11 +202,9 @@ calibrate_bail:
         goto draw_bail;
     }
 
+    // physical collisions between world objects now handled here
     world_update(tc);
     world_update_time_last = time_ms;
-    
-    // physical collisions between world objects
-    do_world_collision_handling(tc);
     
     // play engine sound
     const char* engine_sounds[] = {"engine", "engineslow"};
@@ -246,7 +244,7 @@ calibrate_bail:
     if(gameNetworkState.hostInfo.hosting || !gameNetworkState.connected) game_ai_run();
     
     // JB: moved to background thread
-    //do_game_network_read();
+    do_game_network_read();
     
     // TODO: this is being called at most once every 1/60th of a second (16ms)
     do_game_network_world_update();
@@ -438,6 +436,11 @@ calibrate_bail:
         strcpy(gameInterfaceControls.statsTextRect.text, statsMessage);
 
         respawned = 0;
+    }
+    else
+    {
+        // failed, we probably died
+        my_ship_id = WORLD_ELEM_ID_INVALID;
     }
     
     gameCamera_sanity();

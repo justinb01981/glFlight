@@ -31,7 +31,7 @@ typedef struct
     char text[1024], textLeft[64], textRight[64];
     char *textDest;
     int *textDestInt;
-    int modal:1, text_align_topleft:1;
+    int modal:2, text_align_topleft:2;
     void *pnext;
     unsigned long dialogLifeFrames;
     
@@ -125,6 +125,9 @@ gameInterfaceHandleTouchEnd(float x, float y);
 
 void
 gameInterfaceHandleAllTouchEnd();
+
+void
+gameInterfaceNotify(const char* msg);
 
 void
 gameInterfaceModalDialog(const char* msg, const char *buttonLeft, const char *buttonRight, void (*cbLeft)(void), void (*cbRight)(void));
