@@ -451,6 +451,7 @@ game_add_asteroid(float x, float y, float z, float dx, float dy, float dz)
     world_get_last_object()->destructible = 1;
     world_get_last_object()->object_type = OBJ_BLOCK_MOVING;
     world_get_last_object()->stuff.subtype = GAME_SUBTYPE_ASTEROID;
+    world_get_last_object()->physics.ptr->friction = 1;
     update_object_velocity(obj_id,
                            (dest[0] - spawn[0]) / speed,
                            (dest[1] - spawn[1]) / speed,
@@ -661,9 +662,9 @@ game_init_objects()
 //                pCur->elem->stuff.u.orbiter.period = rand_in_range(4, 16);
 //                pCur->elem->stuff.u.orbiter.theta = rand_in_range(0, 628) / 100.0;
                 pCur->elem->bounding_reflect = 1;
-                rVel = rand_in_range(20.0, 5.0);
-                random_heading_vector(rV);
-                update_object_velocity(pCur->elem->elem_id, rV[0]*rVel, rV[1]*rVel, rV[2]*rVel, 0);
+                //rVel = rand_in_range(20.0, 5.0);
+                //random_heading_vector(rV);
+                //update_object_velocity(pCur->elem->elem_id, rV[0]*rVel, rV[1]*rVel, rV[2]*rVel, 0);
                 break;
                 
             default:
@@ -1222,7 +1223,7 @@ game_handle_collision(WorldElem* elemA, WorldElem* elemB, int collision_action)
     //if(collision_action != COLLISION_ACTION_DAMAGE && collision_action != COLLISION_ACTION_FLAG) return;
     if(collision_action == COLLISION_ACTION_REPULSE) return;
     
-    if(!gameStateSinglePlayer.started) return;
+    if(!gameStateSinglePlayer.started && !gameNetworkState.connected) return;
     
     if(elemA->remove_pending || elemB->remove_pending) return;
     

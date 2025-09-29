@@ -187,7 +187,7 @@ world_build_run_program(float x, float y, float z)
             }
         }
     }
-    
+
     // MARK: add some asteroids
     float asteroid_scale = SCALE_MAX;
     float asteroid_speed = (MAX_SPEED/10)*GAME_TICK_RATE;
@@ -201,8 +201,8 @@ world_build_run_program(float x, float y, float z)
         
         if(world_elem_list_find_nearest(&head, C, &neardist) != NULL && neardist >= asteroid_scale)
         {
-            world_add_object(MODEL_ICOSAHEDRON, C[0], C[1], C[2], 0, 0, 0, asteroid_scale, TEXTURE_ID_ASTEROID);
-            world_get_last_object()->object_type = OBJ_BLOCK_MOVING;
+            game_add_asteroid(C[0], C[1], C[2], 0, 0, 0);
+           
             update_object_velocity(world_get_last_object()->elem_id,
                                    rand_in_range(-asteroid_speed, asteroid_speed), rand_in_range(-asteroid_speed, asteroid_speed), rand_in_range(-asteroid_speed, asteroid_speed), 0);
         }

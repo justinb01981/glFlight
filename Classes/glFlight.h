@@ -12,6 +12,7 @@
 extern int world_inited;
 extern int game_paused;
 extern int game_terminated_gracefully;
+extern unsigned long tex_pass;
 extern char* world_data;
 
 extern void (*glFlightDrawframeHook)(void);

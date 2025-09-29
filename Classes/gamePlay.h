@@ -308,6 +308,8 @@ int game_add_spawnpoint(float x, float y, float z, char* game_name);
 
 int game_add_powerup(float x, float y, float z, int type, int lifetime);
 
+void game_add_asteroid(float x, float y, float z, float dx, float dy, float dz);
+
 void fireBullet(int bulletAction);
 
 int firePoopedCube(WorldElem *elem);

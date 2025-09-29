@@ -894,12 +894,12 @@ static model_coord_t model_ship2_normals[] =
 
 static model_coord_t model_missle[] =
 {
-    0, 0, -1.0,
-    -0.25, 0, -0.7,
-    0.25, 0, -0.7,
-    0, 0, 0,
-    0, 0.15, -0.7,
-    0, -0.15, -0.7
+    0, 0, -0.7,
+    -0.25, 0, -0.3,
+    0.25, 0, -0.3,
+    0, 0, 0.5,
+    0, 0.15, -0.3,
+    0, -0.15, -0.3
 };
 
 static model_index_t model_missle_indices[] = {

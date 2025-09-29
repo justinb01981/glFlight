@@ -204,6 +204,8 @@ world_add_drawline(float a[3], float b[3], float color[3], unsigned int lifetime
 void
 world_random_spawn_location(float loc[6], int affiliation);
 
+int update_object_in_motion(WorldElem* pElem);
+
 int update_object_velocity(int object_id, float x, float y, float z, int relative);
 
 int update_object_velocity_with_friction(int object_id, float v[3], float cthrust, float cfriction);

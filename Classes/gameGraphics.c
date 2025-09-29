@@ -28,6 +28,7 @@
 #include "textures.h"
 #include "framebuffer.h"
 #include "gameGraphicsTerrain.h"
+#include "glFlight.h"
 
 #define BACKGROUND_MODEL model_background
 #define BACKGROUND_MODEL_TEXCOORDS /*model_cube_texcoords_alt*/ model_background_texcoords

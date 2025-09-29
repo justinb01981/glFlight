@@ -27,7 +27,6 @@ enum {
     DURABILITY_MISSLE = 3,
 };
 
-extern int tex_pass;
 extern volatile float time_ms;
 extern volatile float time_ms_wall;
 extern double speed;
@@ -128,14 +127,13 @@ const static long GAME_NETWORK_PORT_DEFAULT = 52000;
 
 #define GAME_FRAME_RATE 60
 #define GAME_TICK_RATE PLATFORM_TICK_RATE
-#define MAX_AI_RUN_PER_FRAME 16 // careful this has resullted in stalled enemies due to starvation
 
 #define game_ammo_missles_max 4
 #define game_ammo_bullets_max 32
 #define GAME_POWERUP_DROP_TABLE_LEN 10
 #define GAME_CONTROL_SCALAR (M_PI * 5.0)
 #define POWERUP_LIFETIME_SEC 20
-#define BULLET_VELOCITY_DEFAULT (MAX_SPEED*7)
+#define BULLET_VELOCITY_DEFAULT (MAX_SPEED*6)
 
 #define GAME_CAPTURE_TOW_FORCE 0.60 // based on brief testing of stickiness
 

@@ -90,6 +90,22 @@ typedef enum {
     GAME_NETWORK_MSGARG_INTARRAY,
 } gameNetworkArgsType;
 
+static int perform_rexmit(unsigned msg_cmd)
+{
+    // these messages from the client are re-distributed to all players by the server
+    switch (msg_cmd) {
+    case GAME_NETWORK_MSG_PLAYER_INFO:
+    case GAME_NETWORK_MSG_CONNECT:
+    case GAME_NETWORK_MSG_KILLED:
+    case GAME_NETWORK_MSG_HITME:
+    case GAME_NETWORK_MSG_FIRE_BULLET:
+    case GAME_NETWORK_MSG_ADD_OBJECT: // ?
+        return 1;
+    default:
+        return 0;
+    }
+}
+
 typedef struct
 {
     unsigned char storage[128];
@@ -123,11 +139,11 @@ typedef struct __attribute__((packed))
     unsigned int game_id;
     unsigned int cmd;
     unsigned int player_id;
-    unsigned int rebroadcasted:1;
-    unsigned int needs_stream:1;
-    unsigned int needs_ack:1;
-    unsigned int is_ack:1;
-    unsigned int is_nbo:1;
+    unsigned int relayed:2;
+    unsigned int needs_stream:2;
+    unsigned int needs_ack:2;
+    unsigned int is_ack:2;
+    unsigned int is_nbo:2;
     unsigned int elem_id_net;
     unsigned int msg_seq;
     game_timeval_t timestamp;
@@ -231,7 +247,7 @@ typedef struct
     struct
     {
         int hosting;
-        int bonjour_lan;
+        int bonjour_lan;    // TODO: correct this name since bonjour is no longer involved
         char name[GAME_NETWORK_MAX_STRING_LEN];
         gameNetworkSocket socket;
         gameNetworkSocket map_socket;

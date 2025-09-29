@@ -244,7 +244,7 @@ calibrate_bail:
     if(gameNetworkState.hostInfo.hosting || !gameNetworkState.connected) game_ai_run();
     
     // JB: moved to background thread
-    do_game_network_read();
+    //do_game_network_read();
     
     // TODO: this is being called at most once every 1/60th of a second (16ms)
     do_game_network_world_update();

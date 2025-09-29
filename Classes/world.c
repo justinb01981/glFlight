@@ -40,7 +40,6 @@ static void get_element_bounding_box(WorldElem* pElem, float box[6]);
 static int check_bounding_box_overlap(float boxA[6], float boxB[6]);
 void update_regions(void);
 void convert_mesh_to_world_elems(struct mesh_t* mesh, unsigned int texture_id, float tile_div, struct mesh_coordinate_t* vis_normal);
-void world_build_visibility_data(void);
 void world_update(float tc);
 void world_handle_impact(WorldElem*, WorldElem*);
 int check_collision(WorldElem*, WorldElem*);
@@ -88,6 +87,7 @@ world_add_object_core(Model type,
     WorldElem* pElem;
 
     if(isnan(x) || isnan(y) || isnan(z)) {
+        assert(0);
         DBPRINTF(("WARNING: world_add_object loc NaN! ignoring object"));
         return WORLD_ELEM_ID_INVALID;
     }
@@ -964,7 +964,7 @@ world_find_elem_with_attrs(WorldElemListNode* head, int object_type, int affilia
     return NULL;
 }
 
-static void update_object_in_motion(WorldElem* pElem)
+int update_object_in_motion(WorldElem* pElem)
 {
 
     pElem->physics.ptr->velocity = sqrt(pElem->physics.ptr->vx*pElem->physics.ptr->vx +
@@ -978,10 +978,18 @@ static void update_object_in_motion(WorldElem* pElem)
     }
     
     pElem->moving = 1;
+    return pElem->elem_id;
 }
 
 int update_object_velocity(int object_id, float x, float y, float z, int relative)
 {
+
+    if (isnan(x) || isnan(y) || isnan(z)) {
+        assert(0);
+        DBPRINTF(("WARNING: world_add_object loc NaN! ignoring object"));
+        return WORLD_ELEM_ID_INVALID;
+    }
+
     WorldElemListNode* pElemNode = world_elem_list_find(object_id, &gWorld->elements_list);
     
     if(pElemNode)
@@ -1020,23 +1028,6 @@ int update_object_velocity(int object_id, float x, float y, float z, int relativ
 
 int update_object_velocity_with_friction(int object_id, float v[3], float cthrust, float cfriction)
 {
-    /*
-     float c_thrust = C_THRUST;
-     float c_friction = C_FRICTION;
-     float ship_vnew[3] =
-     {
-     (-ship_z_vec[0]*speed * c_thrust) + (-pWorldElemMyShip->physics.ptr->vx * c_friction),
-     (-ship_z_vec[1]*speed * c_thrust) + (-pWorldElemMyShip->physics.ptr->vy * c_friction),
-     (-ship_z_vec[2]*speed * c_thrust) + (-pWorldElemMyShip->physics.ptr->vz * c_friction),
-     };
-     
-     update_object_velocity(my_ship_id,
-     ship_vnew[0],
-     ship_vnew[1],
-     ship_vnew[2],
-     1);
-     */
-    
     WorldElemListNode* pElemNode = world_elem_list_find(object_id, &gWorld->elements_list);
 
     if(pElemNode)
@@ -1306,7 +1297,7 @@ void world_init(float radius)
     {
         *(gWorld->terrain_height_map + i*(WORLD_TERRAIN_COMPLEXITY/2+j)) = sin((float) j/(WORLD_TERRAIN_COMPLEXITY/2)) * 10;
         *(gWorld->terrain_height_map + i*(WORLD_TERRAIN_COMPLEXITY/2-j)) = sin((float) j/(WORLD_TERRAIN_COMPLEXITY/2)) * 10;
-     }
+    }
     
     // build spherical bounding
     float Ty, Tx;
@@ -1405,8 +1396,6 @@ void world_init(float radius)
     // gravity vector
     gWorld->vec_gravity[1] = -32.0;
     
-    //world_build_visibility_data();
-    
     models_init();
 
 	return;
@@ -1463,24 +1452,6 @@ void world_unlock()
     game_lock_unlock(&gWorldLock);
 }
 
-/*
-void
-rebuild_world_done()
-{
-    // empty list of newly-added elements
-    world_elem_list_clear(&gWorld->elements_to_be_added);
-    
-    // free pending-freed elements
-    WorldElemListNode* pPendingCur = gWorld->elements_to_be_freed.next;
-    while(pPendingCur)
-    {
-        //world_elem_free(pPendingCur->elem);
-        pPendingCur = pPendingCur->next;
-    }
-    world_elem_list_clear(&gWorld->elements_to_be_freed);
-}
- */
-
 void
 move_elem_relative(WorldElem* pElem, float x, float y, float z)
 {
@@ -1531,11 +1502,10 @@ world_repulse_elem(WorldElem* pCollisionB, WorldElem* pCollisionA, float tc, flo
     };
 
     float* r[] = {
-    &pCollisionB->physics.ptr->vx,
-    &pCollisionB->physics.ptr->vy,
-    &pCollisionB->physics.ptr->vz
+        &pCollisionB->physics.ptr->vx,
+        &pCollisionB->physics.ptr->vy,
+        &pCollisionB->physics.ptr->vz
     };
-
 
     float nD = sqrt(O[0] * O[0] + O[1] * O[1] + O[2] * O[2]);
 
@@ -1547,9 +1517,10 @@ world_repulse_elem(WorldElem* pCollisionB, WorldElem* pCollisionA, float tc, flo
 
         // apply force back unless static
         //if(pCollisionB->moving) *r[i] -= Fx;
-    } 
+    }
 
-    // NOT calling move_elem_relative because that is done outside 
+    // NOT calling move_elem_relative? because that is done outside 
+    world_move_elem(pCollisionA, O[0] / Frepulse, O[1] / Frepulse, O[2] / Frepulse, 1);
 
     if(pCollisionB->moving) update_object_in_motion(pCollisionB); // must do it here tho for right-hand collided object
 }
@@ -2080,7 +2051,7 @@ world_update(float tc)
 
                                                 if(colact == COLLISION_ACTION_REPULSE)
                                                 {
-                                                    //momentum = 0;// cancel forward momentum?
+                                                    momentum = 1.5;// cancel forward momentum? this is just goofy
 
                                                     world_repulse_elem(pRegionElem, pElemCollided, tc, collision_repulsion_coeff);
 
@@ -2145,7 +2116,8 @@ world_update(float tc)
                             }
 
                             // no collisions, move along VM
-                            if(momentum > 0) move_elem_relative(pElem, vm[0] * tc, vm[1] * tc, vm[2] * tc);
+                            if(momentum > 0) 
+                                move_elem_relative(pElem, vm[0] * tc * momentum, vm[1] * tc * momentum, vm[2] * tc * momentum);
 
                             // MARK: -- resolve collisions with other objects - DONE (restore collision priority)
 

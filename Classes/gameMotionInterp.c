@@ -6,6 +6,7 @@
 //
 
 #include <stdio.h>
+#include <assert.h>
 #include "gameMotionInterp.h"
 #include "world.h"
 
@@ -101,7 +102,6 @@ motion_interpolate_velocity(game_timeval_t network_time_ms, motion_interp_st* mo
     };
     
     float time_win = motion->timestamp_last[0] - motion->timestamp_last[2];
-    //printf("time_win:%f", time_win);
 
     if(interp_velo && time_win <= (update_frequency_ms * velo_interp_update_mult) && time_win > 0)
     {
@@ -143,9 +143,11 @@ motion_interpolate_velocity(game_timeval_t network_time_ms, motion_interp_st* mo
     }
     else
     {
-        v[0] = pElem->physics.ptr->vx;
-        v[1] = pElem->physics.ptr->vy;
-        v[2] = pElem->physics.ptr->vz;
+        v[0] = msg->params.f[7];
+        v[1] = msg->params.f[8];
+        v[2] = msg->params.f[9];
+
+        for (int k = 0; k < 3; k++) assert(!isnan(v[k]));
         
         /*
         gameNetwork_updatePlayerObject(pInfo,
