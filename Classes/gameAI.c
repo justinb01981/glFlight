@@ -200,7 +200,7 @@ game_ai_run(void)
     int found = 0;
 
     WorldElemListNode* pCur = gWorld->elements_intelligent.next, *pNext;
-    while(pCur && found < MAX_AI_RUN_PER_FRAME)
+    while(pCur)
     {
         pNext = pCur->next;
         WorldElem* pCurElem = pCur->elem;
