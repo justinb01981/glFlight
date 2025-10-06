@@ -153,13 +153,13 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
             // MARK: -- BY NOW all logical collision handling applicable to  game state is done
             if (world_coll_act == COLLISION_ACTION_DAMAGE)
             {
-                
-                int pD[] = { a->durability, b->durability };    // prior to assigning damage
+                DBPRINTF(("dmg (type%s->%s)%d->%d", typestr(a->object_type), typestr(b->object_type), a->durability, b->durability));
 
-                if(a->durability >= b->durability) a->durability -= b->durability;
-                if(b->durability >= pD[0]) b->durability -= pD[0];
+                int adtmp = a->durability;
+                a->durability -= MIN(a->durability, b->durability);
+                b->durability -= MIN(b->durability, adtmp);
 
-                if (pD[1] > 0)
+                if (b->durability >= 0)
                 {
                     // add explosion graphic
                     int obj_id =
@@ -176,10 +176,12 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
                     world_get_last_object()->destructible = 0;
                     world_object_set_lifetime(obj_id, 30);
                     update_object_velocity(obj_id, 0, 0, 0, 0);
+
+                    object_destroyed = 1;
                     
                 }
 
-                // moving object destroyed
+                // static object destroyed
                 if (a->durability <= 0)
                 {
                     game_handle_destruction(a);
@@ -190,7 +192,7 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
                         world_elem_list_add(a, &gWorld->elements_to_be_freed);
                     }
 
-                    if (pD[0] > 0)
+                    if (adtmp > 0)
                     {
                         int obj_id =
                             world_add_object(MODEL_ICOSAHEDRON,
@@ -211,7 +213,7 @@ static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
 
                 }
 
-                // "static" object destroyed
+                // "moving" object destroyed
                 if (b->durability <= 0)
                 {
                     game_handle_destruction(b);

@@ -928,11 +928,6 @@ void gameInterfaceProcessAction(void)
             save_map = 0;
             break;
             
-        case ACTION_NETWORK_GAME_SCORE:
-            gameDialogState.hideNetworkStatus = 0;
-            gameDialogNetworkGameStatus();
-            break;
-            
         case ACTION_START_SURVIVAL_GAME:
             gameNetwork_disconnectSignal();
             gameInterfaceControls.mainMenu.visible = 0;

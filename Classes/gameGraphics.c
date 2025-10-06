@@ -172,7 +172,6 @@ bindTexture(unsigned int tex_id)
 
     if(!bindTextureRequestCore(tex_id))
     {
-        //assert(tex_id == TEXTURE_ID_BOUNDING);       /**/
         tex_id = TEXTURE_ID_FONTMAP;
         glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
         drawn_texture_last = tex_id;
@@ -1311,8 +1310,9 @@ visible_list_remove(WorldElem* elem, unsigned int* n_visible, WorldElemListNode*
 
 static void drawBoundingInit(int tex_id)
 {
-    int iC = 0, iV = 0, iT = 0, i;
+    int iC = 0, iV = 0, iT = 0, i, yc = 0;
     float hackMinSize = 0.001, hackMinSizeTot = 0;
+    float oTx = 0.5, oTy = 0.5;
 
     boData = malloc(sizeof(*boData));
     memset(boData, 0, sizeof(*boData));
@@ -1392,15 +1392,16 @@ static void drawBoundingInit(int tex_id)
             }
         }
 
-        float texYmax = U[1] > 0 ? 1.0 : -1.0;
-        boData->txcoords256[iT++] = 0.0;
-        boData->txcoords256[iT++] = 0.0;
-        boData->txcoords256[iT++] = 1.0;
-        boData->txcoords256[iT++] = 0.0;
-        boData->txcoords256[iT++] = 0.0;
-        boData->txcoords256[iT++] = texYmax;
-        boData->txcoords256[iT++] = 1.0;
-        boData->txcoords256[iT++] = texYmax;
+        float HI = 1/WORLD_BOUNDING_SPHERE_STEPS*4, LO = -1/WORLD_BOUNDING_SPHERE_STEPS*4;
+        float texYmax = U[1] > 0 ? HI : LO;
+        boData->txcoords256[iT++] = oTx + 0.0;
+        boData->txcoords256[iT++] = oTy + 0.0;
+        boData->txcoords256[iT++] = oTx + HI;
+        boData->txcoords256[iT++] = oTy + 0.0;
+        boData->txcoords256[iT++] = oTx + 0.0;
+        boData->txcoords256[iT++] = oTy + texYmax;
+        boData->txcoords256[iT++] = oTx + HI;
+        boData->txcoords256[iT++] = oTy + texYmax;
 
         boData->indices256[iV++] = indices[0];
         boData->indices256[iV++] = indices[1];
@@ -1412,6 +1413,9 @@ static void drawBoundingInit(int tex_id)
 
         hackMinSizeTot += hackMinSize;
 
+        if (yc % 4 == 0) oTx += HI;
+        oTy += HI;
+        yc++;
     }
 }
 
@@ -1523,16 +1527,6 @@ drawBackgroundUninit(void)
 }
 
 void
-drawBackground_tess(float* modelC, float* textureC, unsigned int* indicesC, unsigned long indicesN)
-{
-    glVertexPointer(3, GL_FLOAT, 0, modelC);
-    glTexCoordPointer(2, GL_FLOAT, 0, textureC);
-
-    bindTexture(TEXTURE_ID_TERRAIN);
-    glDrawElements(GL_TRIANGLES, (int)indicesN, index_type_enum, indicesC);
-}
-
-void
 drawBackgroundCore(void)
 {
     if(!bgData) return;
@@ -1558,10 +1552,10 @@ drawBackgroundCore(void)
     glVertexPointer(3, GL_FLOAT, 0, bgData->coords);
     glTexCoordPointer(2, GL_FLOAT, 0, bgData->texcoords);
 
-    // background (skybox) drawing (disabled now in favor of bounding textures
-    //bindTexture(bgData->tex_id);
-    //glDrawElements(GL_TRIANGLES, bgData->n_indices,
-    //               index_type_enum, bgData->indices);
+    // background (skybox) drawing (disabled now in favor of bounding textures)
+    bindTexture(bgData->tex_id);
+    /*glDrawElements(GL_TRIANGLES, bgData->n_indices,
+                   index_type_enum, bgData->indices);*/
 
     glPopMatrix();
 
@@ -1570,7 +1564,6 @@ drawBackgroundCore(void)
 
     // draw terrain
     bindTexture(TEXTURE_ID_TERRAIN);
-    //tess_walk(bgData->tess.S, drawBackground_tess);
 
     terrainDraw();
 }
@@ -1890,7 +1883,7 @@ gameGraphicsInit(void)
     assert(gWorld->bound_radius > 0);
     assert(texture_id_background > 0);
 
-    drawBackgroundInit(TEXTURE_ID_TERRAIN, 0, 0, 0,
+    drawBackgroundInit(texture_id_background, 0, 0, 0,
                        gWorld->bound_radius,
                        16.0,
                        BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));

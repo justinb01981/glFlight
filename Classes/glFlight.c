@@ -584,7 +584,6 @@ calibrate_bail:
     glTranslatef(-gameCamera_getX(), -gameCamera_getY(), -gameCamera_getZ());
     
     // walk list of new elements, adding to visible list
-    // TODO: THIS IS NOT WORKING because added-list is being cleaned in clear_pending
     WorldElemListNode* pAddedPtr = gWorld->elements_to_be_added.next, *pAddedPtrNext;
     while(pAddedPtr)
     {
@@ -614,9 +613,6 @@ calibrate_bail:
     // 1.1 walk list of pending removals, removing from visible list
     clear_world_pending_removals();
 
-    // now sort visibile elements
-
-    // sort elements by distance
     static float visible_dot = 0.7;
 
     // start visible-subset building/policing (spans multiple frames) over if necessary
@@ -627,14 +623,12 @@ calibrate_bail:
     if(!btreeVisibleTest)
     {
         visibleBtreeRootBuilding = &visibleBtreeRootStorage1;
-
         //world_elem_btree_destroy_root(visibleBtreeRootBuilding);
-
         btreeVisibleTest = gWorld->elements_list.next;
     }
 
     // walk part of the list and add some potentially-visible elements
-    unsigned int btreeVisibleTestCount = 100;
+    unsigned int btreeVisibleTestCount = VISIBLE_TEST_MAX_PERFRAME;
     //unsigned int btreeVisIdx = (visibleBtreeRootBuilding == &visibleBtreeRootStorage1 ? 0 : 1);
     while(btreeVisibleTest && btreeVisibleTestCount > 0)
     {

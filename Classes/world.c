@@ -990,12 +990,20 @@ int update_object_velocity(int object_id, float x, float y, float z, int relativ
         return WORLD_ELEM_ID_INVALID;
     }
 
-    WorldElemListNode* pElemNode = world_elem_list_find(object_id, &gWorld->elements_list);
+    WorldElemListNode* pElemNode;
+    WorldElem* pElem;
     
-    if(pElemNode)
-    {
-        WorldElem* pElem = pElemNode->elem;
-        
+    if (world_get_last_object()->elem_id == object_id) {
+        pElem = world_get_last_object();
+    }
+    else {
+        pElemNode = world_elem_list_find(object_id, &gWorld->elements_list);
+
+        if (pElemNode) pElem = pElemNode->elem;
+    }
+    
+    if(pElem)
+    {   
         // not allowing moving elements to span regions (for speed)
         /*
         if(pElem->spans_regions) 
@@ -1957,9 +1965,11 @@ world_update(float tc)
                                 }
                                 else if(pElem->bounding_reflect)
                                 {
-                                    if(V[0] / pElem->physics.ptr->vx < 0.0) pElem->physics.ptr->vx = -pElem->physics.ptr->vx;
-                                    if(V[1] / pElem->physics.ptr->vy < 0.0) pElem->physics.ptr->vy = -pElem->physics.ptr->vy;
-                                    if(V[2] / pElem->physics.ptr->vz < 0.0) pElem->physics.ptr->vz = -pElem->physics.ptr->vz;
+                                    pElem->physics.ptr->vx = -pElem->physics.ptr->vx;
+                                    pElem->physics.ptr->vy = -pElem->physics.ptr->vy;
+                                    pElem->physics.ptr->vz = -pElem->physics.ptr->vz;
+
+                                    assert(isnan(pElem->physics.ptr->vx));
 
                                     bounding_enforced = 1;
                                 }
@@ -2098,6 +2108,8 @@ world_update(float tc)
                                             }
                                         }
 
+                                        assert(!isnan(pRegionElem->physics.ptr->vx));
+
                                     world_update_collision_ignore:
 
                                         // check if this was invalidated by the remove-callback
@@ -2109,7 +2121,7 @@ world_update(float tc)
                                         //    goto region_collision_retry;
                                         //    
                                         //}
-
+                                        
                                         gWorld->world_update_state.world_region_iterate_cur = rgniterNext;
                                     }
                                 }

@@ -53,4 +53,20 @@ object_is_static(Object o)
     }
 }
 
+static const char*
+typestr(int object_type) 
+{
+    switch (object_type) {
+    case OBJ_SHIP: return "ship";
+    case OBJ_BLOCK: return "block";
+    case OBJ_POWERUP_GENERIC: return "powerup";
+    case OBJ_BULLET: return "bullet";
+    case OBJ_PLAYER: return "player";
+    case OBJ_MISSLE: return "missle";
+    case OBJ_TURRET: return "turret";
+    default:
+        return "unknown";
+    }
+}
+
 #endif /* __OBJECT_H__ */

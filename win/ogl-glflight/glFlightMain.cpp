@@ -207,7 +207,7 @@ public:
         static int mouseFlagsLast = 0;
         static int keysLast[GLFW_KEY_LAST] = { 0 };
         static float eulerO[3] = { 0, 0, 0 };
-        static float sSense = 0.2;
+        static float sSense = 0.4;
         static float mouseDownRightLoc[2] = { 0, 0 };
         static int joyActivated = 0;
         static float* joyAxes;

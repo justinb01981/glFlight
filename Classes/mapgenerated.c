@@ -23,7 +23,7 @@ typedef struct {
 } terrain_t;
 
 static float SCALE_MAX = 4;
-static int num_asteroids = 3;
+static int num_asteroids = 0;   // why crash
 static int cube_groups = 16;
 
 WorldElemListNode*
@@ -198,13 +198,18 @@ world_build_run_program(float x, float y, float z)
             rand_in_range(1, gWorld->bound_radius),
             rand_in_range(-gWorld->bound_radius, gWorld->bound_radius)
         };
+         float D[] = {
+            rand_in_range(-gWorld->bound_radius, gWorld->bound_radius),
+            rand_in_range(1, gWorld->bound_radius),
+            rand_in_range(-gWorld->bound_radius, gWorld->bound_radius)
+        };
         
         if(world_elem_list_find_nearest(&head, C, &neardist) != NULL && neardist >= asteroid_scale)
         {
-            game_add_asteroid(C[0], C[1], C[2], 0, 0, 0);
+            game_add_asteroid(C[0], C[1], C[2], D[0], D[1], D[2]);
            
-            update_object_velocity(world_get_last_object()->elem_id,
-                                   rand_in_range(-asteroid_speed, asteroid_speed), rand_in_range(-asteroid_speed, asteroid_speed), rand_in_range(-asteroid_speed, asteroid_speed), 0);
+            /*update_object_velocity(world_get_last_object()->elem_id,
+                                   rand_in_range(-asteroid_speed, asteroid_speed), rand_in_range(-asteroid_speed, asteroid_speed), rand_in_range(-asteroid_speed, asteroid_speed), 0);*/
         }
     }
     
