@@ -1307,12 +1307,13 @@ void world_init(float radius)
         *(gWorld->terrain_height_map + i*(WORLD_TERRAIN_COMPLEXITY/2-j)) = sin((float) j/(WORLD_TERRAIN_COMPLEXITY/2)) * 10;
     }
     
-    // build spherical bounding
+    // build spherical bounding normals
     float Ty, Tx;
     float I = WORLD_BOUNDING_SPHERE_STEPS;
     float R = M_PI*2;
-    float Rad = gWorld->bound_radius;
-    float RL = (R/I);
+    float RL = (R / I);
+    float Rad = sin(RL) * gWorld->bound_radius;
+    
     quaternion_t Qx, Qy, Qz;
     
     boundingRegion* br = boundingRegionInit(I * I + 1);

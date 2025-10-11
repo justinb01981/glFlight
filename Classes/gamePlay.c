@@ -571,7 +571,7 @@ void
 game_move_spawnpoint(WorldElem* pElem)
 {
     static float orbit_T = 0.0;
-    float radius = 75;
+    float radius = gWorld->bound_radius / 2.0;
     float orbit_origin[] = {0, atoi(MAP_BASE_ALT), 0};
     
     {

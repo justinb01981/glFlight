@@ -10,8 +10,8 @@
 #include "textures.h"
 
 #define N 32768000
-#define TRAD 2 // triangle size
-#define STRIDE 1.5 // spacing between triangles
+#define TRAD 10 // triangle size
+#define STRIDE 10 // spacing between triangles
 
 typedef struct Terrain_ {
     model_coord_t vertices[N];
@@ -187,11 +187,11 @@ void terrainUninit(void) {
 void terrainBuild(void) {
 
     float R = TRAD;
-    float X = STRIDE;
-    float width = gWorld->bound_radius*3;
+    float X = 2;
+    float width = gWorld->bound_radius * 2.2;
 
-    float col = -gWorld->bound_radius ; //my_ship_x - width/2;
-    float row = -gWorld->bound_radius ; //my_ship_z - width/2;
+    float col = -gWorld->bound_radius; //my_ship_x - width/2;
+    float row = -gWorld->bound_radius; //my_ship_z - width/2;
 
     Point A = {col, YcalculateFromXZ(col,row), row};
 
@@ -217,8 +217,8 @@ void terrainInit(void) {
 
 void terrainDraw(void) {
 
-    terrainInit();
-    terrainBuild();// dude try moving this to async without locking and see what it looks like drawing
+    //terrainInit();
+    //terrainBuild();// dude try moving this to async without locking and see what it looks like drawing
 
     glVertexPointer(3, GL_FLOAT, 0, terrain.vertices);
     glTexCoordPointer(2, GL_FLOAT, 0, terrain.texvertices);

@@ -35,11 +35,11 @@
 #define MAPMODEL_CUBE_INVERTED "18"
 #define MAPMODEL_SPHERE "19"
 #define MAPMODEL_ENEMYBASE "20"
-#define MAP_BASE_ALT "50"
+#define MAP_BASE_ALT "30"
 #define MAPMODEL_SPRITE_SCENERY "22"
 
 #define TEXTURE_ID_STR_(x) #x
-#define TEXTURE_ID_STR(x) TEXTURE_ID_STR_(96)
+#define TEXTURE_ID_STR(x) TEXTURE_ID_STR_(x)
 
 /*
  (Model type, float x, float y, float z, float yaw, float pitch, float roll, float scale, int texture_id)
@@ -51,7 +51,12 @@
 "add_object "model" "#x" "#y" "#z" "#yaw" "#pitch" "#roll" "#scale" "#tx_id"\n"
 
 // WARN: this contains 2 \n\n trailing so nothing after it in the string will be read
-#define WORLD_SCALED_FRAME(x, tex, scale)         "register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n""set_world_size r\n""map_program_with_args 100 0 100\n"
+#define WORLD_SCALED_FRAME(x, tex, scale)         \
+"set_background_info " TEXTURE_ID_STR(107)"\n"\
+"register_params 150 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   \
+"register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n" \
+"set_world_size r\n" \
+"map_program_with_args 100 0 100\n"
 
 #define WORLD_SCALED_FRAME_TERRAIN(y, tex, scale) \
 WORLD_CUBEGRID(y, tex, scale)
@@ -265,7 +270,7 @@ const static char initial_map_200x100x200[] = ""
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
 
-"set_background_info " TEXTURE_ID_STR(TEXTURE_ID_BOUNDING) "\n"
+"set_background_info " TEXTURE_ID_STR(107) "\n"
 
 //"add_object 0 100 50 100 0 0 0 1 13\n" /* add a jet */
 //"add_enemy_jet 1 10\n" /* make last object a jet of difficulty n, durability x */
@@ -511,7 +516,7 @@ const static char initial_map_survival[] = ""
 
 WORLD_SCALED_FRAME(1, 28, 4)
 "set_background_info " 
-TEXTURE_ID_STR(TEXTURE_ID_BOUNDING) "\n"
+TEXTURE_ID_STR(107) "\n"
 
 // else
 "register_params 2 rndx 20 rndy 0 0 0 10 0 0 0 0 0 0 0 0\n"
@@ -858,7 +863,7 @@ const static char map_400x100x400[] = ""
 "set_world_size 400\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
-"set_background_info " TEXTURE_ID_STR(TEXTURE_ID_BOUNDING) "\n"
+"set_background_info " TEXTURE_ID_STR(96) "\n"
 
 "add_bounding_vec wx0.5 wy0 wz0.5 0 1 0\n" // floor
 "add_bounding_vec wx0.5 wy1.0 wz0.5 0 -1 0\n" // ceiling
@@ -893,7 +898,7 @@ const static char map_400x100x400_flat[] = ""
 "set_world_size 400\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
-"set_background_info " TEXTURE_ID_STR(TEXTURE_ID_BOUNDING) "\n"
+"set_background_info " TEXTURE_ID_STR(96) "\n"
 
 // mesh of cubes
 "mesh_manip_add wx1.0 " "wy0.0" " wz1.0" " -8 0 0" " 0 0 -8" " 50 50\n"
@@ -905,7 +910,7 @@ const static char map_200x100x200_pits[] = ""
 "set_world_size 200\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
-"set_background_info " TEXTURE_ID_STR(TEXTURE_ID_BOUNDING) "\n"
+"set_background_info " TEXTURE_ID_STR(96) "\n"
 
 // mesh of cubes
 "mesh_manip_add wx1.0 " "wy0.5" " wz1.0" " -4 0 0" " 0 0 -4" " 50 50\n"
@@ -932,7 +937,7 @@ RANDOM_FLOATING_BLOCKS_1
 // MARK: -- map - lobby
 const static char map_portal_lobby[] = ""
 "set_world_size 50\n" // all must be divisible by MAX_WORLD_REGIONS (50 currently)
-"set_background_info " TEXTURE_ID_STR(TEXTURE_ID_BOUNDING) "\n"
+"set_background_info " TEXTURE_ID_STR(107) "\n"
 ;
 
 const static char pokeball_map[] = ""
@@ -941,7 +946,7 @@ const static char pokeball_map[] = ""
 
 "set_world_plane 0 0 10 0 1 0 0 0 0 1\n" // idx, origin[3], v1[3], v2[3]
 
-"set_background_info " TEXTURE_ID_STR(TEXTURE_ID_BOUNDING) "\n"
+"set_background_info " TEXTURE_ID_STR(107) "\n"
 //MESH_CUBES_1(19, 5)
 
 // add test tower
@@ -983,7 +988,7 @@ WORLD_ADD_OBJECT(11, rndx, rndy, rndz, 0, 0, 0, 1, 35) \
 
 //"set_world_size 200 100 200\n" // all must be divisible by MAX_WORLD_REGIONS
 
-"set_background_info " TEXTURE_ID_STR(TEXTURE_ID_BOUNDING) "\n"
+"set_background_info " TEXTURE_ID_STR(107) "\n"
 
 //MESH_CUBES_2(28, 4)
 //WORLD_SCALED_FRAME_GL_TERRAIN(1, 83, 4)
@@ -1054,7 +1059,7 @@ const static char* initial_map = ""
 "register_params 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
 "register_params_mul 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"
 "set_world_size r\n"
-"set_background_info " TEXTURE_ID_STR(TEXTURE_ID_BOUNDING)
+"set_background_info " TEXTURE_ID_STR(107)
 "\n"
 
 //WORLD_SCALED_FRAME(1, /*57*/28, 4)
@@ -1067,6 +1072,7 @@ const static char* initial_map = ""
 "0 3.14 3.14"// initial ship orient -- watch out ship doesnt slerp to cam afterwards tho!
 "\n"
 
+// add two models next to player for each jet
 WORLD_ADD_OBJECT(13,
                  -2, 5, -4,
                  0,3.14,3.14,

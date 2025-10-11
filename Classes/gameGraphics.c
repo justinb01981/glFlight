@@ -1312,7 +1312,8 @@ static void drawBoundingInit(int tex_id)
 {
     int iC = 0, iV = 0, iT = 0, i, yc = 0;
     float hackMinSize = 0.001, hackMinSizeTot = 0;
-    float oTx = 0.5, oTy = 0.5;
+    float oTx = 0.5, oTy = -0.5;
+    float tex_radius = 30, tex_p = 0.15;
 
     boData = malloc(sizeof(*boData));
     memset(boData, 0, sizeof(*boData));
@@ -1355,12 +1356,15 @@ static void drawBoundingInit(int tex_id)
         boData->coords256[iC++] = origin[0];
         boData->coords256[iC++] = origin[1] + hackMinSizeTot;
         boData->coords256[iC++] = origin[2];
+
         boData->coords256[iC++] = origin[0] + U[0] * r;
         boData->coords256[iC++] = origin[1] + U[1] * r + hackMinSizeTot;
         boData->coords256[iC++] = origin[2] + U[2] * r;
+
         boData->coords256[iC++] = origin[0] + V[0] * r;
         boData->coords256[iC++] = origin[1] + V[1] * r + hackMinSizeTot;
         boData->coords256[iC++] = origin[2] + V[2] * r;
+
         boData->coords256[iC++] = (origin[0] + V[0] * r + U[0] * r);
         boData->coords256[iC++] = (origin[1] + V[1] * r + U[1] * r) + hackMinSizeTot;
         boData->coords256[iC++] = (origin[2] + V[2] * r + U[2] * r);
@@ -1392,16 +1396,23 @@ static void drawBoundingInit(int tex_id)
             }
         }
 
-        float HI = 1/WORLD_BOUNDING_SPHERE_STEPS*4, LO = -1/WORLD_BOUNDING_SPHERE_STEPS*4;
-        float texYmax = U[1] > 0 ? HI : LO;
-        boData->txcoords256[iT++] = oTx + 0.0;
-        boData->txcoords256[iT++] = oTy + 0.0;
-        boData->txcoords256[iT++] = oTx + HI;
-        boData->txcoords256[iT++] = oTy + 0.0;
-        boData->txcoords256[iT++] = oTx + 0.0;
-        boData->txcoords256[iT++] = oTy + texYmax;
-        boData->txcoords256[iT++] = oTx + HI;
-        boData->txcoords256[iT++] = oTy + texYmax;
+
+        float th = atan2(.5-U[0], .5-U[2]), p = tex_p;
+        float tj = atan2(.5 - U[1], .5 - U[0]);
+
+        float tx = oTx + (sin(th)) * tex_radius;
+        float ty = oTy + (sin(tj)) * tex_radius;
+        boData->txcoords256[iT++] = tx;
+        boData->txcoords256[iT++] = ty;
+
+        boData->txcoords256[iT++] = tx;
+        boData->txcoords256[iT++] = ty - p;
+
+        boData->txcoords256[iT++] = tx - p;
+        boData->txcoords256[iT++] = ty;
+
+        boData->txcoords256[iT++] = tx - p;
+        boData->txcoords256[iT++] = ty - p;
 
         boData->indices256[iV++] = indices[0];
         boData->indices256[iV++] = indices[1];
@@ -1412,10 +1423,6 @@ static void drawBoundingInit(int tex_id)
         boData->indices256[iV++] = indices[5];
 
         hackMinSizeTot += hackMinSize;
-
-        if (yc % 4 == 0) oTx += HI;
-        oTy += HI;
-        yc++;
     }
 }
 
