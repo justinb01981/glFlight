@@ -17,7 +17,7 @@
     #if GAME_PLATFORM_IOS
     #include <Endian.h>
     #else
-    #include <sys/endian.h>
+    //#include <sys/endian.h>
     #endif
 
 #endif

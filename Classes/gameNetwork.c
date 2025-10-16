@@ -263,7 +263,7 @@ send_lan_broadcast(void)
     
     sa_bc6->sin6_family = AF_INET6;
 #ifdef BSD_SOCKETS
-    sa_bc6.sin6_len = sizeof(sa_bc6);
+    sa_bc6->sin6_len = sizeof(sa_bc6);
 #endif
     sa_bc6->sin6_port = htons(gameNetworkState.hostInfo.port);
     sa_bc6->sin6_addr =

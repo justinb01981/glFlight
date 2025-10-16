@@ -129,7 +129,7 @@ typedef struct {
 } motion_interp_st;
 
 #ifdef GAME_PLATFORM_OGL
-__pragma(pack(push, 1)) 
+//__pragma(pack(push, 1))
 typedef struct
 #else
 typedef struct __attribute__((packed))
@@ -170,9 +170,6 @@ typedef struct __attribute__((packed))
         
     } params;
 }  gameNetworkMessage;
-#ifdef GAME_PLATFORM_OGL
-__pragma(pack(pop))
-#endif
 
 struct gameNetworkMessageQueued {
     struct gameNetworkMessageQueued* next;

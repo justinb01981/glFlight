@@ -104,6 +104,7 @@ collision_actions_set_default()
 static void collision_handle_impact(WorldElem* a, WorldElem* b, float tc)
 {
     // a,b priority determined by object-id ascending in world.c - e.g. pCollisionB will point at the OBJ_BULLET, pCollisionA at the OBJ_SHIP
+    if(!a->bounding.pnorm || !b->bounding.pnorm) return;
 
     // action recorded by world-boundary-checks
     collision_action_t world_coll_act = a->object_type > b->object_type ? collision_actions[a->object_type][b->object_type] : collision_actions[b->object_type][a->object_type];

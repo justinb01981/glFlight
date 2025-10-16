@@ -1,3 +1,6 @@
 [submodule "win/ogl-samples-master"]
 	path = win/ogl-samples-master
 	url = git@github.com:g-truc/ogl-samples.git
+[submodule "win/ogl-samples"]
+	path = win/ogl-samples
+	url = git@github.com:g-truc/ogl-samples.git

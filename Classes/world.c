@@ -525,6 +525,7 @@ world_add_object_core(Model type,
     if(pElem->bounding.pnorm) free(pElem->bounding.pnorm);
     pElem->bounding.pnorm = malloc(sizeof(model_coord_t) * model_normals_sizeof);
     pElem->bounding.normals = model_normals_sizeof;
+    assert(model_normals_sizeof > 0);
     //memcpy(pElem->bounding.pnorm, model_normals, model_normals_sizeof * sizeof(model_coord_t));
     //model_normals = pElem->bounding.pnorm;
     
@@ -2029,10 +2030,17 @@ world_update(float tc)
 
                                         WorldElemListNode* rgniterNext = gWorld->world_update_state.world_region_iterate_cur->next;
 
-                                        if (pRegionElem->remove_pending) goto world_update_collision_ignore;
+                                        if (!pRegionElem->destructible || pRegionElem->remove_pending) goto world_update_collision_ignore;
+
+                                        if(!pRegionElem->bounding.pnorm) {
+                                            DBPRINTF(("WARN: pnormals=NULL (%s)", typestr(pRegionElem->object_type)));
+                                            goto world_update_collision_ignore;
+                                        }
 
                                         if(pRegionElem != pElemCollided)
                                         {
+
+
                                             if(check_collision(pElemCollided, pRegionElem))
                                             {
                                                 //DBPRINTF(("check_collision %02x(%d) -> %02x(%d)",
@@ -2079,7 +2087,8 @@ world_update(float tc)
 
                                                 collision_handle_impact(pRegionElem, pElemCollided, tc);
 
-                                                
+                                                assert(pRegionElem->bounding.pnorm != NULL);
+
                                                 /*{
                                                     WorldElemListNode *nA, *nB;
 

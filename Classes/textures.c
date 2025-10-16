@@ -78,6 +78,7 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
     int height = max_bitmap_dim;
     
     sprintf(file_name, "%s""texture%d.bmp", initTexturesPrefix, tex_id);
+    DBPRINTF(("read_bitmap_to_gltexture_with_replace path (%s)", file_name));
 
     /*
      * bitmaps are 24-bit BMP files (usually 512x512 but some power of 2)

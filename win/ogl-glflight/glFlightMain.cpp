@@ -23,7 +23,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <al.h>
+#include "OpenAL/al.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,13 +68,16 @@ private:
 
     unsigned long bgThreadId;
 
+#ifdef _NOT_POSIX
     WSAData wsaData;
+#endif
 
 public:
 
     GLFlightGame(int argc, char* argv[]) :
-        gameFramework(argc, argv, "glFlightMain", gameFramework::CORE, 2, 0, 0, MATCH_TEMPLATE, glm::uvec2(GLM_VIEW_WIDTH, GLM_VIEW_HEIGHT))
+        gameFramework(argc, argv, "glFlightMain", gameFramework::CORE, 1, 0, 0, MATCH_TEMPLATE, glm::uvec2(GLM_VIEW_WIDTH, GLM_VIEW_HEIGHT))
     {
+        DBPRINTF(("GLFlightGame() init"));
     }
 
     void glFlightInitialize()
@@ -136,13 +139,25 @@ public:
         glActiveTexture(GL_TEXTURE0);
         glEnable(GL_TEXTURE_2D);
 
+#ifdef _NOT_POSIX
         WSAStartup(MAKEWORD(2, 2), &wsaData);
+#else
+        pthread_t tinfo;
+        pthread_attr_t attr;
+
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, 1);
+#endif
 
         glFlightInitialize();
 
         openALInit();
 
+#ifdef _NOT_POSIX
         CreateThread(NULL, 1024 * 64, GLFlightGame::backgroundWorker, &glFlightInited, 0, &bgThreadId);
+#else
+        pthread_create(&tinfo, &attr, GLFlightGame::backgroundWorker, &glFlightInited);
+#endif
 
         glFlightInited = true;
 
@@ -156,7 +171,11 @@ public:
         glFlightInited = false;
 
         // TODO: poll for thread exit code
+#ifdef _NOT_POSIX
         Sleep(1000);
+#else
+        usleep(1000 * 100000);
+#endif
 
         gameNetwork_disconnect();
         if (save_map)
@@ -369,7 +388,8 @@ public:
         }
     }
 
-    static unsigned long 
+    //static unsigned long
+    static void*
     backgroundWorker(void* arg)
     {
         bool* glFlightInited = (bool*) arg;

@@ -9,18 +9,26 @@ set(SOURCE_FILES ogl-glflight/stubs.cpp ogl-glflight/gameWinStubs.c ogl-glflight
 include_directories(ogl-glflight)
 include_directories(../Classes)
 
-add_definitions(/FI"gameWinTypes.h")
+# HACK
+if(MSVC)
+    add_definitions(-D_NOT_POSIX)
+    add_definitions(/FI"gameWinTypes.h")
+else()
+    # GCC or Clang
+    add_definitions(-DBSD_SOCKETS=1)
+endif()
 
 add_definitions(-fpermissive)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 add_definitions(-DGAME_PLATFORM_OGL=1)
+add_definitions(-DGL_SILENCE_DEPRECATION)
 
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-DGLEW_STATIC)
-add_definitions(-D_NOT_POSIX)
+
 add_definitions(-DGAME_NETWORK_USE_NBO=0)
 
-set(OGL_DIR ogl-samples-master)
+set(OGL_DIR ogl-samples)
 
 add_subdirectory(${OGL_DIR})
 
@@ -56,9 +64,8 @@ include_directories(${OGL_DIR}/external/glu-0.1.0.0/glu)
 
 add_executable(glFlightMain ${SOURCE_FILES})
 
-target_link_libraries(glFlightMain framework libEGL FreeImage glfw3 OpenAL32)
-target_link_libraries(glFlightMain wsock32 ws2_32 winmm)
-target_link_libraries(glFlightMain opengl32)
+target_link_libraries(glFlightMain "-framework Cocoa -framework AVFoundation -framework CoreGraphics -framework IOKit -framework OpenGL -framework OpenAL  -framework CoreVideo")
+target_link_libraries(glFlightMain framework glfw3)
 
 #add_dependencies(glFlightMain ${OGL_DIR})
 

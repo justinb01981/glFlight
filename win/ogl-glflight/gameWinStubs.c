@@ -1,16 +1,28 @@
 
 #include "gameWinStubs.h"
-#include <stdint.h> // portable: uint64_t   MSVC: __int64 
+#include <stdint.h> // portable: uint64_t   MSVC: __int64
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+#if MSVC
 #include <Windows.h>
+#endif
+
+
+
 
 extern void angle_usleep(unsigned long);
+extern unsigned long rand(void);
 
+#if MSVC
 void usleep(unsigned int usec)
 {
+
     Sleep(usec / 1000);
 }
 
-int gettimeofday(struct timeval* tp, struct timezone* tzp)
+unsigned long gettimeofday(struct timeval* tp, struct timezone* tzp)
 {
     // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
     // This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
@@ -28,8 +40,11 @@ int gettimeofday(struct timeval* tp, struct timezone* tzp)
 
     tp->tv_sec = (long)((time - EPOCH) / 10000000L);
     tp->tv_usec = (long)(system_time.wMilliseconds * 1000);
+
     return 0;
 }
+
+#endif
 
 void appWriteSettings()
 {

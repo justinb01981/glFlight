@@ -47,7 +47,7 @@ unsigned int visibleElementsLen = 0;
 
 int numEnemies = 0;
 
-int tex_pass = 0;
+unsigned long tex_pass = 0;
 int goal_fps = GAME_FRAME_RATE;
 
 float block_scale = 1;
@@ -61,7 +61,7 @@ unsigned int count_elems_last = 0, count_elems_grid = 100;
 
 struct
 {
-    int tex_pass_last;
+    unsigned long tex_pass_last;
     time_t tex_time_last;
     int fps;
 } perf_data;
@@ -518,8 +518,7 @@ calibrate_bail:
 
     glFrontFace(GL_CCW);
     
-    drawBackground();
-	
+    //drawBackground();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	

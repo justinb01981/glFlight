@@ -9,10 +9,10 @@
 #ifndef gl_flight_gameLock_h
 #define gl_flight_gameLock_h
 
-#ifndef _NOT_POSIX
-#include <pthread.h>
-#else
+#ifdef _NOT_POSIX
 #include <windows.h>
+#else
+#include <pthread.h>
 #endif
 
 typedef struct

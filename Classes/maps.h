@@ -48,7 +48,7 @@
 "add_object "#model" "#x" "#y" "#z" "#yaw" "#pitch" "#roll" "#scale" "#tx_id"\n"
 
 #define WORLD_ADD_OBJECT_ENUM(model, x, y, z, yaw, pitch, roll, scale, tx_id) \
-"add_object "model" "#x" "#y" "#z" "#yaw" "#pitch" "#roll" "#scale" "#tx_id"\n"
+"add_object " model" "#x" "#y" "#z" "#yaw" "#pitch" "#roll" "#scale" "#tx_id"\n"
 
 // WARN: this contains 2 \n\n trailing so nothing after it in the string will be read
 #define WORLD_SCALED_FRAME(x, tex, scale)         "register_params 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"   "register_params_mul "#x" "#x" "#x" 1 1 1 1 1 1 1 1 1 1 1 1 1\n""set_world_size r\n""map_program_with_args 100 0 100\n"

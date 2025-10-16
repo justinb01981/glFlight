@@ -155,7 +155,7 @@ game_ai_find_target(WorldElem *pElem)
                 
                 // don't always take highest-weighted target, some element of randomness
                 if(dist <= dist_thresh)
-                if(w > wMin || rand_in_range(1, 100) <= 25)
+                if(w > wMin)
                 {
                     minId = pTarget->elem->elem_id;
                     minDist = dist;

@@ -167,7 +167,7 @@ gameDialogVisitHomepage()
 
 #define WELCOMESTR                                  \
 "^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D\n"    \
-"^DWelcome to "GAMETITLE"!^D\n"                        \
+"^DWelcome to " GAMETITLE "!^D\n"                        \
 "^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D^D\n"
 
 static void

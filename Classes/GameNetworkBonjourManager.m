@@ -685,14 +685,14 @@ void GameNetworkBonjourManagerSendMessageToPeer(uint8_t* msg_, int peer_id)
     [GameNetworkBonjourManager.instance sendPeer:msg peer:peer_id];
 }
 
-int GameNetworkBonjourManagerBrowseBegin()
+int GameNetworkBonjourManagerBrowseBeginDEPRECATED()
 {
     //GameNetworkBonjourManager.instance = nil;
     [GameNetworkBonjourManager.instance browse];
     return 1;
 }
 
-int GameNetworkBonjourManagerBrowseEnd(gameNetworkAddress* server_address_ptr)
+int GameNetworkBonjourManagerBrowseEndDEPRECATED(gameNetworkAddress* server_address_ptr)
 {
     GameNetworkBonjourManager* m = GameNetworkBonjourManager.instance;
     [m browseEnd];

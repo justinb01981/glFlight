@@ -193,6 +193,7 @@ int playSound = 1;
             if(audioPlayersPreloaded.clone)
             {
                 ac = [[AVAudioPlayer alloc] initWithContentsOfURL:[a url] error:&e];
+                assert( [ac enableRate]);
             }
             else
             {
