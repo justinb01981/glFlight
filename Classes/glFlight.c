@@ -518,7 +518,7 @@ calibrate_bail:
 
     glFrontFace(GL_CCW);
     
-    //drawBackground();
+    drawBackground();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	

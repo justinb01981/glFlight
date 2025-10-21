@@ -98,7 +98,7 @@ extern void (*glFlightOnPurchase)(void);
 /* reducing friction influences this... should be MAX_THRUST really */
 #define MAX_SPEED (6.25)
 
-const static char* GAME_VERSION_STR = "1.16.0_core";
+const static char* GAME_VERSION_STR = "1.18.0_core";
 
 const static char* GAME_NETWORK_DIRECTORY_HOSTNAME_DEFAULT = "d0gf1ght.domain17.net";
 
@@ -108,7 +108,7 @@ const static float SPEED_BOOST_FRAMES = 60 * 5;
 extern float C_THRUST;
 extern float C_FRICTION;    
 
-#define C_FRICTION_DEFAULT (0.06)
+#define C_FRICTION_DEFAULT (0.04)
 
 const static int OBJ_LIFETIME_WRECKAGE_FRAMES = 3600;
 

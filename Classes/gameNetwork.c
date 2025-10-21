@@ -15,7 +15,6 @@
 #include <unistd.h>
 #include <assert.h>
 #include <fcntl.h>
-#include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <string.h>
@@ -24,6 +23,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <errno.h>
+#include <netinet/in.h>
 
 #define ADDRINFO struct addrinfo
 #else
@@ -266,12 +266,7 @@ send_lan_broadcast(void)
     sa_bc6->sin6_len = sizeof(sa_bc6);
 #endif
     sa_bc6->sin6_port = htons(gameNetworkState.hostInfo.port);
-    sa_bc6->sin6_addr =
-#ifdef BSD_SOCKETS
-        in6addr_linklocal_allnodes;
-#else
-        in6addr_allnodesonlink;
-#endif
+    sa_bc6->sin6_addr = in6addr_any; // overwriting this with inet_pton ideally with in6addr_linklocal_allnodes
     addr.len = sizeof(struct sockaddr_in6);
 
     assert(inet_pton(AF_INET6, "::ffff:255.255.255.255", &sa_bc6->sin6_addr) == 1);
@@ -419,7 +414,11 @@ gameNetwork_getDNSAddress(char *name, gameNetworkAddress* addr)
     memset(&hints, 0, sizeof(hints));
 
     hints.ai_family =
-    AF_INET6    // todo: test android is okay with change from AF_UNSPEC 
+#if GAME_PLATFORM_ANDROID
+    AF_UNSPEC               // android is not okay with change from AF_UNSPEC
+#else
+    AF_INET6
+#endif
     ;
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE

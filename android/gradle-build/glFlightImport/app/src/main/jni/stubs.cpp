@@ -16,16 +16,16 @@ extern "C" {
         return;
     }
     
-    int GameNetworkBonjourManagerBrowseBegin()
-    {
-        return 0;
-    }
-    
-    int GameNetworkBonjourManagerBrowseEnd(gameNetworkAddress* server_address_ptr)
-    {
-        return 0;
-    }
-    
+//    int GameNetworkBonjourManagerBrowseBegin()
+//    {
+//        return 0;
+//    }
+//
+//    int GameNetworkBonjourManagerBrowseEnd(gameNetworkAddress* server_address_ptr)
+//    {
+//        return 0;
+//    }
+//
     void GameNetworkBonjourManagerDisconnect()
     {
     }
