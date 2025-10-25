@@ -24,7 +24,7 @@
 //#define WORLD_MAX_REGIONS /*50*/ 25
 #define WORLD_MAX_PLANES 16
 #define WORLD_MAX_TRIANGLE_MESH 16
-#define WORLD_BOUNDING_SPHERE_STEPS ((float) 8)
+#define WORLD_BOUNDING_SPHERE_STEPS (8)
 #define WORLD_TERRAIN_COMPLEXITY 64
 
 // a little fudgey - see world.c
