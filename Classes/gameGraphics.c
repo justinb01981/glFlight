@@ -1342,7 +1342,7 @@ static void drawBoundingInit(int tex_id)
         }
 
         const float Vpad = 0.2;
-        float r = tan(M_PI / (WORLD_BOUNDING_SPHERE_STEPS))*gWorld->bound_radius*2 + Vpad; // sin((M_PI*2) / WORLD_BOUNDING_SPHERE_STEPS) * (gWorld->bound_radius);
+        float r = tan(2.0*M_PI / ((float) WORLD_BOUNDING_SPHERE_STEPS))*gWorld->bound_radius*2 + Vpad; // sin((M_PI*2) / WORLD_BOUNDING_SPHERE_STEPS) * (gWorld->bound_radius);
 
         model_coord_t origin[3] = { boundVec->f[0], boundVec->f[1], boundVec->f[2] };
         for(int k = 0; k < 3; k++) origin[k] -= U[k]*(r/2);
@@ -1392,7 +1392,7 @@ static void drawBoundingInit(int tex_id)
             }
         }
 
-        float HI = 1/WORLD_BOUNDING_SPHERE_STEPS*4, LO = -1/WORLD_BOUNDING_SPHERE_STEPS*4;
+        float HI = 4.0/WORLD_BOUNDING_SPHERE_STEPS, LO = -4.0/WORLD_BOUNDING_SPHERE_STEPS;
         float texYmax = U[1] > 0 ? HI : LO;
         boData->txcoords256[iT++] = oTx + 0.0;
         boData->txcoords256[iT++] = oTy + 0.0;
@@ -1413,9 +1413,16 @@ static void drawBoundingInit(int tex_id)
 
         hackMinSizeTot += hackMinSize;
 
-        if (yc % 4 == 0) oTx += HI;
         oTy += HI;
+
         yc++;
+
+        if (2*yc % (int) WORLD_BOUNDING_SPHERE_STEPS == 0) {
+            oTx += HI;
+            oTy = 0.5;
+        }
+
+
     }
 }
 
