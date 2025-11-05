@@ -208,7 +208,9 @@ int update_object_in_motion(WorldElem* pElem);
 
 int update_object_velocity(int object_id, float x, float y, float z, int relative);
 
-int update_object_velocity_with_friction(int object_id, float v[3], float cthrust, float cfriction);
+int update_object_velocity_direct(WorldElem* pElem, float x, float y, float z, int relative);   // faster
+
+int update_object_velocity_with_friction(WorldElem*, float v[3], float cthrust, float cfriction);
 
 int world_object_set_lifetime(int object_id, int tex_passes);
 

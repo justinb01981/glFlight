@@ -91,7 +91,6 @@ static game_timeval_t world_update_time_last;
 static int do_track_fps = 0;
 WorldElemListNode visibleSkipList;
 
-
 world_elem_btree_node visibleBtreeRootStorage1 = WORLD_ELEM_BTREE_NODE_ZERO;
 world_elem_btree_node *visibleBtreeRoot = &visibleBtreeRootStorage1;
 world_elem_btree_node *visibleBtreeRootBuilding = &visibleBtreeRootStorage1;
@@ -99,6 +98,8 @@ unsigned int visibleBtreeDrawn = 0;
 WorldElemListNode* btreeVisibleTest = NULL;
 
 unsigned int draw_elem_max = PLATFORM_DRAW_ELEMS_MAX;
+
+WorldElem* pWorldElemMyShip = NULL;
 
 static void
 world_elem_btree_restart(void)
@@ -120,7 +121,6 @@ glFlightFrameStage1(void)
     int backface_culling = 1;
     WorldElemListNode* pListNode = NULL;
     WorldElemListNode* pCameraWatchNode = NULL;
-    WorldElem* pWorldElemMyShip = NULL;
     int n_visibleChecks = 400;
     char statsMessage[256];
     static int respawned = 0;
@@ -218,6 +218,8 @@ calibrate_bail:
             int sound_idx = 0;
             float rate = 0.25 + (speed/maxSpeed);
 
+            rate = MIN(rate, 1.0);
+
             if(speed/maxSpeed < 0.5)
             {
                 sound_idx = 1;
@@ -245,7 +247,10 @@ calibrate_bail:
     
     // JB: moved to background thread
     //do_game_network_read();
-    
+
+
+    world_unlock(); // temporarily release for network thread
+
     // TODO: this is being called at most once every 1/60th of a second (16ms)
     do_game_network_world_update();
 
@@ -261,15 +266,18 @@ calibrate_bail:
         pNetworkMsg->processed = 1;
         pNetworkMsg = pNetworkMsgNext;
     }
-    
+
     game_lock_unlock(&gameNetworkState.msgQueue.lock);
-    
+
+    world_lock();
+
     do_game_network_write();
 
     paused_bail:
     
     if(glFlightDrawframeHook) glFlightDrawframeHook();
-    
+
+    pWorldElemMyShip = NULL;
     pListNode = world_elem_list_find(my_ship_id, &gWorld->elements_list);
     if(pListNode) pWorldElemMyShip = pListNode->elem;
     
@@ -338,21 +346,18 @@ calibrate_bail:
                              my_ship_x, my_ship_y, my_ship_z,
                              my_ship_alpha, my_ship_beta, my_ship_gamma,
                              1, texture_id_playership);
-        
-        world_get_last_object()->object_type = OBJ_PLAYER;
+
         targetSpeed = MAX_SPEED/10;
 
         update_object_velocity(my_ship_id, 0,0,0, 0);   // fuck these dont matter because next frame does them
 
-        world_get_last_object()->bounding_remain = 1;
-        world_get_last_object()->durability = ship_durability;
-
         pWorldElemMyShip = world_get_last_object();
-        
+
+        game_elem_setup_player(pWorldElemMyShip, GAME_NETWORK_PLAYER_ID_HOST);
+        pWorldElemMyShip->durability = ship_durability;
+
         console_write(game_log_messages[GAME_LOG_TELEPORT]);
         gameAudioPlaySoundAtLocationWithRate("teleport", 1.0, gameCamera_getX(), gameCamera_getY(), gameCamera_getZ(), 1.0);
-
-        //return; // HACK: is this necessary anymore - testing needed
     }
    
 
@@ -375,7 +380,7 @@ calibrate_bail:
             -ship_z_vec[1]*speed,
             -ship_z_vec[2]*speed
         };
-        update_object_velocity_with_friction(my_ship_id, tv, C_THRUST, C_FRICTION);
+        update_object_velocity_with_friction(pWorldElemMyShip, tv, C_THRUST, C_FRICTION);
 
         if(camera_locked_frames > 0)
         {

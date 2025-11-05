@@ -150,6 +150,9 @@
 		D08AC6C31DAAE3DA00E367B7 /* texture101.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D08AC6C01DAAE3DA00E367B7 /* texture101.bmp */; };
 		D08C196D1D4455D1003EE6B2 /* texture97.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D08C196C1D4455D1003EE6B2 /* texture97.bmp */; };
 		D09051CA196DD87200E5F29E /* texture74.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09051C9196DD87200E5F29E /* texture74.bmp */; };
+		D09695982EAD05E500DE1B37 /* glflight_entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = D09695972EAD05E500DE1B37 /* glflight_entitlements.plist */; };
+		D09695992EAD05E500DE1B37 /* glflight_entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = D09695972EAD05E500DE1B37 /* glflight_entitlements.plist */; };
+		D096959A2EAD05E500DE1B37 /* glflight_entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = D09695972EAD05E500DE1B37 /* glflight_entitlements.plist */; };
 		D098934D1937F44400298C8E /* speedboost.wav in Resources */ = {isa = PBXBuildFile; fileRef = D098934C1937F44400298C8E /* speedboost.wav */; };
 		D098934F1937FA4100298C8E /* texture66.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D098934E1937FA4100298C8E /* texture66.bmp */; };
 		D09893511937FD7D00298C8E /* texture67.bmp in Resources */ = {isa = PBXBuildFile; fileRef = D09893501937FD7D00298C8E /* texture67.bmp */; };
@@ -859,6 +862,7 @@
 		D08AC6C01DAAE3DA00E367B7 /* texture101.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture101.bmp; sourceTree = "<group>"; };
 		D08C196C1D4455D1003EE6B2 /* texture97.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture97.bmp; sourceTree = "<group>"; };
 		D09051C9196DD87200E5F29E /* texture74.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture74.bmp; sourceTree = "<group>"; };
+		D09695972EAD05E500DE1B37 /* glflight_entitlements.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = glflight_entitlements.plist; sourceTree = "<group>"; };
 		D097E2582226161300A19853 /* model_newship.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = model_newship.h; sourceTree = "<group>"; };
 		D098934C1937F44400298C8E /* speedboost.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = speedboost.wav; sourceTree = "<group>"; };
 		D098934E1937FA4100298C8E /* texture66.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = texture66.bmp; sourceTree = "<group>"; };
@@ -1120,6 +1124,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				D09695972EAD05E500DE1B37 /* glflight_entitlements.plist */,
 				D02B8F12195DF41600830369 /* Android */,
 				D02D2CC317D5C5FF00C03EB5 /* Default.png */,
 				D0C133C419F448BF003A6949 /* Default2.png */,
@@ -1588,6 +1593,7 @@
 				D00D78D41A09525100E701B9 /* texture80.bmp in Resources */,
 				D09E7FC816EFBFC500343CE6 /* texture27.bmp in Resources */,
 				D0AF470E18E2546000081B81 /* texture62.bmp in Resources */,
+				D09695982EAD05E500DE1B37 /* glflight_entitlements.plist in Resources */,
 				D0EC73632CA4BB0A00B0D40A /* texture117.bmp in Resources */,
 				D0A7FF422E4A859200C6128B /* Default@2x.png in Resources */,
 				D08AC6C31DAAE3DA00E367B7 /* texture101.bmp in Resources */,
@@ -1763,6 +1769,7 @@
 				D0EC72DF2CA4B73600B0D40A /* texture27.bmp in Resources */,
 				D0EC72E02CA4B73600B0D40A /* texture62.bmp in Resources */,
 				D0EC73622CA4BB0A00B0D40A /* texture117.bmp in Resources */,
+				D096959A2EAD05E500DE1B37 /* glflight_entitlements.plist in Resources */,
 				D0EC72E12CA4B73600B0D40A /* texture101.bmp in Resources */,
 				D0EC72E22CA4B73600B0D40A /* texture59.bmp in Resources */,
 				D0EC72E32CA4B73600B0D40A /* texture109.bmp in Resources */,
@@ -1939,6 +1946,7 @@
 				D0F4D9552B1568B500948122 /* texture27.bmp in Resources */,
 				D0F4D9562B1568B500948122 /* texture62.bmp in Resources */,
 				D0EC73612CA4BB0A00B0D40A /* texture117.bmp in Resources */,
+				D09695992EAD05E500DE1B37 /* glflight_entitlements.plist in Resources */,
 				D0F4D9572B1568B500948122 /* texture101.bmp in Resources */,
 				D0F4D9582B1568B500948122 /* texture59.bmp in Resources */,
 				D0F4D9592B1568B500948122 /* texture109.bmp in Resources */,
@@ -2306,6 +2314,7 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = shipicon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = glflight_entitlements.plist;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
@@ -2343,6 +2352,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = shipicon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = glflight_entitlements.plist;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = YES;

@@ -736,7 +736,7 @@ char* world_write_buffer()
                         strcat(p, line);
                     }
                     
-                    printf("%s:%d(%s): %s\n", __FILE__, __LINE__, __FUNCTION__, line);
+                    //printf("%s:%d(%s): %s\n", __FILE__, __LINE__, __FUNCTION__, line);
                 }
             }
             

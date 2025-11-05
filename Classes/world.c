@@ -113,7 +113,10 @@ world_add_object_core(Model type,
         
         if(type != pElem->type)
         {
+            DBPRINTF(("ERROR: replace_object with type != pelem->type %d -> %d", type, pElem->type));
+
             /* not allowing this for now */
+            //assert(0);
             //model_changed = 1;
             type = pElem->type;
         }
@@ -982,6 +985,35 @@ int update_object_in_motion(WorldElem* pElem)
     return pElem->elem_id;
 }
 
+int update_object_velocity_direct(WorldElem* pElem, float x, float y, float z, int relative)
+{
+    // not allowing moving elements to span regions (for speed)
+    /*
+    if(pElem->spans_regions)
+    {
+        remove_element_from_region(pElem);
+        pElem->spans_regions = 0;
+    }
+     */
+
+    if(!relative)
+    {
+        pElem->physics.ptr->vx = x;
+        pElem->physics.ptr->vy = y;
+        pElem->physics.ptr->vz = z;
+    }
+    else
+    {
+        pElem->physics.ptr->vx += x;
+        pElem->physics.ptr->vy += y;
+        pElem->physics.ptr->vz += z;
+    }
+
+    update_object_in_motion(pElem);
+
+    return pElem->elem_id;
+}
+
 int update_object_velocity(int object_id, float x, float y, float z, int relative)
 {
 
@@ -992,8 +1024,8 @@ int update_object_velocity(int object_id, float x, float y, float z, int relativ
     }
 
     WorldElemListNode* pElemNode;
-    WorldElem* pElem;
-    
+    WorldElem* pElem = NULL;
+
     if (world_get_last_object()->elem_id == object_id) {
         pElem = world_get_last_object();
     }
@@ -1005,47 +1037,23 @@ int update_object_velocity(int object_id, float x, float y, float z, int relativ
     
     if(pElem)
     {   
-        // not allowing moving elements to span regions (for speed)
-        /*
-        if(pElem->spans_regions) 
-        {
-            remove_element_from_region(pElem);
-            pElem->spans_regions = 0;
-        }
-         */
-        
-        if(!relative)
-        {
-            pElem->physics.ptr->vx = x;
-            pElem->physics.ptr->vy = y;
-            pElem->physics.ptr->vz = z;
-        }
-        else
-        {
-            pElem->physics.ptr->vx += x;
-            pElem->physics.ptr->vy += y;
-            pElem->physics.ptr->vz += z;
-        }
-        
-        update_object_in_motion(pElem);
-        
-        return object_id;
+        return update_object_velocity_direct(pElem, x, y, z, relative);
     }
     
     return WORLD_ELEM_ID_INVALID;
 }
 
-int update_object_velocity_with_friction(int object_id, float v[3], float cthrust, float cfriction)
+int update_object_velocity_with_friction(WorldElem* pElem, float v[3], float cthrust, float cfriction)
 {
-    WorldElemListNode* pElemNode = world_elem_list_find(object_id, &gWorld->elements_list);
+    //WorldElemListNode* pElemNode = world_elem_list_find(object_id, &gWorld->elements_list);
 
-    if(pElemNode)
+    if(pElem)
     {
         float ship_vnew[3] =
         {
-            (v[0] * cthrust) + (pElemNode->elem->physics.ptr->vx * -cfriction),
-            (v[1] * cthrust) + (pElemNode->elem->physics.ptr->vy * -cfriction),
-            (v[2] * cthrust) + (pElemNode->elem->physics.ptr->vz * -cfriction)
+            (v[0] * cthrust) + (pElem->physics.ptr->vx * -cfriction),
+            (v[1] * cthrust) + (pElem->physics.ptr->vy * -cfriction),
+            (v[2] * cthrust) + (pElem->physics.ptr->vz * -cfriction)
         };
         
         /*
@@ -1055,13 +1063,13 @@ int update_object_velocity_with_friction(int object_id, float v[3], float cthrus
                                ship_vnew[2],
                                1);
          */
-        pElemNode->elem->physics.ptr->vx += ship_vnew[0];
-        pElemNode->elem->physics.ptr->vy += ship_vnew[1];
-        pElemNode->elem->physics.ptr->vz += ship_vnew[2];
+        pElem->physics.ptr->vx += ship_vnew[0];
+        pElem->physics.ptr->vy += ship_vnew[1];
+        pElem->physics.ptr->vz += ship_vnew[2];
 
-        update_object_in_motion(pElemNode->elem);
+        update_object_in_motion(pElem);
         
-        return object_id;
+        return pElem->elem_id;
     }
 
     return WORLD_ELEM_ID_INVALID;
@@ -1171,7 +1179,7 @@ world_random_spawn_location(float loc[6], int affiliation)
     }
 }
 
-void world_free()
+void world_free(void)
 {
 	if(gWorld)
 	{
@@ -1410,7 +1418,7 @@ void world_init(float radius)
 	return;
 }
 
-void world_clear_pending()
+void world_clear_pending(void)
 {
     // clear pending additions
     world_elem_list_clear(&gWorld->elements_to_be_added);
@@ -1441,22 +1449,22 @@ void world_clear_pending()
     }
 }
 
-void world_lock_init()
+void world_lock_init(void)
 {
     game_lock_init(&gWorldLock);
 }
 
-void world_lock_uninit()
+void world_lock_uninit(void)
 {
     game_lock_uninit(&gWorldLock);
 }
 
-void world_lock()
+void world_lock(void)
 {
     game_lock_lock(&gWorldLock);
 }
 
-void world_unlock()
+void world_unlock(void)
 {
     game_lock_unlock(&gWorldLock);
 }
@@ -1525,7 +1533,7 @@ world_repulse_elem(WorldElem* pCollisionB, WorldElem* pCollisionA, float tc, flo
         *p[i] += Fx;
 
         // apply force back unless static
-        //if(pCollisionB->moving) *r[i] -= Fx;
+        if(pCollisionB->moving) *r[i] -= Fx;
     }
 
     // NOT calling move_elem_relative? because that is done outside 
@@ -1736,7 +1744,10 @@ add_element_to_region(WorldElem* pElem)
                                                                      yr*Rs - gWorld->bound_radius,
                                                                      zr*Rs - gWorld->bound_radius);
                 
-                    if(pListHead) world_elem_list_add_fast(pElem, pListHead, LIST_TYPE_REGION);
+                    if(pListHead && !world_elem_list_find_elem(pElem, pListHead))
+                    {
+                        world_elem_list_add_fast(pElem, pListHead, LIST_TYPE_REGION);
+                    }
                     regions_spanned++;
                 }
             }
@@ -1839,7 +1850,7 @@ world_update(float tc)
     int do_sound_checks = 1;
     // HACK: -- apply min velocity "wobble back/forth"
     float Fmin = 0.01 * (tex_pass % 2) - 1;
-    int iF;
+//    int iF;
      // out-of-bounds
 
 
@@ -2069,7 +2080,7 @@ world_update(float tc)
 
                                                 if(colact == COLLISION_ACTION_REPULSE)
                                                 {
-                                                    momentum = 1.5;// cancel forward momentum? this is just goofy
+                                                    //momentum = 0;// cancel forward momentum? this is just goofy
 
                                                     world_repulse_elem(pRegionElem, pElemCollided, tc, collision_repulsion_coeff);
 
@@ -2087,7 +2098,7 @@ world_update(float tc)
 
                                                 collision_handle_impact(pRegionElem, pElemCollided, tc);
 
-                                                assert(pRegionElem->bounding.pnorm != NULL);
+                                                //assert(pRegionElem->bounding.pnorm != NULL);
 
                                                 /*{
                                                     WorldElemListNode *nA, *nB;
@@ -2365,14 +2376,14 @@ world_prepare_mesh(float x, float y, float z,
 }
 
 float
-world_mesh_pending_x()
+world_mesh_pending_x(void)
 {
     if(!world_pending_mesh) return 0;
     return world_pending_mesh->dim_x;
 }
 
 float
-world_mesh_pending_y()
+world_mesh_pending_y(void)
 {
     if(!world_pending_mesh) return 0;
     return world_pending_mesh->dim_y;

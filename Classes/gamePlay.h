@@ -150,11 +150,11 @@ const static float game_variables_default[] = {
     50,          // ENEMY1_FORGET_DISTANCE
     30,          // ENEMY1_PURSUE_DISTANCE
     MAX_SPEED,   // ENEMY1_SPEED_MAX
-    /*1.2*/ 0.4,         // ENEMY1_TURN_MAX_RADIANS
+    /*1.2*/ 0.2,         // ENEMY1_TURN_MAX_RADIANS
     1,           // CHANGES_TARGET
     1,           // PATROLS
-    800.0,       // SCAN_DISTANCE_MAX
-    0.02,        // ENEMY1_MAX_TURN_SKILL_SCALE
+    9999999.0,       // SCAN_DISTANCE_MAX
+    0.05,        // ENEMY1_MAX_TURN_SKILL_SCALE
     25,    // ENEMY1_JUKE_PCT
     2,           // ENEMY1_COLLECT_DURABILITY
     10,          // ENEMY_RUN_DISTANCE
@@ -319,6 +319,9 @@ game_variable_get(const char* name);
 
 float
 game_variable_set(const char* name, float val);
+
+void
+game_elem_setup_player(WorldElem* elem, int skill);
 
 void
 game_elem_setup_ship(WorldElem* elem, int skill);

@@ -13,6 +13,7 @@
 #import "AudioToolbox/AudioServices.h"
 #import "Foundation/NSUrl.h"
 #include "sounds.h"
+#include "gameDebug.h"
 
 #define MAX_CACHED_AUDIOPLAYERS 16
 
@@ -208,6 +209,7 @@ int playSound = 1;
             
             [ac setVolume:volume];
             ac.rate = rate;
+            DBPRINTF(("playSound withVolume andRate: %f", rate));
             [ac play];
         }
         

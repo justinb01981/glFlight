@@ -182,7 +182,7 @@ game_ai_find_target(WorldElem *pElem)
         
         return minId;
     }
-    
+
     if(pElem->stuff.u.enemy.scan_distance > 0 &&
        pElem->stuff.u.enemy.scan_distance < GAME_VARIABLE("ENEMY1_SCAN_DISTANCE_MAX"))
     {
@@ -395,7 +395,7 @@ game_ai_run(void)
     game_ai_run_skip_ai:
         if(pCur->elem->stuff.intelligent)
         {
-            update_object_velocity_with_friction(pCur->elem->elem_id, pCur->elem->stuff.u.enemy.vthrust, C_THRUST, C_FRICTION);
+            update_object_velocity_with_friction(pCur->elem, pCur->elem->stuff.u.enemy.vthrust, C_THRUST, C_FRICTION);
         }
         
         pCur = pNext;
@@ -450,23 +450,19 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     if(elem->stuff.u.enemy.enemy_state == ENEMY_STATE_PURSUE)
     {
         // adjust target vector to intercept (with some fudge-factor)
-        float fm = (1.0 + (1.0 / (float) rand_in_range(1, 100)));
+//        float fm = (1.0 + (1.0 / (float) rand_in_range(1, 100)));
         float bulletPredictTime = dist / bulletVel;
-        float interceptPredictTime = 2;
-        
+        float interceptPredictTime = 1.0;
+
         // if not firing, intercept course
         if(!elem->stuff.u.enemy.fires)
         {
-            fm = 1.0;
-            
             ax += vx * interceptPredictTime * tc;
             ay += vy * interceptPredictTime * tc;
             az += vz * interceptPredictTime * tc;
         }
         else
         {
-            fm = 1.0;
-            
             ax += vx * bulletPredictTime * tc;
             ay += vy * bulletPredictTime * tc;
             az += vz * bulletPredictTime * tc;

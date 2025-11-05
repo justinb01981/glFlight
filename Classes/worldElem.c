@@ -333,6 +333,9 @@ world_elem_list_remove(WorldElem* pElem, WorldElemListNode* pHeadNode)
 WorldElemListNode*
 world_elem_list_find(int elem_id, WorldElemListNode* pHeadNode)
 {
+    // HACK: to trap edge cases in gameNetwork msg handling
+    if(elem_id == WORLD_ELEM_ID_INVALID) return NULL;
+
     WorldElemListNode* pCur = pHeadNode->next;
     
     if(pHeadNode->hash_ptr)

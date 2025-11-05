@@ -568,7 +568,7 @@ game_add_turret(float x, float y, float z)
 }
 
 void
-game_move_spawnpoint(WorldElem* pElem)
+game_move_enemybase(WorldElem* pElem)
 {
     static float orbit_T = 0.0;
     float radius = 75;
@@ -1645,7 +1645,7 @@ game_run()
                         world_get_last_object()->stuff.affiliation = pCur->elem->stuff.affiliation;
                     }
                     
-                    game_move_spawnpoint(pCur->elem);
+                    game_move_enemybase(pCur->elem);
                 }
                 break;
                 
@@ -2630,6 +2630,21 @@ game_variable_set(const char* name, float val)
     }
     if(i < sizeof(game_variables_val)/sizeof(float)) game_variables_val[i] = val;
     return val;
+}
+
+void
+game_elem_setup_player(WorldElem* elem, int player_id)
+{
+
+    elem->object_type = OBJ_PLAYER;
+    elem->durability = DURABILITY_PLAYER;
+    elem->stuff.affiliation = player_id;
+    elem->stuff.game_object_id = player_id;
+    elem->bounding_remain = 1;
+    elem->stuff.network_created = 1;
+    elem->physics.ptr->friction = 1;
+    elem->bounding_remain = 1;
+
 }
 
 void

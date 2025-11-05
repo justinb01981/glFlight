@@ -9,11 +9,14 @@
 #ifndef gl_flight_glFlight_h
 #define gl_flight_glFlight_h
 
+#include "WorldElem.h"
+
 extern int world_inited;
 extern int game_paused;
 extern int game_terminated_gracefully;
 extern unsigned long tex_pass;
 extern char* world_data;
+extern WorldElem* pWorldElemMyShip;
 
 extern void (*glFlightDrawframeHook)(void);
 
