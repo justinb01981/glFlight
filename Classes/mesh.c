@@ -353,7 +353,7 @@ TESS_BEGIN_FUNCTION
     S->Icur = S->Is;
     S->Mcur = S->Ms;
     S->Tcur = S->Ts;
-    S->Imir = S->Icur;
+    S->Imir = *S->Icur;
     
     S->Ist = NULL;
     

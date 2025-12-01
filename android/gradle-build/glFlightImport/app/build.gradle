@@ -21,7 +21,7 @@ android {
     }
     defaultConfig {
         targetSdk 36
-        minSdk 19
+        minSdk 21
         versionCode 1180000
         versionName '1.18.0'
         sourceSets.main {
