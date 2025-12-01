@@ -282,6 +282,7 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
 {
     struct sockaddr_storage sa;
     int r;
+    char buf[255];
 
     memcpy(&sa, address->storage, address->len);
 
@@ -297,6 +298,8 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
     // REMOVED -- android ndk uses ipv4 we can be agnostic from here to send tho
     //assert(((struct sockaddr_in6*) &sa)->sin6_family == AF_INET6);
     
+    assert(inet_ntop(AF_INET6, &address->storage[0], buf, 255) != NULL);
+    
     r = sendto(gameNetworkState.hostInfo.socket.s, msg, sizeof(*msg),
                0, (struct sockaddr*)(address->storage), address->len);
     if(r < 0)
@@ -308,8 +311,7 @@ send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
             DBPRINTF(("sendto errno=%u)\n", errno));
         }
 #endif
-        DBPRINTF(("sendto: %d - errno:%s\n", r, strerror(errno)));
-        assert(0);
+        DBPRINTF(("sendto failed: @ %s:%u (errno: %s)\n", buf, ntohs(((struct sockaddr_in6*)address)->sin6_port), strerror(errno)));
     }
 
     gameMessage_from_nbo(msg);
@@ -3258,8 +3260,7 @@ int gameNetwork_onBonjourConnecting1(gameNetworkMessage* msg, gameNetworkAddress
         if(gameNetworkState.gameNetworkHookGameDiscovered)
         {
             console_write("GAME FOUND\nOpening portal to %s\n", /*msg->params.c*/ bdst);
-            gameNetworkState.gameNetworkHookGameDiscovered(msg->params.c/* bdst */);
-            //return 1;
+            gameNetworkState.gameNetworkHookGameDiscovered(/* msg->params.c */ bdst);
         }
         
         if(strncmp(msg->params.c, gameNetworkState.hostInfo.name, sizeof(msg->params.c)) == 0 ||

@@ -4,6 +4,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := glFlight
 LOCAL_LDLIBS := -lEGL -lGLESv1_CM -llog
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_SRC_FILES := glFlightJNI.cpp stubs.cpp
 
 GAME_SRC := ../../../../../../../Classes
