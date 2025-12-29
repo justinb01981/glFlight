@@ -281,10 +281,12 @@ static void
 send_to_address_udp(gameNetworkMessage* msg, gameNetworkAddress* address)
 {
     struct sockaddr_storage sa;
-    int r;
+    size_t r;
     char buf[255];
 
     memcpy(&sa, address->storage, address->len);
+    
+    if(sa.ss_family != AF_INET6) return;     // HACK to trap 0x0000000 invalid addresses sometimes seen during dns resolution etc.
 
     gameMessage_to_nbo(msg);
     
@@ -3263,16 +3265,23 @@ int gameNetwork_onBonjourConnecting1(gameNetworkMessage* msg, gameNetworkAddress
             gameNetworkState.gameNetworkHookGameDiscovered(/* msg->params.c */ bdst);
         }
         
-        if(strncmp(msg->params.c, gameNetworkState.hostInfo.name, sizeof(msg->params.c)) == 0 ||
-           gameNetworkState.hostInfo.bonjour_lan)
+        assert(!gameNetworkState.hostInfo.hosting);
+        
+        if(
+           /*strncmp(msg->params.c, gameNetworkState.hostInfo.name, sizeof(msg->params.c)) == 0 ||
+           gameNetworkState.hostInfo.bonjour_lan */
+           1)
         {
             gameNetworkState.gameNetworkHookOnMessage = gameNetwork_onBonjourConnecting2;
             send_connect(srcAddr);
         }
         else
         {
+            /*
             gameNetworkAddress_incrementPort(&gameNetworkState.gameDirectory.directory_address);
             send_beacon(&gameNetworkState.gameDirectory.directory_address, gameNetworkState.hostInfo.name);
+             */
+            assert(0);
         }
         
         return 1;

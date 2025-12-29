@@ -389,7 +389,7 @@ game_ai_run(void)
             world_object_set_nametag(pCurElem->elem_id, tag_debug);
 #endif
             pCurElem->stuff.u.enemy.collided = 0;
-            pCurElem->stuff.u.enemy.time_last_run = time_ms + rand_in_range(-pCurElem->stuff.u.enemy.time_run_interval/10, pCurElem->stuff.u.enemy.time_run_interval/10);
+            pCurElem->stuff.u.enemy.time_last_run = time_ms;
         }
         
     game_ai_run_skip_ai:
