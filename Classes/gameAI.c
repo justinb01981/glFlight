@@ -23,17 +23,17 @@ float skill_m = 0.1; // 10% per skill-level
 
 float diff_m = 0.1;
 float scan_dist_increase = 60;
-float game_ai_fire_rate_ms = 800.0;
+float game_ai_fire_rate_ms = 600.0;
 float patrol_area_reached = 4.0;
-float tow_v_scale = /*0.5*/ 2.0;
-float min_patrol_distance = 20;
-float collect_deploy_distance = -2.5;
+float tow_v_scale = 1.2;
+//float min_patrol_distance = 20;
+//float collect_deploy_distance = -2.5;
 float change_target_frequency = 30000;  // nearly never
 float zdot_infront = 0.5;
-const float zdot_ikillyou = 0.5;
+const float zdot_ikillyou = 0.7;
 const float zdot_juke = 0.3;
 const float zdot_collision = 0.7;
-const float dist_tooclose = 10.0;
+const float dist_tooclose = 5.0;// fire bullets if hitting a wall
 // TODO: tweaking this to allow enemies to capture powerups close to boundary
 const float boundary_avoid_distance = 2.0;
 
@@ -687,14 +687,7 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
         }
     }
     
-    // test that conversion to euler is possible
-    
     // convert new heading vector back
-    /*
-    float alpha = atan2(zq.x, -zq.y);
-    float beta = acos(zq.z);
-    float gamma = atan2(zq.z, yq.z);
-     */
     
     float alpha, beta, gamma;
     get_euler_from_body_vectors(&xq, &yq, &zq, &alpha, &beta, &gamma);
@@ -703,55 +696,6 @@ object_pursue(float x, float y, float z, float vx, float vy, float vz, WorldElem
     elem->xq = xq;
     elem->yq = yq;
     elem->zq = zq;
-    
-#if 0
-    // TODO: re-apply a,b,g to elem body vectors or store the whole quaternion - no more drift to NaN
-    float* pFloatCheckIsNan[] = {
-        &alpha,
-        &beta,
-        &gamma,
-        &elem->physics.ptr->x,
-        &elem->physics.ptr->y,
-        &elem->physics.ptr->z
-    };
-    for(iF = 0; iF < sizeof(pFloatCheckIsNan)/sizeof(float*); iF++)
-    {
-        if(isnan(*pFloatCheckIsNan[iF]))
-        {
-            printf("gameAI.c: isnan (%p)\n", elem);
-
-            alpha = beta = gamma = 0.0;
-            *pFloatCheckIsNan[iF] = 1.0;
-
-            break;
-            /*
-            // *pFloatCheckIsNan[iF] = 0;
-            
-            // *pFloatCheckIsNan[iF] = *pFloatCheckIsNanR[iF];
-            
-            // normalize body vectors
-            xq = QX;
-            yq = QY;
-            zq = QZ;
-            
-            quaternion_t resz, resx;
-            
-            slerp(zq.w, zq.x, zq.y, zq.z, zqOrigin.w, zqOrigin.x, zqOrigin.y, zqOrigin.z, 1.0, &resz.w, &resz.x, &resz.y, &resz.z);
-            slerp(xq.w, xq.x, xq.y, xq.z, xqOrigin.w, xqOrigin.x, xqOrigin.y, xqOrigin.z, 1.0, &resx.w, &resx.x, &resx.y, &resx.z);
-            
-            float A[] = {resz.x, resz.y, resz.z};
-            float B[] = {resx.x, resx.y, resx.z};
-            float R[3];
-            
-            vector_cross_product(A, B, R);
-            
-            quaternion_t resy = {1, R[0], R[1], R[2]};
-            
-            get_euler_from_body_vectors(&resx, &resy, &resz, &alpha, &beta, &gamma);
-            */
-        }
-    }
-#endif
     
     world_replace_object(elem->elem_id, elem->type,
                          elem->physics.ptr->x, elem->physics.ptr->y, elem->physics.ptr->z,

@@ -73,8 +73,10 @@ private:
 public:
 
     GLFlightGame(int argc, char* argv[]) :
-        gameFramework(argc, argv, "glFlightMain", gameFramework::CORE, 2, 0, 0, MATCH_TEMPLATE, glm::uvec2(GLM_VIEW_WIDTH, GLM_VIEW_HEIGHT))
+        gameFramework(argc, argv, "glFlightMain", gameFramework::CORE, 1, 0, 2, MATCH_TEMPLATE, glm::uvec2(GLM_VIEW_WIDTH, GLM_VIEW_HEIGHT))
     {
+
+        // todo set frame swap behavior gl clear buf?
     }
 
     void glFlightInitialize()
@@ -187,7 +189,11 @@ public:
 		if (!glFlightInited) return true;
 
         test = get_time_ms();
-        if (test - renderLast < floor(1000.0 / GAME_FRAME_RATE)) return true;    // cap frame rate
+        if (test - renderLast < floor(1000.0 / GAME_FRAME_RATE)) {
+            //glClearColor(0, 0, 0, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            return true;    // cap frame rate
+        }
         renderLast = test;
 
         glfwPollEvents();
