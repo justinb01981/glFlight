@@ -30,6 +30,7 @@ static void fulfillShipPurchase(void) {
 @implementation glFlightGLKViewController
 {
 //    GLKBaseEffect* effect;
+    GLKView* glView;
 }
 
 -(UIInterfaceOrientationMask)supportedInterfaceOrientations
@@ -37,10 +38,106 @@ static void fulfillShipPurchase(void) {
     return UIInterfaceOrientationMaskLandscapeRight;
 }
 
+unsigned int VBO[1], VAO[1];
+GLfloat vertices[] = {
+    // first triangle
+    -0.9f, -0.5f, 0.0f,  // left
+    -0.0f, -0.5f, 0.0f,  // right
+    -0.45f, 0.5f, 0.0f,  // top
+    // second triangle
+     0.0f, -0.5f, 0.0f,  // left
+     0.9f, -0.5f, 0.0f,  // right
+     0.45f, 0.5f, 0.0f   // top
+};
+GLuint vertexShader;
+const char *vertexShaderSource =
+"#version 300 es                            \n"
+"layout(location = 0) in vec4 a_position;   \n"
+"void main()                                \n"
+"{                                          \n"
+"   gl_Position = a_position;               \n"
+"}                                          \n";
+
+// todo: texture sampler
+const char* fragmentShaderSrc =
+"#version 300 es                                     \n"
+"precision mediump float;                            \n"
+"layout(location = 0) out vec4 outColor;             \n"
+"void main()                                         \n"
+"{                                                   \n"
+"   outColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);         \n"
+"}                                                   \n";
+unsigned int fragmentShader;
+unsigned int shaderProgram;
+unsigned int samplerLoc, uniformS, uniformPos;
+
+-(void)initGL {
+
+    
+    glGenBuffers(1, &VBO[0]);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+
+    glView.drawableDepthFormat = GLKViewDrawableDepthFormat24;
+    
+    // shader
+    
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    if(vertexShader == 0) assert(0);
+    
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+    
+    int  success;
+    char infoLog[512] = {0};
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if(!success) {
+        glGetShaderInfoLog(vertexShader, sizeof(infoLog), NULL, infoLog);///glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        assert(0);
+    }
+    
+    
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSrc, NULL);
+    glCompileShader(fragmentShader);
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if(!success) assert(0);
+    
+    
+    shaderProgram = glCreateProgram();
+    
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    
+    success = 0;
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if(!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        assert(0);
+    }
+    
+    glUseProgram(shaderProgram);
+    
+    glEnableVertexAttribArray(0);
+    
+    glGenVertexArraysOES(1, &VAO[0]);
+    glBindVertexArrayOES(VAO[0]);
+    
+    uniformS = glGetUniformLocation ( samplerLoc, "s_texture" );
+    uniformPos = glGetUniformLocation( samplerLoc, "a_position");
+}
+
 -(void) awakeFromNib {
-    GLKView* glView;
+    
     
     [super awakeFromNib];
+    
+    glView = (GLKView*)self.view;
+    
+    glView.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
+    [glView.context setMultiThreaded:FALSE];
     
     self.initBlock = nil;
     
@@ -48,20 +145,13 @@ static void fulfillShipPurchase(void) {
     
     self.delegate = self;
     
-    glView = (GLKView*)self.view;
-    
-    glView.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
-    [glView.context setMultiThreaded:FALSE];
-
-    glView.drawableDepthFormat = GLKViewDrawableDepthFormat24;
-    
 //    effect = nil;
 }
 
 -(void) viewDidAppear:(BOOL)animated {
     
     [EAGLContext setCurrentContext:((GLKView*)self.view).context];
-
+    
     //shrink inside of safe-area insets (iphone x)
     /*
     if (@available(iOS 11.0, *))
@@ -82,8 +172,10 @@ static void fulfillShipPurchase(void) {
     if(self.initBlock != nil) {
         self.initBlock(self.view.frame.size);
         self.initBlock = nil;
+        
     }
-
+    
+    [self initGL];  // view dimensions set in initBlock
 
     // init purchases
     [PurchaseManager.shared uponActivation:^{
@@ -283,3 +375,37 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
 }
 
 @end
+
+
+unsigned short indices[] = {0,1,2};
+extern float viewWidth, viewHeight;
+    
+void glDrawFirstly(void) {
+    glViewport(0,0, viewWidth, viewHeight);
+
+}
+
+void glDrawLastly(void) {
+    
+    glUseProgram(shaderProgram);
+    
+    glClearColor(1.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glEnableVertexAttribArray(0);
+    
+    glBindVertexArrayOES(VAO[0]);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+    
+    // todo: see drawState2dSet
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    
+    glUniform1i ( samplerLoc, 0 );
+    glUniform3f(uniformPos, 1, 1, 0);
+    
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    return;
+}

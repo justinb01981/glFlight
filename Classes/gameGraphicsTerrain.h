@@ -220,7 +220,8 @@ void terrainDraw(void) {
     terrainInit();
     terrainBuild();// dude try moving this to async without locking and see what it looks like drawing
 
-    glVertexPointer(3, GL_FLOAT, 0, terrain.vertices);
+    //glVertexPointer(3, GL_FLOAT, 0, terrain.vertices);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)terrain.vertices);
     glTexCoordPointer(2, GL_FLOAT, 0, terrain.texvertices);
 
     // background (skybox) drawing (disabled now in favor of bounding textures

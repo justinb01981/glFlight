@@ -1883,16 +1883,20 @@ drawTriangleMesh(struct mesh_opengl_t* glmesh, int tex_id)
     glDrawElements(GL_TRIANGLES, glmesh->n_indices, index_type_enum, glmesh->indices);
 }
 
+GLint GL_PROGRAM1;
+
 void
 gameGraphicsInit(void)
 {
     assert(gWorld != NULL);
     assert(gWorld->bound_radius > 0);
     assert(texture_id_background > 0);
+    
+    glUseProgram(GL_PROGRAM1);
 
     drawBackgroundInit(texture_id_background, 0, 0, 0,
                        gWorld->bound_radius,
-                       16.0,
+                       16.0,    // scale
                        BACKGROUND_MODEL_INDICES1, sizeof(BACKGROUND_MODEL_INDICES1) / sizeof(model_index_t));
 
     drawBoundingInit(texture_id_background);

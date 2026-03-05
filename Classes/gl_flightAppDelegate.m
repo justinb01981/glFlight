@@ -101,8 +101,7 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
     gameMapSetMap(initial_map);
 
     console_write("Welcome to "GAMETITLE" %s\n"
-                  "http://www.domain17.net/d0gf1ght\n"
-                  "^D^Dnow with bluetooth local play!^D^D\n",
+                  "http://www.domain17.net/d0gf1ght\n",
                   [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] UTF8String]);
     
     gameInterfaceInit(viewWidth, viewHeight);

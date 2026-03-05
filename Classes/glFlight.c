@@ -128,6 +128,10 @@ glFlightFrameStage1(void)
     float tc = 0;
     float spawn[6];
     
+    extern void glDrawFirstly(void);
+    extern void glDrawLastly(void);
+    glDrawFirstly();
+    
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnable(GL_DEPTH_TEST);
     
@@ -698,6 +702,9 @@ calibrate_bail:
     }
     
     glEnable(GL_DEPTH_TEST);
+    
+    
+    glDrawLastly();
     
     /****************************************
      * OpenGL frame is ready to be rendered *
