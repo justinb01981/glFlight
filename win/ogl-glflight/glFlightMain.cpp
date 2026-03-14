@@ -23,7 +23,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "OpenAL/al.h"
+#include "al.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -389,7 +389,7 @@ public:
     }
 
     //static unsigned long
-    static void*
+    static unsigned long __stdcall
     backgroundWorker(void* arg)
     {
         bool* glFlightInited = (bool*) arg;

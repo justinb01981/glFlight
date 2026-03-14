@@ -1,7 +1,7 @@
 #include <iostream>
 #include <limits>
-#include "OpenAL/al.h"
-#include "OpenAL/alc.h"
+#include "al.h"
+#include "alc.h"
 
 #define INCLUDE_VIA_GAMEAUDIO_CPP
 #include "gameAudioOpenAL.h"

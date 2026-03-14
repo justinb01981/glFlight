@@ -11,7 +11,7 @@ include_directories(../Classes)
 
 # HACK
 if(MSVC)
-    add_definitions(-D_NOT_POSIX)
+    add_definitions(/D_NOT_POSIX)
     add_definitions(/FI"gameWinTypes.h")
 else()
     # GCC or Clang
@@ -28,7 +28,7 @@ add_definitions(-DGLEW_STATIC)
 
 add_definitions(-DGAME_NETWORK_USE_NBO=0)
 
-set(OGL_DIR ogl-samples)
+set(OGL_DIR ogl-samples-master)
 
 add_subdirectory(${OGL_DIR})
 
@@ -64,8 +64,14 @@ include_directories(${OGL_DIR}/external/glu-0.1.0.0/glu)
 
 add_executable(glFlightMain ${SOURCE_FILES})
 
+if(MSVC)
+target_link_libraries(glFlightMain framework libEGL FreeImage glfw3 OpenAL32)
+target_link_libraries(glFlightMain wsock32 ws2_32 winmm)
+target_link_libraries(glFlightMain opengl32)
+else()
 target_link_libraries(glFlightMain "-framework Cocoa -framework AVFoundation -framework CoreGraphics -framework IOKit -framework OpenGL -framework OpenAL  -framework CoreVideo")
 target_link_libraries(glFlightMain framework glfw3)
+endif()
 
 #add_dependencies(glFlightMain ${OGL_DIR})
 

@@ -31,7 +31,7 @@
 #define TEXTURE_ID_ENEMYSHIP     24
 #define TEXTURE_ID_ENEMYSHIP_ACE 71
 
-const static int
+const int
 TEXTURE_ID_NONE = 0,
 
 TEXTURE_ID_PORTAL = 98,
@@ -120,7 +120,7 @@ TEXTURE_ID_BUILDING9 = 123,
 TEXTURE_ID_TAPWARN = 117,
 TEXTURE_ID_LAST = 9999;
 
-const static int texture_id_table[] =
+static int texture_id_table[] =
 {
     TEXTURE_ID_POOPED_CUBE,
     TEXTURE_ID_BLOCK,
