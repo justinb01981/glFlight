@@ -71,8 +71,8 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
     
     initTextures([[NSString stringWithFormat:@"%@/", [[NSBundle mainBundle] resourcePath]] UTF8String]);
     
-    viewWidth = viewSize.width;
-    viewHeight = viewSize.height;
+    viewWidth = viewSize.width * viewController.view.contentScaleFactor;
+    viewHeight = viewSize.height * viewController.view.contentScaleFactor;
     
     gameCamera_init(0, 0, 0, 0, 0, 0); // this is inited elsewhere too
 
@@ -128,11 +128,7 @@ void glFlightResume(time_t time_last_suspend)
 
     [application setIdleTimerDisabled:TRUE];
     
-    [(glFlightGLKViewController*) UIApplication.sharedApplication.keyWindow.rootViewController viewInitialized: ^(CGSize size){
-        glFlightGLKViewController* vc = (glFlightGLKViewController*) UIApplication.sharedApplication.keyWindow.rootViewController;
-        glFlightInit(vc, vc.view.frame.size);
-        [vc startAnimation];
-    }];
+
     
     [NSThread detachNewThreadSelector:@selector(run) toTarget:[[cocoaAudioThread alloc] init] withObject:NULL];
 
@@ -144,7 +140,7 @@ void glFlightResume(time_t time_last_suspend)
     
     gameSettingsLaunchCount++;
     
-    [self.window setFrame:[[UIScreen mainScreen] bounds]];
+
     
     return YES;
 }
@@ -159,6 +155,14 @@ void glFlightResume(time_t time_last_suspend)
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     [[cocoaGyroManager instance] startUpdates];
+
+    [self.window setFrame:[[UIScreen mainScreen] bounds]];
+
+    [(glFlightGLKViewController*) UIApplication.sharedApplication.keyWindow.rootViewController viewInitialized: ^(CGSize size){
+        glFlightGLKViewController* vc = (glFlightGLKViewController*) UIApplication.sharedApplication.keyWindow.rootViewController;
+        glFlightInit(vc, vc.view.frame.size);
+        [vc startAnimation];
+    }];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

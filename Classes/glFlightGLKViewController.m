@@ -14,6 +14,45 @@
 #import "PurchaseManager.h"
 
 
+typedef struct mat4 { GLfloat f[16]; } mat4;
+typedef struct vec4 { GLfloat f[4]; } vec4;
+
+//unsigned int VBO[1], VAO[1];
+mat4 vertices[] = {
+    // first triangle
+    0.9, -1.0, 0.0f,  // left
+    -0.9,  -1.0, 0.0f,  // right
+    0.1, -2.0, 0.0f,   // top
+    // second triangle
+     2.9, 1.0, 0.0f,  // left
+     -2.9,  1.0, 0.0f,  // right
+     2.1, -1.0, 0.0f   // top
+};
+GLfloat texVertices[] = {
+  0.0,0.0,
+    0.0,1.0,
+    1.0,1.0,
+    1.0,0.0
+};
+GLushort elements[] = {
+    0,1,2,
+    3,4,5
+};
+enum {
+    VERTXATTRIB_XFORM,
+    VERTXATTRIB_TXPOS,
+    VERTXATTRIB_COLOR,
+    VERTXATTRIB_MAX
+};
+
+enum {
+    BUFFERNAME_VTX,
+    BUFFERNAME_ELX,
+    BUFFERNAME_UTX,
+    BUFFERNAME_MAX
+};
+
+
 // TODO: -- relocate to an extension
 extern int model_my_ship;
 static void fulfillShipPurchase(void) {
@@ -25,8 +64,7 @@ static void fulfillShipPurchase(void) {
 
 }
 
-// --
-
+#pragma mark: glFlightGLKViewController
 @implementation glFlightGLKViewController
 {
 //    GLKBaseEffect* effect;
@@ -38,51 +76,142 @@ static void fulfillShipPurchase(void) {
     return UIInterfaceOrientationMaskLandscapeRight;
 }
 
-unsigned int VBO[1], VAO[1];
-GLfloat vertices[] = {
-    // first triangle
-    -0.9f, -0.5f, 0.0f,  // left
-    -0.0f, -0.5f, 0.0f,  // right
-    -0.45f, 0.5f, 0.0f,  // top
-    // second triangle
-     0.0f, -0.5f, 0.0f,  // left
-     0.9f, -0.5f, 0.0f,  // right
-     0.45f, 0.5f, 0.0f   // top
-};
-GLuint vertexShader;
-const char *vertexShaderSource =
+
+#pragma mark: globals
+const char *vertexShaderSource =    ""
 "#version 300 es                            \n"
-"layout(location = 0) in vec4 a_position;   \n"
+"precision highp float;                     \n"
+"precision highp int;                       \n"
+"layout(std140, column_major) uniform;      \n"
+""
+"uniform transform                          \n"
+"{                          \n"
+"    mat4 MVP;                          \n"
+"} Transform;                          \n"
+"\n"
+"in vec2 Position;                          \n"
+"in vec2 Texcoord;                          \n"
+"\n"
+"out vec2 Fragtexco;                          \n"
 "void main()                                \n"
 "{                                          \n"
-"   gl_Position = a_position;               \n"
+"    Fragtexco = Texcoord;                  \n"
+"    gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);  \n"
 "}                                          \n";
 
-// todo: texture sampler
-const char* fragmentShaderSrc =
-"#version 300 es                                     \n"
-"precision mediump float;                            \n"
-"layout(location = 0) out vec4 outColor;             \n"
-"void main()                                         \n"
-"{                                                   \n"
-"   outColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);         \n"
-"}                                                   \n";
-unsigned int fragmentShader;
+const char* fragmentShaderSrc = ""
+"#version 300 es                                    \n"
+"precision highp float;                              \n"
+"precision highp int;                                \n"
+"layout(std140, column_major) uniform;               \n"
+""
+"uniform sampler2D Diffuse;                          \n"
+""
+"in vec2 Fragtexco;                                  \n"
+""
+"layout (location = 0) out vec4 Color;               \n"
+""
+"void main()                                        \n"
+"{                                                  \n"
+"    Color = texture(Diffuse, Fragtexco);           \n"
+"}                                                  \n";
+
+
+GLuint fragmentShader;
+GLuint vertexShader;
 unsigned int shaderProgram;
 unsigned int samplerLoc, uniformS, uniformPos;
+int  UniformMVP, UniformEnvironment;
+GLuint BufferName[BUFFERNAME_MAX], VAONames[VERTXATTRIB_MAX];
+GLint UniformBufferOffset;
+GLuint TextureName;
+GLuint *txData;
+const unsigned tx_dim = 8;
+
+#define MAT4IDENT() \
+{                   \
+1,0,0,0,            \
+0,1,0,0,            \
+0,0,1,0,            \
+0,0,0,1             \
+}
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
+float MVP[4][4] = MAT4IDENT();
+
+unsigned short indices[] = {0,1,2, 2,3,0};
+extern float viewWidth, viewHeight;
+float camDist = 3.0;
+int tex_id = 2;
+
+const mat4 Ident = MAT4IDENT();
+mat4  *MxProjection, *MxModel, *Pointer;
+mat4 cur = MAT4IDENT();
+
+typedef struct vec2 {
+    GLfloat f[2];
+} vec2;
+typedef struct vertex_v2fv2f
+{
+    vec2 Position;
+    vec2 Texcoord;
+} vertex_v2fv2f;
+
+#pragma mark: render
+
+void glDrawFirstly(void) {
+
+    glViewport(0,0, viewWidth, viewHeight);
+
+    {
+        glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
+        mat4* Pointer = (mat4*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+        MxProjection = &cur;
+
+        /* todo: Ptr = M * V + P  matrix multiply*/
+
+        *Pointer = *MxProjection;
+        MxProjection->f[0] += 0.001;
+        MxProjection->f[4] += 0.001;
+
+        glUnmapBuffer(GL_UNIFORM_BUFFER);
+    }
+
+//    glDrawBuffer(GL_BACK);
+//    glDisable(GL_FRAMEBUFFER_SRGB);
+}
+
+
+void glDrawLastly(void) {
+
+    vec4 cl = {.f =  0, 1, 0, 1};
+    glClearBufferfv(GL_COLOR, 0, &cl.f[0]);
+
+    glUseProgram(shaderProgram);
+
+    glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+
+    // keep bufferData (building) confined to init not render
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, TextureName+1);
+
+    glBindBufferBase(GL_UNIFORM_BUFFER, VERTXATTRIB_XFORM, BufferName[BUFFERNAME_UTX]);
+    glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
+
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);  // passing NULL indicates to use bound..um...buffers
+
+    return;
+}
 
 -(void)initGL {
-
     
-    glGenBuffers(1, &VBO[0]);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+    glGenBuffers(BUFFERNAME_MAX, &BufferName[0]);
 
     glView.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
     // shader
-    
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
     if(vertexShader == 0) assert(0);
     
@@ -94,43 +223,156 @@ unsigned int samplerLoc, uniformS, uniformPos;
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if(!success) {
         glGetShaderInfoLog(vertexShader, sizeof(infoLog), NULL, infoLog);///glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        printf(infoLog);
         assert(0);
     }
-    
     
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSrc, NULL);
     glCompileShader(fragmentShader);
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if(!success) assert(0);
-    
+    if(!success) {
+        glGetShaderInfoLog(fragmentShader, sizeof(infoLog), NULL, infoLog);///glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        printf(infoLog);
+        assert(0);
+    }
     
     shaderProgram = glCreateProgram();
-    
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
+
+    glUseProgram(shaderProgram);
+
+    initBuffer();
+
+    initTexture();
+
+    initVertexArray();
+
+    glUseProgram(0);
+
+    UniformMVP = glGetUniformLocation(shaderProgram, "MVP");
+    UniformEnvironment = glGetUniformLocation(shaderProgram, "Diffuse");
     
+    glBindAttribLocation(shaderProgram, VERTXATTRIB_XFORM, "Position");
+    glBindAttribLocation(shaderProgram, VERTXATTRIB_TXPOS, "Texcoord");
+    //glBindFragDataLocation(shaderProgram, VERTXATTRIB_COLOR, "Color");
+//    https://stackoverflow.com/questions/19064055/os-x-opengl-3-2-doesnt-include-glbindfragdatalocation
+    
+    glUniformBlockBinding(shaderProgram, glGetUniformBlockIndex(shaderProgram, "transform"), VERTXATTRIB_XFORM);
+
+    glLinkProgram(shaderProgram);
     success = 0;
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if(!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        printf("%s", infoLog);
         assert(0);
     }
-    
-    glUseProgram(shaderProgram);
-    
-    glEnableVertexAttribArray(0);
-    
-    glGenVertexArraysOES(1, &VAO[0]);
-    glBindVertexArrayOES(VAO[0]);
-    
-    uniformS = glGetUniformLocation ( samplerLoc, "s_texture" );
-    uniformPos = glGetUniformLocation( samplerLoc, "a_position");
+
+    uniformS = glGetUniformLocation ( samplerLoc, "Color");
+    uniformPos = glGetUniformLocation( samplerLoc, "Position");
+    glUniform1i(glGetUniformLocation(samplerLoc, "Diffuse"), 0);
+
+    assert(uniformS != 0 && uniformPos != 0);
+
+    printf("%s done\n", self.debugDescription.UTF8String);
+}
+
+static bool initVertexArray(void)
+{
+    glGenVertexArrays(1, &VAONames[VERTXATTRIB_XFORM]);
+    glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
+    /*
+     struct vertex_v2fv2f
+     {
+         vertex_v2fv2f
+         (
+             glm::vec2 const & Position,
+             glm::vec2 const & Texcoord
+         ) :
+             Position(Position),
+             Texcoord(Texcoord)
+         {}
+
+         glm::vec2 Position;
+         glm::vec2 Texcoord;
+     };
+     */
+    glVertexAttribPointer(VERTXATTRIB_XFORM, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(0));
+    glVertexAttribPointer(VERTXATTRIB_TXPOS, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(sizeof(vec2)));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glEnableVertexAttribArray(VERTXATTRIB_XFORM);
+    glEnableVertexAttribArray(VERTXATTRIB_TXPOS);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFERNAME_ELX]);
+    glBindVertexArray(0);
+
+    return true;
+}
+
+static bool initBuffer(void) {
+
+    UniformBufferOffset = 0;
+    glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
+    GLint UniformBlockSize = MAX(sizeof(MVP), UniformBufferOffset);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFERNAME_ELX]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);  /* "indices" formerly */
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    // todo: see drawState2dSet
+    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
+    glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    return true;
+}
+
+static bool initTexture(void) {
+    int tx_lev = 1;
+    //gli::texture2d Texture(gli::load((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+
+    //gli::gl GL(gli::gl::PROFILE_GL32);
+    //gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    glGenTextures(1, &TextureName);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, TextureName);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, tx_lev-1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, tx_lev-1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, tx_lev == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f);
+//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
+
+    int width = tx_dim, height = tx_dim;
+    txData = malloc(width * height * sizeof(GLuint) + 64);
+    for(int off = 0; off < width*height; off++) {
+        txData[off] = rand() % 0xEF<<16 | rand() % 0xEF<<8 | rand() % 0xEF<<0  | 0xff000000;
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                 /*GL_BGRA*/ GL_RGBA, GL_UNSIGNED_BYTE, txData);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
+    return true;
 }
 
 -(void) awakeFromNib {
-    
     
     [super awakeFromNib];
     
@@ -377,35 +619,4 @@ CGPoint touchPointInView(UITouch* t, UIView* v)
 @end
 
 
-unsigned short indices[] = {0,1,2};
-extern float viewWidth, viewHeight;
-    
-void glDrawFirstly(void) {
-    glViewport(0,0, viewWidth, viewHeight);
 
-}
-
-void glDrawLastly(void) {
-    
-    glUseProgram(shaderProgram);
-    
-    glClearColor(1.0, 0.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    glEnableVertexAttribArray(0);
-    
-    glBindVertexArrayOES(VAO[0]);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-    
-    // todo: see drawState2dSet
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    
-    glUniform1i ( samplerLoc, 0 );
-    glUniform3f(uniformPos, 1, 1, 0);
-    
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    return;
-}

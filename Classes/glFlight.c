@@ -131,7 +131,8 @@ glFlightFrameStage1(void)
     extern void glDrawFirstly(void);
     extern void glDrawLastly(void);
     glDrawFirstly();
-    
+
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnable(GL_DEPTH_TEST);
     
@@ -172,6 +173,9 @@ glFlightFrameStage1(void)
         
         goto draw_bail;
     }
+
+    //drawText("hello world", 0, 0, 2.0);
+    goto goDrawLastly;
 
     //extern void update_time_ms_frame_tick(void);
     //update_time_ms_frame_tick();
@@ -527,7 +531,7 @@ calibrate_bail:
 
     glFrontFace(GL_CCW);
     
-    drawBackground();
+    //drawBackground();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	
@@ -703,7 +707,8 @@ calibrate_bail:
     
     glEnable(GL_DEPTH_TEST);
     
-    
+
+goDrawLastly:
     glDrawLastly();
     
     /****************************************

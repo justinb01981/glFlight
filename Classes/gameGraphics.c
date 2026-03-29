@@ -1572,7 +1572,7 @@ drawBackgroundCore(void)
     // draw terrain
     bindTexture(TEXTURE_ID_TERRAIN);
 
-    terrainDraw();
+    //terrainDraw();
 }
 
 void drawBackground(void)
