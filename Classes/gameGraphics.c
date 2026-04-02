@@ -1051,8 +1051,8 @@ drawState2dSet(gameGraphics_drawState2d* state)
 void
 drawState2dDraw(void)
 {
-    glDrawElements(GL_TRIANGLES, sizeof(drawState_2d.indices)/sizeof(model_index_t),
-                   index_type_enum, drawState_2d.indices);
+    //glDrawElements(GL_TRIANGLES, sizeof(drawState_2d.indices)/sizeof(model_index_t),
+    //               index_type_enum, /*drawState_2d.indices*/0);
 }
 
 void

@@ -14,29 +14,26 @@
 #import "PurchaseManager.h"
 
 
-typedef struct mat4 { GLfloat f[16]; } mat4;
+typedef struct mat4 { GLfloat f[4][4]; } mat4;
 typedef struct vec4 { GLfloat f[4]; } vec4;
 
 //unsigned int VBO[1], VAO[1];
-mat4 vertices[] = {
-    // first triangle
-    0.9, -1.0, 0.0f,  // left
-    -0.9,  -1.0, 0.0f,  // right
-    0.1, -2.0, 0.0f,   // top
-    // second triangle
-     2.9, 1.0, 0.0f,  // left
-     -2.9,  1.0, 0.0f,  // right
-     2.1, -1.0, 0.0f   // top
+GLfloat vertices[] = {
+    // square
+    -1, -1, 0.0f,  // left
+    1.0,  -1.0, 0.0f,  // right
+    0.5, 0.5, 0.0f,   // bt right
+     -0.5, 0.5, 0.0f,  // bt left
 };
 GLfloat texVertices[] = {
-  0.0,0.0,
-    0.0,1.0,
+    0.0,0.0,
+    1.0,0.0,
     1.0,1.0,
-    1.0,0.0
+    0.0,1.0
 };
 GLushort elements[] = {
-    0,1,2,
-    3,4,5
+    0,2,1,
+    3,1,2
 };
 enum {
     VERTXATTRIB_XFORM,
@@ -137,6 +134,24 @@ const unsigned tx_dim = 8;
 }
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+#define MAT4MUL_inplace(o, x) \
+{   \
+for(r = 0; r < 4; r++) { \
+for(c = 0; c < 4; c++) { \
+    o.f[r][c] *= x.f[r][c];    \
+}   \
+}   \
+}
+
+#define MAT4XLT_inplace(o, x) \
+{   \
+for(r = 0; r < 4; r++) { \
+for(c = 0; c < 4; c++) { \
+    o.f[r][c] += x.f[r][c];    \
+}   \
+}   \
+}
+
 float MVP[4][4] = MAT4IDENT();
 
 unsigned short indices[] = {0,1,2, 2,3,0};
@@ -146,7 +161,19 @@ int tex_id = 2;
 
 const mat4 Ident = MAT4IDENT();
 mat4  *MxProjection, *MxModel, *Pointer;
-mat4 cur = MAT4IDENT();
+mat4 cur = MAT4IDENT(),
+    scale = {
+        1.001, 0.0, 0.0, 0.0,
+        0.0, 1.001, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    },
+    translate = {
+        0.001, -0.001, 0.0, 0.0,
+        -0.001, 0.001, 0.0, 0.0,
+        0, 0, 0.0, 0.0,
+        0,0,0,0
+};
 
 typedef struct vec2 {
     GLfloat f[2];
@@ -169,11 +196,16 @@ void glDrawFirstly(void) {
 
         MxProjection = &cur;
 
-        /* todo: Ptr = M * V + P  matrix multiply*/
+        cur.f[3][2] += 0.01;
 
+        int r, c;
+        //MAT4MUL_inplace(cur, scale);
+        MAT4XLT_inplace(cur, translate);
+
+        cur.f[1][3] += 0.01;
         *Pointer = *MxProjection;
-        MxProjection->f[0] += 0.001;
-        MxProjection->f[4] += 0.001;
+//        MxProjection->f[0] += 0.001;
+//        MxProjection->f[4] += 0.001;
 
         glUnmapBuffer(GL_UNIFORM_BUFFER);
     }
@@ -200,7 +232,7 @@ void glDrawLastly(void) {
     glBindBufferBase(GL_UNIFORM_BUFFER, VERTXATTRIB_XFORM, BufferName[BUFFERNAME_UTX]);
     glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);  // passing NULL indicates to use bound..um...buffers
+    glDrawElements(GL_TRIANGLES, sizeof(elements)/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);  // passing NULL indicates to use bound..um...buffers
 
     return;
 }
