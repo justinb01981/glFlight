@@ -174,7 +174,7 @@ glFlightFrameStage1(void)
         goto draw_bail;
     }
 
-    drawText("hello world", 0, 0, 2.0);
+    //drawText("hello world", 0, 0, 2.0);
     goto goDrawLastly;
 
     //extern void update_time_ms_frame_tick(void);
@@ -708,6 +708,7 @@ calibrate_bail:
     glEnable(GL_DEPTH_TEST);
     
 
+    
 goDrawLastly:
     glDrawLastly();
     

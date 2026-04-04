@@ -10,20 +10,20 @@
 #import "gameInterface.h"
 #import "glFlight.h"
 #import "gameGlobals.h"
+#import "gameGraphics.h"
 #import "world.h"
 #import "PurchaseManager.h"
 
-
-typedef struct mat4 { GLfloat f[4][4]; } mat4;
-typedef struct vec4 { GLfloat f[4]; } vec4;
-
-//unsigned int VBO[1], VAO[1];
-GLfloat vertices[] = {
-    // square
-    -1, -1, 0.0f,  // left
-    1.0,  -1.0, 0.0f,  // right
-    0.5, 0.5, 0.0f,   // bt right
-     -0.5, 0.5, 0.0f,  // bt left
+GLfloat const vertices[] =
+{
+    //vertex_v2fv2f(vec2(-1.0f,-1.0f), vec2(0.0f, 1.0f)),
+    -0.5, -1.0,     0.0,1.0,
+//    vertex_v2fv2f(vec2( 1.0f,-1.0f), vec2(1.0f, 1.0f)),
+    1.0, -1.0,      1.0, 1.0,
+//    vertex_v2fv2f(vec2( 1.0f, 1.0f), vec2(1.0f, 0.0f)),
+    1.0, 1.0,       1.0, 0.0,
+//    vertex_v2fv2f(vec2(-1.0f, 1.0f), vec2(0.0f, 0.0f))
+    -1.0,1.0,       0.0, 0.0
 };
 GLfloat texVertices[] = {
     0.0,0.0,
@@ -32,23 +32,9 @@ GLfloat texVertices[] = {
     0.0,1.0
 };
 GLushort elements[] = {
-    0,2,1,
-    3,1,2
+   0,1,2,
+    2,3,0
 };
-enum {
-    VERTXATTRIB_XFORM,
-    VERTXATTRIB_TXPOS,
-    VERTXATTRIB_COLOR,
-    VERTXATTRIB_MAX
-};
-
-enum {
-    BUFFERNAME_VTX,
-    BUFFERNAME_ELX,
-    BUFFERNAME_UTX,
-    BUFFERNAME_MAX
-};
-
 
 // TODO: -- relocate to an extension
 extern int model_my_ship;
@@ -64,7 +50,6 @@ static void fulfillShipPurchase(void) {
 #pragma mark: glFlightGLKViewController
 @implementation glFlightGLKViewController
 {
-//    GLKBaseEffect* effect;
     GLKView* glView;
 }
 
@@ -114,45 +99,7 @@ const char* fragmentShaderSrc = ""
 "}                                                  \n";
 
 
-GLuint fragmentShader;
-GLuint vertexShader;
-unsigned int shaderProgram;
-unsigned int samplerLoc, uniformS, uniformPos;
-int  UniformMVP, UniformEnvironment;
-GLuint BufferName[BUFFERNAME_MAX], VAONames[VERTXATTRIB_MAX];
-GLint UniformBufferOffset;
-GLuint TextureName;
-GLuint *txData;
 const unsigned tx_dim = 8;
-
-#define MAT4IDENT() \
-{                   \
-1,0,0,0,            \
-0,1,0,0,            \
-0,0,1,0,            \
-0,0,0,1             \
-}
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-#define MAT4MUL_inplace(o, x) \
-{   \
-for(r = 0; r < 4; r++) { \
-for(c = 0; c < 4; c++) { \
-    o.f[r][c] *= x.f[r][c];    \
-}   \
-}   \
-}
-
-#define MAT4XLT_inplace(o, x) \
-{   \
-for(r = 0; r < 4; r++) { \
-for(c = 0; c < 4; c++) { \
-    o.f[r][c] += x.f[r][c];    \
-}   \
-}   \
-}
-
-float MVP[4][4] = MAT4IDENT();
 
 unsigned short indices[] = {0,1,2, 2,3,0};
 extern float viewWidth, viewHeight;
@@ -163,26 +110,19 @@ const mat4 Ident = MAT4IDENT();
 mat4  *MxProjection, *MxModel, *Pointer;
 mat4 cur = MAT4IDENT(),
     scale = {
-        1.001, 0.0, 0.0, 0.0,
-        0.0, 1.001, 0.0, 0.0,
+        1.00, 0.0, 0.0, 0.0,
+        0.0, 1.00, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0
     },
     translate = {
-        0.001, -0.001, 0.0, 0.0,
-        -0.001, 0.001, 0.0, 0.0,
+        -0.001, 0.0, 0.0, 0.0,
+        0.0, -0.001, 0.0, 0.0,
         0, 0, 0.0, 0.0,
         0,0,0,0
 };
 
-typedef struct vec2 {
-    GLfloat f[2];
-} vec2;
-typedef struct vertex_v2fv2f
-{
-    vec2 Position;
-    vec2 Texcoord;
-} vertex_v2fv2f;
+GLfloat posTex[] = {0,0, 1.0, 0,0, 0,0, 0,0};
 
 #pragma mark: render
 
@@ -196,16 +136,11 @@ void glDrawFirstly(void) {
 
         MxProjection = &cur;
 
-        cur.f[3][2] += 0.01;
-
         int r, c;
         //MAT4MUL_inplace(cur, scale);
         MAT4XLT_inplace(cur, translate);
 
-        cur.f[1][3] += 0.01;
         *Pointer = *MxProjection;
-//        MxProjection->f[0] += 0.001;
-//        MxProjection->f[4] += 0.001;
 
         glUnmapBuffer(GL_UNIFORM_BUFFER);
     }
@@ -335,6 +270,7 @@ static bool initVertexArray(void)
      */
     glVertexAttribPointer(VERTXATTRIB_XFORM, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(0));
     glVertexAttribPointer(VERTXATTRIB_TXPOS, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(sizeof(vec2)));
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(posTex), posTex, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glEnableVertexAttribArray(VERTXATTRIB_XFORM);

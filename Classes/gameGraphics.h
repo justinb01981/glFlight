@@ -18,7 +18,72 @@ extern float viewWidth;
 extern float viewHeight;
 extern int radar_mode;
 
+
+extern GLuint fragmentShader;
+extern GLuint vertexShader;
+extern unsigned int shaderProgram;
+extern unsigned int samplerLoc, uniformS, uniformPos;
+extern int  UniformMVP, UniformEnvironment;
+extern GLuint BufferName[], VAONames[];
+extern GLint UniformBufferOffset;
+extern GLuint TextureName;
+extern GLuint *txData;
+extern float MVP[4][4];
+
 const static int TERRAIN_BG_MULT = 2;
+
+enum {
+    VERTXATTRIB_XFORM,
+    VERTXATTRIB_TXPOS,
+    VERTXATTRIB_COLOR,
+    VERTXATTRIB_MAX
+};
+
+enum {
+    BUFFERNAME_VTX,
+    BUFFERNAME_ELX,
+    BUFFERNAME_UTX,
+    BUFFERNAME_MAX
+};
+
+typedef struct vec2 {
+    GLfloat f[2];
+} vec2;
+typedef struct vertex_v2fv2f
+{
+    vec2 Position;
+    vec2 Texcoord;
+} vertex_v2fv2f;
+
+typedef struct mat4 { GLfloat f[4][4]; } mat4;
+typedef struct vec4 { GLfloat f[4]; } vec4;
+
+#define MAT4IDENT() \
+{                   \
+1,0,0,0,            \
+0,1,0,0,            \
+0,0,1,0,            \
+0,0,0,1             \
+}
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
+#define MAT4MUL_inplace(o, x) \
+{   \
+for(r = 0; r < 4; r++) { \
+for(c = 0; c < 4; c++) { \
+    o.f[r][c] *= x.f[r][c];    \
+}   \
+}   \
+}
+
+#define MAT4XLT_inplace(o, x) \
+{   \
+for(r = 0; r < 4; r++) { \
+for(c = 0; c < 4; c++) { \
+    o.f[r][c] += x.f[r][c];    \
+}   \
+}   \
+}
 
 typedef struct
 {

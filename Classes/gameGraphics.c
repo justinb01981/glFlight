@@ -37,6 +37,18 @@
 extern int game_target_missle_id;
 extern int game_target_objective_id;
 
+/* gl 3.2 vars */
+GLuint fragmentShader;
+GLuint vertexShader;
+unsigned int shaderProgram;
+unsigned int samplerLoc, uniformS, uniformPos;
+int  UniformMVP, UniformEnvironment;
+GLuint BufferName[BUFFERNAME_MAX], VAONames[VERTXATTRIB_MAX];
+GLint UniformBufferOffset;
+GLuint TextureName;
+GLuint *txData;
+float MVP[4][4] = MAT4IDENT();
+
 float viewWidth;
 float viewHeight;
 DrawBackgroundData* bgData = NULL;
@@ -1044,15 +1056,51 @@ drawState2dSet(gameGraphics_drawState2d* state)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glVertexPointer(3, GL_FLOAT, 0, drawState_2d.coords);
-    glTexCoordPointer(2, GL_FLOAT, 0, drawState_2d.texcoords);
+    //glVertexPointer(3, GL_FLOAT, 0, drawState_2d.coords);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(drawState_2d.coords), drawState_2d.coords, GL_STATIC_DRAW);
+    
+    UniformBufferOffset = 0;
+    glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
+    GLint UniformBlockSize = MAX(sizeof(MVP), UniformBufferOffset);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
+    glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+    
+    //glTexCoordPointer(2, GL_FLOAT, 0, drawState_2d.texcoords);
+    
+    glVertexAttribPointer(VERTXATTRIB_XFORM, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(0));
+    glVertexAttribPointer(VERTXATTRIB_TXPOS, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(sizeof(vec2)));
+    
+    //glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
+    //mat4* Pointer = (mat4*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+    //mat4 ident = MAT4IDENT();
+    //*Pointer = ident;
+
+    //glUnmapBuffer(GL_UNIFORM_BUFFER);
 }
 
 void
 drawState2dDraw(void)
 {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFERNAME_ELX]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(drawState_2d.indices), drawState_2d.indices, GL_STATIC_DRAW);  /* "indices" formerly */
+    
+    glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+
+    glBindBufferBase(GL_UNIFORM_BUFFER, VERTXATTRIB_XFORM, BufferName[BUFFERNAME_UTX]);
+    
+    glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
+    
     //glDrawElements(GL_TRIANGLES, sizeof(drawState_2d.indices)/sizeof(model_index_t),
     //               index_type_enum, /*drawState_2d.indices*/0);
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    
 }
 
 void
@@ -1060,7 +1108,10 @@ drawElemBatch(void)
 {
     if(drawElem_indicesBatchBuffer_count > 0)
     {
+        // todo buffer vertex data
         glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBufferCur);
+        
+        // todo buffer texcoord data
         glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBufferCur);
         gl_vertex_ptr_last = drawElem_vertexBatchBufferCur;
         gl_texcoord_ptr_last = drawElem_textCoordBatchBufferCur;
