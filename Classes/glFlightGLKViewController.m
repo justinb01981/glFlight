@@ -17,19 +17,13 @@
 GLfloat const vertices[] =
 {
     //vertex_v2fv2f(vec2(-1.0f,-1.0f), vec2(0.0f, 1.0f)),
-    -0.5, -1.0,     0.0,1.0,
+    -1.0, -1.0, 2.0,     0.0,1.0,
 //    vertex_v2fv2f(vec2( 1.0f,-1.0f), vec2(1.0f, 1.0f)),
-    1.0, -1.0,      1.0, 1.0,
+    1.0, -1.0, 0.0,      1.0, 1.0,
 //    vertex_v2fv2f(vec2( 1.0f, 1.0f), vec2(1.0f, 0.0f)),
-    1.0, 1.0,       1.0, 0.0,
+    1.0, 1.0, 0.0,      1.0, 0.0,
 //    vertex_v2fv2f(vec2(-1.0f, 1.0f), vec2(0.0f, 0.0f))
-    -1.0,1.0,       0.0, 0.0
-};
-GLfloat texVertices[] = {
-    0.0,0.0,
-    1.0,0.0,
-    1.0,1.0,
-    0.0,1.0
+    -1.0, 1.0, 2.0,    0.0, 0.0
 };
 GLushort elements[] = {
    0,1,2,
@@ -68,17 +62,18 @@ const char *vertexShaderSource =    ""
 ""
 "uniform transform                          \n"
 "{                          \n"
-"    mat4 MVP;                          \n"
-"} Transform;                          \n"
+"    mat4 MVP;                              \n"
+"    mat4 persp;                            \n"
+"} Transform;                               \n"
 "\n"
-"in vec2 Position;                          \n"
+"in vec3 Position;                          \n"
 "in vec2 Texcoord;                          \n"
 "\n"
-"out vec2 Fragtexco;                          \n"
+"out vec2 Fragtexco;                        \n"
 "void main()                                \n"
 "{                                          \n"
 "    Fragtexco = Texcoord;                  \n"
-"    gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);  \n"
+"    gl_Position = Transform.MVP * Transform.persp * vec4(Position, 1.0);  \n"
 "}                                          \n";
 
 const char* fragmentShaderSrc = ""
@@ -118,13 +113,13 @@ mat4 cur = MAT4IDENT(),
     translate = {
         -0.001, 0.0, 0.0, 0.0,
         0.0, -0.001, 0.0, 0.0,
-        0, 0, 0.0, 0.0,
+        0, 0, -0.0, 0.0,
         0,0,0,0
 };
 
-GLfloat posTex[] = {0,0, 1.0, 0,0, 0,0, 0,0};
-
 #pragma mark: render
+
+float Zee = 0.5;
 
 void glDrawFirstly(void) {
 
@@ -132,15 +127,16 @@ void glDrawFirstly(void) {
 
     {
         glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
-        mat4* Pointer = (mat4*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+        mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-        MxProjection = &cur;
-
-        int r, c;
         //MAT4MUL_inplace(cur, scale);
-        MAT4XLT_inplace(cur, translate);
+        //MAT4XLT_inplace(cur, translate);
+        
+        mat4 Perspective = MAT4PERSPECTIVE(Zee);
+        Zee -= 0.001;
 
-        *Pointer = *MxProjection;
+        (*Pointer).f = cur;
+        (*Pointer).p = Perspective;
 
         glUnmapBuffer(GL_UNIFORM_BUFFER);
     }
@@ -268,9 +264,9 @@ static bool initVertexArray(void)
          glm::vec2 Texcoord;
      };
      */
-    glVertexAttribPointer(VERTXATTRIB_XFORM, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(0));
-    glVertexAttribPointer(VERTXATTRIB_TXPOS, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(sizeof(vec2)));
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(posTex), posTex, GL_STATIC_DRAW);
+    glVertexAttribPointer(VERTXATTRIB_XFORM, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(0));
+    glVertexAttribPointer(VERTXATTRIB_TXPOS, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(sizeof(vec3)));
+    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glEnableVertexAttribArray(VERTXATTRIB_XFORM);

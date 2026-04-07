@@ -174,7 +174,6 @@ glFlightFrameStage1(void)
         goto draw_bail;
     }
 
-    //drawText("hello world", 0, 0, 2.0);
     goto goDrawLastly;
 
     //extern void update_time_ms_frame_tick(void);
@@ -204,11 +203,11 @@ calibrate_bail:
     //tc = 16.667/1000.0;
     tc = ((float) time_ms - (float) world_update_time_last) / 1000.0;
 
-    if(tc > 1.0)
-    {
-        world_update_time_last = time_ms;
-        goto draw_bail;
-    }
+//    if(tc > 1.0)
+//    {
+//        world_update_time_last = time_ms;
+//        goto draw_bail;
+//    }
 
     // physical collisions between world objects now handled here
     world_update(tc);

@@ -49,13 +49,17 @@ enum {
 typedef struct vec2 {
     GLfloat f[2];
 } vec2;
+typedef struct vec3 {
+    GLfloat f[3];
+} vec3;
 typedef struct vertex_v2fv2f
 {
-    vec2 Position;
+    vec3 Position;
     vec2 Texcoord;
 } vertex_v2fv2f;
 
 typedef struct mat4 { GLfloat f[4][4]; } mat4;
+typedef struct mat4u { mat4 f, p; } mat4u;
 typedef struct vec4 { GLfloat f[4]; } vec4;
 
 #define MAT4IDENT() \
@@ -65,6 +69,15 @@ typedef struct vec4 { GLfloat f[4]; } vec4;
 0,0,1,0,            \
 0,0,0,1             \
 }
+#define Pfoc 2.0
+#define MAT4PERSPECTIVE(z) \
+{                   \
+1.0/(-z)/Pfoc  ,0.0,                0.0,        0.0,            \
+0.0,            1.0/(-z)/Pfoc,      0.0,        0.0,            \
+0.0,            0.0,                0.0,        Pfoc,           \
+0.0,            0.0,                0.0,        0.0             \
+}
+
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 #define MAT4MUL_inplace(o, x) \
@@ -77,12 +90,13 @@ for(c = 0; c < 4; c++) { \
 }
 
 #define MAT4XLT_inplace(o, x) \
-{   \
-for(r = 0; r < 4; r++) { \
-for(c = 0; c < 4; c++) { \
+{                               \
+int r, c;                       \
+for(r = 0; r < 4; r++) {        \
+for(c = 0; c < 4; c++) {        \
     o.f[r][c] += x.f[r][c];    \
-}   \
-}   \
+}                               \
+}                               \
 }
 
 typedef struct
