@@ -69,13 +69,21 @@ typedef struct vec4 { GLfloat f[4]; } vec4;
 0,0,1,0,            \
 0,0,0,1             \
 }
-#define Pfoc 2.0
+#define Pfoc 0.5
 #define MAT4PERSPECTIVE(z) \
 {                   \
-1.0/(-z)/Pfoc  ,0.0,                0.0,        0.0,            \
-0.0,            1.0/(-z)/Pfoc,      0.0,        0.0,            \
+(-z)/Pfoc  ,0.0,                0.0,        0.0,            \
+0.0,            (-z)/Pfoc,      0.0,        0.0,            \
 0.0,            0.0,                0.0,        Pfoc,           \
 0.0,            0.0,                0.0,        0.0             \
+}
+
+#define MAT4TRANSLATE(X, Y, Z) \
+{                   \
+X ,           0.0,                0.0,        0,            \
+0.0,            Y,                0.0,        0,            \
+0.0,            0.0,                Z,        0,            \
+0.0,            0.0,                0.0,        1.0           \
 }
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -213,5 +221,11 @@ gameGraphicsUninit();
 
 int
 bindTexture(unsigned int tex_id);
+
+void glPrepareShaderAttributesVertices(GLfloat* src, size_t len);
+
+void glPrepareShaderAttributesTexUV(GLfloat* src, size_t len);
+
+void glPrepareShaderAttributesDraw(GLushort* src, size_t len);
 
 #endif

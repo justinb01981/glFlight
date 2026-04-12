@@ -14,20 +14,26 @@
 #import "world.h"
 #import "PurchaseManager.h"
 
+const GLfloat vZ = 1.0;
 GLfloat const vertices[] =
 {
-    //vertex_v2fv2f(vec2(-1.0f,-1.0f), vec2(0.0f, 1.0f)),
-    -1.0, -1.0, 2.0,     0.0,1.0,
-//    vertex_v2fv2f(vec2( 1.0f,-1.0f), vec2(1.0f, 1.0f)),
-    1.0, -1.0, 0.0,      1.0, 1.0,
-//    vertex_v2fv2f(vec2( 1.0f, 1.0f), vec2(1.0f, 0.0f)),
-    1.0, 1.0, 0.0,      1.0, 0.0,
-//    vertex_v2fv2f(vec2(-1.0f, 1.0f), vec2(0.0f, 0.0f))
-    -1.0, 1.0, 2.0,    0.0, 0.0
+    0.0, 1.0, vZ,
+    2.0, 1.0, vZ,
+    2.0, -1.0, vZ-0.5,
+    0.0, -1.0, vZ
 };
+
+GLfloat const txUv[] =
+{
+    -1.0,-1.0,
+    1.0,-1.0,
+    1.0,1.0,
+    -1.0,1.0
+};
+
 GLushort elements[] = {
    0,1,2,
-    2,3,0
+   2,3,0
 };
 
 // TODO: -- relocate to an extension
@@ -40,18 +46,6 @@ static void fulfillShipPurchase(void) {
     }];
 
 }
-
-#pragma mark: glFlightGLKViewController
-@implementation glFlightGLKViewController
-{
-    GLKView* glView;
-}
-
--(UIInterfaceOrientationMask)supportedInterfaceOrientations
-{
-    return UIInterfaceOrientationMaskLandscapeRight;
-}
-
 
 #pragma mark: globals
 const char *vertexShaderSource =    ""
@@ -73,7 +67,7 @@ const char *vertexShaderSource =    ""
 "void main()                                \n"
 "{                                          \n"
 "    Fragtexco = Texcoord;                  \n"
-"    gl_Position = Transform.MVP * Transform.persp * vec4(Position, 1.0);  \n"
+"    gl_Position = Transform.persp * Transform.MVP * vec4(Position, 1.0);  \n"
 "}                                          \n";
 
 const char* fragmentShaderSrc = ""
@@ -100,6 +94,7 @@ unsigned short indices[] = {0,1,2, 2,3,0};
 extern float viewWidth, viewHeight;
 float camDist = 3.0;
 int tex_id = 2;
+float Zee = 1.0;
 
 const mat4 Ident = MAT4IDENT();
 mat4  *MxProjection, *MxModel, *Pointer;
@@ -109,17 +104,61 @@ mat4 cur = MAT4IDENT(),
         0.0, 1.00, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0
-    },
-    translate = {
-        -0.001, 0.0, 0.0, 0.0,
-        0.0, -0.001, 0.0, 0.0,
-        0, 0, -0.0, 0.0,
-        0,0,0,0
-};
+    };
 
 #pragma mark: render
 
-float Zee = 0.5;
+typedef struct ShaderPrep {
+    GLfloat *vert, *texUVco, *stor, *write;
+    size_t lVert, lTexUv;
+    
+} ShaderPrep;
+
+ShaderPrep gShaderPrep = {.vert = 0, .texUVco = 0, .stor = 0 , .lVert = 0, .lTexUv = 0};
+
+void glPrepareShaderAttributesVertices(GLfloat* src, size_t len) {
+    gShaderPrep.vert = src;
+    gShaderPrep.lVert = len;
+}
+
+void glPrepareShaderAttributesTexUV(GLfloat* src, size_t len) {
+    gShaderPrep.texUVco = src;
+    gShaderPrep.lTexUv = len;
+}
+
+void glPrepareShaderAttributesDraw(GLushort* src, size_t len) {
+    int i;
+    
+    if(!gShaderPrep.stor) {
+        gShaderPrep.stor = malloc(sizeof(GLfloat)*16384); // todo: free
+    }
+    gShaderPrep.write = gShaderPrep.stor;
+    
+    GLfloat* vTmp = gShaderPrep.vert;
+    GLfloat* tTmp = gShaderPrep.texUVco;
+    
+    // copy over to bound shader attributes
+    for(i=0; i< len; i++) {
+        // fill position attr
+        memcpy(gShaderPrep.write, vTmp, sizeof(vec3));
+        vTmp += 3; gShaderPrep.write += 3;
+        
+        // fill texture U,V position attr
+        memcpy(gShaderPrep.write, tTmp, sizeof(vec2));
+        tTmp += 2; gShaderPrep.write += 2;
+    }
+    
+    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
+    glBufferData(GL_ARRAY_BUFFER, (gShaderPrep.lTexUv + gShaderPrep.lVert) * sizeof(GLfloat), gShaderPrep.stor, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, len, src, GL_STATIC_DRAW);
+    
+    glDrawElements(GL_TRIANGLES, (int) len/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);  // passing NULL indicates to use bound..um...buffers
+
+    // reset
+    
+}
+
+GLfloat X = 1, Y = 1, Z = 1;
 
 void glDrawFirstly(void) {
 
@@ -130,12 +169,13 @@ void glDrawFirstly(void) {
         mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
         //MAT4MUL_inplace(cur, scale);
-        //MAT4XLT_inplace(cur, translate);
-        
+    
+        mat4 MVP = MAT4TRANSLATE(X, Y, Z);
+        Z+= 0.01;
+        X-= 0.001;
         mat4 Perspective = MAT4PERSPECTIVE(Zee);
-        Zee -= 0.001;
 
-        (*Pointer).f = cur;
+        (*Pointer).f = MVP;
         (*Pointer).p = Perspective;
 
         glUnmapBuffer(GL_UNIFORM_BUFFER);
@@ -163,9 +203,24 @@ void glDrawLastly(void) {
     glBindBufferBase(GL_UNIFORM_BUFFER, VERTXATTRIB_XFORM, BufferName[BUFFERNAME_UTX]);
     glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
 
+    
+    /*
     glDrawElements(GL_TRIANGLES, sizeof(elements)/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);  // passing NULL indicates to use bound..um...buffers
+     */
+    glPrepareShaderAttributesDraw(elements, sizeof(elements));
 
     return;
+}
+
+#pragma mark: glFlightGLKViewController
+@implementation glFlightGLKViewController
+{
+    GLKView* glView;
+}
+
+-(UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskLandscapeRight;
 }
 
 -(void)initGL {
@@ -186,7 +241,7 @@ void glDrawLastly(void) {
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if(!success) {
         glGetShaderInfoLog(vertexShader, sizeof(infoLog), NULL, infoLog);///glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        printf(infoLog);
+        printf("%s\n", infoLog);
         assert(0);
     }
     
@@ -196,7 +251,7 @@ void glDrawLastly(void) {
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if(!success) {
         glGetShaderInfoLog(fragmentShader, sizeof(infoLog), NULL, infoLog);///glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        printf(infoLog);
+        printf("%s\n", infoLog);
         assert(0);
     }
     
@@ -291,12 +346,14 @@ static bool initBuffer(void) {
     // todo: see drawState2dSet
     glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
     glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+    
+    glPrepareShaderAttributesVertices(vertices, sizeof(vertices)/sizeof(GLfloat));
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
     return true;
 }
 
@@ -332,6 +389,8 @@ static bool initTexture(void) {
                  /*GL_BGRA*/ GL_RGBA, GL_UNSIGNED_BYTE, txData);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    
+    glPrepareShaderAttributesTexUV(txUv, sizeof(txUv)/sizeof(GLfloat));
 
     return true;
 }
