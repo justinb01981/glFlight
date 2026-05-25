@@ -219,19 +219,17 @@ void initTextures(const char *prefix)
     int i;
     strcpy(initTexturesPrefix, prefix);
     
-    // for(i = 0; i < MAX_TEXTURES; i++)
-    // {
-    //     texture_list_loaded[i] = 0;
-    //
-    //     bindTextureRequestCore(i);
-    // }
-
+     for(i = 0; i < MAX_TEXTURES; i++)
+     {
+         texture_list_loaded[i] = 0;
+    
+         bindTextureRequestCore(i);
+     }
     
 }
 
 int bindTextureRequestCore(int tex_id)
 {
-
     if(tex_id <= TEXTURE_ID_NONE)
     {
         return 0;

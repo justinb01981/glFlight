@@ -45,7 +45,6 @@ unsigned int samplerLoc, uniformS, uniformPos;
 int  UniformMVP, UniformEnvironment;
 GLuint BufferName[BUFFERNAME_MAX], VAONames[VERTXATTRIB_MAX];
 GLint UniformBufferOffset;
-GLuint TextureName;
 GLuint *txData;
 float MVP[4][4] = MAT4IDENT();
 
@@ -124,7 +123,7 @@ void radarDrawTextDone(void)
 }
 
 static void
-setupGLModelView(float scrWidth, float scrHeight)
+setupGLModelViewGl1(float scrWidth, float scrHeight)
 {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -151,11 +150,40 @@ setupGLModelView(float scrWidth, float scrHeight)
     //glRotatef(90, 0, 0, 1);
 }
 
+extern GLfloat X,Y,Z, Zee;
+
 static void
-setupGLModelViewDone(void)
+setupGLModelView(float scrWidth, float scrHeight)
+{
+    /*
+     * 0,0 starts in center of view
+     * remember: matrix stack is applied in-reverse!
+     */
+    
+    glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
+    mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+    mat4 MVP = MAT4IDENT(), Sc = MAT4SCALE(5);
+    MAT4MUL_inplace(MVP, Sc);
+    mat4 Perspective = MAT4ORTHO(scrWidth, scrHeight);
+
+    (*Pointer).f = MVP;
+    (*Pointer).p = Perspective;
+
+        
+}
+
+static void
+setupGLModelViewDone1(void)
 {
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
+}
+
+static void
+setupGLModelViewDone(void)
+{
+    glUnmapBuffer(GL_UNIFORM_BUFFER);
 }
 
 static void
@@ -180,7 +208,7 @@ setupGLTextureViewDone(void)
 int
 bindTexture(unsigned int tex_id)
 {
-    if(tex_id == drawn_texture_last) return 1;
+    //if(tex_id == drawn_texture_last) return 1;
 
     if(!bindTextureRequestCore(tex_id))
     {
@@ -198,7 +226,7 @@ bindTexture(unsigned int tex_id)
     }
     else
     {
-        assert(0);  // unknow tex-id?
+        //assert(0);  // unknow tex-id?
     }
 
     return 0;
@@ -1043,8 +1071,8 @@ drawState2dSetCoords(gameGraphics_drawState2d* state)
     memcpy(drawState_2d.coords, state->coords, sizeof(drawState_2d.coords));
     memcpy(drawState_2d.texcoords, state->texcoords, sizeof(drawState_2d.texcoords));
     memcpy(drawState_2d.indices, state->indices, sizeof(drawState_2d.indices));
+    
     drawState_2d.tex_id = state->tex_id;
-
     bindTexture(drawState_2d.tex_id);
 }
 
@@ -1057,6 +1085,7 @@ drawState2dSet(gameGraphics_drawState2d* state)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //glVertexPointer(3, GL_FLOAT, 0, drawState_2d.coords);
+    glPrepareShaderAttributesVertices(drawState_2d.coords, sizeof(drawState_2d.coords)/sizeof(GLfloat));
     
     glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(drawState_2d.coords), drawState_2d.coords, GL_STATIC_DRAW);
@@ -1069,6 +1098,7 @@ drawState2dSet(gameGraphics_drawState2d* state)
     glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
     
     //glTexCoordPointer(2, GL_FLOAT, 0, drawState_2d.texcoords);
+    glPrepareShaderAttributesTexUV(drawState_2d.texcoords, sizeof(drawState_2d.texcoords)/sizeof(GLfloat));
     
     glVertexAttribPointer(VERTXATTRIB_XFORM, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(0));
     glVertexAttribPointer(VERTXATTRIB_TXPOS, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(sizeof(vec2)));
@@ -1094,13 +1124,14 @@ drawState2dDraw(void)
     
     glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
     
-    //glDrawElements(GL_TRIANGLES, sizeof(drawState_2d.indices)/sizeof(model_index_t),
-    //               index_type_enum, /*drawState_2d.indices*/0);
+//    glDrawElements(GL_TRIANGLES, sizeof(drawState_2d.indices)/sizeof(model_index_t),
+//                   index_type_enum, /*drawState_2d.indices*/0);
+    glPrepareShaderAttributesDraw(drawState_2d.indices, sizeof(drawState_2d.indices)/sizeof(GLushort));
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    
+//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+//    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+//    
 }
 
 void

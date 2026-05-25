@@ -69,13 +69,30 @@ typedef struct vec4 { GLfloat f[4]; } vec4;
 0,0,1,0,            \
 0,0,0,1             \
 }
-#define Pfoc 0.5
+
+#define MAT4SCALE(S) \
+{                   \
+S,0,0,0,            \
+0,S,0,0,            \
+0,0,S,0,            \
+0,0,0,1             \
+}
+
+#define Pfoc 0.8
 #define MAT4PERSPECTIVE(z) \
 {                   \
 (-z)/Pfoc  ,0.0,                0.0,        0.0,            \
 0.0,            (-z)/Pfoc,      0.0,        0.0,            \
 0.0,            0.0,                0.0,        Pfoc,           \
 0.0,            0.0,                0.0,        0.0             \
+}
+
+#define MAT4ORTHO(w, h) \
+{                   \
+1.0/w,          0.0,                0.0,        0.0,           \
+0.0,            1.0/h,              0.0,        0.0,           \
+0.0,            0.0,                1.0,        0.0,           \
+0.0,            0.0,                0.0,        1.0            \
 }
 
 #define MAT4TRANSLATE(X, Y, Z) \
@@ -90,6 +107,7 @@ X ,           0.0,                0.0,        0,            \
 
 #define MAT4MUL_inplace(o, x) \
 {   \
+int r, c;                   \
 for(r = 0; r < 4; r++) { \
 for(c = 0; c < 4; c++) { \
     o.f[r][c] *= x.f[r][c];    \

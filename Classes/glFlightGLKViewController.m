@@ -13,6 +13,7 @@
 #import "gameGraphics.h"
 #import "world.h"
 #import "PurchaseManager.h"
+#include "textures.h"
 
 const GLfloat vZ = 1.0;
 GLfloat const vertices[] =
@@ -95,6 +96,7 @@ extern float viewWidth, viewHeight;
 float camDist = 3.0;
 int tex_id = 2;
 float Zee = 1.0;
+extern int gDbgTextureName;
 
 const mat4 Ident = MAT4IDENT();
 mat4  *MxProjection, *MxModel, *Pointer;
@@ -126,16 +128,20 @@ void glPrepareShaderAttributesTexUV(GLfloat* src, size_t len) {
     gShaderPrep.lTexUv = len;
 }
 
+int texK = 1, texKmax = 3200;
 void glPrepareShaderAttributesDraw(GLushort* src, size_t len) {
     int i;
     
     if(!gShaderPrep.stor) {
-        gShaderPrep.stor = malloc(sizeof(GLfloat)*16384); // todo: free
+        gShaderPrep.stor = malloc(sizeof(GLfloat)*655360); // todo: free
     }
     gShaderPrep.write = gShaderPrep.stor;
     
     GLfloat* vTmp = gShaderPrep.vert;
     GLfloat* tTmp = gShaderPrep.texUVco;
+    
+    glBindTexture(GL_TEXTURE_2D, texture_list[texK++ / 100]);
+    if(texK > texKmax) texK = 1;
     
     // copy over to bound shader attributes
     for(i=0; i< len; i++) {
@@ -152,7 +158,7 @@ void glPrepareShaderAttributesDraw(GLushort* src, size_t len) {
     glBufferData(GL_ARRAY_BUFFER, (gShaderPrep.lTexUv + gShaderPrep.lVert) * sizeof(GLfloat), gShaderPrep.stor, GL_STATIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, len, src, GL_STATIC_DRAW);
     
-    glDrawElements(GL_TRIANGLES, (int) len/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);  // passing NULL indicates to use bound..um...buffers
+    glDrawElements(GL_TRIANGLES, (GLsizei) len, GL_UNSIGNED_SHORT, 0);  // passing NULL indicates to use bound..um...buffers
 
     // reset
     
@@ -171,8 +177,9 @@ void glDrawFirstly(void) {
         //MAT4MUL_inplace(cur, scale);
     
         mat4 MVP = MAT4TRANSLATE(X, Y, Z);
-        Z+= 0.01;
+        Z+= 0.005;
         X-= 0.001;
+        Y+= 0.002;
         mat4 Perspective = MAT4PERSPECTIVE(Zee);
 
         (*Pointer).f = MVP;
@@ -196,9 +203,6 @@ void glDrawLastly(void) {
     glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
     // keep bufferData (building) confined to init not render
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, TextureName+1);
 
     glBindBufferBase(GL_UNIFORM_BUFFER, VERTXATTRIB_XFORM, BufferName[BUFFERNAME_UTX]);
     glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
@@ -303,22 +307,7 @@ static bool initVertexArray(void)
     glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
 
     glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
-    /*
-     struct vertex_v2fv2f
-     {
-         vertex_v2fv2f
-         (
-             glm::vec2 const & Position,
-             glm::vec2 const & Texcoord
-         ) :
-             Position(Position),
-             Texcoord(Texcoord)
-         {}
 
-         glm::vec2 Position;
-         glm::vec2 Texcoord;
-     };
-     */
     glVertexAttribPointer(VERTXATTRIB_XFORM, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(0));
     glVertexAttribPointer(VERTXATTRIB_TXPOS, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(sizeof(vec3)));
     
@@ -345,7 +334,7 @@ static bool initBuffer(void) {
 
     // todo: see drawState2dSet
     glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
     glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
@@ -366,9 +355,9 @@ static bool initTexture(void) {
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    glGenTextures(1, &TextureName);
+    glGenTextures(1, &texture_list[0]);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, TextureName);
+    glBindTexture(GL_TEXTURE_2D, texture_list[0]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, tx_lev-1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, tx_lev-1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, tx_lev == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
