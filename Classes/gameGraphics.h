@@ -78,8 +78,7 @@ S,0,0,0,            \
 0,0,0,1             \
 }
 
-#define Pfoc 0.8
-#define MAT4PERSPECTIVE(z) \
+#define MAT4PERSPECTIVE(z, Pfoc) \
 {                   \
 (-z)/Pfoc  ,0.0,                0.0,        0.0,            \
 0.0,            (-z)/Pfoc,      0.0,        0.0,            \
@@ -101,6 +100,14 @@ X ,           0.0,                0.0,        0,            \
 0.0,            Y,                0.0,        0,            \
 0.0,            0.0,                Z,        0,            \
 0.0,            0.0,                0.0,        1.0           \
+}
+
+#define MAT4ROTY(th)                                      \
+{                                                         \
+1.0,        0.0,            0.0,    0,            \
+0.0,       cos(th),         -sin(th),        0,            \
+0.0,       sin(th),         cos(th),    0,            \
+0.0,       0.0,             0.0,        1.0           \
 }
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))

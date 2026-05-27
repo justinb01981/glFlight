@@ -18,10 +18,10 @@
 const GLfloat vZ = 1.0;
 GLfloat const vertices[] =
 {
-    0.0, 1.0, vZ,
-    2.0, 1.0, vZ,
-    2.0, -1.0, vZ-0.5,
-    0.0, -1.0, vZ
+    -1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0,
+    1.0, -1.0, 0.67,
+    -1.0, -1.0, 1.0
 };
 
 GLfloat const txUv[] =
@@ -95,8 +95,8 @@ unsigned short indices[] = {0,1,2, 2,3,0};
 extern float viewWidth, viewHeight;
 float camDist = 3.0;
 int tex_id = 2;
-float Zee = 1.0;
-extern int gDbgTextureName;
+float Zee = 1.5, ZeePfoc = 2.0;
+GLfloat X = 0.0, Y = 0.0, Z = 0.0, gTheta = 0.0, gRad = 3.0;
 
 const mat4 Ident = MAT4IDENT();
 mat4  *MxProjection, *MxModel, *Pointer;
@@ -128,7 +128,7 @@ void glPrepareShaderAttributesTexUV(GLfloat* src, size_t len) {
     gShaderPrep.lTexUv = len;
 }
 
-int texK = 1, texKmax = 3200;
+int texK = 1, texKmax = 6400;
 void glPrepareShaderAttributesDraw(GLushort* src, size_t len) {
     int i;
     
@@ -140,7 +140,8 @@ void glPrepareShaderAttributesDraw(GLushort* src, size_t len) {
     GLfloat* vTmp = gShaderPrep.vert;
     GLfloat* tTmp = gShaderPrep.texUVco;
     
-    glBindTexture(GL_TEXTURE_2D, texture_list[texK++ / 100]);
+    glBindTexture(GL_TEXTURE_2D, texture_list[texK / 100]);
+    texK += 2;
     if(texK > texKmax) texK = 1;
     
     // copy over to bound shader attributes
@@ -163,24 +164,30 @@ void glPrepareShaderAttributesDraw(GLushort* src, size_t len) {
     // reset
     
 }
-
-GLfloat X = 1, Y = 1, Z = 1;
-
 void glDrawFirstly(void) {
 
     glViewport(0,0, viewWidth, viewHeight);
 
+    
     {
         glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
         mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
         //MAT4MUL_inplace(cur, scale);
     
-        mat4 MVP = MAT4TRANSLATE(X, Y, Z);
-        Z+= 0.005;
-        X-= 0.001;
-        Y+= 0.002;
-        mat4 Perspective = MAT4PERSPECTIVE(Zee);
+        //Z+= 0.005;
+        //X-= 0.002;
+        //Y+= 0.002;
+        
+        Y = sin(gTheta) * gRad;
+        Z = cos(gTheta) * gRad;
+        
+        gTheta += 0.01;
+        
+        mat4 MVP = MAT4ROTY(gTheta);
+        mat4 trans = MAT4TRANSLATE(0, 0.0, 1.5);
+        MAT4XLT_inplace(MVP, trans);
+        mat4 Perspective = MAT4PERSPECTIVE(Zee, ZeePfoc);
 
         (*Pointer).f = MVP;
         (*Pointer).p = Perspective;
