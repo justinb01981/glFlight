@@ -133,7 +133,7 @@ void glPrepareShaderAttributesDraw(GLushort* src, size_t len) {
     int i;
     
     if(!gShaderPrep.stor) {
-        gShaderPrep.stor = malloc(sizeof(GLfloat)*655360); // todo: free
+        gShaderPrep.stor = malloc(sizeof(GLfloat)*65536); // todo: free
     }
     gShaderPrep.write = gShaderPrep.stor;
     
@@ -168,10 +168,15 @@ void glDrawFirstly(void) {
 
     glViewport(0,0, viewWidth, viewHeight);
 
-    
     {
-        glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
+        glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
+//        glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
         mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+        
+        if(!Pointer) {
+            printf("glMapBufferRange failed with: %d", glGetError());
+            return;
+        }
 
         //MAT4MUL_inplace(cur, scale);
     
@@ -191,8 +196,6 @@ void glDrawFirstly(void) {
 
         (*Pointer).f = MVP;
         (*Pointer).p = Perspective;
-
-        glUnmapBuffer(GL_UNIFORM_BUFFER);
     }
 
 //    glDrawBuffer(GL_BACK);
@@ -202,23 +205,27 @@ void glDrawFirstly(void) {
 
 void glDrawLastly(void) {
 
-    vec4 cl = {.f =  0, 1, 0, 1};
+    vec4 cl = {.f =  0, 0, 0, 1};
     glClearBufferfv(GL_COLOR, 0, &cl.f[0]);
 
     glUseProgram(shaderProgram);
-
+    
     glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
     // keep bufferData (building) confined to init not render
 
     glBindBufferBase(GL_UNIFORM_BUFFER, VERTXATTRIB_XFORM, BufferName[BUFFERNAME_UTX]);
     glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
-
     
     /*
     glDrawElements(GL_TRIANGLES, sizeof(elements)/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);  // passing NULL indicates to use bound..um...buffers
      */
     glPrepareShaderAttributesDraw(elements, sizeof(elements));
+    
+    // unbind
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glUnmapBuffer(GL_UNIFORM_BUFFER);
 
     return;
 }
@@ -269,8 +276,11 @@ void glDrawLastly(void) {
     shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
-
-    glUseProgram(shaderProgram);
+    
+    glBindAttribLocation(shaderProgram, VERTXATTRIB_XFORM, "Position");
+    glBindAttribLocation(shaderProgram, VERTXATTRIB_TXPOS, "Texcoord");
+    //glBindFragDataLocation(shaderProgram, VERTXATTRIB_COLOR, "Color");
+//    https://stackoverflow.com/questions/19064055/os-x-opengl-3-2-doesnt-include-glbindfragdatalocation
 
     initBuffer();
 
@@ -278,17 +288,8 @@ void glDrawLastly(void) {
 
     initVertexArray();
 
-    glUseProgram(0);
-
     UniformMVP = glGetUniformLocation(shaderProgram, "MVP");
     UniformEnvironment = glGetUniformLocation(shaderProgram, "Diffuse");
-    
-    glBindAttribLocation(shaderProgram, VERTXATTRIB_XFORM, "Position");
-    glBindAttribLocation(shaderProgram, VERTXATTRIB_TXPOS, "Texcoord");
-    //glBindFragDataLocation(shaderProgram, VERTXATTRIB_COLOR, "Color");
-//    https://stackoverflow.com/questions/19064055/os-x-opengl-3-2-doesnt-include-glbindfragdatalocation
-    
-    glUniformBlockBinding(shaderProgram, glGetUniformBlockIndex(shaderProgram, "transform"), VERTXATTRIB_XFORM);
 
     glLinkProgram(shaderProgram);
     success = 0;
@@ -298,14 +299,21 @@ void glDrawLastly(void) {
         printf("%s", infoLog);
         assert(0);
     }
+    
+    glUniformBlockBinding(shaderProgram, glGetUniformBlockIndex(shaderProgram, "transform"), VERTXATTRIB_XFORM);
 
-    uniformS = glGetUniformLocation ( samplerLoc, "Color");
+    glUseProgram(shaderProgram);
+    
+    //uniformS = glGetUniformLocation ( samplerLoc, "Color");
     uniformPos = glGetUniformLocation( samplerLoc, "Position");
     glUniform1i(glGetUniformLocation(samplerLoc, "Diffuse"), 0);
 
-    assert(uniformS != 0 && uniformPos != 0);
+    //assert(uniformS != 0 && uniformPos != 0);
 
-    printf("%s done\n", self.debugDescription.UTF8String);
+    int r;
+    while((r = glGetError() && r != 0)) {
+        printf("%s done (error: %d)\n", self.debugDescription.UTF8String, r);
+    }
 }
 
 static bool initVertexArray(void)
@@ -333,7 +341,7 @@ static bool initBuffer(void) {
 
     UniformBufferOffset = 0;
     glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
-    GLint UniformBlockSize = MAX(sizeof(MVP), UniformBufferOffset);
+    GLint UniformBlockSize = MAX(sizeof(mat4u), UniformBufferOffset);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFERNAME_ELX]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);  /* "indices" formerly */
@@ -391,27 +399,23 @@ static bool initTexture(void) {
     return true;
 }
 
--(void) awakeFromNib {
-    
-    [super awakeFromNib];
+-(void) viewDidAppear:(BOOL)animated{
     
     glView = (GLKView*)self.view;
     
     glView.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
-    [glView.context setMultiThreaded:FALSE];
+    [EAGLContext setCurrentContext:glView.context];
     
-    self.initBlock = nil;
+    //[glView.context setMultiThreaded:FALSE];
     
-    self.view.frame = UIScreen.mainScreen.bounds;
+    if(self.initBlock != nil) {
+        self.initBlock(self.view.frame.size);
+        self.initBlock = nil;
+    }
+    
+    //self.view.frame = UIScreen.mainScreen.bounds;
     
     self.delegate = self;
-    
-//    effect = nil;
-}
-
--(void) viewDidAppear:(BOOL)animated {
-    
-    [EAGLContext setCurrentContext:((GLKView*)self.view).context];
     
     //shrink inside of safe-area insets (iphone x)
     /*
@@ -430,14 +434,8 @@ static bool initTexture(void) {
     }
     */
 
-    if(self.initBlock != nil) {
-        self.initBlock(self.view.frame.size);
-        self.initBlock = nil;
-        
-    }
+    [self startAnimation];
     
-    [self initGL];  // view dimensions set in initBlock
-
     // init purchases
     [PurchaseManager.shared uponActivation:^{
         // activation successful
@@ -449,17 +447,11 @@ static bool initTexture(void) {
     glFlightOnPurchase = fulfillShipPurchase;
 }
 
-
-
 - (void)glkView: (GLKView*)glkView drawInRect: (CGRect)rect {
+    [EAGLContext setCurrentContext:glView.context];
     
-    if(self.initBlock != nil) {
-        printf("glkView drawInRect called before init done");
-        return;
-    }
+    assert(self.initBlock == nil);
     
-    [EAGLContext setCurrentContext:((GLKView*)self.view).context];
-
     gameInput();
     
     glFlightFrameStage1();
@@ -474,12 +466,15 @@ static bool initTexture(void) {
 
 -(void)startAnimation
 {
+    [self initGL];
+    
     self.paused = NO;
     self.preferredFramesPerSecond = PLATFORM_TICK_RATE;
     
     ((GLKView*)self.view).delegate = self;
+
     
-    [(GLKView*)self.view display];
+    //[(GLKView*)self.view display];
 }
 
 -(void)stopAnimation
@@ -487,9 +482,9 @@ static bool initTexture(void) {
     self.paused = YES;
 }
 
-- (void)glkViewControllerUpdate:(nonnull GLKViewController *)controller {
-    
-}
+//- (void)glkViewControllerUpdate:(nonnull GLKViewController *)controller {
+//
+//}
 
 - (void)encodeWithCoder:(nonnull NSCoder *)aCoder {
     

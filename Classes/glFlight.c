@@ -130,8 +130,6 @@ glFlightFrameStage1(void)
     
     extern void glDrawFirstly(void);
     extern void glDrawLastly(void);
-    glDrawFirstly();
-
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnable(GL_DEPTH_TEST);
@@ -143,6 +141,9 @@ glFlightFrameStage1(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
+    glDrawFirstly();
+    
+    goto goDrawLastly;
     
     world_lock();
     
@@ -173,8 +174,6 @@ glFlightFrameStage1(void)
         
         goto draw_bail;
     }
-
-    goto goDrawLastly;
 
     //extern void update_time_ms_frame_tick(void);
     //update_time_ms_frame_tick();

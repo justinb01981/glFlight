@@ -107,6 +107,8 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
     gameInterfaceInit(viewWidth, viewHeight);
     
     if(gameTests_run_sanity() != 0) assert(0);
+    
+    
 }
 
 void glFlightResume(time_t time_last_suspend)
@@ -161,7 +163,6 @@ void glFlightResume(time_t time_last_suspend)
     [(glFlightGLKViewController*) UIApplication.sharedApplication.keyWindow.rootViewController viewInitialized: ^(CGSize size){
         glFlightGLKViewController* vc = (glFlightGLKViewController*) UIApplication.sharedApplication.keyWindow.rootViewController;
         glFlightInit(vc, vc.view.frame.size);
-        [vc startAnimation];
     }];
 }
 
