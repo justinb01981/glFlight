@@ -708,7 +708,6 @@ calibrate_bail:
 goDrawLastly:
     
     glDrawLastly();
-    //drawText("aiuehfsdkruvae", 10, 10, 10);
     
     /****************************************
      * OpenGL frame is ready to be rendered *

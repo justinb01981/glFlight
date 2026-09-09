@@ -42,7 +42,7 @@ GLuint fragmentShader;
 GLuint vertexShader;
 unsigned int shaderProgram;
 unsigned int samplerLoc, uniformS, uniformPos;
-int  UniformMVP, UniformEnvironment;
+int  UniformEnvironment;
 GLuint BufferName[BUFFERNAME_MAX], VAONames[VERTXATTRIB_MAX];
 GLint UniformBufferOffset;
 GLuint *txData;
@@ -162,15 +162,16 @@ setupGLModelView(float scrWidth, float scrHeight)
     
     glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
     mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+    assert(Pointer);
 
     mat4 MVP = MAT4IDENT(), Sc = MAT4SCALE(5);
-    MAT4MUL_inplace(MVP, Sc);
+//    MAT4MUL_inplace(MVP, Sc);
     mat4 Perspective = MAT4ORTHO(scrWidth, scrHeight);
 
     (*Pointer).f = MVP;
     (*Pointer).p = Perspective;
-
-        
+    
+    glUnmapBuffer(GL_UNIFORM_BUFFER);
 }
 
 static void
@@ -183,7 +184,7 @@ setupGLModelViewDone1(void)
 static void
 setupGLModelViewDone(void)
 {
-    glUnmapBuffer(GL_UNIFORM_BUFFER);
+    
 }
 
 static void
@@ -258,11 +259,11 @@ void drawText(char *str, float x, float y, float scale)
     fscreenwidth *= m;
     fscreenheight *= m;
 
-    glMatrixMode(GL_TEXTURE);
-    glPushMatrix();
-    glLoadIdentity();
-    glScalef(-(fmapwidth/cols) / fmapwidth, -(fmapheight/rows) / (fmapheight), 1);
-    glRotatef(90, 0, 0, 1);
+//    glMatrixMode(GL_TEXTURE);
+//    glPushMatrix();
+//    glLoadIdentity();
+//    glScalef(-(fmapwidth/cols) / fmapwidth, -(fmapheight/rows) / (fmapheight), 1);
+//    glRotatef(90, 0, 0, 1);
 
     // enable alpha-blending
     glEnable(GL_BLEND);
@@ -379,9 +380,6 @@ void drawText(char *str, float x, float y, float scale)
     }
 
     glDisable(GL_BLEND);
-
-    glMatrixMode(GL_TEXTURE);
-    glPopMatrix();
 
     setupGLModelViewDone();
 }
@@ -1089,27 +1087,16 @@ drawState2dSet(gameGraphics_drawState2d* state)
     
     glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(drawState_2d.coords), drawState_2d.coords, GL_STATIC_DRAW);
-    
-    UniformBufferOffset = 0;
-    glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
-    GLint UniformBlockSize = MAX(sizeof(MVP), UniformBufferOffset);
-
-    glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
-    glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+//    
+//    UniformBufferOffset = 0;
+//    glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
+//    GLint UniformBlockSize = MAX(sizeof(MVP), UniformBufferOffset);
+//
+//    glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
+//    glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
     
     //glTexCoordPointer(2, GL_FLOAT, 0, drawState_2d.texcoords);
     glPrepareShaderAttributesTexUV(drawState_2d.texcoords, sizeof(drawState_2d.texcoords)/sizeof(GLfloat));
-    
-    glVertexAttribPointer(VERTXATTRIB_XFORM, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(0));
-    glVertexAttribPointer(VERTXATTRIB_TXPOS, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(sizeof(vec2)));
-    
-    //glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
-    //mat4* Pointer = (mat4*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-
-    //mat4 ident = MAT4IDENT();
-    //*Pointer = ident;
-
-    //glUnmapBuffer(GL_UNIFORM_BUFFER);
 }
 
 void
@@ -1118,8 +1105,6 @@ drawState2dDraw(void)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFERNAME_ELX]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(drawState_2d.indices), drawState_2d.indices, GL_STATIC_DRAW);  /* "indices" formerly */
     
-    glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-
     glBindBufferBase(GL_UNIFORM_BUFFER, VERTXATTRIB_XFORM, BufferName[BUFFERNAME_UTX]);
     
     glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);

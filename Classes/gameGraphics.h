@@ -23,7 +23,7 @@ extern GLuint fragmentShader;
 extern GLuint vertexShader;
 extern unsigned int shaderProgram;
 extern unsigned int samplerLoc, uniformS, uniformPos;
-extern int  UniformMVP, UniformEnvironment;
+extern int UniformEnvironment;
 extern GLuint BufferName[], VAONames[];
 extern GLint UniformBufferOffset;
 extern GLuint TextureName;
@@ -78,6 +78,8 @@ S,0,0,0,            \
 0,0,0,1             \
 }
 
+#define ZeePfoc 1.5
+
 #define MAT4PERSPECTIVE(z, Pfoc) \
 {                   \
 (-z)/Pfoc  ,0.0,                0.0,        0.0,            \
@@ -86,12 +88,13 @@ S,0,0,0,            \
 0.0,            0.0,                0.0,        0.0             \
 }
 
+#define ORTHOFAR ZeePfoc
 #define MAT4ORTHO(w, h) \
 {                   \
-1.0/w,          0.0,                0.0,        0.0,           \
-0.0,            1.0/h,              0.0,        0.0,           \
-0.0,            0.0,                1.0,        0.0,           \
-0.0,            0.0,                0.0,        1.0            \
+2.0/w,          0.0,                0.0,            -w,           \
+0.0,            2.0/h,              0.0,            -h,           \
+0.0,            0.0,                -2.0/ORTHOFAR,   -ORTHOFAR,   \
+0.0,            0.0,                0.0,            1             \
 }
 
 #define MAT4TRANSLATE(X, Y, Z) \
@@ -247,10 +250,10 @@ gameGraphicsUninit();
 int
 bindTexture(unsigned int tex_id);
 
-void glPrepareShaderAttributesVertices(GLfloat* src, size_t len);
+void glPrepareShaderAttributesVertices(const GLfloat* src, const size_t len);
 
-void glPrepareShaderAttributesTexUV(GLfloat* src, size_t len);
+void glPrepareShaderAttributesTexUV(const GLfloat* src, const size_t len);
 
-void glPrepareShaderAttributesDraw(GLushort* src, size_t len);
+void glPrepareShaderAttributesDraw(const GLushort* src, const size_t len);
 
 #endif

@@ -15,13 +15,12 @@
 #import "PurchaseManager.h"
 #include "textures.h"
 
-const GLfloat vZ = 1.0;
 GLfloat const vertices[] =
 {
-    -1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0,
-    1.0, -1.0, 0.67,
-    -1.0, -1.0, 1.0
+    -1.0, 1.0, 1,
+    1.0, 1.0, 1,
+    1.0, -1.0, 1,
+    -1.0, -1.0, 1
 };
 
 GLfloat const txUv[] =
@@ -95,8 +94,8 @@ unsigned short indices[] = {0,1,2, 2,3,0};
 extern float viewWidth, viewHeight;
 float camDist = 3.0;
 int tex_id = 2;
-float Zee = 1.5, ZeePfoc = 2.0;
-GLfloat X = 0.0, Y = 0.0, Z = 0.0, gTheta = 0.0, gRad = 3.0;
+float Zee = 1.5;
+GLfloat X = 0.0, Y = 0.0, Z = 0.0, gTheta = 0.0, gRad = 3;
 
 const mat4 Ident = MAT4IDENT();
 mat4  *MxProjection, *MxModel, *Pointer;
@@ -111,30 +110,29 @@ mat4 cur = MAT4IDENT(),
 #pragma mark: render
 
 typedef struct ShaderPrep {
-    GLfloat *vert, *texUVco, *stor, *write;
+    const GLfloat *vert, *texUVco, *stor, *write;
     size_t lVert, lTexUv;
     
 } ShaderPrep;
 
 ShaderPrep gShaderPrep = {.vert = 0, .texUVco = 0, .stor = 0 , .lVert = 0, .lTexUv = 0};
 
-void glPrepareShaderAttributesVertices(GLfloat* src, size_t len) {
+void glPrepareShaderAttributesVertices(const GLfloat* src, const size_t len) {
     gShaderPrep.vert = src;
     gShaderPrep.lVert = len;
 }
 
-void glPrepareShaderAttributesTexUV(GLfloat* src, size_t len) {
+void glPrepareShaderAttributesTexUV(const GLfloat* src, const size_t len) {
     gShaderPrep.texUVco = src;
     gShaderPrep.lTexUv = len;
 }
 
 int texK = 1, texKmax = 6400;
-void glPrepareShaderAttributesDraw(GLushort* src, size_t len) {
+void glPrepareShaderAttributesDraw(const GLushort* src, const size_t len) {
     int i;
     
-    if(!gShaderPrep.stor) {
-        gShaderPrep.stor = malloc(sizeof(GLfloat)*65536); // todo: free
-    }
+    assert(gShaderPrep.stor);
+    
     gShaderPrep.write = gShaderPrep.stor;
     
     GLfloat* vTmp = gShaderPrep.vert;
@@ -159,49 +157,52 @@ void glPrepareShaderAttributesDraw(GLushort* src, size_t len) {
     glBufferData(GL_ARRAY_BUFFER, (gShaderPrep.lTexUv + gShaderPrep.lVert) * sizeof(GLfloat), gShaderPrep.stor, GL_STATIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, len, src, GL_STATIC_DRAW);
     
+    assert(gShaderPrep.vert && gShaderPrep.texUVco);
+    
     glDrawElements(GL_TRIANGLES, (GLsizei) len, GL_UNSIGNED_SHORT, 0);  // passing NULL indicates to use bound..um...buffers
+}
 
-    // reset
+void glDrawSecondly(void) {
     
 }
+
 void glDrawFirstly(void) {
+    
+    int r;
+    
+    while((r = glGetError() && r != 0)) {
+        // todo: happens elsewhere external during drawing
+        printf("glGetError ignored: %u\n",  r);
+        if(r != 1) assert(0);
+    }
 
     glViewport(0,0, viewWidth, viewHeight);
-
+    
     {
         glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
-//        glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
+        glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
         mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
         
-        if(!Pointer) {
-            printf("glMapBufferRange failed with: %d", glGetError());
-            return;
-        }
-
-        //MAT4MUL_inplace(cur, scale);
-    
-        //Z+= 0.005;
-        //X-= 0.002;
-        //Y+= 0.002;
+        assert(Pointer);
         
         Y = sin(gTheta) * gRad;
         Z = cos(gTheta) * gRad;
         
         gTheta += 0.01;
         
-        mat4 MVP = MAT4ROTY(gTheta);
-        mat4 trans = MAT4TRANSLATE(0, 0.0, 1.5);
-        MAT4XLT_inplace(MVP, trans);
+        mat4 drawPos = MAT4ROTY(gTheta), trans = MAT4TRANSLATE(0, 0, 1.5);
+        
         mat4 Perspective = MAT4PERSPECTIVE(Zee, ZeePfoc);
+        //mat4 Perspective = MAT4ORTHO(viewWidth, viewHeight);
 
-        (*Pointer).f = MVP;
+        MAT4XLT_inplace(drawPos, trans);
+        
+        (*Pointer).f = drawPos;
         (*Pointer).p = Perspective;
+        
+        glUnmapBuffer(GL_UNIFORM_BUFFER);
     }
-
-//    glDrawBuffer(GL_BACK);
-//    glDisable(GL_FRAMEBUFFER_SRGB);
 }
-
 
 void glDrawLastly(void) {
 
@@ -209,8 +210,6 @@ void glDrawLastly(void) {
     glClearBufferfv(GL_COLOR, 0, &cl.f[0]);
 
     glUseProgram(shaderProgram);
-    
-    glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
     // keep bufferData (building) confined to init not render
 
@@ -223,10 +222,11 @@ void glDrawLastly(void) {
     glPrepareShaderAttributesDraw(elements, sizeof(elements));
     
     // unbind
+    
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-//    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    glUnmapBuffer(GL_UNIFORM_BUFFER);
-
+    
+    assert( !glGetError() );
     return;
 }
 
@@ -243,8 +243,12 @@ void glDrawLastly(void) {
 
 -(void)initGL {
     
+    if(!gShaderPrep.stor) {
+        gShaderPrep.stor = malloc(sizeof(GLfloat)*65536); // todo: free
+    }
+    
     glGenBuffers(BUFFERNAME_MAX, &BufferName[0]);
-
+    
     glView.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
     // shader
@@ -283,14 +287,22 @@ void glDrawLastly(void) {
 //    https://stackoverflow.com/questions/19064055/os-x-opengl-3-2-doesnt-include-glbindfragdatalocation
 
     initBuffer();
-
+    
     initTexture();
-
+    
     initVertexArray();
-
-    UniformMVP = glGetUniformLocation(shaderProgram, "MVP");
+    
+    int blockIdx = glGetUniformBlockIndex(shaderProgram, "transform");
+    glUniformBlockBinding(shaderProgram, blockIdx, VERTXATTRIB_XFORM);
+    
+    glUseProgram(shaderProgram);
+    
     UniformEnvironment = glGetUniformLocation(shaderProgram, "Diffuse");
-
+    
+//    uniformS = glGetUniformLocation ( samplerLoc, "Color");
+    uniformPos = glGetUniformLocation( samplerLoc, "Position");
+    glUniform1i(glGetUniformLocation(samplerLoc, "Diffuse"), 1);
+    
     glLinkProgram(shaderProgram);
     success = 0;
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
@@ -300,57 +312,44 @@ void glDrawLastly(void) {
         assert(0);
     }
     
-    glUniformBlockBinding(shaderProgram, glGetUniformBlockIndex(shaderProgram, "transform"), VERTXATTRIB_XFORM);
-
-    glUseProgram(shaderProgram);
-    
-    //uniformS = glGetUniformLocation ( samplerLoc, "Color");
-    uniformPos = glGetUniformLocation( samplerLoc, "Position");
-    glUniform1i(glGetUniformLocation(samplerLoc, "Diffuse"), 0);
-
     //assert(uniformS != 0 && uniformPos != 0);
-
-    int r;
-    while((r = glGetError() && r != 0)) {
-        printf("%s done (error: %d)\n", self.debugDescription.UTF8String, r);
-    }
 }
 
 static bool initVertexArray(void)
 {
     glGenVertexArrays(1, &VAONames[VERTXATTRIB_XFORM]);
     glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
-
+    
     glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
-
+    
     glVertexAttribPointer(VERTXATTRIB_XFORM, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(0));
     glVertexAttribPointer(VERTXATTRIB_TXPOS, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_v2fv2f), BUFFER_OFFSET(sizeof(vec3)));
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+    
     glEnableVertexAttribArray(VERTXATTRIB_XFORM);
     glEnableVertexAttribArray(VERTXATTRIB_TXPOS);
-
+    
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFERNAME_ELX]);
     glBindVertexArray(0);
-
+    
     return true;
 }
 
 static bool initBuffer(void) {
-
+    
     UniformBufferOffset = 0;
     glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
     GLint UniformBlockSize = MAX(sizeof(mat4u), UniformBufferOffset);
-
+    
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFERNAME_ELX]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);  /* "indices" formerly */
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
+    
     // todo: see drawState2dSet
     glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
     //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+    
     glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
     glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
     
@@ -363,13 +362,9 @@ static bool initBuffer(void) {
 
 static bool initTexture(void) {
     int tx_lev = 1;
-    //gli::texture2d Texture(gli::load((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-
-    //gli::gl GL(gli::gl::PROFILE_GL32);
-    //gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
-
+    
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
+    
     glGenTextures(1, &texture_list[0]);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_list[0]);
@@ -381,21 +376,21 @@ static bool initTexture(void) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f);
-//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
-
+    //    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
+    
     int width = tx_dim, height = tx_dim;
     txData = malloc(width * height * sizeof(GLuint) + 64);
     for(int off = 0; off < width*height; off++) {
         txData[off] = rand() % 0xEF<<16 | rand() % 0xEF<<8 | rand() % 0xEF<<0  | 0xff000000;
     }
-
+    
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
                  /*GL_BGRA*/ GL_RGBA, GL_UNSIGNED_BYTE, txData);
-
+    
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     
     glPrepareShaderAttributesTexUV(txUv, sizeof(txUv)/sizeof(GLfloat));
-
+    
     return true;
 }
 
@@ -403,46 +398,19 @@ static bool initTexture(void) {
     
     glView = (GLKView*)self.view;
     
-    glView.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
+    if(!glView.context) glView.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
+    
     [EAGLContext setCurrentContext:glView.context];
     
-    //[glView.context setMultiThreaded:FALSE];
-    
-    if(self.initBlock != nil) {
-        self.initBlock(self.view.frame.size);
-        self.initBlock = nil;
-    }
-    
-    //self.view.frame = UIScreen.mainScreen.bounds;
-    
-    self.delegate = self;
-    
-    //shrink inside of safe-area insets (iphone x)
-    /*
-    if (@available(iOS 11.0, *))
-    {
-        UIEdgeInsets insets = [self.view safeAreaInsets];
-
-        CGRect childRect = [self.view frame];
-
-        childRect.size.width -= insets.left + insets.right;
-        childRect.origin.x += insets.left;
-
-        [self.view setFrame: childRect];
-
-        [[self.view superview] setBackgroundColor:[UIColor blackColor]];
-    }
-    */
-
     [self startAnimation];
     
     // init purchases
     [PurchaseManager.shared uponActivation:^{
         // activation successful
         printf("purchase successful: %d", PurchaseManager.shared.purchased);
-
+        
         gameInterfaceActivateShip();
-
+        
     }];
     glFlightOnPurchase = fulfillShipPurchase;
 }
@@ -450,13 +418,23 @@ static bool initTexture(void) {
 - (void)glkView: (GLKView*)glkView drawInRect: (CGRect)rect {
     [EAGLContext setCurrentContext:glView.context];
     
-    assert(self.initBlock == nil);
+    if(self.initBlock != nil) {
+        self.initBlock(self.view.frame.size);
+        self.initBlock = nil;
+        
+        printf("glErr@initblock: \n", glGetError());
+        assert(!glGetError());
+    }
     
     gameInput();
     
     glFlightFrameStage1();
     
     glFlightFrameStage2();
+}
+
+-(void) viewWillDisppear:(BOOL)animated {
+    [self stopAnimation];
 }
 
 -(void) viewInitialized: (void (^)(CGSize)) execute
@@ -472,62 +450,11 @@ static bool initTexture(void) {
     self.preferredFramesPerSecond = PLATFORM_TICK_RATE;
     
     ((GLKView*)self.view).delegate = self;
-
-    
-    //[(GLKView*)self.view display];
 }
 
 -(void)stopAnimation
 {
     self.paused = YES;
-}
-
-//- (void)glkViewControllerUpdate:(nonnull GLKViewController *)controller {
-//
-//}
-
-- (void)encodeWithCoder:(nonnull NSCoder *)aCoder {
-    
-}
-
-- (void)traitCollectionDidChange:(nullable UITraitCollection *)previousTraitCollection {
-    
-}
-
-- (void)preferredContentSizeDidChangeForChildContentContainer:(nonnull id<UIContentContainer>)container {
-    
-}
-
-- (CGSize)sizeForChildContentContainer:(nonnull id<UIContentContainer>)container withParentContainerSize:(CGSize)parentSize {
-    return parentSize;
-}
-
-- (void)systemLayoutFittingSizeDidChangeForChildContentContainer:(nonnull id<UIContentContainer>)container {
-    
-}
-
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(nonnull id<UIViewControllerTransitionCoordinator>)coordinator {
-    
-}
-
-- (void)willTransitionToTraitCollection:(nonnull UITraitCollection *)newCollection withTransitionCoordinator:(nonnull id<UIViewControllerTransitionCoordinator>)coordinator {
-    
-}
-
-- (void)didUpdateFocusInContext:(nonnull UIFocusUpdateContext *)context withAnimationCoordinator:(nonnull UIFocusAnimationCoordinator *)coordinator {
-    
-}
-
-- (void)setNeedsFocusUpdate {
-    
-}
-
-- (BOOL)shouldUpdateFocusInContext:(nonnull UIFocusUpdateContext *)context {
-    return true;
-}
-
-- (void)updateFocusIfNeeded {
-    
 }
 
 // mark: -- touch delegate
