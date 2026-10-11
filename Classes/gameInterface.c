@@ -71,7 +71,7 @@ gameInterfaceInit(double screenWidth, double screenHeight)
     gameInterfaceControls.interfaceWidth = screenWidth;
     
     gameInterfaceControls.textWidth = ceil(screenHeight / 120);
-    gameInterfaceControls.textHeight = gameInterfaceControls.textWidth * 5; //ceil(gameInterfaceControls.textWidth * 2.2 * (screenWidth/screenHeight));
+    gameInterfaceControls.textHeight = gameInterfaceControls.textWidth * 3; //ceil(gameInterfaceControls.textWidth * 2.2 * (screenWidth/screenHeight));
 
     // origin (in non-landscape mode) is upper left
     // (in landscape mode, screenWidth = Y-axis, screenHeight = X-axis

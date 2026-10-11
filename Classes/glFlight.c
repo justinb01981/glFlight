@@ -118,7 +118,7 @@ void
 glFlightFrameStage1(void)
 {
     int dynamic_draw_distance = 0;
-    int backface_culling = 1;
+    int backface_culling = 0;
     WorldElemListNode* pListNode = NULL;
     WorldElemListNode* pCameraWatchNode = NULL;
     int n_visibleChecks = 400;
@@ -143,8 +143,7 @@ glFlightFrameStage1(void)
     
     glDrawFirstly();
     
-    goto goDrawLastly;
-    
+
     world_lock();
     
     if(!world_inited && world_data)
@@ -174,6 +173,8 @@ glFlightFrameStage1(void)
         
         goto draw_bail;
     }
+    
+    goto goDrawLastly;
 
     //extern void update_time_ms_frame_tick(void);
     //update_time_ms_frame_tick();
@@ -678,9 +679,13 @@ calibrate_bail:
     drawBillboard(&targetingReticleElem);
     
     glDisable(GL_DEPTH_TEST);
+   
+    goDrawLastly:
     
-    drawRadar();
-    drawControls();
+//    drawRadar();
+//    drawControls();
+    
+    
     
     if(!gameInterfaceControls.consoleHidden)
     {        
@@ -705,9 +710,9 @@ calibrate_bail:
     
     glEnable(GL_DEPTH_TEST);
     
-goDrawLastly:
-    
     glDrawLastly();
+    
+    drawText("kiss my ass", 0, 0,5.0);
     
     /****************************************
      * OpenGL frame is ready to be rendered *

@@ -22,7 +22,7 @@ extern int radar_mode;
 extern GLuint fragmentShader;
 extern GLuint vertexShader;
 extern unsigned int shaderProgram;
-extern unsigned int samplerLoc, uniformS, uniformPos;
+extern GLint uniformS, uniformPos;
 extern int UniformEnvironment;
 extern GLuint BufferName[], VAONames[];
 extern GLint UniformBufferOffset;
@@ -88,6 +88,11 @@ S,0,0,0,            \
 0.0,            0.0,                0.0,        0.0             \
 }
 
+/*
+ glOrthof(-sw/2, sw/2,
+          -sh/2, sh/2,
+          1, -1);
+ */
 #define ORTHOFAR ZeePfoc
 #define MAT4ORTHO(w, h) \
 {                   \

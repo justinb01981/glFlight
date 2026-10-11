@@ -23,12 +23,13 @@ GLfloat const vertices[] =
     -1.0, -1.0, 1
 };
 
+const GLfloat txuv = 0.5;
 GLfloat const txUv[] =
 {
-    -1.0,-1.0,
-    1.0,-1.0,
-    1.0,1.0,
-    -1.0,1.0
+    0,0,
+    1,0,
+    1,1,
+    0,1
 };
 
 GLushort elements[] = {
@@ -67,25 +68,32 @@ const char *vertexShaderSource =    ""
 "void main()                                \n"
 "{                                          \n"
 "    Fragtexco = Texcoord;                  \n"
-"    gl_Position = Transform.persp * Transform.MVP * vec4(Position, 1.0);  \n"
+"    mat4 rot =  mat4(                           \n"
+"    vec4(0.0, -1.0, 0.0, 0.0),                  \n"
+"    vec4(1.0, 0.0, 0.0, 0.0),                  \n"
+"    vec4(0.0, 0.0, 1.0, 0.0),                  \n"
+"    vec4(0.0, 0.0, 0.0, 1.0)                   \n"
+"    );                                         \n"
+"    gl_Position = Transform.persp * Transform.MVP * rot * vec4(Position, 1.0);  \n"
 "}                                          \n";
 
 const char* fragmentShaderSrc = ""
-"#version 300 es                                    \n"
+"#version 300 es                                     \n"
 "precision highp float;                              \n"
 "precision highp int;                                \n"
 "layout(std140, column_major) uniform;               \n"
-""
+"\n"
 "uniform sampler2D Diffuse;                          \n"
-""
+"\n"
 "in vec2 Fragtexco;                                  \n"
-""
+"\n"
 "layout (location = 0) out vec4 Color;               \n"
 ""
-"void main()                                        \n"
-"{                                                  \n"
-"    Color = texture(Diffuse, Fragtexco);           \n"
-"}                                                  \n";
+"void main()                                         \n"
+"{                                                   \n"
+"    vec2 rotco = vec2(Fragtexco.y, 1.0-Fragtexco.x);    \n"
+"    Color = texture(Diffuse, rotco);                \n"
+"}                                                   \n";
 
 
 const unsigned tx_dim = 8;
@@ -101,8 +109,8 @@ const mat4 Ident = MAT4IDENT();
 mat4  *MxProjection, *MxModel, *Pointer;
 mat4 cur = MAT4IDENT(),
     scale = {
-        1.00, 0.0, 0.0, 0.0,
-        0.0, 1.00, 0.0, 0.0,
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0
     };
@@ -110,9 +118,8 @@ mat4 cur = MAT4IDENT(),
 #pragma mark: render
 
 typedef struct ShaderPrep {
-    const GLfloat *vert, *texUVco, *stor, *write;
+    GLfloat *vert, *texUVco, *stor, *write;
     size_t lVert, lTexUv;
-    
 } ShaderPrep;
 
 ShaderPrep gShaderPrep = {.vert = 0, .texUVco = 0, .stor = 0 , .lVert = 0, .lTexUv = 0};
@@ -138,10 +145,6 @@ void glPrepareShaderAttributesDraw(const GLushort* src, const size_t len) {
     GLfloat* vTmp = gShaderPrep.vert;
     GLfloat* tTmp = gShaderPrep.texUVco;
     
-    glBindTexture(GL_TEXTURE_2D, texture_list[texK / 100]);
-    texK += 2;
-    if(texK > texKmax) texK = 1;
-    
     // copy over to bound shader attributes
     for(i=0; i< len; i++) {
         // fill position attr
@@ -159,11 +162,7 @@ void glPrepareShaderAttributesDraw(const GLushort* src, const size_t len) {
     
     assert(gShaderPrep.vert && gShaderPrep.texUVco);
     
-    glDrawElements(GL_TRIANGLES, (GLsizei) len, GL_UNSIGNED_SHORT, 0);  // passing NULL indicates to use bound..um...buffers
-}
-
-void glDrawSecondly(void) {
-    
+    glDrawElements(GL_TRIANGLES, (GLsizei) len, index_type_enum, 0);  // passing NULL indicates to use bound..um...buffers
 }
 
 void glDrawFirstly(void) {
@@ -184,11 +183,8 @@ void glDrawFirstly(void) {
         mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
         
         assert(Pointer);
-        
-        Y = sin(gTheta) * gRad;
-        Z = cos(gTheta) * gRad;
-        
-        gTheta += 0.01;
+
+        gTheta += 0.02;
         
         mat4 drawPos = MAT4ROTY(gTheta), trans = MAT4TRANSLATE(0, 0, 1.5);
         
@@ -210,8 +206,9 @@ void glDrawLastly(void) {
     glClearBufferfv(GL_COLOR, 0, &cl.f[0]);
 
     glUseProgram(shaderProgram);
-
-    // keep bufferData (building) confined to init not render
+    
+    glPrepareShaderAttributesVertices(vertices, sizeof(vertices)/sizeof(GLfloat));
+    glPrepareShaderAttributesTexUV(txUv, sizeof(txUv)/sizeof(GLfloat));
 
     glBindBufferBase(GL_UNIFORM_BUFFER, VERTXATTRIB_XFORM, BufferName[BUFFERNAME_UTX]);
     glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
@@ -226,7 +223,7 @@ void glDrawLastly(void) {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
-    assert( !glGetError() );
+    //assert( !glGetError() );
     return;
 }
 
@@ -299,9 +296,9 @@ void glDrawLastly(void) {
     
     UniformEnvironment = glGetUniformLocation(shaderProgram, "Diffuse");
     
-//    uniformS = glGetUniformLocation ( samplerLoc, "Color");
-    uniformPos = glGetUniformLocation( samplerLoc, "Position");
-    glUniform1i(glGetUniformLocation(samplerLoc, "Diffuse"), 1);
+    //uniformS = glGetUniformLocation (shaderProgram, "Color");
+    uniformPos = glGetUniformLocation(shaderProgram, "Position");
+    glUniform1i(glGetUniformLocation(shaderProgram, "Diffuse"), 0);
     
     glLinkProgram(shaderProgram);
     success = 0;
@@ -311,8 +308,7 @@ void glDrawLastly(void) {
         printf("%s", infoLog);
         assert(0);
     }
-    
-    //assert(uniformS != 0 && uniformPos != 0);
+    //assert(uniformS > 0 && uniformPos > 0);
 }
 
 static bool initVertexArray(void)

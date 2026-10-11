@@ -41,8 +41,7 @@ extern int game_target_objective_id;
 GLuint fragmentShader;
 GLuint vertexShader;
 unsigned int shaderProgram;
-unsigned int samplerLoc, uniformS, uniformPos;
-int  UniformEnvironment;
+GLint UniformEnvironment, uniformS, uniformPos;
 GLuint BufferName[BUFFERNAME_MAX], VAONames[VERTXATTRIB_MAX];
 GLint UniformBufferOffset;
 GLuint *txData;
@@ -164,46 +163,39 @@ setupGLModelView(float scrWidth, float scrHeight)
     mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
     assert(Pointer);
 
-    mat4 MVP = MAT4IDENT(), Sc = MAT4SCALE(5);
-//    MAT4MUL_inplace(MVP, Sc);
-    mat4 Perspective = MAT4ORTHO(scrWidth, scrHeight);
+    mat4 modelview = MAT4ORTHO(scrWidth, scrHeight);
+    // todo: apply cam euler to uniform
+    mat4 Perspective = MAT4PERSPECTIVE(1.0, 1.0);
 
-    (*Pointer).f = MVP;
+    (*Pointer).f = modelview;
     (*Pointer).p = Perspective;
     
-    glUnmapBuffer(GL_UNIFORM_BUFFER);
-}
-
-static void
-setupGLModelViewDone1(void)
-{
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
 }
 
 static void
 setupGLModelViewDone(void)
 {
-    
+    glUnmapBuffer(GL_UNIFORM_BUFFER);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 static void
 setupGLTextureView(void)
 {
-    glMatrixMode(GL_TEXTURE);
-    glPushMatrix();
-    glLoadIdentity();
-    glRotatef(180, 0, 1, 0);
-    glRotatef(90, 0, 0, 1);
+//    glMatrixMode(GL_TEXTURE);
+//    glPushMatrix();
+//    glLoadIdentity();
+//    glRotatef(180, 0, 1, 0);
+//    glRotatef(90, 0, 0, 1);
 }
 
 static void
 setupGLTextureViewDone(void)
 {
-    glMatrixMode(GL_TEXTURE);
-    glPopMatrix();
-
-    glMatrixMode(GL_MODELVIEW); // ?
+//    glMatrixMode(GL_TEXTURE);
+//    glPopMatrix();
+//
+//    glMatrixMode(GL_MODELVIEW); // ?
 }
 
 int
@@ -245,9 +237,9 @@ void drawText(char *str, float x, float y, float scale)
     float scalechar = 1.0;
     float fmapwidth = 512; // width of the font bitmap
     float fmapheight = 512; // height of the font bitmap
-    float rows = 6;
-    float cols = 10;
-    float z = -2.0;
+    float rows = 6.05;
+    float cols = 10.0;
+    float z = -1.0;
     int maxLines = 20;
     gameGraphics_drawState2d *ds = &drawText_ds;
 
@@ -255,15 +247,9 @@ void drawText(char *str, float x, float y, float scale)
 
     setupGLModelView(screenWidth, screenHeight);
 
-    float m = /*480 / gameInterfaceControls.interfaceWidth*/ 0.85;
-    fscreenwidth *= m;
-    fscreenheight *= m;
-
-//    glMatrixMode(GL_TEXTURE);
-//    glPushMatrix();
-//    glLoadIdentity();
-//    glScalef(-(fmapwidth/cols) / fmapwidth, -(fmapheight/rows) / (fmapheight), 1);
-//    glRotatef(90, 0, 0, 1);
+//    float m = /*480 / gameInterfaceControls.interfaceWidth*/ 0.85;
+//    fscreenwidth *= m;
+//    fscreenheight *= m;
 
     // enable alpha-blending
     glEnable(GL_BLEND);
@@ -327,23 +313,26 @@ void drawText(char *str, float x, float y, float scale)
         //  |       | |
         //  |       | \/
         //  1-------0
-        int irow = (c-' ') / 10;
-        int icol = (c-' ') % 10;
-        float col = icol;
-        float row = irow;
+        float irow = floor((c-' ') / cols);
+        float icol = floor(fmod((c-' '), cols));
 
+        GLfloat tU, tV;
+        
+        tU = (1.0/rows) * (irow);
+        tV = (1.0/cols) * (icol);
+        
         // 0
-        ds->texcoords[0] = row+1;
-        ds->texcoords[1] = col+1;
+        ds->texcoords[0] = tU + (1.0/rows); //row+1;
+        ds->texcoords[1] = tV + (1.0/cols);
         // 1
-        ds->texcoords[2] = row;
-        ds->texcoords[3] = col+1;
+        ds->texcoords[2] = tU;
+        ds->texcoords[3] = tV + (1.0/cols);
         // 2
-        ds->texcoords[4] = row+1;
-        ds->texcoords[5] = col;
+        ds->texcoords[4] = tU + (1.0/rows);
+        ds->texcoords[5] = tV;
         // 3
-        ds->texcoords[6] = row;
-        ds->texcoords[7] = col;
+        ds->texcoords[6] = tU;
+        ds->texcoords[7] = tV;
 
         r.x = x - (line*fscreenheight) - fscreenheight*(scalechar);
         r.y = y + j*fscreenwidth;
@@ -424,11 +413,11 @@ int drawRadar(void)
             setupGLModelView(screenWidth, screenHeight);
 
             // rotate textures
-            glMatrixMode(GL_TEXTURE);
-            glPushMatrix();
-            glLoadIdentity();
-            glRotatef(180, 0, 1, 0);
-            glRotatef(90, 0, 0, 1);
+//            glMatrixMode(GL_TEXTURE);
+//            glPushMatrix();
+//            glLoadIdentity();
+//            glRotatef(180, 0, 1, 0);
+//            glRotatef(90, 0, 0, 1);
 
             // enable alpha-blending
             glEnable(GL_BLEND);
@@ -1082,36 +1071,17 @@ drawState2dSet(gameGraphics_drawState2d* state)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //glVertexPointer(3, GL_FLOAT, 0, drawState_2d.coords);
-    glPrepareShaderAttributesVertices(drawState_2d.coords, sizeof(drawState_2d.coords)/sizeof(GLfloat));
+    glPrepareShaderAttributesVertices(drawState_2d.coords, sizeof(drawState_2d.coords)/sizeof(model_coord_t)); //glVertexPointer(3, GL_FLOAT, 0, drawState_2d.coords);
     
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(drawState_2d.coords), drawState_2d.coords, GL_STATIC_DRAW);
-//    
-//    UniformBufferOffset = 0;
-//    glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
-//    GLint UniformBlockSize = MAX(sizeof(MVP), UniformBufferOffset);
-//
-//    glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
-//    glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
-    
-    //glTexCoordPointer(2, GL_FLOAT, 0, drawState_2d.texcoords);
-    glPrepareShaderAttributesTexUV(drawState_2d.texcoords, sizeof(drawState_2d.texcoords)/sizeof(GLfloat));
+    glPrepareShaderAttributesTexUV(drawState_2d.texcoords, sizeof(drawState_2d.texcoords)/sizeof(model_texcoord_t)); //glTexCoordPointer(2, GL_FLOAT, 0, drawState_2d.texcoords);
 }
 
 void
 drawState2dDraw(void)
 {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFERNAME_ELX]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(drawState_2d.indices), drawState_2d.indices, GL_STATIC_DRAW);  /* "indices" formerly */
-    
-    glBindBufferBase(GL_UNIFORM_BUFFER, VERTXATTRIB_XFORM, BufferName[BUFFERNAME_UTX]);
-    
-    glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
-    
 //    glDrawElements(GL_TRIANGLES, sizeof(drawState_2d.indices)/sizeof(model_index_t),
 //                   index_type_enum, /*drawState_2d.indices*/0);
-    glPrepareShaderAttributesDraw(drawState_2d.indices, sizeof(drawState_2d.indices)/sizeof(GLushort));
+    glPrepareShaderAttributesDraw(drawState_2d.indices, sizeof(drawState_2d.indices)/sizeof(model_index_t));
     
 //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 //    glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1125,14 +1095,14 @@ drawElemBatch(void)
     if(drawElem_indicesBatchBuffer_count > 0)
     {
         // todo buffer vertex data
-        glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBufferCur);
+        glPrepareShaderAttributesVertices(drawElem_vertexBatchBufferCur, drawElem_vertexBatchBuffer_count * sizeof(model_coord_t));    //glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBufferCur);
         
         // todo buffer texcoord data
-        glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBufferCur);
+        glPrepareShaderAttributesTexUV(drawElem_textCoordBatchBufferCur, drawElem_textCoordBatchBuffer_count * sizeof(model_texcoord_t)); //glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBufferCur);
         gl_vertex_ptr_last = drawElem_vertexBatchBufferCur;
         gl_texcoord_ptr_last = drawElem_textCoordBatchBufferCur;
 
-        glDrawElements(GL_TRIANGLES, drawElem_indicesBatchBuffer_count, index_type_enum, drawElem_indicesBatchBufferCur);
+        glPrepareShaderAttributesDraw(drawElem_indicesBatchBufferCur, drawElem_indicesBatchBuffer_count * sizeof(model_index_t)); //glDrawElements(GL_TRIANGLES, drawElem_indicesBatchBuffer_count, index_type_enum, drawElem_indicesBatchBufferCur);
 
         drawElem_indicesBatchBufferCur = drawElem_indicesBatchBufferCur + drawElem_indicesBatchBuffer_count;
         drawElem_vertexBatchBufferCur = drawElem_vertexBatchBufferCur + drawElem_vertexBatchBuffer_count;
@@ -1297,14 +1267,14 @@ drawElem(WorldElem* pElem)
 
             if(gl_vertex_ptr_last != drawElem_vertexBatchBuffer)
             {
-                glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBuffer);
+                glPrepareShaderAttributesVertices(drawElem_vertexBatchBuffer, drawElem_vertexBatchBuffer_count);    //glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBuffer);
                 gl_vertex_ptr_last = drawElem_vertexBatchBuffer;
             }
 
 
             if(gl_texcoord_ptr_last != drawElem_textCoordBatchBuffer)
             {
-                glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBuffer);
+                glPrepareShaderAttributesTexUV(drawElem_textCoordBatchBuffer, drawElem_textCoordBatchBuffer_count);    //glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBuffer);
                 gl_texcoord_ptr_last = drawElem_textCoordBatchBuffer;
             }
         }

@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface glFlightGLKViewController: GLKViewController <GLKViewControllerDelegate, GLKViewDelegate>
+@interface glFlightGLKViewController: GLKViewController <GLKViewDelegate>
 
 @property (nonatomic, nullable) void (^initBlock)(CGSize);
 

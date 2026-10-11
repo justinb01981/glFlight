@@ -127,7 +127,7 @@ const static long GAME_NETWORK_PORT_DEFAULT = 52000;
 
 const static unsigned VISIBLE_TEST_MAX_PERFRAME = 128;
 
-#define GAME_FRAME_RATE 60
+#define GAME_FRAME_RATE 120
 #define GAME_TICK_RATE PLATFORM_TICK_RATE
 
 #define game_ammo_missles_max 4
