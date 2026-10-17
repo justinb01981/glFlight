@@ -359,8 +359,8 @@ void drawText(char *str, float x, float y, float scale)
         ds->coords[11] = z;
 
         // {0,1,2, 1,3,2};
-        ds->indices[0] = 0; ds->indices[1] = 1; ds->indices[2] = 2;
-        ds->indices[3] = 1; ds->indices[4] = 3; ds->indices[5] = 2;
+        ds->indices[0] = 0; ds->indices[1] = 1; ds->indices[2] = 3;
+        ds->indices[3] = 1; ds->indices[4] = 2; ds->indices[5] = 3;
 
         drawState2dSet(ds);
         drawState2dDraw();
