@@ -1068,9 +1068,6 @@ drawState2dSet(gameGraphics_drawState2d* state)
 {
     drawState2dSetCoords(state);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     glPrepareShaderAttributesVertices(drawState_2d.coords, sizeof(drawState_2d.coords)/sizeof(model_coord_t)); //glVertexPointer(3, GL_FLOAT, 0, drawState_2d.coords);
     
     glPrepareShaderAttributesTexUV(drawState_2d.texcoords, sizeof(drawState_2d.texcoords)/sizeof(model_texcoord_t)); //glTexCoordPointer(2, GL_FLOAT, 0, drawState_2d.texcoords);
@@ -1079,14 +1076,7 @@ drawState2dSet(gameGraphics_drawState2d* state)
 void
 drawState2dDraw(void)
 {
-//    glDrawElements(GL_TRIANGLES, sizeof(drawState_2d.indices)/sizeof(model_index_t),
-//                   index_type_enum, /*drawState_2d.indices*/0);
-    glPrepareShaderAttributesDraw(drawState_2d.indices, sizeof(drawState_2d.indices)/sizeof(model_index_t));
-    
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
-//    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-//    
+    glPrepareShaderAttributesDraw(drawState_2d.indices, sizeof(drawState_2d.indices)/sizeof(model_index_t)); //    glDrawElements(GL_TRIANGLES, sizeof(drawState_2d.indices)/sizeof(model_index_t), index_type_enum, /*drawState_2d.indices*/0);
 }
 
 void

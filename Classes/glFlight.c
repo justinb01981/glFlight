@@ -712,7 +712,10 @@ calibrate_bail:
     
     glDrawLastly();
     
-    drawText("kiss my ass", 0, 0,5.0);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    
+    drawText("kiss my ass", 500, 0.0, 5.0);
+    drawControls();
     
     /****************************************
      * OpenGL frame is ready to be rendered *
