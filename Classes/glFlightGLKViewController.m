@@ -69,8 +69,8 @@ const char *vertexShaderSource =    ""
 "{                                          \n"
 "    Fragtexco = Texcoord;                  \n"
 "    mat4 rot =  mat4(                           \n"
-"    vec4(0.0, -1.0, 0.0, 0.0),                  \n"
 "    vec4(1.0, 0.0, 0.0, 0.0),                  \n"
+"    vec4(0.0, 1.0, 0.0, 0.0),                  \n"
 "    vec4(0.0, 0.0, 1.0, 0.0),                  \n"
 "    vec4(0.0, 0.0, 0.0, 1.0)                   \n"
 "    );                                         \n"
@@ -91,7 +91,7 @@ const char* fragmentShaderSrc = ""
 ""
 "void main()                                         \n"
 "{                                                   \n"
-"    vec2 rotco = vec2(Fragtexco.y, 1.0-Fragtexco.x);    \n"
+"    vec2 rotco = vec2(Fragtexco.x, Fragtexco.y);    \n"
 "    Color = texture(Diffuse, rotco);                \n"
 "}                                                   \n";
 
@@ -127,11 +127,13 @@ ShaderPrep gShaderPrep = {.vert = 0, .texUVco = 0, .stor = 0 , .lVert = 0, .lTex
 void glPrepareShaderAttributesVertices(const GLfloat* src, const size_t len) {
     gShaderPrep.vert = src;
     gShaderPrep.lVert = len;
+    //glBufferData(GL_ARRAY_BUFFER, len * sizeof(GLfloat), src, GL_STATIC_DRAW);
 }
 
 void glPrepareShaderAttributesTexUV(const GLfloat* src, const size_t len) {
     gShaderPrep.texUVco = src;
     gShaderPrep.lTexUv = len;
+    //glBufferData(GL_ARRAY_BUFFER, len * sizeof(GLfloat), src, GL_STATIC_DRAW);
 }
 
 int texK = 1, texKmax = 6400;
@@ -157,12 +159,22 @@ void glPrepareShaderAttributesDraw(const GLushort* src, const size_t len) {
     }
     
     glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
+    glBufferData(GL_ARRAY_BUFFER, (gShaderPrep.lTexUv + gShaderPrep.lVert) * sizeof(GLfloat), 0, GL_STATIC_DRAW);
     glBufferData(GL_ARRAY_BUFFER, (gShaderPrep.lTexUv + gShaderPrep.lVert) * sizeof(GLfloat), gShaderPrep.stor, GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, len, src, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, len * sizeof(GLushort), src, GL_STATIC_DRAW);
     
     assert(gShaderPrep.vert && gShaderPrep.texUVco);
     
     glDrawElements(GL_TRIANGLES, (GLsizei) len, index_type_enum, 0);  // passing NULL indicates to use bound..um...buffers
+}
+
+void glPrepareShaderAttributesNewFrame(void)
+{
+    gShaderPrep.write = gShaderPrep.stor;
+    gShaderPrep.texUVco = gShaderPrep.vert = NULL;
+    gShaderPrep.lTexUv = gShaderPrep.lTexUv = 0;
+    
+    glUseProgram(shaderProgram);
 }
 
 void glDrawFirstly(void) {
@@ -188,8 +200,7 @@ void glDrawFirstly(void) {
         
         mat4 drawPos = MAT4ROTY(gTheta), trans = MAT4TRANSLATE(0, 0, 1.5);
         
-        mat4 Perspective = MAT4PERSPECTIVE(Zee, ZeePfoc);
-        //mat4 Perspective = MAT4ORTHO(viewWidth, viewHeight);
+        mat4 Perspective = MAT4PERSPECTIVE(-5, -50, -1.0, 1.0, -1.0, 1.0);
 
         MAT4XLT_inplace(drawPos, trans);
         
@@ -202,8 +213,8 @@ void glDrawFirstly(void) {
 
 void glDrawLastly(void) {
 
-    vec4 cl = {.f =  0, 0, 0, 1};
-    glClearBufferfv(GL_COLOR, 0, &cl.f[0]);
+//    vec4 cl = {.f =  0, 0, 0, 1};
+//    glClearBufferfv(GL_COLOR, 0, &cl.f[0]);
 
     glUseProgram(shaderProgram);
     
@@ -241,7 +252,7 @@ void glDrawLastly(void) {
 -(void)initGL {
     
     if(!gShaderPrep.stor) {
-        gShaderPrep.stor = malloc(sizeof(GLfloat)*65536); // todo: free
+        gShaderPrep.write = gShaderPrep.stor = malloc(sizeof(GLfloat)*655360); // todo: free
     }
     
     glGenBuffers(BUFFERNAME_MAX, &BufferName[0]);

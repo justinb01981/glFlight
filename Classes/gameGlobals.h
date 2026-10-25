@@ -125,7 +125,7 @@ const static float TOW_DISTANCE_MIN = -3.0; // hack: work around collision compe
 const static float GAME_AI_UPDATE_INTERVAL_MS = 32;
 const static long GAME_NETWORK_PORT_DEFAULT = 52000;
 
-const static unsigned VISIBLE_TEST_MAX_PERFRAME = 128;
+const static unsigned VISIBLE_TEST_MAX_PERFRAME = 1000;
 
 #define GAME_FRAME_RATE 120
 #define GAME_TICK_RATE PLATFORM_TICK_RATE

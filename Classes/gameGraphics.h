@@ -80,14 +80,22 @@ S,0,0,0,            \
 
 #define ZeePfoc 1.5
 
-#define MAT4PERSPECTIVE(z, Pfoc) \
+#define MAT4PERSPECTIVE(n, f, b, t, l, r) \
 {                   \
-(-z)/Pfoc  ,0.0,                0.0,        0.0,            \
-0.0,            (-z)/Pfoc,      0.0,        0.0,            \
-0.0,            0.0,                0.0,        Pfoc,           \
-0.0,            0.0,                0.0,        0.0             \
+2.0*n/(r-l)  ,0.0,            (r+l)/(r-l),        0.0,            \
+0.0,         2.0*n/(t-b),       (t+b)/(t-b),        0.0,            \
+0.0,         0.0,            -(f+n)/(f-n),       -(2.0*f*n)/(f-n),           \
+0.0,          0.0,                -1,        0.0             \
 }
 
+ #define MAT4P1(z, Pfoc) \
+ {                   \
+ (-z)/Pfoc  ,0.0,                0.0,        0.0,            \
+ 0.0,            (-z)/Pfoc,      0.0,        0.0,            \
+ 0.0,            0.0,                0.0,        Pfoc,           \
+ 0.0,            0.0,                0.0,        0.0             \
+ }
+ 
 /*
  glOrthof(-sw/2, sw/2,
           -sh/2, sh/2,
@@ -260,5 +268,7 @@ void glPrepareShaderAttributesVertices(const GLfloat* src, const size_t len);
 void glPrepareShaderAttributesTexUV(const GLfloat* src, const size_t len);
 
 void glPrepareShaderAttributesDraw(const GLushort* src, const size_t len);
+
+void glPrepareShaderAttributesNewFrame(void);
 
 #endif

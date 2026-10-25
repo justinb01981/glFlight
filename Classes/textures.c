@@ -242,6 +242,10 @@ int bindTextureRequestCore(int tex_id)
         
         //console_clear();
         //console_write("loading texture: %d", tex_id);
+        
+        if(tex_id != 44) {
+            printf("ok!\n");
+        }
 
         if(read_bitmap_to_gltexture(tex_id) != 0)
         {

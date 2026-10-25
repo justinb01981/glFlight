@@ -159,13 +159,41 @@ setupGLModelView(float scrWidth, float scrHeight)
      * remember: matrix stack is applied in-reverse!
      */
     
+    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
     glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
+    glBindBufferBase(GL_UNIFORM_BUFFER, VERTXATTRIB_XFORM, BufferName[BUFFERNAME_UTX]);
+    glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
+    
+    mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+    assert(Pointer);
+
+    mat4 modelview = MAT4TRANSLATE(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());   // camera
+    // todo: apply cam euler to uniform
+    mat4 Perspective = MAT4PERSPECTIVE(-VISIBLE_DISTANCE_PLATFORM, VISIBLE_DISTANCE_PLATFORM, -1.0, 1.0, -1, 1);
+
+    (*Pointer).f = modelview;
+    (*Pointer).p = Perspective;
+}
+
+static void
+setupGLOrthoView(float scrWidth, float scrHeight)
+{
+    /*
+     * 0,0 starts in center of view
+     * remember: matrix stack is applied in-reverse!
+     */
+    
+    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFERNAME_VTX]);
+    glBindBuffer(GL_UNIFORM_BUFFER, BufferName[BUFFERNAME_UTX]);
+    glBindBufferBase(GL_UNIFORM_BUFFER, VERTXATTRIB_XFORM, BufferName[BUFFERNAME_UTX]);
+    glBindVertexArray(VAONames[VERTXATTRIB_XFORM]);
+    
     mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
     assert(Pointer);
 
     mat4 modelview = MAT4ORTHO(scrWidth, scrHeight);
     // todo: apply cam euler to uniform
-    mat4 Perspective = MAT4PERSPECTIVE(1.0, 1.0);
+    mat4 Perspective = MAT4P1(1.0, 1.0);
 
     (*Pointer).f = modelview;
     (*Pointer).p = Perspective;
@@ -177,6 +205,7 @@ setupGLModelViewDone(void)
 {
     glUnmapBuffer(GL_UNIFORM_BUFFER);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 static void
@@ -234,10 +263,11 @@ void drawText(char *str, float x, float y, float scale)
     unsigned long len = strlen(str);
     float fscreenwidth = /*8*/ gameInterfaceControls.textWidth * scale;
     float fscreenheight = /*12*/ gameInterfaceControls.textHeight * scale;
+    float fstrwidth = gameInterfaceControls.textWidth * len;
     float scalechar = 1.0;
     float fmapwidth = 512; // width of the font bitmap
     float fmapheight = 512; // height of the font bitmap
-    float rows = 6.05;
+    float rows = 6.0;
     float cols = 10.0;
     float z = -1.0;
     int maxLines = 20;
@@ -245,7 +275,7 @@ void drawText(char *str, float x, float y, float scale)
 
     controlRect r;
 
-    setupGLModelView(screenWidth, screenHeight);
+    setupGLOrthoView(screenWidth, screenHeight);
 
 //    float m = /*480 / gameInterfaceControls.interfaceWidth*/ 0.85;
 //    fscreenwidth *= m;
@@ -304,63 +334,65 @@ void drawText(char *str, float x, float y, float scale)
                 ds->tex_id = TEXTURE_ID_FONTMAP2;
             }
         }
-
-        int c = toupper(str[i]);
-        //  above transforms cause this orientation:
-        //     x-->
-        //  3-------2
-        //  |       | y
-        //  |       | |
-        //  |       | \/
-        //  1-------0
-        float irow = floor((c-' ') / cols);
-        float icol = floor(fmod((c-' '), cols));
-
-        GLfloat tU, tV;
         
-        tU = (1.0/rows) * (irow);
-        tV = (1.0/cols) * (icol);
+        // tex texture map layout (10 cols x 6 rows):
+        //  0 1 2 3 4
+        //  _ A B C D
+        //  E F G H I
+        //  X Y Z -
+
+
+        char c = toupper(str[i]) - ' ';
+        float per_row = cols, irow = ceil((c / per_row)+0.01);
+        float icol = floor(fmod(c, cols));
+
+        GLfloat tU, tV, nU = cols, nV = rows;
         
+        irow = rows - irow;
+        
+        tU = (1.0/nU) * (icol);
+        tV = (1.0/nV) * (irow);
+        
+        int C = 0;
         // 0
-        ds->texcoords[0] = tU + (1.0/rows); //row+1;
-        ds->texcoords[1] = tV + (1.0/cols);
+        ds->texcoords[C++] = tU + (1.0/nU);
+        ds->texcoords[C++] = tV + (1.0/nV);
         // 1
-        ds->texcoords[2] = tU;
-        ds->texcoords[3] = tV + (1.0/cols);
+        ds->texcoords[C++] = tU;
+        ds->texcoords[C++] = tV + (1.0/nV);
         // 2
-        ds->texcoords[4] = tU + (1.0/rows);
-        ds->texcoords[5] = tV;
+        ds->texcoords[C++] = tU;
+        ds->texcoords[C++] = tV;
         // 3
-        ds->texcoords[6] = tU;
-        ds->texcoords[7] = tV;
+        ds->texcoords[C++] = tU + (1.0/nU);
+        ds->texcoords[C++] = tV;
 
-        r.x = x - (line*fscreenheight) - fscreenheight*(scalechar);
-        r.y = y + j*fscreenwidth;
-        r.xw = fscreenheight * scalechar;
-        r.yw = fscreenwidth * scalechar;
+        r.x = fstrwidth - x - j*fscreenwidth;
+        r.y = y + line*fscreenheight;
+        r.xw = fscreenwidth * scalechar;
+        r.yw = fscreenheight * scalechar;
+        
+        C = 0;
+        // 0
+        ds->coords[C++] = r.x;
+        ds->coords[C++] = r.y;
+        ds->coords[C++] = z;
+        // 1
+        ds->coords[C++] = r.x+r.xw;
+        ds->coords[C++] = r.y;
+        ds->coords[C++] = z;
+        // 2
+        ds->coords[C++] = r.x+r.xw;
+        ds->coords[C++] = r.y+r.yw;
+        ds->coords[C++] = z;
+        // 3
+        ds->coords[C++] = r.x;
+        ds->coords[C++] = r.y+r.yw;
+        ds->coords[C++] = z;
 
-        // HACK: to flip instead of glRotatef
-        r.y = screenHeight - r.y-r.yw;
-
-        ds->coords[0] = r.x;
-        ds->coords[1] = r.y;
-        ds->coords[2] = z;
-
-        ds->coords[3] = r.x+r.xw;
-        ds->coords[4] = r.y;
-        ds->coords[5] = z;
-
-        ds->coords[6] = r.x;
-        ds->coords[7] = r.y+r.yw;
-        ds->coords[8] = z;
-
-        ds->coords[9] = r.x+r.xw;
-        ds->coords[10] = r.y+r.yw;
-        ds->coords[11] = z;
-
-        // {0,1,2, 1,3,2};
-        ds->indices[0] = 0; ds->indices[1] = 1; ds->indices[2] = 3;
-        ds->indices[3] = 1; ds->indices[4] = 2; ds->indices[5] = 3;
+        GLushort indices[] = {0, 1, 2, 0, 2, 3};
+        
+        memcpy(&ds->indices[0], &indices[0], sizeof(indices));
 
         drawState2dSet(ds);
         drawState2dDraw();
@@ -410,7 +442,7 @@ int drawRadar(void)
 
         if(visible)
         {
-            setupGLModelView(screenWidth, screenHeight);
+            setupGLOrthoView(screenWidth, screenHeight);
 
             // rotate textures
 //            glMatrixMode(GL_TEXTURE);
@@ -760,17 +792,9 @@ void drawControls(void)
         subElementsN = 0;
         int needTpop = 0;
 
-        setupGLModelView(screenWidth, screenHeight);
+        setupGLOrthoView(screenWidth, screenHeight);
 
-        // rotate textures
         setupGLTextureView();
-        /*
-         glMatrixMode(GL_TEXTURE);
-         glPushMatrix();
-         glLoadIdentity();
-         glRotatef(180, 0, 1, 0);
-         glRotatef(90, 0, 0, 1);
-         */
 
         // enable alpha-blending
         glEnable(GL_BLEND);
@@ -1047,6 +1071,8 @@ void drawControls(void)
 void
 drawElem_newFrame(void)
 {
+    glPrepareShaderAttributesNewFrame();
+    
     gl_vertex_ptr_last = gl_texcoord_ptr_last = NULL;
 
     drawElemAnimationIdx = floor((fmodf(time_ms, 1000) / 1000) * (float) TEXTURE_ANIMATION_LEN);
@@ -1084,6 +1110,12 @@ drawElemBatch(void)
 {
     if(drawElem_indicesBatchBuffer_count > 0)
     {
+        if(drawElem_indicesBatchBufferCur == NULL ) {
+            assert(0);
+        }
+        
+        setupGLModelView(viewWidth, viewHeight);
+        
         // todo buffer vertex data
         glPrepareShaderAttributesVertices(drawElem_vertexBatchBufferCur, drawElem_vertexBatchBuffer_count * sizeof(model_coord_t));    //glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBufferCur);
         
@@ -1091,8 +1123,12 @@ drawElemBatch(void)
         glPrepareShaderAttributesTexUV(drawElem_textCoordBatchBufferCur, drawElem_textCoordBatchBuffer_count * sizeof(model_texcoord_t)); //glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBufferCur);
         gl_vertex_ptr_last = drawElem_vertexBatchBufferCur;
         gl_texcoord_ptr_last = drawElem_textCoordBatchBufferCur;
+        
+        // TODO: set up shader
 
-        glPrepareShaderAttributesDraw(drawElem_indicesBatchBufferCur, drawElem_indicesBatchBuffer_count * sizeof(model_index_t)); //glDrawElements(GL_TRIANGLES, drawElem_indicesBatchBuffer_count, index_type_enum, drawElem_indicesBatchBufferCur);
+        glPrepareShaderAttributesDraw(drawElem_indicesBatchBufferCur, drawElem_indicesBatchBuffer_count); //glDrawElements(GL_TRIANGLES, drawElem_indicesBatchBuffer_count, index_type_enum, drawElem_indicesBatchBufferCur);
+        
+        setupGLModelViewDone();
 
         drawElem_indicesBatchBufferCur = drawElem_indicesBatchBufferCur + drawElem_indicesBatchBuffer_count;
         drawElem_vertexBatchBufferCur = drawElem_vertexBatchBufferCur + drawElem_vertexBatchBuffer_count;
@@ -1113,6 +1149,8 @@ drawElem(WorldElem* pElem)
 
     if(pElem->type == MODEL_SPRITE)
     {
+        return;
+        
         drawElemBatch();
 
         // draw billboards
@@ -1136,6 +1174,8 @@ drawElem(WorldElem* pElem)
 //    }
     else if(pElem->type == MODEL_LINE)
     {
+        return;
+        
         drawElemBatch();
 
         drawLineBegin();
@@ -1152,14 +1192,6 @@ drawElem(WorldElem* pElem)
             }
         }
 
-        if(pElem->renderInfo.tex_adjust)
-        {
-            for(int x = 1; x < pElem->n_texcoords; x+=2)
-            {
-                pElem->texcoords[x] += tex_coord_adjust[x];
-            }
-        }
-
         int texture_id = pElem->texture_id;
 
         int texture_id_animated = texture_animated(texture_id, drawElemAnimationIdx);
@@ -1167,7 +1199,7 @@ drawElem(WorldElem* pElem)
         if(drawn_texture_last != texture_id_animated)
         {
             // dispatch batched drawElements and restart a new batch
-            drawElemBatch();
+            //drawElemBatch();
         }
 
         if(bindTexture(texture_id_animated))
@@ -1185,7 +1217,7 @@ drawElem(WorldElem* pElem)
         {
             int idx;
 
-            unsigned long indicesBatchOffset = drawElem_indicesBatchBuffer_count;
+            unsigned long indicesBatchOffset = drawElem_indicesBatchBuffer_count;   // reset start of every frame build/walk
 
             const int coord_inval = -1;
 
@@ -1201,7 +1233,7 @@ drawElem(WorldElem* pElem)
             }
 
             int iFace = 0;
-            while(iFace < pElemIndicesCount/3)
+            while(iFace*3 < pElemIndicesCount)
             {
                 face_table[iFace] = &(pElemIndices[iFace*3]);
                 iFace++;
@@ -1215,38 +1247,47 @@ drawElem(WorldElem* pElem)
             // TODO: only sort faces on "complex" objects - zbuffer makes this unnecessary i think but test w/convex poly e.g. enemy floating spawn doodad
             iFace = 0;
             idx = 0;
-            while(iFace < pElemIndicesCount/3)
+            while(iFace*3 < pElemIndicesCount)
             {
                 model_index_t *pTriangle = face_table[iFace];
-
+                
                 for(int i = 0; i < 3; i++)
                 {
-                    int coord_unmapped = pTriangle[i];
-
-                    if(coord_table[coord_unmapped] == coord_inval)
+                    size_t coord_unmapped = pTriangle[i];
+                    
+                    if(coord_table[coord_unmapped] == coord_inval) // not copied yet
                     {
-                        coord_table[coord_unmapped] = (int) drawElem_vertexBatchBuffer_count/coord_size;
-
+                        // allocate a new coordinate
+                        coord_table[coord_unmapped] = drawElem_vertexBatchBuffer_count/coord_size;
+                        
                         // copy coordinates
                         drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+0] = pElemCoords[pTriangle[i]*coord_size];
                         drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+1] = pElemCoords[pTriangle[i]*coord_size+1];
                         drawElem_vertexBatchBufferCur[drawElem_vertexBatchBuffer_count+2] = pElemCoords[pTriangle[i]*coord_size+2];
-
+                        
                         // copy texture coordinates
                         drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+0] = pElemTexCoords[pTriangle[i]*texcoord_size];
                         drawElem_textCoordBatchBufferCur[drawElem_textCoordBatchBuffer_count+1] = pElemTexCoords[pTriangle[i]*texcoord_size+1];
-
+                        
                         drawElem_vertexBatchBuffer_count += coord_size;
                         drawElem_textCoordBatchBuffer_count += texcoord_size;
+                        
+                        // copy index
+                        drawElem_indicesBatchBufferCur[indicesBatchOffset+idx] = coord_table[coord_unmapped];
+                        idx++;
                     }
-
-                    // copy index
-                    drawElem_indicesBatchBufferCur[indicesBatchOffset+idx] = coord_table[pTriangle[i]];
-                    idx++;
+                    else
+                    {
+                        // copy index
+                        drawElem_indicesBatchBufferCur[indicesBatchOffset+idx] = coord_table[coord_unmapped];
+                        idx++;
+                    }
+                    
                 }
-
+                
                 iFace++;
             }
+
             drawElem_indicesBatchBuffer_count += idx;
 
             free(coord_table);
@@ -1254,23 +1295,14 @@ drawElem(WorldElem* pElem)
 
             free(face_table);
             face_table = NULL;
-
-            if(gl_vertex_ptr_last != drawElem_vertexBatchBuffer)
-            {
-                glPrepareShaderAttributesVertices(drawElem_vertexBatchBuffer, drawElem_vertexBatchBuffer_count);    //glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBuffer);
-                gl_vertex_ptr_last = drawElem_vertexBatchBuffer;
-            }
-
-
-            if(gl_texcoord_ptr_last != drawElem_textCoordBatchBuffer)
-            {
-                glPrepareShaderAttributesTexUV(drawElem_textCoordBatchBuffer, drawElem_textCoordBatchBuffer_count);    //glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBuffer);
-                gl_texcoord_ptr_last = drawElem_textCoordBatchBuffer;
-            }
+            
+            // convert above batched data to gl buffers
+            //glPrepareShaderAttributesDraw(drawElem_indicesBatchBuffer, drawElem_indicesBatchBuffer_count);
+            drawElemBatch();
         }
         else
         {
-            drawElemBatch();
+            assert(0);
         }
     }
 }
@@ -1583,8 +1615,8 @@ drawBackgroundCore(void)
     // Z
     glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerAlpha()), 0, 0, 1);
 
-    glVertexPointer(3, GL_FLOAT, 0, bgData->coords);
-    glTexCoordPointer(2, GL_FLOAT, 0, bgData->texcoords);
+    //glVertexPointer(3, GL_FLOAT, 0, bgData->coords);
+    //glTexCoordPointer(2, GL_FLOAT, 0, bgData->texcoords);
 
     // background (skybox) drawing (disabled now in favor of bounding textures)
     bindTexture(bgData->tex_id);
@@ -1618,8 +1650,8 @@ void drawBounding(int boundtex_id)
 
     bindTexture(boundtex_id);
 
-    glDrawElements(GL_TRIANGLES, boData->count,
-        index_type_enum, boData->indices256);
+    //glDrawElements(GL_TRIANGLES, boData->count,
+    //    index_type_enum, boData->indices256);
 }
 
 struct
@@ -1666,6 +1698,10 @@ static gameGraphics_drawState2d drawBillboard_ds;
 void
 drawBillboard(WorldElem* pElem)
 {
+    
+    return;
+    
+    
     float x = pElem->physics.ptr->x;
     float y = pElem->physics.ptr->y;
     float z = pElem->physics.ptr->z;

@@ -143,7 +143,6 @@ glFlightFrameStage1(void)
     
     glDrawFirstly();
     
-
     world_lock();
     
     if(!world_inited && world_data)
@@ -173,8 +172,6 @@ glFlightFrameStage1(void)
         
         goto draw_bail;
     }
-    
-    goto goDrawLastly;
 
     //extern void update_time_ms_frame_tick(void);
     //update_time_ms_frame_tick();
@@ -530,7 +527,7 @@ calibrate_bail:
 
     glFrontFace(GL_CCW);
     
-    //drawBackground();
+    drawBackground();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	
@@ -665,8 +662,18 @@ calibrate_bail:
         btreeVisibleTestCount--;
     }
 
+    
+    
+    //drawText("+", 0, 0, 5.0);
+    
+    //glClear(GL_DEPTH_BUFFER_BIT);
+    
+#if 0
+    glDrawLastly();
 
-
+    glClear(GL_DEPTH_BUFFER_BIT);
+    
+#else
     WorldElemListNode* pDrawCur = gWorld->elements_visible.next;
 
     // actual drawing (happens asynchronouly)
@@ -675,18 +682,10 @@ calibrate_bail:
     world_elem_btree_walk(visibleBtreeRoot, draw_btree_elements);
     drawElemEnd();
     count_elems_last = visibleBtreeDrawn;
+#endif
     
-    drawBillboard(&targetingReticleElem);
-    
-    glDisable(GL_DEPTH_TEST);
-   
-    goDrawLastly:
-    
-//    drawRadar();
-//    drawControls();
-    
-    
-    
+    //drawBillboard(&targetingReticleElem);
+
     if(!gameInterfaceControls.consoleHidden)
     {        
         unsigned l = console_typewriter_lag+1;
@@ -707,15 +706,8 @@ calibrate_bail:
         
         if(l == 0) console_typewriter_lag += 1;
     }
-    
-    glEnable(GL_DEPTH_TEST);
-    
-    glDrawLastly();
-    
-    glClear(GL_DEPTH_BUFFER_BIT);
-    
-    drawText("kiss my ass", 500, 0.0, 5.0);
-    drawControls();
+   
+    //drawControls();
     
     /****************************************
      * OpenGL frame is ready to be rendered *
