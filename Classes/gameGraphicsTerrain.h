@@ -188,7 +188,7 @@ void terrainBuild(void) {
 
     float R = TRAD;
     float X = STRIDE;
-    float width = gWorld->bound_radius*3;
+    float width = gWorld->bound_radius/2;
 
     float col = -gWorld->bound_radius ; //my_ship_x - width/2;
     float row = -gWorld->bound_radius ; //my_ship_z - width/2;
@@ -211,8 +211,6 @@ void terrainInit(void) {
 
     terrain.nVertices = 0;
     terrain.nIndices = 0;
-
-    terrainBuild();
 }
 
 void terrainDraw(void) {
@@ -220,16 +218,20 @@ void terrainDraw(void) {
     terrainInit();
     terrainBuild();// dude try moving this to async without locking and see what it looks like drawing
 
+    glPrepareShaderAttributesVertices(&terrain.vertices[0], terrain.nVertices*3);
+    glPrepareShaderAttributesTexUV(&terrain.texvertices[0], terrain.nVertices*2);
     //glVertexPointer(3, GL_FLOAT, 0, terrain.vertices);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)terrain.vertices);
-    glTexCoordPointer(2, GL_FLOAT, 0, terrain.texvertices);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)terrain.vertices);
+    //glTexCoordPointer(2, GL_FLOAT, 0, terrain.texvertices);
 
     // background (skybox) drawing (disabled now in favor of bounding textures
     bindTexture(TEXTURE_ID_TERRAIN);
-    glDrawElements(GL_TRIANGLES,
-                   (GLsizei) terrain.nIndices,
-                   index_type_enum,
-                   terrain.indices);
+//    glDrawElements(GL_TRIANGLES,
+//                   (GLsizei) terrain.nIndices,
+//                   index_type_enum,
+//                   terrain.indices);
+    glPrepareShaderAttributesDraw( &terrain.indices[0],  terrain.nIndices);
+    
 
     Xt += 3.141 / 240.0;
     Zt += 0.3;

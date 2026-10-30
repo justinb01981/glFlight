@@ -167,10 +167,21 @@ setupGLModelView(float scrWidth, float scrHeight)
     mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
     assert(Pointer);
 
-    mat4 modelview = MAT4TRANSLATE(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());   // camera
+    mat4 modelview = MAT4TRANSLATE(1.0, -0.1, -20.0);   // camera
+    
+    mat4 alpha = MAT4IDENT(), beta = MAT4IDENT(), gamma = MAT4IDENT();
+    //quaternion_to_matrix_1(cam_pos.bx.w, cam_pos.bx.x, cam_pos.bx.y, cam_pos.bx.z, alpha.f, 1);
+    //quaternion_to_matrix_1(cam_pos.by.w, cam_pos.by.x, cam_pos.by.y, cam_pos.by.z, beta.f, 1);
+    //quaternion_to_matrix_1(cam_pos.bz.w, cam_pos.bz.x, cam_pos.bz.y, cam_pos.bz.z, gamma.f, 1);
+    
     // todo: apply cam euler to uniform
-    mat4 Perspective = MAT4PERSPECTIVE(-VISIBLE_DISTANCE_PLATFORM, VISIBLE_DISTANCE_PLATFORM, -1.0, 1.0, -1, 1);
+    GLfloat dimY = 1.0, dimX = dimY * (scrWidth/scrHeight), zNear = 1, zFar = 80;
+    mat4 Perspective = MAT4PERSPECTIVE(zFar, zNear, -dimY, dimY, -dimX, dimX);
 
+    MAT4MUL_inplace(modelview, gamma);
+    MAT4MUL_inplace(modelview, beta);
+    MAT4MUL_inplace(modelview, alpha);
+    
     (*Pointer).f = modelview;
     (*Pointer).p = Perspective;
 }
@@ -1631,12 +1642,12 @@ drawBackgroundCore(void)
     // draw terrain
     bindTexture(TEXTURE_ID_TERRAIN);
 
-    //terrainDraw();
+    terrainDraw();
 }
 
 void drawBackground(void)
 {
-    drawBackgroundCore();
+    //drawBackgroundCore();
 
     drawBounding(texture_id_background);
 }
@@ -1645,13 +1656,16 @@ void drawBounding(int boundtex_id)
 {
     if(!boData) return;
 
-    glVertexPointer(3, GL_FLOAT, 0, boData->coords256);
-    glTexCoordPointer(2, GL_FLOAT, 0, boData->txcoords256);
+    glPrepareShaderAttributesVertices(boData->coords256, boData->count*3);
+    glPrepareShaderAttributesTexUV(boData->txcoords256, boData->count*2);
+//    glVertexPointer(3, GL_FLOAT, 0, boData->coords256);
+//    glTexCoordPointer(2, GL_FLOAT, 0, boData->txcoords256);
 
     bindTexture(boundtex_id);
 
     //glDrawElements(GL_TRIANGLES, boData->count,
     //    index_type_enum, boData->indices256);
+    glPrepareShaderAttributesDraw(boData->indices256, boData->count);
 }
 
 struct

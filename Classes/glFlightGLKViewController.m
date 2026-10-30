@@ -70,7 +70,7 @@ const char *vertexShaderSource =    ""
 "    Fragtexco = Texcoord;                  \n"
 "    mat4 rot =  mat4(                           \n"
 "    vec4(1.0, 0.0, 0.0, 0.0),                  \n"
-"    vec4(0.0, 1.0, 0.0, 0.0),                  \n"
+"    vec4(0.0, -1.0, 0.0, 0.0),                  \n"
 "    vec4(0.0, 0.0, 1.0, 0.0),                  \n"
 "    vec4(0.0, 0.0, 0.0, 1.0)                   \n"
 "    );                                         \n"
@@ -136,7 +136,6 @@ void glPrepareShaderAttributesTexUV(const GLfloat* src, const size_t len) {
     //glBufferData(GL_ARRAY_BUFFER, len * sizeof(GLfloat), src, GL_STATIC_DRAW);
 }
 
-int texK = 1, texKmax = 6400;
 void glPrepareShaderAttributesDraw(const GLushort* src, const size_t len) {
     int i;
     

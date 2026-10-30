@@ -527,7 +527,7 @@ calibrate_bail:
 
     glFrontFace(GL_CCW);
     
-    drawBackground();
+    //drawBackground();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	
@@ -584,12 +584,12 @@ calibrate_bail:
     // angles, and yaw/pitch/roll are usually tait-bryan)
     
     // Z''
-    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerGamma()), 0, 0, 1);
+    //glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerGamma()), 0, 0, 1);
     // X'
-    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerBeta()), 1, 0, 0);
+    //glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerBeta()), 1, 0, 0);
     // Z
-    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerAlpha()), 0, 0, 1);
-    glTranslatef(-gameCamera_getX(), -gameCamera_getY(), -gameCamera_getZ());
+    //glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerAlpha()), 0, 0, 1);
+   // glTranslatef(-gameCamera_getX(), -gameCamera_getY(), -gameCamera_getZ());
     
     // walk list of new elements, adding to visible list
     WorldElemListNode* pAddedPtr = gWorld->elements_to_be_added.next, *pAddedPtrNext;
