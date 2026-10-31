@@ -167,7 +167,7 @@ setupGLModelView(float scrWidth, float scrHeight)
     mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
     assert(Pointer);
 
-    mat4 modelview = MAT4TRANSLATE(1.0, -0.1, -20.0);   // camera
+    mat4 modelview = MAT4TRANSLATE(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());   // camera
     
     mat4 alpha = MAT4IDENT(), beta = MAT4IDENT(), gamma = MAT4IDENT();
     //quaternion_to_matrix_1(cam_pos.bx.w, cam_pos.bx.x, cam_pos.bx.y, cam_pos.bx.z, alpha.f, 1);
@@ -175,12 +175,13 @@ setupGLModelView(float scrWidth, float scrHeight)
     //quaternion_to_matrix_1(cam_pos.bz.w, cam_pos.bz.x, cam_pos.bz.y, cam_pos.bz.z, gamma.f, 1);
     
     // todo: apply cam euler to uniform
-    GLfloat dimY = 1.0, dimX = dimY * (scrWidth/scrHeight), zNear = 1, zFar = 80;
+    static GLfloat dimY = 10.0, dimX = 10.0, zNear = 2.0, zFar = 20;
     mat4 Perspective = MAT4PERSPECTIVE(zFar, zNear, -dimY, dimY, -dimX, dimX);
+//    zFar += 0.001;
 
-    MAT4MUL_inplace(modelview, gamma);
-    MAT4MUL_inplace(modelview, beta);
-    MAT4MUL_inplace(modelview, alpha);
+    //MAT4MUL_inplace(modelview, gamma);
+    //MAT4MUL_inplace(modelview, beta);
+    //MAT4MUL_inplace(modelview, alpha);
     
     (*Pointer).f = modelview;
     (*Pointer).p = Perspective;

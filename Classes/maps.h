@@ -1068,15 +1068,15 @@ const static char* initial_map = ""
 "\n"
 
 WORLD_ADD_OBJECT_TEX(13,
-                 -2, 5, -4,
+                 -2, 0, -4,
                  0,3.14,3.14,
                  1.0, ISTR(TEXTURE_ID_ENEMYSHIP))
 WORLD_ADD_OBJECT_TEX(15,
-                 2, 5, -4,
+                 2, 1.0, -2,
                  0,3.14,3.14,
                  1.0 , ISTR(TEXTURE_ID_ENEMYSHIP_ACE))
 WORLD_ADD_OBJECT_TEX(1,
-                 4, 5, -4,
+                 4, 0, -4,
                  0,3.14,3.14,
                  1.0 , ISTR(TEXTURE_ID_SHIP1))
 "";

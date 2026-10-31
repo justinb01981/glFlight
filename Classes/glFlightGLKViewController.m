@@ -49,6 +49,8 @@ static void fulfillShipPurchase(void) {
 }
 
 #pragma mark: globals
+
+//https://lmb.informatik.uni-freiburg.de/people/reisert/opengl/doc/glFrustum.html
 const char *vertexShaderSource =    ""
 "#version 300 es                            \n"
 "precision highp float;                     \n"
@@ -68,13 +70,7 @@ const char *vertexShaderSource =    ""
 "void main()                                \n"
 "{                                          \n"
 "    Fragtexco = Texcoord;                  \n"
-"    mat4 rot =  mat4(                           \n"
-"    vec4(1.0, 0.0, 0.0, 0.0),                  \n"
-"    vec4(0.0, -1.0, 0.0, 0.0),                  \n"
-"    vec4(0.0, 0.0, 1.0, 0.0),                  \n"
-"    vec4(0.0, 0.0, 0.0, 1.0)                   \n"
-"    );                                         \n"
-"    gl_Position = Transform.persp * Transform.MVP * rot * vec4(Position, 1.0);  \n"
+"    gl_Position = Transform.persp * Transform.MVP * vec4(Position, 1.0);  \n"
 "}                                          \n";
 
 const char* fragmentShaderSrc = ""
