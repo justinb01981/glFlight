@@ -169,9 +169,9 @@ setupGLModelView(float scrWidth, float scrHeight)
 
     static GLfloat th = 0.1;
     
-    mat4 modelview = MAT4TRANSLATE(gameCamera_getX(), gameCamera_getY(), gameCamera_getZ());   // camera
+    mat4 modelview = MAT4TRANSLATE(-gameCamera_getX(), -gameCamera_getY(), -gameCamera_getZ());   // camera
     
-    mat4 alpha = MAT4ROTZ(th), beta = MAT4IDENT(), gamma = MAT4IDENT();
+    mat4 alpha = MAT4ROTZ(gameCamera_getEulerAlpha()), beta = MAT4ROTX(gameCamera_getEulerBeta()), gamma = MAT4ROTZ(gameCamera_getEulerGamma());
     
     th += 0.001;
 
@@ -186,7 +186,7 @@ setupGLModelView(float scrWidth, float scrHeight)
     (*Pointer).f = modelview;
     
     // todo: apply cam euler to uniform
-    static GLfloat dimY = 10.0, dimX = 10.0, zNear = 2.0, zFar = 50;
+    static GLfloat dimY = 9.0, dimX = 16.0, zNear = 2.0, zFar = 50;
     mat4 Perspective = MAT4PERSPECTIVE(zFar, zNear, -dimY, dimY, -dimX, dimX);
     (*Pointer).p = Perspective;
 }

@@ -275,6 +275,8 @@ gameDialogInitial()
 
 // MARK: -- first draw-callback called to render intro and finally pop welcome
 static int gameDialogInitialCountdownDrawCallbackCount = TIMEOUT;
+static float CAMZ_RADIUS = 5.0;
+
 static void
 gameDialogInitialCountdownDrawCallback()
 {
@@ -283,7 +285,7 @@ gameDialogInitialCountdownDrawCallback()
 //        // TODO: freeze camera here and display ship
     gameInterfaceControls.mainMenu.visible = 0;
     static float ph = 0.01;
-    const float rad = 2.0;
+    const float rad = CAMZ_RADIUS;
     {
         float x = sin(ph) * rad;
         float z = cos(ph) * rad;
