@@ -117,7 +117,16 @@ S,0,0,0,            \
 X,            Y,                Z,        1.0           \
 }
 
+/*https://en.wikipedia.org/wiki/Rotation_matrix*/
 #define MAT4ROTY(th)                                      \
+{                                                         \
+cos(th),   0.0,        sin(th),    0,            \
+0.0,       1.0,        0.0,     0,            \
+-sin(th),  0.0,        cos(th),         0,            \
+0.0,       0.0,        0.0,        1.0           \
+}
+
+#define MAT4ROTX(th)                                      \
 {                                                         \
 1.0,        0.0,            0.0,    0,            \
 0.0,       cos(th),         -sin(th),        0,            \
@@ -125,17 +134,35 @@ X,            Y,                Z,        1.0           \
 0.0,       0.0,             0.0,        1.0           \
 }
 
+#define MAT4ROTZ(th)                                      \
+{                                                         \
+cos(th),       -sin(th),       0.0,    0,            \
+sin(th),       cos(th),         0,        0,            \
+0.0,            0.0,           1.0,    0,            \
+0.0,            0.0,           0.0,        1.0           \
+}
+
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-#define MAT4MUL_inplace(o, x) \
-{   \
-int r, c;                   \
-for(r = 0; r < 4; r++) { \
-for(c = 0; c < 4; c++) { \
-    o.f[r][c] *= x.f[r][c];    \
-}   \
-}   \
-}
+#define Mi 4
+#define Ni 4
+#define MAT4MUL_inplace(mat1, mat2) \
+{                                               \
+    mat4 matResult;                             \
+      for (int i = 0; i < Mi; i++) {             \
+      float sum = 0;                             \
+        for (int j = 0; j < Ni; j++) {           \
+          for (int k = 0; k < Ni; k++) {         \
+            sum = sum + (mat1.f[i][k] * mat2.f[k][j]);  \
+          }                                                 \
+          matResult.f[i][j] = sum;                        \
+          sum = 0;                                  \
+        }                                       \
+      }                                         \
+    for (int r = 0 ; r < Mi; r++)                \
+        for(int c = 0; c < Ni; c++)              \
+            mat1.f[r][c] = matResult.f[r][c];     \
+    }
 
 #define MAT4XLT_inplace(o, x) \
 {                               \
