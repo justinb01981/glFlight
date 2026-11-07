@@ -21,7 +21,7 @@
 
 #define GAME_DIALOG_LIFE_MAX 999999
 #define INTRO_ANIMATION_FRAMES (GAME_FRAME_RATE*3)
-#define TIMEOUT GAME_FRAME_RATE * 600;
+#define TIMEOUT GAME_FRAME_RATE * 3;
 
 struct gameDialogStateStruct
 {

@@ -230,7 +230,8 @@ void terrainDraw(void) {
 //                   (GLsizei) terrain.nIndices,
 //                   index_type_enum,
 //                   terrain.indices);
-    glPrepareShaderAttributesDraw( &terrain.indices[0],  terrain.nIndices);
+    
+    glPrepareShaderAttributesDraw( &terrain.indices[0],  terrain.nIndices*3);
     
 
     Xt += 3.141 / 240.0;

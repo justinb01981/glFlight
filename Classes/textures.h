@@ -9,7 +9,7 @@
 #ifndef __TEXTURES_H__
 #define __TEXTURES_H__
 
-#define MAX_TEXTURES 256
+#define MAX_TEXTURES 128
 
 #define BASE_TEXTURE_ID_FRIENDLY "98"
 #define BASE_TEXTURE_ID_ENEMY "89"
@@ -24,7 +24,7 @@
 #define MAP_TEXTURE_ID_ANIMATED_STATIC "18"
 #define MAP_TEXTURE_ID_SHIP1 115
 
-#define TEXTURE_ID_BOUNDING     96
+#define TEXTURE_ID_BOUNDING     19
 #define TEXTURE_ID_SHIP1        115
 #define TEXTURE_ID_SHIP2        13
 #define TEXTURE_ID_SHIP3        23

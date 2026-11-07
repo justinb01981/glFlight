@@ -141,7 +141,7 @@ glFlightFrameStage1(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
-    glDrawFirstly();
+    //glDrawFirstly();
     
     world_lock();
     
@@ -149,7 +149,7 @@ glFlightFrameStage1(void)
     {
         bindTexture(TEXTURE_ID_FONTMAP2);
         bindTexture(TEXTURE_ID_FONTMAP);
-        
+    
         world_elem_btree_restart();
         
         gameGraphicsUninit();
@@ -177,6 +177,7 @@ glFlightFrameStage1(void)
     //update_time_ms_frame_tick();
     
 calibrate_bail:
+    
     get_time_ms();
 
     // TODO: move timer handleing to platform code - i think this is only for android?
@@ -200,11 +201,11 @@ calibrate_bail:
     //tc = 16.667/1000.0;
     tc = ((float) time_ms - (float) world_update_time_last) / 1000.0;
 
-//    if(tc > 1.0)
-//    {
-//        world_update_time_last = time_ms;
-//        goto draw_bail;
-//    }
+    if(tc > 1.0)
+    {
+        world_update_time_last = time_ms;
+        goto draw_bail;
+    }
 
     // physical collisions between world objects now handled here
     world_update(tc);
@@ -527,16 +528,15 @@ calibrate_bail:
 
     glFrontFace(GL_CCW);
     
-    //drawBackground();
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+//	glMatrixMode(GL_PROJECTION);
+//	glLoadIdentity();
 	
 	// set up perspective projection...
 	// http://www.songho.ca/opengl/gl_transform.html
     float yfrust = 1.0;
     float R = viewWidth / viewHeight;
     float xfrust = yfrust * R;
-	glFrustumf(-xfrust, xfrust, -yfrust, yfrust, drawDistanceNear, drawDistanceFar);
+//	glFrustumf(-xfrust, xfrust, -yfrust, yfrust, drawDistanceNear, drawDistanceFar);
     
     /*
     glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
@@ -565,13 +565,13 @@ calibrate_bail:
         else if(visible_distance < 100) visible_distance += 0.1;
     }
     
-    glMatrixMode(GL_MODELVIEW);
+//    glMatrixMode(GL_MODELVIEW);
     
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnable(GL_TEXTURE_2D);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     
-    glLoadIdentity();
+//    glLoadIdentity();
     
     // using rotate/translate functions instead of
     // building the transform matrix myself and using glMultMatrix
@@ -661,13 +661,9 @@ calibrate_bail:
         btreeVisibleTest = btreeVisibleTest->next;
         btreeVisibleTestCount--;
     }
-
     
-    
-    //drawText("+", 0, 0, 5.0);
-    
-    //glClear(GL_DEPTH_BUFFER_BIT);
-    
+    drawBackground();
+//    drawControls();
 #if 0
     glDrawLastly();
 
@@ -683,7 +679,7 @@ calibrate_bail:
     drawElemEnd();
     count_elems_last = visibleBtreeDrawn;
 #endif
-    
+
     //drawBillboard(&targetingReticleElem);
 
     if(!gameInterfaceControls.consoleHidden)
@@ -706,8 +702,6 @@ calibrate_bail:
         
         if(l == 0) console_typewriter_lag += 1;
     }
-   
-    //drawControls();
     
     /****************************************
      * OpenGL frame is ready to be rendered *

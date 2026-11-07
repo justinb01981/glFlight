@@ -87,7 +87,7 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
      * created with GIMP
      */
 
-    assert(texture_data_table[tex_id] == NULL);
+    //assert(texture_data_table[tex_id] == NULL);
     
     fp = fopen(file_name, "rb");
     if(fp)
@@ -187,8 +187,8 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
                 }
                 
                 // this is OK says openGL docs
-                free(data);
-                texture_data_table[tex_id] = NULL;
+//                free(data);
+//                texture_data_table[tex_id] = NULL;
             }
         }
         
@@ -215,7 +215,6 @@ void initTextures(const char *prefix)
 
     uninitTextures();
 
-
     int i;
     strcpy(initTexturesPrefix, prefix);
     
@@ -223,9 +222,8 @@ void initTextures(const char *prefix)
      {
          texture_list_loaded[i] = 0;
     
-         bindTextureRequestCore(i);
+         //bindTextureRequestCore(i);
      }
-    
 }
 
 int bindTextureRequestCore(int tex_id)
@@ -242,16 +240,15 @@ int bindTextureRequestCore(int tex_id)
         
         //console_clear();
         //console_write("loading texture: %d", tex_id);
-        
-        if(tex_id != 44) {
-            printf("ok!\n");
-        }
 
         if(read_bitmap_to_gltexture(tex_id) != 0)
         {
             printf("failed to load texture: %d\n", tex_id);
             return 0;
         }
+    }
+    else {
+        glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
     }
     
     return texture_list_loaded[tex_id];

@@ -291,7 +291,7 @@ void glDrawLastly(void) {
 
     initBuffer();
     
-    initTexture();
+//    initTexture();
     
     initVertexArray();
     

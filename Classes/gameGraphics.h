@@ -104,8 +104,8 @@ S,0,0,0,            \
 #define ORTHOFAR ZeePfoc
 #define MAT4ORTHO(w, h) \
 {                   \
-2.0/w,          0.0,                0.0,            -w,           \
-0.0,            2.0/h,              0.0,            -h,           \
+2.0/w,          0.0,                0.0,            0.0,           \
+0.0,            2.0/h,              0.0,            0.0,           \
 0.0,            0.0,                -2.0/ORTHOFAR,   -ORTHOFAR,   \
 0.0,            0.0,                0.0,            1             \
 }
@@ -197,7 +197,7 @@ typedef struct
     model_coord_t coords256[6194];
     model_texcoord_t txcoords256[2048];
     model_index_t indices256[2048];
-    int count;
+    int count, n_vertices;
 } DrawBoundingData;
 
 typedef struct

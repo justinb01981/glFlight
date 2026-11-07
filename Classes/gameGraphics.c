@@ -167,18 +167,10 @@ setupGLModelView(float scrWidth, float scrHeight)
     mat4u* Pointer = (mat4u*) glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(mat4u), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
     assert(Pointer);
 
-    static GLfloat th = 0.1;
-    
     mat4 modelview = MAT4TRANSLATE(-gameCamera_getX(), -gameCamera_getY(), -gameCamera_getZ());   // camera
     
     mat4 alpha = MAT4ROTZ(gameCamera_getEulerAlpha()), beta = MAT4ROTX(gameCamera_getEulerBeta()), gamma = MAT4ROTZ(gameCamera_getEulerGamma());
-    
-    th += 0.001;
-
-    //quaternion_to_matrix_1(cam_pos.bz.w, cam_pos.bz.x, cam_pos.bz.y, cam_pos.bz.z, &alpha.f[0], 1);
-    //quaternion_to_matrix_1(cam_pos.by.w, cam_pos.by.x, cam_pos.by.y, cam_pos.by.z, &beta.f[0], 1);
-    //quaternion_to_matrix_1(cam_pos.bx.w, cam_pos.bx.x, cam_pos.bx.y, cam_pos.bx.z, &gamma.f[0], 1);
-
+        
     MAT4MUL_inplace(modelview, alpha);
     MAT4MUL_inplace(modelview, beta);
     MAT4MUL_inplace(modelview, gamma);
@@ -209,6 +201,7 @@ setupGLOrthoView(float scrWidth, float scrHeight)
 
     mat4 modelview = MAT4ORTHO(scrWidth, scrHeight);
     // todo: apply cam euler to uniform
+//    mat4 Perspective = MAT4PERSPECTIVE(1.0, 1.001, viewHeight/2, -viewHeight/2, -viewWidth/2, viewWidth/2);
     mat4 Perspective = MAT4P1(1.0, 1.0);
 
     (*Pointer).f = modelview;
@@ -246,7 +239,7 @@ setupGLTextureViewDone(void)
 int
 bindTexture(unsigned int tex_id)
 {
-    //if(tex_id == drawn_texture_last) return 1;
+    if(tex_id == drawn_texture_last) return 1;
 
     if(!bindTextureRequestCore(tex_id))
     {
@@ -1133,10 +1126,10 @@ drawElemBatch(void)
         setupGLModelView(viewWidth, viewHeight);
         
         // todo buffer vertex data
-        glPrepareShaderAttributesVertices(drawElem_vertexBatchBufferCur, drawElem_vertexBatchBuffer_count * sizeof(model_coord_t));    //glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBufferCur);
+        glPrepareShaderAttributesVertices(drawElem_vertexBatchBufferCur, drawElem_vertexBatchBuffer_count );    //glVertexPointer(3, GL_FLOAT, 0, drawElem_vertexBatchBufferCur);
         
         // todo buffer texcoord data
-        glPrepareShaderAttributesTexUV(drawElem_textCoordBatchBufferCur, drawElem_textCoordBatchBuffer_count * sizeof(model_texcoord_t)); //glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBufferCur);
+        glPrepareShaderAttributesTexUV(drawElem_textCoordBatchBufferCur, drawElem_textCoordBatchBuffer_count ); //glTexCoordPointer(2, GL_FLOAT, 0, drawElem_textCoordBatchBufferCur);
         gl_vertex_ptr_last = drawElem_vertexBatchBufferCur;
         gl_texcoord_ptr_last = drawElem_textCoordBatchBufferCur;
         
@@ -1214,8 +1207,9 @@ drawElem(WorldElem* pElem)
 
         if(drawn_texture_last != texture_id_animated)
         {
+            drawElemBatch();
+            bindTexture(texture_id_animated);
             // dispatch batched drawElements and restart a new batch
-            //drawElemBatch();
         }
 
         if(bindTexture(texture_id_animated))
@@ -1313,8 +1307,7 @@ drawElem(WorldElem* pElem)
             face_table = NULL;
             
             // convert above batched data to gl buffers
-            //glPrepareShaderAttributesDraw(drawElem_indicesBatchBuffer, drawElem_indicesBatchBuffer_count);
-            drawElemBatch();
+            // drawElemBatch() will be called at prior-to or at drawElemsEnd()
         }
         else
         {
@@ -1337,8 +1330,6 @@ drawElemStart(WorldElemListNode* pVisibleList)
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    drawElem_newFrame();
 
     if(!drawElem_indicesBatchBuffer)
     {
@@ -1389,6 +1380,8 @@ static void drawBoundingInit(int tex_id)
     float hackMinSize = 0.001, hackMinSizeTot = 0;
     float oTx = 0.5, oTy = 0.5;
 
+    if(boData) assert(0);
+    
     boData = malloc(sizeof(*boData));
     memset(boData, 0, sizeof(*boData));
 
@@ -1613,56 +1606,61 @@ drawBackgroundCore(void)
 {
     if(!bgData) return;
 
-    glMatrixMode(GL_TEXTURE);
-    glPushMatrix();
-    glLoadIdentity();
+//    glMatrixMode(GL_TEXTURE);
+//    glPushMatrix();
+//    glLoadIdentity();
+//
+//    glMatrixMode(GL_MODELVIEW);
+//    glPushMatrix();
+//    glLoadIdentity();
+//
+//    glOrthof(-1, 1,
+//             -1, 1,
+//             1, -1);
+//
+//    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerGamma()), 0, 0, 1);
+//    // X'
+//    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerBeta()), 1, 0, 0);
+//    // Z
+//    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerAlpha()), 0, 0, 1);
 
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
-    glOrthof(-1, 1,
-             -1, 1,
-             1, -1);
-
-    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerGamma()), 0, 0, 1);
-    // X'
-    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerBeta()), 1, 0, 0);
-    // Z
-    glRotatef(RADIANS_TO_DEGREES(gameCamera_getEulerAlpha()), 0, 0, 1);
-
-    //glVertexPointer(3, GL_FLOAT, 0, bgData->coords);
-    //glTexCoordPointer(2, GL_FLOAT, 0, bgData->texcoords);
+    glPrepareShaderAttributesVertices(bgData->coords, bgData->n_indices*3);
+    glPrepareShaderAttributesTexUV(bgData->texcoords, bgData->n_indices*2);
 
     // background (skybox) drawing (disabled now in favor of bounding textures)
-    bindTexture(bgData->tex_id);
+    bindTexture(/*bgData->tex_id*/ TEXTURE_ID_BOUNDING);
     /*glDrawElements(GL_TRIANGLES, bgData->n_indices,
                    index_type_enum, bgData->indices);*/
+    glPrepareShaderAttributesDraw(bgData->indices, bgData->n_indices);
 
-    glPopMatrix();
-
-    glMatrixMode(GL_TEXTURE);
-    glPopMatrix();
+//    glPopMatrix();
+//
+//    glMatrixMode(GL_TEXTURE);
+//    glPopMatrix();
 
     // draw terrain
-    bindTexture(TEXTURE_ID_TERRAIN);
-
-    terrainDraw();
+    //bindTexture(TEXTURE_ID_TERRAIN);
+    
+    //terrainDraw();
 }
 
 void drawBackground(void)
 {
+    setupGLModelView(viewWidth, viewHeight);
+    
     //drawBackgroundCore();
 
     drawBounding(texture_id_background);
+    
+    setupGLModelViewDone();
 }
 
 void drawBounding(int boundtex_id)
 {
     if(!boData) return;
-
-    glPrepareShaderAttributesVertices(boData->coords256, boData->count*3);
-    glPrepareShaderAttributesTexUV(boData->txcoords256, boData->count*2);
+    
+    glPrepareShaderAttributesVertices(boData->coords256, sizeof(boData->coords256)/sizeof(model_coord_t));
+    glPrepareShaderAttributesTexUV(boData->txcoords256, sizeof(boData->txcoords256)/sizeof(model_coord_t));
 //    glVertexPointer(3, GL_FLOAT, 0, boData->coords256);
 //    glTexCoordPointer(2, GL_FLOAT, 0, boData->txcoords256);
 
@@ -1717,9 +1715,7 @@ static gameGraphics_drawState2d drawBillboard_ds;
 void
 drawBillboard(WorldElem* pElem)
 {
-    
-    return;
-    
+    return ;
     
     float x = pElem->physics.ptr->x;
     float y = pElem->physics.ptr->y;
@@ -1799,6 +1795,8 @@ struct
 void
 drawLineBegin(void)
 {
+    assert(0); // not ported
+    
     glDisable(GL_TEXTURE_2D);
     glColor4f(0.0, 1.0, 0.0, 1.0);
 }
@@ -1806,6 +1804,8 @@ drawLineBegin(void)
 void
 drawLineEnd(void)
 {
+    assert(0); // not ported
+    
     glEnable(GL_TEXTURE_2D);
     glColor4f(1.0, 1.0, 1.0, 1.0);
 

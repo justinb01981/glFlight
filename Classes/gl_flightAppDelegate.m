@@ -46,6 +46,9 @@ NSString* get_docs_prefix()
 void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
 {
     int reset_map = 1;
+    static int init_once = 0;
+    if(init_once) return;
+    init_once = 1;
     
     NSString *docsPrefix = get_docs_prefix();
     
