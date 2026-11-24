@@ -33,7 +33,6 @@
 #import <math.h>
 #import "cocoaGameInput.h"
 #import "CoreMotion/CMDeviceMotion.h"
-#import "gl_flightViewController.h"
 #import "quaternions.h"
 #import "gameInterface.h"
 #import "gameCamera.h"

@@ -201,8 +201,8 @@ setupGLOrthoView(float scrWidth, float scrHeight)
 
     mat4 modelview = MAT4ORTHO(scrWidth, scrHeight);
     // todo: apply cam euler to uniform
-//    mat4 Perspective = MAT4PERSPECTIVE(1.0, 1.001, viewHeight/2, -viewHeight/2, -viewWidth/2, viewWidth/2);
-    mat4 Perspective = MAT4P1(1.0, 1.0);
+    //mat4 Perspective = MAT4PERSPECTIVE(1, -2.0,  -viewHeight/2, viewHeight/2, -viewWidth/2, viewWidth/2);
+    mat4 Perspective = MAT4P1(scrWidth, scrHeight);
 
     (*Pointer).f = modelview;
     (*Pointer).p = Perspective;
@@ -849,21 +849,21 @@ void drawControls(void)
                     0, 0, 0, 1
                 };
 
-                glMatrixMode(GL_TEXTURE);
-
-                glPushMatrix();
-                glLoadIdentity();
-
-                glTranslatef(0.5, 0.5, 0);
-
-                //glRotatef(RADIANS_TO_DEGREES(trimR), 0, 0, 1);
-                glMultMatrixf(m);
-                glTranslatef(-0.5, -0.5, 0);
+//                glMatrixMode(GL_TEXTURE);
+//
+//                glPushMatrix();
+//                glLoadIdentity();
+//
+//                glTranslatef(0.5, 0.5, 0);
+//
+//                //glRotatef(RADIANS_TO_DEGREES(trimR), 0, 0, 1);
+//                glMultMatrixf(m);
+//                glTranslatef(-0.5, -0.5, 0);
                 needTpop = 1; //glPopMatrix();
             }
             else if(controls[i] == &gameInterfaceControls.radar)
             {
-                subElementsN = drawControlsRadar(subElements, sizeof(subElements)/sizeof(drawSubElement));
+//                subElementsN = drawControlsRadar(subElements, sizeof(subElements)/sizeof(drawSubElement));
             }
             else if(controls[i] == &gameInterfaceControls.fireRect2)
             {
@@ -1000,11 +1000,11 @@ void drawControls(void)
             strcpy(controls[i]->text, menuBuf);
         }
 
-        if(needTpop) //(controls[i] == &gameInterfaceControls.trim && controls[i]->visible)
-        {
-            glMatrixMode(GL_TEXTURE);
-            glPopMatrix();
-        }
+//        if(needTpop) //(controls[i] == &gameInterfaceControls.trim && controls[i]->visible)
+//        {
+//            glMatrixMode(GL_TEXTURE);
+//            glPopMatrix();
+//        }
 
         glDisable(GL_BLEND);
         setupGLTextureViewDone();
@@ -1207,13 +1207,9 @@ drawElem(WorldElem* pElem)
 
         if(drawn_texture_last != texture_id_animated)
         {
+            // dispatch batched drawElements and restart a new batch
             drawElemBatch();
             bindTexture(texture_id_animated);
-            // dispatch batched drawElements and restart a new batch
-        }
-
-        if(bindTexture(texture_id_animated))
-        {
         }
 
         model_coord_t* pElemCoords = pElem->coords;
@@ -1639,9 +1635,9 @@ drawBackgroundCore(void)
 //    glPopMatrix();
 
     // draw terrain
-    //bindTexture(TEXTURE_ID_TERRAIN);
+    bindTexture(TEXTURE_ID_TERRAIN);
     
-    //terrainDraw();
+    terrainDraw();
 }
 
 void drawBackground(void)
@@ -1965,8 +1961,6 @@ drawTriangleMesh(struct mesh_opengl_t* glmesh, int tex_id)
     glDrawElements(GL_TRIANGLES, glmesh->n_indices, index_type_enum, glmesh->indices);
 }
 
-GLint GL_PROGRAM1;
-
 void
 gameGraphicsInit(void)
 {
@@ -1974,8 +1968,6 @@ gameGraphicsInit(void)
     assert(gWorld->bound_radius > 0);
     assert(texture_id_background > 0);
     
-    glUseProgram(GL_PROGRAM1);
-
     drawBackgroundInit(texture_id_background, 0, 0, 0,
                        gWorld->bound_radius,
                        16.0,    // scale
@@ -2005,4 +1997,20 @@ gameGraphicsUninit(void)
     //frameBufCleanup(&gFrameBufSt);
 
     terrainUninit();
+}
+
+void GL_ERROR_ASSERT(void) {
+    int err = glGetError();
+    if(err != GL_NO_ERROR) {
+        printf("glError: 0x%02x\n", err);
+        assert(0);
+    }
+}
+
+void GL_SWALLOW_ERR(int errP) {
+    int err = glGetError();
+    if(err != errP) {
+        printf("glError: 0x%02x\n", err);
+        assert(0);
+    }
 }

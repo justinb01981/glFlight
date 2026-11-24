@@ -78,7 +78,7 @@ S,0,0,0,            \
 0,0,0,1             \
 }
 
-#define ZeePfoc 1.5
+#define ZeePfoc 1.0
 
 #define MAT4PERSPECTIVE(n, f, b, t, l, r) \
 {                   \
@@ -88,13 +88,23 @@ S,0,0,0,            \
 0.0,          0.0,                -1,        0.0             \
 }
 
- #define MAT4P1(z, Pfoc) \
+
+/* 0,0 in top left of landscape screen */
+ #define MAT4P1(w, h) \
  {                   \
- (-z)/Pfoc  ,0.0,                0.0,        0.0,            \
- 0.0,            (-z)/Pfoc,      0.0,        0.0,            \
- 0.0,            0.0,                0.0,        Pfoc,           \
- 0.0,            0.0,                0.0,        0.0             \
+ 3.5,            0.0,                0.0,        0.0,            \
+ 0.0,             -3.5,               0.0,        0,            \
+ 0.0,             0.0,                0.0,        1.0,           \
+ -1.0,             1.0,                0.0,        0.0             \
  }
+ 
+// #define MAT4P1(w, h)                                    \
+// {                                                          \
+// 1.0,          0.0,                0.0,        0.0,      \
+// 0.0,            1.0,              0.0,        0.0,            \
+// 0.0,            0.0,              0.0,         1.0,           \
+// w,            -h,                0.0,         0.0             \
+// }
  
 /*
  glOrthof(-sw/2, sw/2,
@@ -296,5 +306,9 @@ void glPrepareShaderAttributesTexUV(const GLfloat* src, const size_t len);
 void glPrepareShaderAttributesDraw(const GLushort* src, const size_t len);
 
 void glPrepareShaderAttributesNewFrame(void);
+
+void GL_ERROR_ASSERT(void);
+
+void GL_SWALLOW_ERR(int errP);
 
 #endif

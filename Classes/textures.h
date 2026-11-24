@@ -26,8 +26,8 @@
 
 #define TEXTURE_ID_BOUNDING     19
 #define TEXTURE_ID_SHIP1        115
-#define TEXTURE_ID_SHIP2        13
-#define TEXTURE_ID_SHIP3        23
+#define TEXTURE_ID_SHIP2        56
+#define TEXTURE_ID_SHIP3        24
 #define TEXTURE_ID_ENEMYSHIP     24
 #define TEXTURE_ID_ENEMYSHIP_ACE 71
 
@@ -118,7 +118,7 @@ TEXTURE_ID_BUILDING7 = 121,
 TEXTURE_ID_BUILDING8 = 122,
 TEXTURE_ID_BUILDING9 = 123,
 TEXTURE_ID_TAPWARN = 117,
-TEXTURE_ID_LAST = 9999;
+TEXTURE_ID_LAST = 125;
 
 const static int texture_id_table[] =
 {
@@ -178,7 +178,6 @@ typedef unsigned char pixelRGBA[4];
 
 extern unsigned int texture_list[];
 extern int n_textures;
-extern int texture_preload_count;
 
 //extern struct FrameBufInst gFrameBufSt;
 
@@ -186,6 +185,7 @@ extern int texture_id_playership;
 
 extern int texture_id_background;
 
+void preinitTextures(void);
 void initTextures(const char *prefix);
 
 void uninitTextures(void);

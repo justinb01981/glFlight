@@ -391,7 +391,7 @@ static bool initTexture(void) {
     
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     
-    glPrepareShaderAttributesTexUV(txUv, sizeof(txUv)/sizeof(GLfloat));
+    //glPrepareShaderAttributesTexUV(txUv, sizeof(txUv)/sizeof(GLfloat));
     
     return true;
 }

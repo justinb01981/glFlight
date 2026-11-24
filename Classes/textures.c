@@ -18,6 +18,7 @@
 
 #include "textures.h"
 #include "framebuffer.h"
+#include "gameGraphics.h"
 
 // remove this hack but requires .h dependency redo
 #ifndef GL_NONE
@@ -27,7 +28,6 @@
 unsigned int texture_list[MAX_TEXTURES] = {0};
 unsigned int texture_list_loaded[MAX_TEXTURES] = {0};
 GLubyte* texture_data_table[MAX_TEXTURES];
-int texture_preload_count = 12;
 const static unsigned char alpha_black = 0x00;
 const static unsigned char alpha_semitrans = 0xD0;
 char initTexturesPrefix[255];
@@ -76,6 +76,9 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
     unsigned char* data;
     int width = max_bitmap_dim;
     int height = max_bitmap_dim;
+    int tx_lev = 1;
+    
+    GL_ERROR_ASSERT();
     
     sprintf(file_name, "%s""texture%d.bmp", initTexturesPrefix, tex_id);
     DBPRINTF(("read_bitmap_to_gltexture_with_replace path (%s)", file_name));
@@ -87,7 +90,7 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
      * created with GIMP
      */
 
-    //assert(texture_data_table[tex_id] == NULL);
+    assert(texture_list_loaded[tex_id] == 0);
     
     fp = fopen(file_name, "rb");
     if(fp)
@@ -118,8 +121,6 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
 
             fseek(fp, pixel_offset, SEEK_SET);
             
-            DBPRINTF(("texture %s: size:%lu pixel_offset:%d\n", file_name, file_size, pixel_offset));
-            
             if(data)
             {
                 int offset = 0;
@@ -129,10 +130,10 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
 
                     memset(pixel, 0x00, sizeof(pixel));
                     
-                    int read_len = fread(pixel, 1, 3, fp);
+                    size_t read_len = fread(pixel, 1, 3, fp);
                     
                     if (read_len < 3) {
-                        DBPRINTF(("\tbail: read_len=%u, offset=%u\n", read_len, offset));
+                        DBPRINTF(("EOF: %s read_len=%lu, offset=%d\n", file_name, read_len, offset));
                         break;
                     }
                     
@@ -170,19 +171,48 @@ read_bitmap_to_gltexture_with_replace(char replace_rgb_pixel_from[3], char repla
                 
                 if(offset >= (pixel_size * width * height))
                 {
+//                    glActiveTexture(GL_TEXTURE0);
+//                    glBindTexture(GL_TEXTURE_2D, texture_list[0]);
+//                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, tx_lev-1);
+//                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, tx_lev-1);
+//                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, tx_lev == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+//                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f);
+//                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f);
+                    
+                    
+                    glActiveTexture(GL_TEXTURE0);
                     glGenTextures(1, &texture_list[tex_id]);
+                    
                     glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
-                    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE); 
+//                    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+                    //GL_SWALLOW_ERR(0x502);
+                    GL_ERROR_ASSERT();
+                    
+                    
+                    
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, tx_lev-1);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, tx_lev-1);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, tx_lev == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f);
+                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f);
+
+                    GL_ERROR_ASSERT();
                     
                     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                                 /*GL_BGRA*/ GL_RGBA, GL_UNSIGNED_BYTE, data);
+                                 /*GL_BGRA*/ GL_RGBA, GL_UNSIGNED_BYTE, texture_data_table[tex_id]);
+                    
+                    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
                     
                     texture_list_loaded[tex_id] = 1;
+
+                    GL_ERROR_ASSERT();
+                    
                     err = 0;
                 }
                 
@@ -210,6 +240,13 @@ read_bitmap_to_gltexture(int tex_id)
     return read_bitmap_to_gltexture_with_replace(key_pixel, key_pixel, tex_id);
 }
 
+void preinitTextures()
+{
+    for(int i = 0;i < MAX_TEXTURES; i++) {
+        texture_list_loaded[i] = texture_data_table[i] = 0;
+    }
+}
+
 void initTextures(const char *prefix)
 {
 
@@ -218,12 +255,11 @@ void initTextures(const char *prefix)
     int i;
     strcpy(initTexturesPrefix, prefix);
     
-     for(i = 0; i < MAX_TEXTURES; i++)
-     {
-         texture_list_loaded[i] = 0;
+    for(i = 1; i <= TEXTURE_ID_LAST; i++) {
+        bindTextureRequestCore(i);
+    }
     
-         //bindTextureRequestCore(i);
-     }
+    bindTextureRequestCore(TEXTURE_ID_CONTROLS_TEXTMENU);
 }
 
 int bindTextureRequestCore(int tex_id)
@@ -246,6 +282,7 @@ int bindTextureRequestCore(int tex_id)
             printf("failed to load texture: %d\n", tex_id);
             return 0;
         }
+        glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
     }
     else {
         glBindTexture(GL_TEXTURE_2D, texture_list[tex_id]);
@@ -276,6 +313,7 @@ void uninitTextures() {
         if(texture_list_loaded[i]) {
             glDeleteTextures(1, &texture_list[i]);
             texture_list[i] = GL_NONE;
+            texture_data_table[i] = NULL;
             texture_list_loaded[i] = 0;
         }
     }

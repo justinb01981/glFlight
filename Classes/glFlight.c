@@ -37,6 +37,8 @@
 static void clear_world_pending_removals(void);
 static void draw_btree_elements(WorldElem* pElem, float priority);
 
+const char* objcGetBundlePath(void);
+
 int world_inited = 0;
 int game_terminated_gracefully = 0;
 char *world_data = NULL;
@@ -130,31 +132,34 @@ glFlightFrameStage1(void)
     
     extern void glDrawFirstly(void);
     extern void glDrawLastly(void);
+    
+    GL_ERROR_ASSERT();  // openGL draw begins...
 
-    glEnableClientState(GL_VERTEX_ARRAY);
+//    glEnableClientState(GL_VERTEX_ARRAY);
     glEnable(GL_DEPTH_TEST);
     
-    glClearColor(0, 0, 0, 1.0f);
+    glClearColor(0, 1.0, 0, 1.0f);
+    bindTexture(TEXTURE_ID_BOUNDING);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // turn off bilinear filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
     //glDrawFirstly();
+    GL_ERROR_ASSERT();  // openGL draw begins...
     
     world_lock();
     
     if(!world_inited && world_data)
     {
-        bindTexture(TEXTURE_ID_FONTMAP2);
-        bindTexture(TEXTURE_ID_FONTMAP);
-    
+//        GL_SWALLOW_ERR(1);
+        GL_ERROR_ASSERT();
+        
+//        initTextures(objcGetBundlePath());
         world_elem_btree_restart();
         
         gameGraphicsUninit();
         gameMapReRender();
         gameNetwork_worldInit();
+        
+        GL_ERROR_ASSERT();
         
         my_ship_id = WORLD_ELEM_ID_INVALID;
         
@@ -166,16 +171,16 @@ glFlightFrameStage1(void)
         
         visibleElementsLen = 0;
         
-        //do_draw_bail = 1;
         // 1.x clear pending removals from last pass
         // 1.1 walk list of pending removals, removing from visible list
         
+        GL_ERROR_ASSERT();
+        
         goto draw_bail;
     }
-
-    //extern void update_time_ms_frame_tick(void);
-    //update_time_ms_frame_tick();
     
+    GL_ERROR_ASSERT();  // openGL draw begins...
+
 calibrate_bail:
     
     get_time_ms();
@@ -511,8 +516,11 @@ calibrate_bail:
     }
     
      // TODO: may be possible to unlock world-state here
+    GL_ERROR_ASSERT();  // openGL draw begins...
      
     drawElem_newFrame();
+    
+    GL_ERROR_ASSERT();  // openGL draw begins...
      
     // set up drawing modes
     if(backface_culling)
@@ -525,6 +533,8 @@ calibrate_bail:
         glDisable(GL_CULL_FACE);
         glCullFace(GL_BACK);
     }
+    
+    GL_ERROR_ASSERT();  // openGL draw begins...
 
     glFrontFace(GL_CCW);
     
@@ -567,11 +577,14 @@ calibrate_bail:
     
 //    glMatrixMode(GL_MODELVIEW);
     
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnable(GL_TEXTURE_2D);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    GL_ERROR_ASSERT();  // openGL draw begins...
+//    glEnable(GL_TEXTURE_2D);
+    GL_ERROR_ASSERT();  // openGL draw begins...
+//    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     
 //    glLoadIdentity();
+    
+    GL_ERROR_ASSERT();  // openGL draw begins...
     
     // using rotate/translate functions instead of
     // building the transform matrix myself and using glMultMatrix
@@ -663,7 +676,9 @@ calibrate_bail:
     }
     
     drawBackground();
-//    drawControls();
+    
+    GL_ERROR_ASSERT();
+    
 #if 0
     glDrawLastly();
 
@@ -681,6 +696,9 @@ calibrate_bail:
 #endif
 
     //drawBillboard(&targetingReticleElem);
+    drawControls();
+    
+    GL_ERROR_ASSERT();  // openGL draw begins...
 
     if(!gameInterfaceControls.consoleHidden)
     {        
@@ -710,6 +728,8 @@ calibrate_bail:
     return;
     
 draw_bail:
+    GL_ERROR_ASSERT();  // openGL draw begins...
+    
     world_elem_list_remove_watch_elem = NULL;
     pVisCheckPtr = NULL;
     pVisCheckPtrHead = NULL;

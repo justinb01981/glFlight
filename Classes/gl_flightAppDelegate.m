@@ -43,12 +43,20 @@ NSString* get_docs_prefix()
             [NSString stringWithFormat:@"Documents"]];
 }
 
+static char objcGetBundlePathBuf[1024];
+const char* objcGetBundlePath(void) {
+    sprintf(objcGetBundlePathBuf, "%s/", [[[NSBundle mainBundle] resourcePath] UTF8String]);
+    return objcGetBundlePathBuf;
+}
+
 void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
 {
     int reset_map = 1;
     static int init_once = 0;
     if(init_once) return;
     init_once = 1;
+    
+    GL_SWALLOW_ERR(0x501);
     
     NSString *docsPrefix = get_docs_prefix();
     
@@ -72,7 +80,9 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
         gameSettingsDefaults();
     }
     
-    initTextures([[NSString stringWithFormat:@"%@/", [[NSBundle mainBundle] resourcePath]] UTF8String]);
+    preinitTextures();
+    
+    initTextures(objcGetBundlePath());
     
     viewWidth = viewSize.width * viewController.view.contentScaleFactor;
     viewHeight = viewSize.height * viewController.view.contentScaleFactor;
