@@ -22,7 +22,7 @@ extern int radar_mode;
 extern GLuint fragmentShader;
 extern GLuint vertexShader;
 extern unsigned int shaderProgram;
-extern GLint uniformS, uniformPos;
+extern GLint uniformS, uniformPos, uniformTxform;
 extern int UniformEnvironment;
 extern GLuint BufferName[], VAONames[];
 extern GLint UniformBufferOffset;
@@ -58,6 +58,7 @@ typedef struct vertex_v2fv2f
     vec2 Texcoord;
 } vertex_v2fv2f;
 
+typedef struct mat2 { GLfloat f[2][2]; } mat2;
 typedef struct mat4 { GLfloat f[4][4]; } mat4;
 typedef struct mat4u { mat4 f, p; } mat4u;
 typedef struct vec4 { GLfloat f[4]; } vec4;
@@ -92,10 +93,10 @@ S,0,0,0,            \
 /* 0,0 in top left of landscape screen */
  #define MAT4P1(w, h) \
  {                   \
- 3.5,            0.0,                0.0,        0.0,            \
- 0.0,             -3.5,               0.0,        0,            \
+ 0.0,            3.5,                0.0,        0.0,            \
+ -3.5,            0.0,               0.0,        0,            \
  0.0,             0.0,                0.0,        1.0,           \
- -1.0,             1.0,                0.0,        0.0             \
+ 1.0,            -1.0,                0.0,        0.0             \
  }
  
 // #define MAT4P1(w, h)                                    \

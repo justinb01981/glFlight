@@ -41,7 +41,7 @@ extern int game_target_objective_id;
 GLuint fragmentShader;
 GLuint vertexShader;
 unsigned int shaderProgram;
-GLint UniformEnvironment, uniformS, uniformPos;
+GLint UniformEnvironment, uniformS, uniformPos, uniformTxform;
 GLuint BufferName[BUFFERNAME_MAX], VAONames[VERTXATTRIB_MAX];
 GLint UniformBufferOffset;
 GLuint *txData;
@@ -1624,7 +1624,7 @@ drawBackgroundCore(void)
     glPrepareShaderAttributesTexUV(bgData->texcoords, bgData->n_indices*2);
 
     // background (skybox) drawing (disabled now in favor of bounding textures)
-    bindTexture(/*bgData->tex_id*/ TEXTURE_ID_BOUNDING);
+    bindTexture(bgData->tex_id);
     /*glDrawElements(GL_TRIANGLES, bgData->n_indices,
                    index_type_enum, bgData->indices);*/
     glPrepareShaderAttributesDraw(bgData->indices, bgData->n_indices);
@@ -1633,11 +1633,6 @@ drawBackgroundCore(void)
 //
 //    glMatrixMode(GL_TEXTURE);
 //    glPopMatrix();
-
-    // draw terrain
-    bindTexture(TEXTURE_ID_TERRAIN);
-    
-    terrainDraw();
 }
 
 void drawBackground(void)
@@ -1646,7 +1641,9 @@ void drawBackground(void)
     
     //drawBackgroundCore();
 
-    drawBounding(texture_id_background);
+    drawBounding(TEXTURE_ID_BOUNDING);
+    
+    terrainDraw();
     
     setupGLModelViewDone();
 }

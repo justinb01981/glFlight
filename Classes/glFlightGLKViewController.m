@@ -80,15 +80,16 @@ const char* fragmentShaderSrc = ""
 "layout(std140, column_major) uniform;               \n"
 "\n"
 "uniform sampler2D Diffuse;                          \n"
+"uniform mat2 Texform;                              \n"
 "\n"
 "in vec2 Fragtexco;                                  \n"
 "\n"
 "layout (location = 0) out vec4 Color;               \n"
 ""
 "void main()                                         \n"
-"{                                                   \n"
-"    vec2 rotco = vec2(Fragtexco.x, Fragtexco.y);    \n"
-"    Color = texture(Diffuse, rotco);                \n"
+"{                                                      \n"
+"    vec2 rotated = Texform * vec2(Fragtexco.x, Fragtexco.y);    \n"
+"    Color = texture(Diffuse, rotated);               \n"
 "}                                                   \n";
 
 
@@ -110,6 +111,9 @@ mat4 cur = MAT4IDENT(),
         0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0
     };
+mat2 textureMatrix = {
+    .f={1.0, 0.0, 0.0, 1.0}
+};
 
 #pragma mark: render
 
@@ -295,6 +299,15 @@ void glDrawLastly(void) {
     
     initVertexArray();
     
+    glLinkProgram(shaderProgram);
+    success = 0;
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if(!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        printf("%s", infoLog);
+        assert(0);
+    }
+    
     int blockIdx = glGetUniformBlockIndex(shaderProgram, "transform");
     glUniformBlockBinding(shaderProgram, blockIdx, VERTXATTRIB_XFORM);
     
@@ -306,14 +319,10 @@ void glDrawLastly(void) {
     uniformPos = glGetUniformLocation(shaderProgram, "Position");
     glUniform1i(glGetUniformLocation(shaderProgram, "Diffuse"), 0);
     
-    glLinkProgram(shaderProgram);
-    success = 0;
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if(!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        printf("%s", infoLog);
-        assert(0);
-    }
+    uniformTxform = glGetUniformLocation(shaderProgram, "Texform");
+    glUniformMatrix2fv(uniformTxform, 1, FALSE, &textureMatrix.f[0]);
+    
+   
     //assert(uniformS > 0 && uniformPos > 0);
 }
 

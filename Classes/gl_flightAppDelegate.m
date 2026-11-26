@@ -56,8 +56,6 @@ void glFlightInit(glFlightGLKViewController* viewController, CGSize viewSize)
     if(init_once) return;
     init_once = 1;
     
-    GL_SWALLOW_ERR(0x501);
-    
     NSString *docsPrefix = get_docs_prefix();
     
     get_time_ms_init();

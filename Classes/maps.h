@@ -1054,7 +1054,7 @@ const static char* initial_map = ""
 "register_params 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
 "register_params_mul 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n"
 "set_world_size r\n"
-"set_background_info " ISTR(TEXTURE_ID_BOUNDING)
+"set_background_info " ISTR(TEXTURE_ID_BACKGROUND_SCENERY)
 "\n"
 
 //WORLD_SCALED_FRAME(1, /*57*/28, 4)

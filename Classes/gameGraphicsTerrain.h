@@ -188,7 +188,7 @@ void terrainBuild(void) {
 
     float R = TRAD;
     float X = STRIDE;
-    float width = gWorld->bound_radius/2;
+    float width = gWorld->bound_radius * 2;
 
     float col = -gWorld->bound_radius ; //my_ship_x - width/2;
     float row = -gWorld->bound_radius ; //my_ship_z - width/2;
@@ -211,12 +211,13 @@ void terrainInit(void) {
 
     terrain.nVertices = 0;
     terrain.nIndices = 0;
+    
+    terrainBuild();
 }
 
 void terrainDraw(void) {
 
-    terrainInit();
-    terrainBuild();// dude try moving this to async without locking and see what it looks like drawing
+    //todo: rebuild / adjust terrain every  frame
 
     glPrepareShaderAttributesVertices(&terrain.vertices[0], terrain.nVertices*3);
     glPrepareShaderAttributesTexUV(&terrain.texvertices[0], terrain.nVertices*2);
@@ -231,7 +232,7 @@ void terrainDraw(void) {
 //                   index_type_enum,
 //                   terrain.indices);
     
-    glPrepareShaderAttributesDraw( &terrain.indices[0],  terrain.nIndices*3);
+    glPrepareShaderAttributesDraw( &terrain.indices[0],  terrain.nIndices);
     
 
     Xt += 3.141 / 240.0;
